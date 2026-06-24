@@ -1,4 +1,5 @@
 <?php
+
 // Thiago Mourão — https://github.com/MouraoBSB — 2026-06-24
 
 namespace App\Models;
@@ -7,15 +8,18 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Palestra extends Model
 {
     use HasFactory;
 
     public const STATUS_PUBLICADO = 'publicado';
+
     public const STATUS_RASCUNHO = 'rascunho';
 
     public const PAPEL_PALESTRANTE = 'palestrante';
+
     public const PAPEL_DIRETOR = 'diretor';
 
     protected $fillable = [
@@ -66,7 +70,7 @@ class Palestra extends Model
             : $this->palestrantes()->wherePivot('papel', self::PAPEL_DIRETOR)->first();
     }
 
-    public function destaques(): \Illuminate\Database\Eloquent\Relations\HasMany
+    public function destaques(): HasMany
     {
         return $this->hasMany(PalestraDestaque::class)->orderBy('ordem');
     }

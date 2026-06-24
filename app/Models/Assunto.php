@@ -1,4 +1,5 @@
 <?php
+
 // Thiago Mourão — https://github.com/MouraoBSB — 2026-06-24
 
 namespace App\Models;

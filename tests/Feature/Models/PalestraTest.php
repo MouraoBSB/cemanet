@@ -4,6 +4,7 @@ namespace Tests\Feature\Models;
 
 use App\Models\Palestra;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class PalestraTest extends TestCase
@@ -25,7 +26,7 @@ class PalestraTest extends TestCase
             'status' => Palestra::STATUS_PUBLICADO,
         ]);
 
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $p->data_da_palestra);
+        $this->assertInstanceOf(Carbon::class, $p->data_da_palestra);
         $this->assertTrue($p->online);
         $this->assertSame(120, $p->publico_total);
     }

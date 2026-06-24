@@ -13,6 +13,7 @@ export default defineConfig({
                 bunny('Poppins', { weights: [400] }),
                 bunny('Roboto', { weights: [400, 500, 600] }),
                 bunny('Roboto Slab', { weights: [400] }),
+                bunny('Roboto Mono', { weights: [400, 500] }),
             ],
         }),
         tailwindcss(),

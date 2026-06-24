@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+::selection{background:#F2A81E;color:#3a3266;}
+@keyframes cemaFade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes cemaRays{0%,100%{opacity:.45}50%{opacity:.95}}
+@keyframes cemaParticle{0%{transform:translateY(0);opacity:0}12%{opacity:.7}100%{transform:translateY(-140px);opacity:0}}
+@keyframes cemaTicker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes cemaPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+@keyframes cemaSlide{from{transform:translateX(-100%)}to{transform:translateX(0)}}
+details > summary{list-style:none; outline:none;}
+details > summary::-webkit-details-marker{display:none;}
+.cema-acc-icon{transition:transform .2s ease;}
+details[open] .cema-acc-icon{transform:rotate(45deg); background:#F2A81E !important; color:#3a3266 !important;}
+.cema-navitem:hover .cema-dropdown{opacity:1 !important; visibility:visible !important; transform:translateY(0) !important; pointer-events:auto !important;}
+</style>
+</helmet>
+<div style="font-family:'Poppins',system-ui,sans-serif; color:#26242e; background:#ffffff; min-height:100vh; line-height:1.6; overflow-x:hidden;">
+
+  <header style="position:sticky; top:0; z-index:80; background:#ffffff; box-shadow:0 1px 0 #E4E4E4;">
+    <div style="max-width:1240px; margin:0 auto; padding:12px 24px; display:flex; align-items:center; gap:22px;">
+      <a onClick="{{ goHome }}" style="cursor:pointer; flex-shrink:0; display:block;">
+        <img src="assets/logo-horizontal.png" alt="CEMA — Centro Espírita Maria Madalena" style="height:46px; display:block;">
+      </a>
+      <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+        <form onSubmit="{{ submitNews }}" style="flex:1; max-width:420px; display:flex; align-items:center; background:#F6F6F6; border:1px solid #E4E4E4; border-radius:50px; padding:4px 4px 4px 16px;">
+          <input placeholder="Pesquisar no site…" style="flex:1; border:0; background:transparent; outline:none; font-family:inherit; font-size:14px; color:#26242e;">
+          <button type="submit" style="flex-shrink:0; width:34px; height:34px; border-radius:50%; border:0; background:#4E4483; color:#fff; cursor:pointer; display:flex; align-items:center; justify-content:center;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><circle cx="11" cy="11" r="7"></circle><line x1="21" y1="21" x2="16.5" y2="16.5"></line></svg>
+          </button>
+        </form>
+        <div style="margin-left:auto; display:flex; align-items:center; gap:6px; font-size:13.5px; color:#414141; white-space:nowrap;">
+          <span style="color:#7A8A8A;">Possui uma conta?</span>
+          <a onClick="{{ toastSoon }}" style="cursor:pointer; color:#4E4483; font-weight:600;">Entrar</a>
+          <span style="color:#cfcfcf;">·</span>
+          <a onClick="{{ toastSoon }}" style="cursor:pointer; color:#6E9FCB; font-weight:600;">Cadastrar</a>
+        </div>
+      </sc-if>
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ openMobile }}" aria-label="Abrir menu" style="margin-left:auto; width:44px; height:44px; border-radius:10px; border:1px solid #E4E4E4; background:#fff; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;">
+          <span style="width:20px; height:2px; background:#4E4483; border-radius:2px;"></span>
+          <span style="width:20px; height:2px; background:#4E4483; border-radius:2px;"></span>
+          <span style="width:20px; height:2px; background:#4E4483; border-radius:2px;"></span>
+        </button>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+      <nav style="background:#4E4483;">
+        <ul style="list-style:none; margin:0 auto; padding:0 24px; max-width:1240px; display:flex; align-items:stretch;">
+          <sc-for list="{{ menu }}" as="m" hint-placeholder-count="8">
+            <li class="cema-navitem" style="position:relative;">
+              <button onClick="{{ m.onClick }}" style="height:100%; border:0; background:transparent; cursor:pointer; color:#efeaf7; font-family:'Roboto',sans-serif; font-size:13.5px; font-weight:500; padding:14px 15px; display:flex; align-items:center; gap:6px;" style-hover="{{ m.btnHover }}">
+                {{ m.label }}<span style="font-size:9px; opacity:.7;">▾</span>
+              </button>
+              <div class="cema-dropdown" style="position:absolute; top:100%; left:0; min-width:232px; background:#fff; border-radius:0 0 12px 12px; box-shadow:0 16px 34px rgba(0,0,0,0.16); border-top:3px solid #F2A81E; padding:8px; z-index:60; opacity:0; visibility:hidden; transform:translateY(7px); pointer-events:none; transition:opacity .18s ease, transform .18s ease;">
+                <sc-for list="{{ m.items }}" as="it" hint-placeholder-count="2">
+                  <a onClick="{{ it.onClick }}" style="display:block; padding:9px 14px; border-radius:6px; font-size:13.5px; color:#3a3553; text-decoration:none; cursor:pointer;" style-hover="{{ it.hover }}">{{ it.label }}</a>
+                </sc-for>
+              </div>
+            </li>
+          </sc-for>
+        </ul>
+      </nav>
+    </sc-if>
+  </header>
+
+  <sc-if value="{{ mobileOpen }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeMobile }}" style="position:fixed; inset:0; background:rgba(38,36,46,0.55); z-index:90; animation:cemaFade .2s ease;"></div>
+    <aside role="dialog" aria-modal="true" style="position:fixed; top:0; left:0; bottom:0; width:300px; max-width:88vw; background:#fff; z-index:95; box-shadow:8px 0 30px rgba(0,0,0,0.2); display:flex; flex-direction:column; animation:cemaSlide .26s ease;">
+      <div style="padding:16px 18px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #EBE8E8;">
+        <img src="assets/logo-horizontal.png" alt="CEMA" style="height:38px;">
+        <button onClick="{{ closeMobile }}" aria-label="Fechar" style="width:36px; height:36px; border-radius:8px; border:0; background:#F6F6F6; cursor:pointer; font-size:20px; color:#4E4483; line-height:1;">×</button>
+      </div>
+      <div style="padding:14px 18px; display:flex; gap:10px; border-bottom:1px solid #EBE8E8;">
+        <a onClick="{{ toastSoon }}" style="flex:1; text-align:center; padding:9px; border-radius:8px; background:#4E4483; color:#fff; font-size:13px; font-weight:600; cursor:pointer;">Fazer Login</a>
+        <a onClick="{{ toastSoon }}" style="flex:1; text-align:center; padding:9px; border-radius:8px; border:1px solid #4E4483; color:#4E4483; font-size:13px; font-weight:600; cursor:pointer;">Criar Conta</a>
+      </div>
+      <nav style="flex:1; overflow-y:auto; padding:8px 10px;">
+        <p style="margin:8px 8px 4px; font-family:'Work Sans',sans-serif; font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:#7A8A8A;">Menu</p>
+        <ul style="list-style:none; margin:0; padding:0;">
+          <sc-for list="{{ menu }}" as="m" hint-placeholder-count="8">
+            <li style="border-bottom:1px solid #F2F1F4;">
+              <details>
+                <summary style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; padding:12px 8px; font-family:'Poppins',sans-serif; font-size:14.5px; color:#3a3553; font-weight:500;">
+                  {{ m.label }}<span class="cema-acc-icon" style="font-size:10px; color:#7A8A8A;">▾</span>
+                </summary>
+                <div style="padding-bottom:6px;">
+                  <sc-for list="{{ m.items }}" as="it" hint-placeholder-count="2">
+                    <a onClick="{{ it.onClick }}" style="display:block; padding:8px 8px 8px 18px; font-size:13.5px; color:#6a6685; text-decoration:none; cursor:pointer;">{{ it.label }}</a>
+                  </sc-for>
+                </div>
+              </details>
+            </li>
+          </sc-for>
+        </ul>
+      </nav>
+    </aside>
+  </sc-if>
+
+  <main style="min-height:40vh;">
+
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+    <div>
+      <section style="position:relative; overflow:hidden;">
+        <div style="position:absolute; top:18px; right:24px; z-index:20; display:flex; align-items:center; gap:8px; background:rgba(255,255,255,0.92); border:1px solid #E4E4E4; border-radius:50px; padding:6px 8px 6px 14px; box-shadow:0 4px 14px rgba(0,0,0,0.08);">
+          <span style="font-family:'Roboto Mono',monospace; font-size:11px; color:#7A8A8A; text-transform:uppercase; letter-spacing:.04em;">Hero</span>
+          <sc-if value="{{ heroV0 }}" hint-placeholder-val="{{ true }}"><button onClick="{{ setHero0 }}" style="width:26px; height:26px; border-radius:50%; border:0; cursor:pointer; font-family:'Roboto Mono',monospace; font-size:12px; font-weight:600; background:#4E4483; color:#fff;">1</button></sc-if>
+          <sc-if value="{{ nHero0 }}" hint-placeholder-val="{{ false }}"><button onClick="{{ setHero0 }}" style="width:26px; height:26px; border-radius:50%; border:0; cursor:pointer; font-family:'Roboto Mono',monospace; font-size:12px; font-weight:600; background:#ECE9F2; color:#7A8A8A;">1</button></sc-if>
+          <sc-if value="{{ heroV1 }}" hint-placeholder-val="{{ false }}"><button onClick="{{ setHero1 }}" style="width:26px; height:26px; border-radius:50%; border:0; cursor:pointer; font-family:'Roboto Mono',monospace; font-size:12px; font-weight:600; background:#4E4483; color:#fff;">2</button></sc-if>
+          <sc-if value="{{ nHero1 }}" hint-placeholder-val="{{ true }}"><button onClick="{{ setHero1 }}" style="width:26px; height:26px; border-radius:50%; border:0; cursor:pointer; font-family:'Roboto Mono',monospace; font-size:12px; font-weight:600; background:#ECE9F2; color:#7A8A8A;">2</button></sc-if>
+          <sc-if value="{{ heroV2 }}" hint-placeholder-val="{{ false }}"><button onClick="{{ setHero2 }}" style="width:26px; height:26px; border-radius:50%; border:0; cursor:pointer; font-family:'Roboto Mono',monospace; font-size:12px; font-weight:600; background:#4E4483; color:#fff;">3</button></sc-if>
+          <sc-if value="{{ nHero2 }}" hint-placeholder-val="{{ true }}"><button onClick="{{ setHero2 }}" style="width:26px; height:26px; border-radius:50%; border:0; cursor:pointer; font-family:'Roboto Mono',monospace; font-size:12px; font-weight:600; background:#ECE9F2; color:#7A8A8A;">3</button></sc-if>
+        </div>
+
+        <sc-if value="{{ heroV0 }}" hint-placeholder-val="{{ true }}">
+          <div style="position:relative; background:#3c3468; padding:96px 24px 110px; text-align:center; overflow:hidden;">
+            <div style="position:absolute; inset:0; background:linear-gradient(160deg,#4E4483 0%,#3c3468 55%,#2f2952 100%);"></div>
+            <div style="position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:1;">
+              <sc-for list="{{ particles }}" as="p" hint-placeholder-count="0"><span style="{{ p.style }}"></span></sc-for>
+            </div>
+            <div style="position:relative; z-index:2; max-width:820px; margin:0 auto;">
+              <span style="display:inline-block; font-family:'Roboto Mono',monospace; font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:#F2A81E; border:1px solid rgba(242,168,30,0.5); border-radius:50px; padding:6px 16px; margin-bottom:26px;">Fé · Estudo · Caridade</span>
+              <h1 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(2.2rem,1.4rem+2.6vw,3.8rem); line-height:1.12; color:#fff; margin:0 0 18px;">Centro Espírita<br>Maria Madalena</h1>
+              <p style="font-family:'Poppins',sans-serif; font-size:clamp(1.05rem,1rem+0.3vw,1.25rem); color:#d8d2ec; max-width:600px; margin:0 auto 34px;">Uma casa de luz dedicada ao estudo do Evangelho, à prática da caridade e ao consolo de quem busca paz.</p>
+              <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+                <a onClick="{{ goPalestra }}" style="cursor:pointer; background:#F2A81E; color:#3a3266; font-weight:600; font-size:15px; padding:14px 28px; border-radius:50px; text-decoration:none; box-shadow:0 8px 20px rgba(242,168,30,0.3);">Próxima palestra →</a>
+                <a onClick="{{ goHistoria }}" style="cursor:pointer; background:transparent; color:#fff; font-weight:500; font-size:15px; padding:14px 26px; border-radius:50px; border:1px solid rgba(255,255,255,0.4); text-decoration:none;">Conheça o CEMA</a>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ heroV1 }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#F3EDDD; padding:84px 24px;">
+            <div style="max-width:1240px; margin:0 auto; display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:48px; align-items:center;">
+              <div>
+                <span style="display:inline-block; font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#89AB98; margin-bottom:18px;">Bem-vindo</span>
+                <h1 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(2.1rem,1.4rem+2.4vw,3.6rem); line-height:1.1; color:#4E4483; margin:0 0 22px;">Centro Espírita Maria Madalena</h1>
+                <div style="background:#fff; border-left:4px solid #F2A81E; border-radius:0 10px 10px 0; padding:18px 22px; box-shadow:0 6px 18px rgba(0,0,0,0.06); max-width:440px;">
+                  <p style="margin:0 0 4px; font-family:'Work Sans',sans-serif; font-weight:600; font-size:13px; letter-spacing:.04em; text-transform:uppercase; color:#89AB98;">Meta do mês</p>
+                  <p style="margin:0; font-family:'Roboto Slab',Georgia,serif; font-size:18px; color:#3a3553;">“Cultivar a paciência diante das provações do dia a dia.”</p>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:16px;">
+                <a onClick="{{ toastSoon }}" style="cursor:pointer; display:flex; align-items:center; gap:16px; background:#4E4483; color:#fff; border-radius:14px; padding:22px 26px; text-decoration:none;"><span style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:26px;">Deus</span><span style="margin-left:auto; opacity:.65; font-size:13px;">A origem de tudo →</span></a>
+                <a onClick="{{ toastSoon }}" style="cursor:pointer; display:flex; align-items:center; gap:16px; background:#6E9FCB; color:#fff; border-radius:14px; padding:22px 26px; text-decoration:none;"><span style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:26px;">Cristo</span><span style="margin-left:auto; opacity:.8; font-size:13px;">O guia e modelo →</span></a>
+                <a onClick="{{ toastSoon }}" style="cursor:pointer; display:flex; align-items:center; gap:16px; background:#89AB98; color:#fff; border-radius:14px; padding:22px 26px; text-decoration:none;"><span style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:26px;">Caridade</span><span style="margin-left:auto; opacity:.85; font-size:13px;">Fora dela não há salvação →</span></a>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ heroV2 }}" hint-placeholder-val="{{ false }}">
+          <div style="position:relative; min-height:520px; display:flex; align-items:flex-end; overflow:hidden;">
+            <div style="position:absolute; inset:0;"><dc-import name="Placeholder" label="foto da casa espírita — fachada" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+            <div style="position:absolute; inset:0; background:linear-gradient(180deg,rgba(47,41,82,0.15) 0%,rgba(47,41,82,0.55) 55%,rgba(47,41,82,0.9) 100%);"></div>
+            <div style="position:relative; max-width:1240px; margin:0 auto; width:100%; padding:0 24px 70px;">
+              <div style="max-width:600px;">
+                <span style="display:inline-block; font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#F2A81E; margin-bottom:16px;">Planaltina · Brasília-DF</span>
+                <h1 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(2.2rem,1.4rem+2.8vw,3.9rem); line-height:1.1; color:#fff; margin:0 0 18px;">Acolher, estudar e servir</h1>
+                <p style="font-size:1.15rem; color:#e7e3f2; margin:0 0 30px;">Há mais de três décadas levando consolo, conhecimento espírita e amor ao próximo.</p>
+                <a onClick="{{ goPalestra }}" style="cursor:pointer; display:inline-block; background:#F2A81E; color:#3a3266; font-weight:600; font-size:15px; padding:14px 28px; border-radius:50px; text-decoration:none;">Participe da próxima palestra →</a>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </section>
+
+      <section style="max-width:1240px; margin:0 auto; padding:74px 24px 20px;">
+        <div style="text-align:center; max-width:640px; margin:0 auto 44px;">
+          <span style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#89AB98;">O que oferecemos</span>
+          <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(1.7rem,1.3rem+1.3vw,2.6rem); color:#4E4483; margin:10px 0 0;">Atividades da casa</h2>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:22px;">
+          <sc-for list="{{ cards }}" as="c" hint-placeholder-count="6">
+            <article onClick="{{ c.onClick }}" style="cursor:pointer; background:#fff; border:1px solid #EBE8E8; border-radius:16px; overflow:hidden; display:flex; flex-direction:column; transition:transform .2s ease, box-shadow .2s ease;" style-hover="{{ c.hover }}">
+              <div style="height:158px; position:relative;">
+                <dc-import name="Placeholder" label="{{ c.ph }}" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import>
+                <span style="{{ c.badgeStyle }}">{{ c.badge }}</span>
+              </div>
+              <div style="padding:20px 22px 24px;">
+                <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.2rem; color:#3a3266; margin:0 0 8px;">{{ c.title }}</h3>
+                <p style="margin:0; font-size:14.5px; color:#5b5766;">{{ c.text }}</p>
+              </div>
+            </article>
+          </sc-for>
+        </div>
+      </section>
+
+      <section style="max-width:1240px; margin:0 auto; padding:54px 24px;">
+        <div style="background:linear-gradient(135deg,#4E4483,#3a3266); border-radius:22px; overflow:hidden; display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); position:relative;">
+          <div style="padding:48px; color:#fff; position:relative;">
+            <span style="display:inline-flex; align-items:center; gap:8px; background:#F2A81E; color:#3a3266; font-family:'Roboto Mono',monospace; font-size:12px; font-weight:500; padding:7px 14px; border-radius:50px; margin-bottom:22px;"><span style="width:7px; height:7px; border-radius:50%; background:#3a3266; animation:cemaPulse 1.4s ease infinite;"></span>{{ cdLabel }}</span>
+            <p style="font-family:'Roboto Mono',monospace; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:#bdb4dd; margin:0 0 6px;">Palestra Pública</p>
+            <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(1.6rem,1.2rem+1.2vw,2.3rem); margin:0 0 16px; line-height:1.15;">A Escola de Nossas Almas</h2>
+            <p style="margin:0 0 24px; color:#d8d2ec; max-width:420px;">Com Abadio Rodrigues · Domingo, 28 de junho · 19h30 · presencial e transmitida ao vivo.</p>
+            <div style="display:flex; gap:10px; margin-bottom:30px; flex-wrap:wrap;">
+              <sc-for list="{{ cdParts }}" as="p" hint-placeholder-count="4">
+                <div style="background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.14); border-radius:12px; padding:12px 16px; text-align:center; min-width:64px;">
+                  <div style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:26px; line-height:1;">{{ p.v }}</div>
+                  <div style="font-family:'Roboto Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#bdb4dd; margin-top:5px;">{{ p.l }}</div>
+                </div>
+              </sc-for>
+            </div>
+            <a onClick="{{ goPalestra }}" style="cursor:pointer; display:inline-block; background:#fff; color:#4E4483; font-weight:600; padding:13px 26px; border-radius:50px; text-decoration:none;">Ver palestra →</a>
+          </div>
+          <div style="position:relative; min-height:300px;">
+            <dc-import name="Placeholder" label="foto do palestrante" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import>
+          </div>
+        </div>
+      </section>
+
+      <section style="max-width:1240px; margin:0 auto; padding:36px 24px 20px;">
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:16px; margin-bottom:30px; flex-wrap:wrap;">
+          <div>
+            <span style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#89AB98;">Sementeira de Luz</span>
+            <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(1.6rem,1.3rem+1.1vw,2.4rem); color:#4E4483; margin:8px 0 0;">Últimas do blog</h2>
+          </div>
+          <a onClick="{{ toastSoon }}" style="cursor:pointer; color:#6E9FCB; font-weight:600; font-size:14.5px; white-space:nowrap;">Ver todas →</a>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:26px; align-items:start;">
+          <article onClick="{{ toastSoon }}" style="cursor:pointer; background:#fff; border:1px solid #EBE8E8; border-radius:16px; overflow:hidden;">
+            <div style="height:230px;"><dc-import name="Placeholder" label="imagem destaque" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+            <div style="padding:24px 26px 28px;">
+              <div style="display:flex; gap:12px; font-family:'Roboto Mono',monospace; font-size:11px; color:#7A8A8A; margin-bottom:12px;"><span>20 JUN 2026</span><span>·</span><span>4 comentários</span></div>
+              <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.5rem; color:#3a3266; margin:0 0 10px; line-height:1.2;">O perdão como caminho de libertação interior</h3>
+              <p style="margin:0; color:#5b5766;">Refletir sobre o perdão é compreender que ele liberta primeiro quem perdoa. Um convite à reforma íntima a partir do Evangelho.</p>
+            </div>
+          </article>
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <sc-for list="{{ posts }}" as="p" hint-placeholder-count="3">
+              <article onClick="{{ p.onClick }}" style="cursor:pointer; display:flex; gap:16px; background:#fff; border:1px solid #EBE8E8; border-radius:14px; padding:12px; align-items:center;">
+                <div style="width:96px; height:78px; flex-shrink:0; border-radius:9px; overflow:hidden;"><dc-import name="Placeholder" label="img" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+                <div>
+                  <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A; margin-bottom:5px;">{{ p.date }}</div>
+                  <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1rem; color:#3a3266; margin:0; line-height:1.25;">{{ p.title }}</h4>
+                </div>
+              </article>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+
+      <section style="max-width:1240px; margin:0 auto; padding:40px 24px;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:24px;">
+          <div style="background:#F3EDDD; border-radius:18px; padding:38px 40px; position:relative; overflow:hidden;">
+            <span style="position:absolute; top:20px; right:22px; background:#89AB98; color:#fff; font-family:'Roboto Mono',monospace; font-size:11px; padding:5px 12px; border-radius:50px;">Ítens 1, 5 a 8</span>
+            <span style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#89AB98;">Evangelho da semana</span>
+            <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.6rem; color:#4E4483; margin:10px 0 14px;">O Sermão da Montanha</h3>
+            <p style="margin:0 0 22px; color:#5b5766; max-width:440px;">Bem-aventurados os que têm fome e sede de justiça, porque serão fartos. Estudo do capítulo VI de O Evangelho Segundo o Espiritismo.</p>
+            <a onClick="{{ toastSoon }}" style="cursor:pointer; color:#4E4483; font-weight:600; font-size:14.5px;">Ler trecho completo →</a>
+          </div>
+          <div onClick="{{ toastSoon }}" style="cursor:pointer; background:#fff; border:1px solid #EBE8E8; border-radius:18px; padding:38px 40px; display:flex; flex-direction:column; justify-content:center;">
+            <span style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#6E9FCB;">Agenda Reforma Íntima</span>
+            <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.6rem; color:#4E4483; margin:10px 0 14px;">Meta do dia</h3>
+            <p style="margin:0 0 8px; font-family:'Roboto Slab',Georgia,serif; font-size:1.15rem; color:#3a3553;">“Ouvir mais do que falar, exercitando a empatia em cada conversa.”</p>
+            <p style="margin:14px 0 0; font-family:'Roboto Mono',monospace; font-size:11px; color:#7A8A8A;">SEGUNDA-FEIRA, 22 DE JUNHO DE 2026</p>
+          </div>
+        </div>
+      </section>
+
+      <section style="background:#4E4483; margin-top:30px;">
+        <div style="max-width:760px; margin:0 auto; padding:74px 24px; text-align:center; color:#fff;">
+          <span style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#F2A81E;">Sementeira de Luz</span>
+          <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(1.7rem,1.3rem+1.4vw,2.6rem); margin:12px 0 14px;">Inscreva-se no nosso boletim</h2>
+          <p style="margin:0 auto 30px; color:#d8d2ec; max-width:480px;">Receba mensagens, agenda de palestras e reflexões semanais diretamente no seu e-mail.</p>
+          <form onSubmit="{{ submitNews }}" style="display:flex; gap:10px; max-width:480px; margin:0 auto; flex-wrap:wrap;">
+            <input value="{{ email }}" onInput="{{ setEmail }}" type="email" placeholder="Seu melhor e-mail" style="flex:1; min-width:200px; border:0; border-radius:50px; padding:15px 22px; font-family:inherit; font-size:15px; outline:none;">
+            <button type="submit" style="background:#F2A81E; color:#3a3266; font-weight:600; font-size:15px; border:0; border-radius:50px; padding:15px 30px; cursor:pointer; white-space:nowrap;">Inscrever</button>
+          </form>
+        </div>
+      </section>
+
+      <section style="max-width:1240px; margin:0 auto; padding:50px 24px 70px;">
+        <p style="text-align:center; font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#7A8A8A; margin:0 0 26px;">Parceiros e federações</p>
+        <div style="display:flex; gap:30px; justify-content:center; align-items:center; flex-wrap:wrap;">
+          <sc-for list="{{ partners }}" as="p" hint-placeholder-count="4">
+            <div style="width:130px; height:64px; border:1px dashed #cfcabb; border-radius:10px; display:flex; align-items:center; justify-content:center; font-family:'Roboto Mono',monospace; font-size:12px; color:#9a93a8;">{{ p }}</div>
+          </sc-for>
+        </div>
+      </section>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isGuia }}" hint-placeholder-val="{{ false }}">
+    <div style="background:#F6F6F6;">
+      <section style="background:#fff; border-bottom:1px solid #EBE8E8;">
+        <div style="max-width:1080px; margin:0 auto; padding:56px 24px;">
+          <span style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#89AB98;">Design System</span>
+          <h1 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(2rem,1.4rem+2vw,3.2rem); color:#4E4483; margin:10px 0 12px;">Guia de Estilo CEMA</h1>
+          <p style="font-size:1.1rem; color:#5b5766; margin:0; max-width:620px;">Identidade visual serena e acolhedora — roxo institucional com apoio de azul e verde, tipografia clara e muito respiro.</p>
+        </div>
+      </section>
+
+      <section style="max-width:1080px; margin:0 auto; padding:50px 24px 20px;">
+        <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.5rem; color:#3a3266; margin:0 0 6px;">Paleta de cores</h2>
+        <p style="margin:0 0 24px; color:#7A8A8A; font-size:14px;">Roxo âncora, apoios azul e verde, dourado da marca e neutros de creme e cinza.</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:16px;">
+          <sc-for list="{{ palette }}" as="c" hint-placeholder-count="8">
+            <div style="border:1px solid #EBE8E8; border-radius:12px; overflow:hidden; background:#fff;">
+              <div style="{{ c.swatch }}"></div>
+              <div style="padding:12px 14px;">
+                <p style="margin:0; font-weight:600; font-size:13.5px; color:#3a3266;">{{ c.name }}</p>
+                <p style="margin:2px 0 0; font-family:'Roboto Mono',monospace; font-size:12px; color:#7A8A8A;">{{ c.hex }}</p>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section style="max-width:1080px; margin:0 auto; padding:40px 24px 20px;">
+        <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.5rem; color:#3a3266; margin:0 0 24px;">Tipografia</h2>
+        <div style="background:#fff; border:1px solid #EBE8E8; border-radius:16px; padding:14px 30px;">
+          <div style="padding:18px 0; border-bottom:1px solid #F2F1F4;"><p style="margin:0 0 4px; font-family:'Roboto Mono',monospace; font-size:11px; color:#89AB98;">H1 · Work Sans 600</p><p style="margin:0; font-family:'Work Sans',sans-serif; font-weight:600; font-size:3rem; color:#4E4483; line-height:1.1;">Centro Espírita</p></div>
+          <div style="padding:18px 0; border-bottom:1px solid #F2F1F4;"><p style="margin:0 0 4px; font-family:'Roboto Mono',monospace; font-size:11px; color:#89AB98;">H2 · Work Sans 400</p><p style="margin:0; font-family:'Work Sans',sans-serif; font-weight:400; font-size:2.2rem; color:#3a3266;">Estudo e caridade</p></div>
+          <div style="padding:18px 0; border-bottom:1px solid #F2F1F4;"><p style="margin:0 0 4px; font-family:'Roboto Mono',monospace; font-size:11px; color:#89AB98;">H3 · Work Sans 400</p><p style="margin:0; font-family:'Work Sans',sans-serif; font-weight:400; font-size:1.6rem; color:#3a3266;">Palestras públicas semanais</p></div>
+          <div style="padding:18px 0; border-bottom:1px solid #F2F1F4;"><p style="margin:0 0 4px; font-family:'Roboto Mono',monospace; font-size:11px; color:#89AB98;">Corpo · Poppins 400</p><p style="margin:0; font-family:'Poppins',sans-serif; font-size:1rem; color:#5b5766; max-width:560px;">O Espiritismo nos convida à reforma íntima — um trabalho contínuo de aprimoramento moral fundamentado no Evangelho de Jesus.</p></div>
+          <div style="padding:18px 0;"><p style="margin:0 0 4px; font-family:'Roboto Mono',monospace; font-size:11px; color:#89AB98;">Citação · Roboto Slab</p><p style="margin:0; font-family:'Roboto Slab',Georgia,serif; font-size:1.25rem; color:#4E4483; font-style:italic;">“Fora da caridade não há salvação.”</p></div>
+        </div>
+      </section>
+
+      <section style="max-width:1080px; margin:0 auto; padding:40px 24px;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px;">
+          <div style="background:#fff; border:1px solid #EBE8E8; border-radius:16px; padding:28px 30px;">
+            <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.2rem; color:#3a3266; margin:0 0 20px;">Botões</h3>
+            <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+              <button onClick="{{ toastSoon }}" style="cursor:pointer; background:#4E4483; color:#fff; font-weight:600; border:0; border-radius:50px; padding:12px 24px; font-size:14px;">Primário</button>
+              <button onClick="{{ toastSoon }}" style="cursor:pointer; background:#F2A81E; color:#3a3266; font-weight:600; border:0; border-radius:50px; padding:12px 24px; font-size:14px;">Destaque</button>
+              <button onClick="{{ toastSoon }}" style="cursor:pointer; background:#fff; color:#4E4483; font-weight:600; border:1px solid #4E4483; border-radius:50px; padding:12px 24px; font-size:14px;">Contorno</button>
+              <button onClick="{{ toastSoon }}" style="cursor:pointer; background:#6E9FCB; color:#fff; font-weight:600; border:0; border-radius:50px; padding:12px 24px; font-size:14px;">Link</button>
+            </div>
+            <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.2rem; color:#3a3266; margin:28px 0 16px;">Badges e tags</h3>
+            <div style="display:flex; flex-wrap:wrap; gap:10px;">
+              <span style="background:#89AB98; color:#fff; font-family:'Roboto Mono',monospace; font-size:11px; padding:5px 12px; border-radius:50px;">Domingos</span>
+              <span style="background:#E79048; color:#fff; font-family:'Roboto Mono',monospace; font-size:11px; padding:5px 12px; border-radius:50px;">Faltam 4 dias</span>
+              <span style="background:#F6F6F6; border:1px solid #E4E4E4; color:#5b5766; font-size:12px; padding:5px 12px; border-radius:50px;">Reforma íntima</span>
+              <span style="background:#F6F6F6; border:1px solid #E4E4E4; color:#5b5766; font-size:12px; padding:5px 12px; border-radius:50px;">Caridade</span>
+            </div>
+          </div>
+          <div style="background:#fff; border:1px solid #EBE8E8; border-radius:16px; padding:28px 30px;">
+            <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.2rem; color:#3a3266; margin:0 0 20px;">Campos de formulário</h3>
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              <input placeholder="Campo de texto" style="border:1px solid #E4E4E4; border-radius:9px; padding:11px 14px; font-family:inherit; font-size:14px; outline:none;">
+              <select style="border:1px solid #E4E4E4; border-radius:9px; padding:11px 14px; font-family:inherit; font-size:14px; outline:none; background:#fff; color:#3a3266;"><option>Selecione um assunto</option><option>Palestras</option></select>
+              <textarea rows="3" placeholder="Área de texto" style="border:1px solid #E4E4E4; border-radius:9px; padding:11px 14px; font-family:inherit; font-size:14px; outline:none; resize:vertical;"></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isHistoria }}" hint-placeholder-val="{{ false }}">
+    <div style="position:relative;">
+      <section style="position:relative; background:#3c3468; overflow:hidden;">
+        <div style="position:absolute; inset:0; background:linear-gradient(150deg,#4E4483,#2f2952);"></div>
+        <div style="position:relative; z-index:2; max-width:900px; margin:0 auto; padding:84px 24px; text-align:center;">
+          <span style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#F2A81E;">Desde 1991</span>
+          <h1 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(2.1rem,1.4rem+2.6vw,3.7rem); color:#fff; margin:12px 0 16px; line-height:1.1;">Nossa História</h1>
+          <p style="font-size:1.15rem; color:#d8d2ec; margin:0 auto; max-width:600px;">Uma trajetória de fé, estudo e caridade construída por mãos dedicadas ao bem ao longo de mais de três décadas.</p>
+        </div>
+      </section>
+
+      <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+        <nav style="position:fixed; right:26px; top:50%; transform:translateY(-50%); z-index:40; display:flex; flex-direction:column; gap:14px;">
+          <sc-if value="{{ hA0 }}" hint-placeholder-val="{{ true }}"><button onClick="{{ goHist0 }}" title="A fundação" style="display:flex; align-items:center; gap:10px; border:0; background:transparent; cursor:pointer; justify-content:flex-end;"><span style="font-size:12px; font-family:'Poppins',sans-serif; color:#4E4483; font-weight:600; background:#fff; padding:3px 9px; border-radius:50px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">A fundação</span><span style="width:14px; height:14px; border-radius:50%; background:#F2A81E; flex-shrink:0;"></span></button></sc-if>
+          <sc-if value="{{ hN0 }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goHist0 }}" title="A fundação" style="display:flex; align-items:center; gap:10px; border:0; background:transparent; cursor:pointer; justify-content:flex-end;"><span style="width:10px; height:10px; border-radius:50%; background:#cbc4dd; flex-shrink:0;"></span></button></sc-if>
+          <sc-if value="{{ hA1 }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goHist1 }}" title="A primeira sede própria" style="display:flex; align-items:center; gap:10px; border:0; background:transparent; cursor:pointer; justify-content:flex-end;"><span style="font-size:12px; font-family:'Poppins',sans-serif; color:#4E4483; font-weight:600; background:#fff; padding:3px 9px; border-radius:50px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">A primeira sede própria</span><span style="width:14px; height:14px; border-radius:50%; background:#F2A81E; flex-shrink:0;"></span></button></sc-if>
+          <sc-if value="{{ hN1 }}" hint-placeholder-val="{{ true }}"><button onClick="{{ goHist1 }}" title="A primeira sede própria" style="display:flex; align-items:center; gap:10px; border:0; background:transparent; cursor:pointer; justify-content:flex-end;"><span style="width:10px; height:10px; border-radius:50%; background:#cbc4dd; flex-shrink:0;"></span></button></sc-if>
+          <sc-if value="{{ hA2 }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goHist2 }}" title="Tempo de expansão" style="display:flex; align-items:center; gap:10px; border:0; background:transparent; cursor:pointer; justify-content:flex-end;"><span style="font-size:12px; font-family:'Poppins',sans-serif; color:#4E4483; font-weight:600; background:#fff; padding:3px 9px; border-radius:50px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">Tempo de expansão</span><span style="width:14px; height:14px; border-radius:50%; background:#F2A81E; flex-shrink:0;"></span></button></sc-if>
+          <sc-if value="{{ hN2 }}" hint-placeholder-val="{{ true }}"><button onClick="{{ goHist2 }}" title="Tempo de expansão" style="display:flex; align-items:center; gap:10px; border:0; background:transparent; cursor:pointer; justify-content:flex-end;"><span style="width:10px; height:10px; border-radius:50%; background:#cbc4dd; flex-shrink:0;"></span></button></sc-if>
+          <sc-if value="{{ hA3 }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goHist3 }}" title="O CEMA hoje" style="display:flex; align-items:center; gap:10px; border:0; background:transparent; cursor:pointer; justify-content:flex-end;"><span style="font-size:12px; font-family:'Poppins',sans-serif; color:#4E4483; font-weight:600; background:#fff; padding:3px 9px; border-radius:50px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">O CEMA hoje</span><span style="width:14px; height:14px; border-radius:50%; background:#F2A81E; flex-shrink:0;"></span></button></sc-if>
+          <sc-if value="{{ hN3 }}" hint-placeholder-val="{{ true }}"><button onClick="{{ goHist3 }}" title="O CEMA hoje" style="display:flex; align-items:center; gap:10px; border:0; background:transparent; cursor:pointer; justify-content:flex-end;"><span style="width:10px; height:10px; border-radius:50%; background:#cbc4dd; flex-shrink:0;"></span></button></sc-if>
+        </nav>
+      </sc-if>
+
+      <div style="max-width:1080px; margin:0 auto; padding:30px 24px 10px;">
+        <sc-for list="{{ histBlocks }}" as="b" hint-placeholder-count="4">
+          <section data-hist="{{ b.id }}" style="padding:44px 0; display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:44px; align-items:center;">
+            <div style="{{ b.textStyle }}">
+              <span style="display:inline-block; font-family:'Roboto Mono',monospace; font-size:12px; font-weight:500; letter-spacing:.08em; color:#fff; background:#89AB98; padding:4px 12px; border-radius:50px; margin-bottom:14px;">{{ b.year }}</span>
+              <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(1.5rem,1.3rem+0.9vw,2.1rem); color:#4E4483; margin:0 0 14px;">{{ b.title }}</h2>
+              <p style="margin:0; color:#5b5766;">{{ b.text }}</p>
+            </div>
+            <div style="{{ b.imgStyle }}"><div style="border-radius:16px; overflow:hidden; min-height:260px;"><dc-import name="Placeholder" label="{{ b.ph }}" hint-size="100%,100%" style="display:block; width:100%; height:100%; min-height:260px;"></dc-import></div></div>
+          </section>
+        </sc-for>
+      </div>
+
+      <section style="background:#F3EDDD; margin-top:20px;">
+        <div style="max-width:1240px; margin:0 auto; padding:56px 24px;">
+          <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.6rem; color:#4E4483; margin:0 0 24px;">Memórias da casa</h2>
+          <div style="display:flex; gap:18px; overflow-x:auto; padding-bottom:10px; scroll-snap-type:x mandatory;">
+            <sc-for list="{{ galleryItems }}" as="g" hint-placeholder-count="6">
+              <div style="flex:0 0 300px; height:210px; border-radius:14px; overflow:hidden; scroll-snap-align:start;"><dc-import name="Placeholder" label="{{ g }}" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+            </sc-for>
+          </div>
+        </div>
+      </section>
+
+      <section style="max-width:1080px; margin:0 auto; padding:60px 24px 80px;">
+        <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.6rem; color:#4E4483; margin:0 0 24px;">Diretoria ao longo dos anos</h2>
+        <div style="border:1px solid #EBE8E8; border-radius:14px; overflow:hidden;">
+          <div style="display:grid; grid-template-columns:1.4fr 1fr 1fr; background:#4E4483; color:#fff; font-family:'Work Sans',sans-serif; font-weight:600; font-size:13px;">
+            <div style="padding:14px 20px;">Nome</div><div style="padding:14px 20px;">Período</div><div style="padding:14px 20px;">Cargo</div>
+          </div>
+          <sc-for list="{{ board }}" as="d" hint-placeholder-count="5">
+            <div style="{{ d.rowStyle }}">
+              <div style="padding:14px 20px; font-weight:500; color:#3a3266;">{{ d.name }}</div>
+              <div style="padding:14px 20px; color:#5b5766; font-family:'Roboto Mono',monospace; font-size:13px;">{{ d.period }}</div>
+              <div style="padding:14px 20px; color:#5b5766;">{{ d.role }}</div>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isContato }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <section style="position:relative; background:#3c3468; overflow:hidden;">
+        <div style="position:absolute; inset:0; background:linear-gradient(150deg,#4E4483,#2f2952);"></div>
+        <div style="position:absolute; inset:0; overflow:hidden; pointer-events:none; z-index:1;">
+          <sc-for list="{{ particles }}" as="p" hint-placeholder-count="0"><span style="{{ p.style }}"></span></sc-for>
+        </div>
+        <div style="position:relative; z-index:2; max-width:1100px; margin:0 auto; padding:72px 24px; text-align:center;">
+          <span style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#F2A81E;">Fale conosco</span>
+          <h1 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(2rem,1.4rem+2.4vw,3.6rem); color:#fff; margin:12px 0 12px;">Contato</h1>
+          <p style="font-size:1.1rem; color:#d8d2ec; margin:0 auto; max-width:520px;">Estamos à disposição para acolher, esclarecer e caminhar com você.</p>
+        </div>
+      </section>
+
+      <section style="background:#F6F6F6; border-bottom:1px solid #EBE8E8;">
+        <nav style="max-width:1100px; margin:0 auto; padding:14px 24px; display:flex; gap:8px; align-items:center; font-size:13px; color:#7A8A8A;">
+          <a onClick="{{ goHome }}" style="cursor:pointer; color:#6E9FCB;">Início</a><span>›</span><span style="color:#3a3266;">Contato</span>
+        </nav>
+      </section>
+
+      <section style="max-width:1100px; margin:0 auto; padding:60px 24px;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:44px; align-items:center;">
+          <div style="border-radius:18px; overflow:hidden; min-height:300px;"><dc-import name="Placeholder" label="imagem ilustrativa — acolhimento" hint-size="100%,100%" style="display:block; width:100%; height:100%; min-height:300px;"></dc-import></div>
+          <div>
+            <span style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#89AB98;">Bem-vindo ao CEMA</span>
+            <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(1.6rem,1.3rem+1.1vw,2.3rem); color:#4E4483; margin:10px 0 16px;">Como podemos ajudar?</h2>
+            <p style="margin:0 0 14px; color:#5b5766;">Seja para participar das palestras, agendar um atendimento fraterno ou tirar dúvidas sobre a doutrina espírita, nossa equipe terá prazer em responder.</p>
+            <p style="margin:0; color:#5b5766;">Preencha o formulário ao lado ou fale conosco pelas redes sociais. Responderemos o mais breve possível.</p>
+          </div>
+        </div>
+      </section>
+
+      <section style="background:#F3EDDD;">
+        <div style="max-width:1100px; margin:0 auto; padding:60px 24px;">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:40px; align-items:start;">
+            <div>
+              <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.5rem; color:#4E4483; margin:0 0 20px;">Nossas redes</h2>
+              <div style="display:flex; flex-direction:column; gap:12px;">
+                <sc-for list="{{ contactChannels }}" as="c" hint-placeholder-count="4">
+                  <a onClick="{{ c.onClick }}" style="cursor:pointer; display:flex; align-items:center; gap:14px; background:#fff; border:1px solid #EBE8E8; border-radius:12px; padding:14px 16px; text-decoration:none;">
+                    <span style="{{ c.iconStyle }}">{{ c.i }}</span>
+                    <span><span style="display:block; font-weight:600; color:#3a3266; font-size:14.5px;">{{ c.name }}</span><span style="font-size:13px; color:#7A8A8A;">{{ c.handle }}</span></span>
+                  </a>
+                </sc-for>
+              </div>
+            </div>
+            <form onSubmit="{{ submitContato }}" style="background:#fff; border:1px solid #EBE8E8; border-radius:18px; padding:30px 30px 32px; box-shadow:0 8px 24px rgba(78,68,131,0.06);">
+              <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.5rem; color:#4E4483; margin:0 0 22px;">Envie uma mensagem</h2>
+              <div style="display:flex; flex-direction:column; gap:16px;">
+                <label style="display:block;"><span style="display:block; font-size:13px; font-weight:600; color:#3a3266; margin-bottom:6px;">Nome *</span><input required placeholder="Seu nome completo" style="width:100%; border:1px solid #E4E4E4; border-radius:9px; padding:11px 14px; font-family:inherit; font-size:14px; outline:none;"></label>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:16px;">
+                  <label style="display:block;"><span style="display:block; font-size:13px; font-weight:600; color:#3a3266; margin-bottom:6px;">E-mail *</span><input required type="email" placeholder="voce@email.com" style="width:100%; border:1px solid #E4E4E4; border-radius:9px; padding:11px 14px; font-family:inherit; font-size:14px; outline:none;"></label>
+                  <label style="display:block;"><span style="display:block; font-size:13px; font-weight:600; color:#3a3266; margin-bottom:6px;">WhatsApp</span><input placeholder="(61) 90000-0000" style="width:100%; border:1px solid #E4E4E4; border-radius:9px; padding:11px 14px; font-family:inherit; font-size:14px; outline:none;"></label>
+                </div>
+                <label style="display:block;"><span style="display:block; font-size:13px; font-weight:600; color:#3a3266; margin-bottom:6px;">Assunto</span><select style="width:100%; border:1px solid #E4E4E4; border-radius:9px; padding:11px 14px; font-family:inherit; font-size:14px; outline:none; background:#fff; color:#3a3266;"><option>Dúvida geral</option><option>Palestras públicas</option><option>Atendimento fraterno</option><option>Estudo do Evangelho</option><option>Voluntariado</option><option>Outro</option></select></label>
+                <label style="display:block;"><span style="display:block; font-size:13px; font-weight:600; color:#3a3266; margin-bottom:6px;">Mensagem</span><textarea rows="4" placeholder="Escreva sua mensagem…" style="width:100%; border:1px solid #E4E4E4; border-radius:9px; padding:11px 14px; font-family:inherit; font-size:14px; outline:none; resize:vertical;"></textarea></label>
+                <button type="submit" style="background:#4E4483; color:#fff; font-weight:600; border:0; border-radius:50px; padding:14px; cursor:pointer; font-size:15px;">Enviar mensagem</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <section style="max-width:1100px; margin:0 auto; padding:56px 24px 70px;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:22px;">
+          <sc-for list="{{ contactInfo }}" as="c" hint-placeholder-count="3">
+            <div style="background:#fff; border:1px solid #EBE8E8; border-radius:14px; padding:24px 26px;">
+              <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#89AB98; margin:0 0 8px;">{{ c.label }}</p>
+              <p style="margin:0; color:#3a3266; font-weight:500;">{{ c.value }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+    </div>
+    </sc-if>
+
+    <sc-if value="{{ isPalestra }}" hint-placeholder-val="{{ false }}">
+    <div>
+      <section style="position:relative; background:#3c3468; overflow:hidden;">
+        <div style="position:absolute; inset:0; background:linear-gradient(150deg,#4E4483,#2f2952);"></div>
+        <div style="position:relative; z-index:2; max-width:1100px; margin:0 auto; padding:30px 24px 56px;">
+          <sc-if value="{{ desktop }}" hint-placeholder-val="{{ true }}">
+            <div style="overflow:hidden; border:1px solid rgba(255,255,255,0.12); border-radius:50px; margin-bottom:30px; background:rgba(255,255,255,0.05);">
+              <div style="display:flex; gap:48px; white-space:nowrap; padding:9px 0; animation:cemaTicker 26s linear infinite; width:max-content;">
+                <sc-for list="{{ tickerLoop }}" as="t" hint-placeholder-count="0"><span style="font-family:'Roboto Mono',monospace; font-size:12px; color:#cfc9e4;"><span style="color:#F2A81E;">{{ t.time }}</span> · {{ t.text }}</span></sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <nav style="display:flex; flex-wrap:wrap; gap:8px; align-items:center; font-size:12.5px; color:#b3aad6; margin-bottom:22px;">
+            <a onClick="{{ goHome }}" style="cursor:pointer; color:#b3aad6;">Início</a><span>›</span>
+            <a onClick="{{ toastSoon }}" style="cursor:pointer; color:#b3aad6;">Palestras Públicas</a><span>›</span>
+            <span style="color:#F2A81E;">A Escola de Nossas Almas</span>
+          </nav>
+          <p style="font-family:'Roboto Mono',monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:#9d94c8; margin:0 0 10px;">Palestra Pública</p>
+          <h1 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(2rem,1.4rem+2.2vw,3.4rem); color:#fff; margin:0 0 14px; line-height:1.12; max-width:780px;">A Escola de Nossas Almas</h1>
+          <p style="font-size:1.1rem; color:#d8d2ec; margin:0 0 26px; max-width:620px;">Como as experiências da vida moldam o espírito e nos conduzem ao aprimoramento moral.</p>
+          <a onClick="{{ toastSoon }}" style="cursor:pointer; display:inline-flex; align-items:center; gap:10px; background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.22); color:#fff; padding:11px 20px; border-radius:50px; font-size:14px; font-weight:500;"><span style="width:8px; height:8px; border-radius:50%; background:#F2A81E;"></span>Ver calendário de palestras</a>
+        </div>
+      </section>
+
+      <section style="background:#fff; border-bottom:1px solid #EBE8E8;">
+        <div style="max-width:1100px; margin:0 auto; padding:16px 24px; display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+          <span style="font-size:13px; color:#7A8A8A; margin-right:6px;">Compartilhar:</span>
+          <button onClick="{{ shareFb }}" style="cursor:pointer; border:1px solid #E4E4E4; background:#fff; color:#3a3266; border-radius:50px; padding:8px 16px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:7px;"><span style="width:20px; height:20px; border-radius:50%; background:#3b5998; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700;">f</span>Facebook</button>
+          <button onClick="{{ shareWhats }}" style="cursor:pointer; border:1px solid #E4E4E4; background:#fff; color:#3a3266; border-radius:50px; padding:8px 16px; font-size:13px; font-weight:600; display:flex; align-items:center; gap:7px;"><span style="width:20px; height:20px; border-radius:50%; background:#25D366; color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700;">W</span>WhatsApp</button>
+          <button onClick="{{ copyLink }}" style="cursor:pointer; border:1px solid #E4E4E4; background:#fff; color:#3a3266; border-radius:50px; padding:8px 16px; font-size:13px; font-weight:600;">Copiar link</button>
+          <button onClick="{{ toggleLike }}" style="{{ likeStyle }}">♥ {{ likeLabel }}</button>
+        </div>
+      </section>
+
+      <section style="max-width:1100px; margin:0 auto; padding:46px 24px;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:36px; align-items:start;">
+          <aside style="position:relative;">
+            <div style="background:#F3EDDD; border-radius:18px; overflow:hidden; border:1px solid #EBE8E8;">
+              <div style="height:230px;"><dc-import name="Placeholder" label="foto do palestrante" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+              <div style="padding:22px 24px;">
+                <p style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#89AB98; margin:0 0 6px;">Palestrante</p>
+                <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.4rem; color:#4E4483; margin:0 0 10px;">Abadio Rodrigues</h3>
+                <p style="margin:0 0 16px; font-size:14px; color:#5b5766;">Expositor e estudioso da doutrina espírita, dedicado às palestras públicas há mais de 20 anos.</p>
+                <a onClick="{{ toastSoon }}" style="cursor:pointer; color:#6E9FCB; font-weight:600; font-size:14px;">Ver perfil completo →</a>
+              </div>
+            </div>
+          </aside>
+
+          <div>
+            <div onClick="{{ toastSoon }}" style="cursor:pointer; position:relative; border-radius:16px; overflow:hidden; height:340px; margin-bottom:26px;">
+              <dc-import name="Placeholder" label="vídeo da palestra · YouTube" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import>
+              <div style="position:absolute; inset:0; display:flex; align-items:center; justify-content:center;">
+                <div style="width:74px; height:74px; border-radius:50%; background:rgba(78,68,131,0.92); display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(0,0,0,0.25);">
+                  <div style="width:0; height:0; border-style:solid; border-width:13px 0 13px 22px; border-color:transparent transparent transparent #fff; margin-left:5px;"></div>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-wrap:wrap; gap:14px; margin-bottom:28px;">
+              <div style="flex:1; min-width:170px; background:#fff; border:1px solid #EBE8E8; border-radius:12px; padding:16px 18px;">
+                <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:#7A8A8A; margin:0 0 5px;">Data</p>
+                <p style="margin:0; font-weight:600; color:#3a3266;">Domingo, 28/06/2026 · 19h30</p>
+              </div>
+              <div style="flex:1; min-width:170px; background:#fff; border:1px solid #EBE8E8; border-radius:12px; padding:16px 18px;">
+                <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:#7A8A8A; margin:0 0 5px;">Local</p>
+                <p style="margin:0; font-weight:600; color:#3a3266;">Sede do CEMA · e ao vivo</p>
+              </div>
+            </div>
+
+            <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.5rem; color:#4E4483; margin:0 0 16px;">Principais tópicos abordados</h2>
+            <div style="display:flex; flex-direction:column; gap:10px;">
+              <sc-for list="{{ accItems }}" as="a" hint-placeholder-count="4">
+                <details style="border:1px solid #EBE8E8; border-radius:12px; overflow:hidden; background:#fff;">
+                  <summary style="cursor:pointer; display:flex; align-items:center; justify-content:space-between; gap:14px; padding:16px 20px; font-family:'Work Sans',sans-serif; font-size:1.02rem; font-weight:500; color:#3a3266;">
+                    {{ a.q }}<span class="cema-acc-icon" style="flex-shrink:0; width:24px; height:24px; border-radius:50%; background:#F3EDDD; color:#4E4483; display:flex; align-items:center; justify-content:center; font-size:16px;">+</span>
+                  </summary>
+                  <div style="padding:0 20px 18px;"><p style="margin:0; color:#5b5766; font-size:14.5px;">{{ a.a }}</p></div>
+                </details>
+              </sc-for>
+            </div>
+
+            <div style="margin-top:30px;">
+              <p style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#7A8A8A; margin:0 0 12px;">Assuntos principais</p>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <sc-for list="{{ tags }}" as="t" hint-placeholder-count="5"><a onClick="{{ toastSoon }}" style="cursor:pointer; background:#F6F6F6; border:1px solid #E4E4E4; color:#5b5766; font-size:13px; padding:6px 14px; border-radius:50px;">{{ t }}</a></sc-for>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section style="border-top:1px solid #EBE8E8; border-bottom:1px solid #EBE8E8; background:#F6F6F6;">
+        <div style="max-width:1100px; margin:0 auto; padding:22px 24px; display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between;">
+          <a onClick="{{ toastSoon }}" style="cursor:pointer; display:flex; align-items:center; gap:12px; color:#4E4483;"><span style="font-size:20px;">‹</span><span><span style="display:block; font-family:'Roboto Mono',monospace; font-size:10px; text-transform:uppercase; color:#7A8A8A;">Anterior</span><span style="font-weight:600;">Sua Vida é Importante</span></span></a>
+          <a onClick="{{ toastSoon }}" style="cursor:pointer; display:flex; align-items:center; gap:12px; color:#4E4483; text-align:right;"><span><span style="display:block; font-family:'Roboto Mono',monospace; font-size:10px; text-transform:uppercase; color:#7A8A8A;">Próxima</span><span style="font-weight:600;">Bezerra de Menezes</span></span><span style="font-size:20px;">›</span></a>
+        </div>
+      </section>
+
+      <section style="max-width:1240px; margin:0 auto; padding:50px 24px 70px;">
+        <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.6rem; color:#4E4483; margin:0 0 26px;">Últimas notícias</h2>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:24px;">
+          <sc-for list="{{ relPosts }}" as="p" hint-placeholder-count="3">
+            <article onClick="{{ p.onClick }}" style="cursor:pointer; background:#fff; border:1px solid #EBE8E8; border-radius:14px; overflow:hidden;">
+              <div style="height:160px;"><dc-import name="Placeholder" label="img" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+              <div style="padding:18px 20px 22px;">
+                <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A; margin-bottom:8px;">{{ p.date }}</div>
+                <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:1.1rem; color:#3a3266; margin:0; line-height:1.25;">{{ p.title }}</h3>
+              </div>
+            </article>
+          </sc-for>
+        </div>
+      </section>
+    </div>
+    </sc-if>
+
+    <!--EXTRA-VIEWS-->
+
+  </main>
+
+  <footer style="background:#2f2952; color:#cfc9e4;">
+    <div style="max-width:1240px; margin:0 auto; padding:64px 24px 40px; display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:40px;">
+      <div>
+        <img src="assets/logo-branco.png" alt="CEMA" style="height:74px; margin-bottom:18px; display:block;">
+        <p style="margin:0; font-size:13.5px; color:#a79fce; max-width:240px;">Centro Espírita Maria Madalena — uma casa de fé, estudo e caridade em Planaltina, DF.</p>
+      </div>
+      <div>
+        <p style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:#fff; margin:0 0 16px;">Institucional</p>
+        <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px;">
+          <sc-for list="{{ footA }}" as="f" hint-placeholder-count="4"><li><a onClick="{{ f.onClick }}" style="cursor:pointer; color:#cfc9e4; text-decoration:none; font-size:14px;" style-hover="{{ f.hover }}">{{ f.label }}</a></li></sc-for>
+        </ul>
+      </div>
+      <div>
+        <p style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:#fff; margin:0 0 16px;">Atividades</p>
+        <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px;">
+          <sc-for list="{{ footB }}" as="f" hint-placeholder-count="5"><li><a onClick="{{ f.onClick }}" style="cursor:pointer; color:#cfc9e4; text-decoration:none; font-size:14px;" style-hover="{{ f.hover }}">{{ f.label }}</a></li></sc-for>
+        </ul>
+      </div>
+      <div>
+        <p style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:#fff; margin:0 0 16px;">Inscreva-se</p>
+        <form onSubmit="{{ submitNews }}" style="display:flex; flex-direction:column; gap:10px; max-width:240px;">
+          <input placeholder="Nome" style="border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.06); color:#fff; border-radius:8px; padding:10px 12px; font-family:inherit; font-size:13.5px; outline:none;">
+          <input type="email" placeholder="E-mail" style="border:1px solid rgba(255,255,255,0.18); background:rgba(255,255,255,0.06); color:#fff; border-radius:8px; padding:10px 12px; font-family:inherit; font-size:13.5px; outline:none;">
+          <button type="submit" style="background:#F2A81E; color:#3a3266; font-weight:600; border:0; border-radius:8px; padding:11px; cursor:pointer; font-size:14px;">Inscrever</button>
+        </form>
+        <div style="display:flex; gap:9px; margin-top:18px;">
+          <sc-for list="{{ socials }}" as="s" hint-placeholder-count="4"><a onClick="{{ s.onClick }}" title="{{ s.name }}" style="cursor:pointer; width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; color:#fff; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14px; text-decoration:none;" style-hover="{{ s.hover }}">{{ s.i }}</a></sc-for>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,0.1);">
+      <div style="max-width:1240px; margin:0 auto; padding:22px 24px; display:flex; flex-wrap:wrap; gap:8px 24px; align-items:center; justify-content:space-between; font-size:12.5px; color:#9a93c4;">
+        <span>Quadra 02, Lote 16, Vila Vicentina, Planaltina, Brasília-DF · CNPJ 01.600.089/0001-90</span>
+        <span>© 2026 CEMA · Todos os direitos reservados · Desenvolvido por DECOM</span>
+      </div>
+    </div>
+  </footer>
+
+  <div style="position:fixed; left:50%; bottom:18px; transform:translateX(-50%); z-index:70; display:flex; align-items:center; gap:4px; background:rgba(47,41,82,0.96); backdrop-filter:blur(8px); border-radius:50px; padding:6px; box-shadow:0 10px 30px rgba(0,0,0,0.25);">
+    <span style="font-family:'Roboto Mono',monospace; font-size:10px; color:#9a93c4; text-transform:uppercase; letter-spacing:.08em; padding:0 10px 0 8px;">Protótipo </span>
+    <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}"><button onClick="{{ goHome }}" style="border:0; cursor:pointer; border-radius:50px; padding:8px 15px; font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:500; background:#F2A81E; color:#3a3266;">Início</button></sc-if>
+    <sc-if value="{{ nHome }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goHome }}" style="border:0; cursor:pointer; border-radius:50px; padding:8px 15px; font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:500; background:transparent; color:#cfc9e4;">Início</button></sc-if>
+    <sc-if value="{{ isPalestra }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goPalestra }}" style="border:0; cursor:pointer; border-radius:50px; padding:8px 15px; font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:500; background:#F2A81E; color:#3a3266;">Palestra</button></sc-if>
+    <sc-if value="{{ nPal }}" hint-placeholder-val="{{ true }}"><button onClick="{{ goPalestra }}" style="border:0; cursor:pointer; border-radius:50px; padding:8px 15px; font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:500; background:transparent; color:#cfc9e4;">Palestra</button></sc-if>
+    <sc-if value="{{ isContato }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goContato }}" style="border:0; cursor:pointer; border-radius:50px; padding:8px 15px; font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:500; background:#F2A81E; color:#3a3266;">Contato</button></sc-if>
+    <sc-if value="{{ nCon }}" hint-placeholder-val="{{ true }}"><button onClick="{{ goContato }}" style="border:0; cursor:pointer; border-radius:50px; padding:8px 15px; font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:500; background:transparent; color:#cfc9e4;">Contato</button></sc-if>
+    <sc-if value="{{ isHistoria }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goHistoria }}" style="border:0; cursor:pointer; border-radius:50px; padding:8px 15px; font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:500; background:#F2A81E; color:#3a3266;">História</button></sc-if>
+    <sc-if value="{{ nHis }}" hint-placeholder-val="{{ true }}"><button onClick="{{ goHistoria }}" style="border:0; cursor:pointer; border-radius:50px; padding:8px 15px; font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:500; background:transparent; color:#cfc9e4;">História</button></sc-if>
+    <sc-if value="{{ isGuia }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goGuia }}" style="border:0; cursor:pointer; border-radius:50px; padding:8px 15px; font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:500; background:#F2A81E; color:#3a3266;">Guia</button></sc-if>
+    <sc-if value="{{ nGui }}" hint-placeholder-val="{{ true }}"><button onClick="{{ goGuia }}" style="border:0; cursor:pointer; border-radius:50px; padding:8px 15px; font-family:'Poppins',sans-serif; font-size:12.5px; font-weight:500; background:transparent; color:#cfc9e4;">Guia</button></sc-if>
+  </div>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; top:84px; left:50%; transform:translateX(-50%); z-index:99; background:#3a3266; color:#fff; padding:13px 24px; border-radius:50px; font-size:14px; box-shadow:0 10px 30px rgba(0,0,0,0.25); animation:cemaFade .25s ease; border:1px solid rgba(242,168,30,0.4);">{{ toast }}</div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    this.particles = Array.from({length:16}).map(()=>({
+      left:Math.round(Math.random()*100),
+      size:4+Math.round(Math.random()*7),
+      delay:(Math.random()*7).toFixed(2),
+      dur:(5+Math.random()*5).toFixed(2),
+    }));
+  }
+  state = {
+    route:'home', heroVariant:0, isMobile:(typeof window!=='undefined'&&window.innerWidth<1024),
+    mobileOpen:false, mobileSub:null, openDrop:null, acc:0,
+    histSection:'fundacao', now:Date.now(), email:'', toast:null, liked:false,
+  };
+  componentDidMount(){
+    this._r=()=>{const m=window.innerWidth<1024; if(m!==this.state.isMobile)this.setState({isMobile:m,mobileOpen:m?this.state.mobileOpen:false});};
+    window.addEventListener('resize',this._r);
+    this._t=setInterval(()=>this.setState({now:Date.now()}),1000);
+  }
+  componentWillUnmount(){window.removeEventListener('resize',this._r);clearInterval(this._t);}
+  go(r){this.setState({route:r,mobileOpen:false,openDrop:null,mobileSub:null});try{window.scrollTo({top:0,behavior:'auto'});}catch(e){}}
+  flash(msg){this.setState({toast:msg});clearTimeout(this._tt);this._tt=setTimeout(()=>this.setState({toast:null}),2600);}
+  renderVals(){
+    const S=this.state; /* v2 */
+    const soon=(e)=>{if(e&&e.preventDefault)e.preventDefault();this.flash('Seção de exemplo — protótipo CEMA');};
+    const pageStyle=(r)=>({border:0,cursor:'pointer',borderRadius:'50px',padding:'8px 15px',fontFamily:"'Poppins',sans-serif",fontSize:'12.5px',fontWeight:500,transition:'all .15s ease',background:S.route===r?'#F2A81E':'transparent',color:S.route===r?'#3a3266':'#cfc9e4'});
+    const MENU=[
+      ['Institucional',[['Nossa Estrutura',null],['Nossa História','historia'],['Contato','contato']]],
+      ['Palestras',[['Palestras Públicas','palestra'],['Palestrantes',null]]],
+      ['Mensagens Mediúnicas',[['Mensagens',null],['Autores Espirituais',null]]],
+      ['Eventos',[['Nossos Eventos',null]]],
+      ['Vibração',[['Caixinha de Vibração',null]]],
+      ['Agenda',[['Agenda Reforma Íntima',null]]],
+      ['Evangelho',[['Evangelho da Semana',null],['Evangelho no Lar',null]]],
+      ['Sementeira',[['Blog Espírita',null],['Reflexões',null],['Espiritualidade',null],['Notícias',null]]],
+    ];
+    const drop={position:'absolute',top:'100%',left:0,minWidth:'232px',background:'#fff',borderRadius:'0 0 12px 12px',boxShadow:'0 16px 34px rgba(0,0,0,0.16)',borderTop:'3px solid #F2A81E',padding:'8px',zIndex:60,transition:'opacity .18s ease, transform .18s ease'};
+    const menu=MENU.map(([label,items])=>{
+      const open=S.openDrop===label;
+      const subOpen=S.mobileSub===label;
+      return {
+        label,
+        onClick:soon,
+        btnHover:{background:'rgba(255,255,255,0.1)'},
+        onEnter:()=>this.setState({openDrop:label}),
+        onLeave:()=>this.setState({openDrop:S.openDrop===label?null:S.openDrop}),
+        panelStyle:{...drop,opacity:open?1:0,visibility:open?'visible':'hidden',transform:open?'translateY(0)':'translateY(7px)',pointerEvents:open?'auto':'none'},
+        onToggle:()=>this.setState({mobileSub:subOpen?null:label}),
+        caretStyle:{fontSize:'10px',color:'#7A8A8A',transition:'transform .2s ease',transform:subOpen?'rotate(180deg)':'none'},
+        subStyle:{overflow:'hidden',transition:'max-height .26s ease',maxHeight:subOpen?'320px':'0'},
+        items:items.map(([l,route])=>({
+          label:l,
+          hover:{background:'#F3EDDD'},
+          onClick:route?(e)=>{if(e&&e.preventDefault)e.preventDefault();this.go(route);}:soon,
+        })),
+      };
+    });
+    const target=new Date('2026-06-28T19:30:00').getTime();
+    const diff=Math.max(0,target-S.now);
+    const dd=Math.floor(diff/86400000),hh=Math.floor(diff%86400000/3600000),mm=Math.floor(diff%3600000/60000),ss=Math.floor(diff%60000/1000);
+    const pad=n=>String(n).padStart(2,'0');
+    const heroBtn=(n)=>({width:'26px',height:'26px',borderRadius:'50%',border:'0',cursor:'pointer',fontFamily:"'Roboto Mono',monospace",fontSize:'12px',fontWeight:600,background:S.heroVariant===n?'#4E4483':'#ECE9F2',color:S.heroVariant===n?'#fff':'#7A8A8A',transition:'all .15s ease'});
+    const cardData=[
+      ['Vibração','Caixinha de vibração e corrente de prece pelos necessitados.','irradiação / prece',null,null],
+      ['Palestras Públicas','Encontros semanais de estudo e reflexão à luz do Espiritismo.','auditório','Domingos','#F2A81E'],
+      ['Mensagem Mediúnica','Mensagens psicofônicas e orientações dos benfeitores espirituais.','mensagens',null,null],
+      ['Agenda Reforma Íntima','Metas diárias e reflexões para o aprimoramento moral.','reflexão diária',null,null],
+      ['Culto do Evangelho no Lar','Roteiro semanal para o estudo do Evangelho em família.','evangelho no lar',null,null],
+      ['Sementeira de Luz','Blog com artigos, notícias e reflexões espíritas.','blog',null,null],
+    ];
+    const cards=cardData.map(([title,text,ph,badge,bc])=>({
+      title,text,ph,badge,onClick:soon,
+      hover:{transform:'translateY(-4px)',boxShadow:'0 14px 30px rgba(78,68,131,0.14)'},
+      badgeStyle:badge?{position:'absolute',top:'12px',left:'12px',background:bc||'#89AB98',color:'#3a3266',fontFamily:"'Roboto Mono',monospace",fontSize:'10.5px',fontWeight:600,padding:'5px 11px',borderRadius:'50px'}:{display:'none'},
+    }));
+    const posts=[
+      ['18 JUN 2026','A prece como alimento da alma'],
+      ['14 JUN 2026','Bezerra de Menezes e a caridade silenciosa'],
+      ['09 JUN 2026','Reforma íntima: começar por si mesmo'],
+    ].map(([date,title])=>({date,title,onClick:soon}));
+    const linkHover={color:'#fff'};
+    const footA=[['Instituição',null],['Nossa História','historia'],['Nosso Blog',null],['Notícias do CEMA',null]].map(([label,r])=>({label,onClick:r?()=>this.go(r):soon,hover:linkHover}));
+    const footB=[['Vibração Virtual',null],['Palestras Públicas','palestra'],['Palestrantes',null],['Evangelho da Semana',null],['Agenda Reforma Íntima',null]].map(([label,r])=>({label,onClick:r?()=>this.go(r):soon,hover:linkHover}));
+    const socials=[['YouTube','Y'],['Instagram','I'],['Facebook','f'],['WhatsApp','W']].map(([name,i])=>({name,i,onClick:soon,hover:{background:'#F2A81E',color:'#3a3266'}}));
+    const accData=[
+      ['A vida como escola do espírito','Cada experiência terrena — alegrias e dores — é oportunidade de aprendizado e crescimento moral, segundo a lei do progresso.'],
+      ['Provas e expiações','A diferença entre provas escolhidas pelo próprio espírito e expiações decorrentes de erros passados, e como enfrentá-las com serenidade.'],
+      ['O papel da reencarnação','Como as múltiplas existências oferecem ao espírito sucessivas chances de aperfeiçoamento rumo à perfeição relativa.'],
+      ['Caridade como síntese','Por que a prática da caridade, em pensamento, palavra e ação, é o caminho mais curto para a evolução da alma.'],
+    ];
+    const accItems=accData.map(([q,a],i)=>{
+      const open=S.acc===i;
+      return {q,a,open,
+        onClick:()=>this.setState({acc:open?-1:i}),
+        iconStyle:{flexShrink:0,width:'24px',height:'24px',borderRadius:'50%',background:open?'#F2A81E':'#F3EDDD',color:open?'#3a3266':'#4E4483',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'16px',transition:'transform .2s ease',transform:open?'rotate(45deg)':'none'},
+        bodyStyle:{overflow:'hidden',transition:'max-height .28s ease, opacity .2s ease, padding .2s ease',maxHeight:open?'200px':'0',opacity:open?1:0,padding:open?'0 20px 18px':'0 20px'},
+      };
+    });
+    const tickerItems=[['08:00','A prece como alimento da alma'],['09:30','Bezerra de Menezes e a caridade'],['11:00','Reforma íntima começa por si'],['14:15','Evangelho no Lar: roteiro da semana']];
+    const tickerLoop=[...tickerItems,...tickerItems].map(([time,text])=>({time,text}));
+    const liked=S.liked;
+    const ch=(bg)=>({flexShrink:0,width:'40px',height:'40px',borderRadius:'10px',background:bg,color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontFamily:"'Work Sans',sans-serif",fontWeight:700,fontSize:'15px'});
+    const contactChannels=[
+      ['YouTube','Y','/CEMAoficial','#C4302B'],
+      ['Instagram','I','@cema.madalena','#C13584'],
+      ['Facebook','f','/centroespiritamm','#3b5998'],
+      ['WhatsApp','W','(61) 90000-0000','#25D366'],
+    ].map(([name,i,handle,bg])=>({name,i,handle,onClick:soon,iconStyle:ch(bg)}));
+    const contactInfo=[
+      ['Endereço','Quadra 02, Lote 16, Vila Vicentina, Planaltina, Brasília-DF'],
+      ['Horários','Palestras aos domingos, 19h30 · Atendimento de seg. a sex.'],
+      ['CNPJ','01.600.089/0001-90'],
+    ].map(([label,value])=>({label,value}));
+    const scrollTo=(id)=>{try{const el=document.querySelector('[data-hist="'+id+'"]');if(el){const y=el.getBoundingClientRect().top+window.scrollY-90;window.scrollTo({top:y,behavior:'smooth'});}this.setState({histSection:id});}catch(e){}};
+    const histDefs=[
+      ['fundacao','1991','A fundação','Um pequeno grupo de trabalhadores reuniu-se com o propósito de estudar o Espiritismo e praticar a caridade, dando origem ao Centro Espírita Maria Madalena em Planaltina.','primeira sede'],
+      ['sede','1998','A primeira sede própria','Após anos de trabalho dedicado, a casa conquistou sua sede própria, ampliando as atividades de assistência e o estudo sistematizado do Evangelho.','construção da sede'],
+      ['expansao','2009','Tempo de expansão','Novos grupos de estudo, a vibração e a agenda de reforma íntima fortaleceram a comunidade, acolhendo um número crescente de frequentadores.','grupo de estudo'],
+      ['hoje','2026','O CEMA hoje','Hoje a casa mantém palestras públicas, atendimento fraterno, mensagens mediúnicas e um blog ativo, levando consolo e conhecimento a toda a região.','casa atual'],
+    ];
+    const histBlocks=histDefs.map(([id,year,title,text,ph],i)=>({id,year,title,text,ph,
+      textStyle:i%2===1?{order:2}:{},
+      imgStyle:i%2===1?{order:1}:{},
+    }));
+    const histNav=histDefs.map(([id,year,title])=>{
+      const active=S.histSection===id;
+      return {label:title,onClick:()=>scrollTo(id),
+        dotStyle:{width:active?'14px':'10px',height:active?'14px':'10px',borderRadius:'50%',background:active?'#F2A81E':'#cbc4dd',transition:'all .2s ease',flexShrink:0},
+        labelStyle:{fontSize:'12px',fontFamily:"'Poppins',sans-serif",color:active?'#4E4483':'#9a93a8',fontWeight:active?600:400,opacity:active?1:0,transition:'opacity .2s ease',background:'#fff',padding:'3px 9px',borderRadius:'50px',boxShadow:active?'0 2px 8px rgba(0,0,0,0.08)':'none'},
+      };
+    });
+    const histDot=(id)=>{const active=S.histSection===id;return {width:active?'14px':'10px',height:active?'14px':'10px',borderRadius:'50%',background:active?'#F2A81E':'#cbc4dd',transition:'all .2s ease',flexShrink:0};};
+    const histLbl=(id)=>{const active=S.histSection===id;return {fontSize:'12px',fontFamily:"'Poppins',sans-serif",color:active?'#4E4483':'#9a93a8',fontWeight:active?600:400,opacity:active?1:0.5,transition:'all .2s ease',background:'#fff',padding:'3px 9px',borderRadius:'50px',boxShadow:active?'0 2px 8px rgba(0,0,0,0.08)':'none'};};
+    const board=[
+      ['Maria das Graças Lima','1991 – 1997','Presidente'],
+      ['João Batista Souza','1998 – 2005','Presidente'],
+      ['Antônio Carlos Pereira','2006 – 2013','Presidente'],
+      ['Helena Rodrigues','2014 – 2021','Presidente'],
+      ['Abadio Rodrigues','2022 – atual','Presidente'],
+    ].map(([name,period,role],i)=>({name,period,role,rowStyle:{display:'grid',gridTemplateColumns:'1.4fr 1fr 1fr',background:i%2?'#F6F6F6':'#fff',borderTop:'1px solid #EBE8E8'}}));
+    return {
+      isHome:S.route==='home',isPalestra:S.route==='palestra',isContato:S.route==='contato',isHistoria:S.route==='historia',isGuia:S.route==='guia',
+      desktop:!S.isMobile,isMobile:S.isMobile,
+      goHome:()=>this.go('home'),goPalestra:()=>this.go('palestra'),goHistoria:()=>this.go('historia'),goContato:()=>this.go('contato'),
+      go:(r)=>this.go(r),toastSoon:soon,
+      menu,
+      mobileOpen:S.mobileOpen,openMobile:()=>this.setState({mobileOpen:true}),closeMobile:()=>this.setState({mobileOpen:false}),
+      heroV0:S.heroVariant===0,heroV1:S.heroVariant===1,heroV2:S.heroVariant===2,
+      heroSwitch:[0,1,2].map(n=>({label:String(n+1),onClick:()=>this.setState({heroVariant:n}),style:heroBtn(n)})),
+      setHero0:()=>this.setState({heroVariant:0}),setHero1:()=>this.setState({heroVariant:1}),setHero2:()=>this.setState({heroVariant:2}),
+      nHero0:S.heroVariant!==0,nHero1:S.heroVariant!==1,nHero2:S.heroVariant!==2,
+      nHome:S.route!=='home',nPal:S.route!=='palestra',nCon:S.route!=='contato',nHis:S.route!=='historia',nGui:S.route!=='guia',
+      hA0:S.histSection==='fundacao',hA1:S.histSection==='sede',hA2:S.histSection==='expansao',hA3:S.histSection==='hoje',
+      hN0:S.histSection!=='fundacao',hN1:S.histSection!=='sede',hN2:S.histSection!=='expansao',hN3:S.histSection!=='hoje',
+      particles:this.particles.map(p=>({style:{position:'absolute',left:p.left+'%',bottom:'-12px',width:p.size+'px',height:p.size+'px',borderRadius:'50%',background:'rgba(242,168,30,0.55)',animation:`cemaParticle ${p.dur}s linear ${p.delay}s infinite`}})),
+      cdLabel:'Faltam '+dd+(dd===1?' dia':' dias'),
+      cdParts:[{v:pad(dd),l:'Dias'},{v:pad(hh),l:'Horas'},{v:pad(mm),l:'Min'},{v:pad(ss),l:'Seg'}],
+      cards,posts,
+      partners:['FEB','UFE','CFN','Livraria'],
+      footA,footB,socials,
+      accItems,tickerLoop,contactChannels,contactInfo,histBlocks,histNav,board,
+      goHist0:()=>scrollTo('fundacao'),goHist1:()=>scrollTo('sede'),goHist2:()=>scrollTo('expansao'),goHist3:()=>scrollTo('hoje'),
+      hist0Dot:histDot('fundacao'),hist1Dot:histDot('sede'),hist2Dot:histDot('expansao'),hist3Dot:histDot('hoje'),
+      hist0Lbl:histLbl('fundacao'),hist1Lbl:histLbl('sede'),hist2Lbl:histLbl('expansao'),hist3Lbl:histLbl('hoje'),
+      galleryItems:['memória 1991','inauguração','grupo de estudo','palestra pública','evangelho no lar','confraternização'],
+      palette:[
+        ['Primary','#4E4483'],['Secondary','#6E9FCB'],['Accent','#89AB98'],['Dourado','#F2A81E'],
+        ['Orange','#E79048'],['Danger','#C33A36'],['Cream','#F3EDDD'],['Neutral','#414141'],
+      ].map(([name,hex])=>({name,hex,swatch:{height:'72px',background:hex}})),
+      submitContato:(e)=>{if(e&&e.preventDefault)e.preventDefault();this.flash('Recebemos a sua solicitação. Em breve entraremos em contato.');},
+      tags:['Reencarnação','Provas e expiações','Reforma íntima','Caridade','Lei do progresso','Evolução'],
+      relPosts:[['18 JUN 2026','A prece como alimento da alma'],['14 JUN 2026','Bezerra de Menezes e a caridade'],['09 JUN 2026','Reforma íntima: começar por si']].map(([date,title])=>({date,title,onClick:soon})),
+      shareFb:soon,shareWhats:soon,copyLink:(e)=>{if(e&&e.preventDefault)e.preventDefault();this.flash('Link copiado para a área de transferência');},
+      liked,toggleLike:()=>{this.setState({liked:!liked});this.flash(liked?'Removido dos favoritos':'Adicionado aos favoritos');},
+      likeLabel:liked?'Curtido':'Curtir',
+      likeStyle:{cursor:'pointer',border:'1px solid '+(liked?'#C33A36':'#E4E4E4'),background:liked?'#C33A36':'#fff',color:liked?'#fff':'#3a3266',borderRadius:'50px',padding:'8px 16px',fontSize:'13px',fontWeight:600,display:'flex',alignItems:'center',gap:'6px'},
+      email:S.email,setEmail:(e)=>this.setState({email:e.target.value}),
+      submitNews:(e)=>{if(e&&e.preventDefault)e.preventDefault();this.flash('Inscrição recebida com sucesso!');this.setState({email:''});},
+      toast:S.toast,
+      pages:[['home','Início'],['palestra','Palestra'],['contato','Contato'],['historia','História'],['guia','Guia']].map(([r,l])=>({label:l,onClick:()=>this.go(r),bg:S.route===r?'#F2A81E':'transparent',col:S.route===r?'#3a3266':'#cfc9e4'})),
+      goGuia:()=>this.go('guia'),
+      pgHome:pageStyle('home'),pgPalestra:pageStyle('palestra'),pgContato:pageStyle('contato'),pgHistoria:pageStyle('historia'),pgGuia:pageStyle('guia'),
+    };
+  }
+}
+</script>
+</body>
+</html>

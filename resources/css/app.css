@@ -1,7 +1,8 @@
 /* Estilos do front público do CEMA — Tailwind CSS v4.
-   Tokens mapeados de design-system/tokens.json (cores, tipografia, breakpoints,
-   raios, sombras e espaçamentos de seção). A fonte padrão (font-sans) é Poppins,
-   usada no corpo; títulos usam font-display (Work Sans).
+   Tokens mapeados de design-system/tokens.json + reconciliação do handoff
+   (ver design-system/ANOTACOES-IMPLEMENTACAO.md): cores (incluindo o dourado da marca
+   #F2A81E), tipografia, breakpoints, raios, sombras e espaçamentos de seção.
+   font-sans = Poppins (corpo); títulos usam font-display (Work Sans).
    Thiago Mourão — https://github.com/MouraoBSB — 2026-06-24 */
 @import 'tailwindcss';
 
@@ -10,47 +11,57 @@
 @source '../views/**/*.blade.php';
 
 @theme {
-    /* Tipografia — design-system */
+    /* ===== Tipografia — design-system ===== */
     --font-sans: 'Poppins', ui-sans-serif, system-ui, sans-serif;
     --font-display: 'Work Sans', ui-sans-serif, system-ui, sans-serif;
     --font-ui: 'Roboto', ui-sans-serif, system-ui, sans-serif;
     --font-serif: 'Roboto Slab', ui-serif, Georgia, serif;
+    --font-mono: 'Roboto Mono', ui-monospace, 'SFMono-Regular', monospace;
 
-    /* Cores institucionais — design-system */
+    /* ===== Cores institucionais — design-system ===== */
     --color-primary: #4e4483;
     --color-secondary: #6e9fcb;
     --color-accent: #89ab98;
+    --color-gold: #f2a81e;
     --color-orange: #e79048;
     --color-danger: #c33a36;
     --color-success: #008000;
     --color-cream: #f3eddd;
-    --color-text: #000000;
-    --color-neutral-dark: #414141;
-    --color-neutral-light: #f6f6f6;
-    --color-neutral-border: #e4e4e4;
-    --color-neutral-muted: #ebe8e8;
-    --color-neutral-gray: #7a8a8a;
 
-    /* Breakpoints semânticos — design-system (somam-se aos sm/md/lg/xl/2xl padrão) */
+    /* Texto */
+    --color-text: #000000;
+    --color-text-ink: #26242e;
+    --color-text-secondary: #414141;
+    --color-text-muted: #7a8a8a;
+
+    /* Superfícies e bordas */
+    --color-surface: #f6f6f6;
+    --color-border: #e4e4e4;
+    --color-border-muted: #ebe8e8;
+    --color-footer-bg: #2f2952;
+
+    /* ===== Breakpoints — design-system ===== */
     --breakpoint-mobile-sm: 480px;
     --breakpoint-mobile: 600px;
+    --breakpoint-tablet-sm: 650px;
     --breakpoint-tablet: 768px;
+    --breakpoint-desktop-sm: 1024px;
     --breakpoint-desktop: 1200px;
     --breakpoint-desktop-lg: 1440px;
 
-    /* Raios — design-system */
+    /* ===== Raios — design-system ===== */
     --radius-sm: 4px;
     --radius-md: 10px;
     --radius-lg: 16px;
     --radius-xl: 20px;
     --radius-pill: 50px;
 
-    /* Sombras — design-system */
+    /* ===== Sombras — design-system ===== */
     --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.08);
     --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.12);
     --shadow-border: inset 0 0 0 1px #e4e4e4;
 
-    /* Espaçamentos de seção (respiro vertical) — design-system */
+    /* ===== Espaçamentos de seção (respiro vertical) — design-system ===== */
     --spacing-section-sm: 3.75rem;
     --spacing-section: 5rem;
     --spacing-section-lg: 9.13rem;

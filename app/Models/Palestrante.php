@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Palestrante extends Model
 {
@@ -28,5 +29,12 @@ class Palestrante extends Model
     public function scopeAtivo(Builder $query): Builder
     {
         return $query->where('ativo', true);
+    }
+
+    public function palestras(): BelongsToMany
+    {
+        return $this->belongsToMany(Palestra::class, 'palestra_pessoa', 'pessoa_id', 'palestra_id')
+            ->withPivot('papel')
+            ->withTimestamps();
     }
 }

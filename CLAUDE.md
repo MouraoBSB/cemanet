@@ -37,12 +37,15 @@ Três insumos já existem; use-os, não recrie:
 1. **Design** — `design-system/` (tokens, componentes, mapa de páginas) e, para
    fidelidade pixel a pixel, o repositório do snapshot
    `github.com/MouraoBSB/cemanet.org-wordpress` (pasta `snapshot/`).
-2. **Conteúdo (REST)** — a **REST API** de cemanet.org.br (Application Password no
-   `.env`, variáveis `CEMA_WP_*`). Usada **apenas com requisições GET**.
-3. **Estrutura do banco (legado, ao vivo)** — conexão **`legado` somente leitura**
-   ao MySQL do WordPress atual, via **túnel SSH**, com um usuário **só-SELECT**
-   (variáveis `LEGADO_DB_*`). Dá o schema real (tabelas, `wp_postmeta`, relações
-   Jet `wp_jet_rel_107/108`, taxonomias). Ver **[DB-LEGADO.md](DB-LEGADO.md)**.
+2. **Conteúdo — banco `legado` (FONTE PREFERIDA p/ importação)** — conexão **`legado`
+   somente leitura** ao MySQL do WordPress atual, via **túnel SSH**, com usuário
+   **só-SELECT** (variáveis `LEGADO_DB_*`). É a fonte **preferida** por ser mais rica
+   e completa que a REST: schema real, `wp_postmeta`, relações Jet `wp_jet_rel_107/108`
+   (triviais via SQL), repeaters serializados e taxonomias. Mapa WP→MySQL já
+   documentado em **[DB-LEGADO.md](DB-LEGADO.md)**.
+3. **Conteúdo — REST (alternativa/complemento)** — a **REST API** de cemanet.org.br
+   (Application Password no `.env`, variáveis `CEMA_WP_*`), **apenas GET**. Use quando
+   o túnel não estiver disponível ou para algo exposto só pela API.
 
 🚫 **REGRAS DURAS:**
 - **Nunca** escrever no WordPress vivo nem no banco legado — só leitura
@@ -60,7 +63,8 @@ Três insumos já existem; use-os, não recrie:
   0–1, opcional) → pivot `palestra_pessoa` com coluna `papel`; cardinalidade
   validada na aplicação (FormRequest/Policy/observer).
 - Importação **idempotente** (upsert por slug), resolvendo palestrantes/diretores
-  e taxonomia por slug. Ver mapeamento de campos em [DATA-MODEL.md](DATA-MODEL.md).
+  e taxonomia por slug, **a partir do banco `legado`** (fonte preferida — conteúdo
+  mais rico). Ver mapeamento em [DATA-MODEL.md](DATA-MODEL.md) e [DB-LEGADO.md](DB-LEGADO.md).
 
 ## Como trabalhar (workflow)
 
@@ -85,7 +89,7 @@ Três insumos já existem; use-os, não recrie:
 
 - `PROJECT.md` — visão, escopo, decisões e inventário de conteúdo.
 - `ROADMAP.md` — fases e estado atual (atualizar ao concluir etapas).
-- `DATA-MODEL.md` — tabelas, relações, regras de negócio e mapeamento REST→MySQL.
+- `DATA-MODEL.md` — tabelas, relações, regras de negócio e mapeamento WP→MySQL.
 - `DB-LEGADO.md` — acesso somente leitura ao banco do WordPress atual (estrutura real).
 - `design-system/` — tokens, componentes e mapa de páginas (referência de UI).
 

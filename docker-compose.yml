@@ -1,0 +1,59 @@
+# Serviços de infraestrutura local do novo site do CEMA.
+# Serviço "app" (PHP/Laravel via Dockerfile) + serviços de dados (MySQL/Mailpit/Adminer).
+# Subir tudo:  docker compose up -d
+# App: http://localhost:8000  |  Adminer: http://localhost:8080  |  Mailpit: http://localhost:8025
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cema-app
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    ports:
+      - "${APP_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.0
+    container_name: cema-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: "${DB_DATABASE:-cema}"
+      MYSQL_USER: "${DB_USERNAME:-cema}"
+      MYSQL_PASSWORD: "${DB_PASSWORD:-secret}"
+      MYSQL_ROOT_PASSWORD: "${DB_ROOT_PASSWORD:-secret}"
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    volumes:
+      - cema-dbdata:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p${DB_ROOT_PASSWORD:-secret}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: cema-mailpit
+    restart: unless-stopped
+    ports:
+      - "1025:1025"   # SMTP
+      - "8025:8025"   # UI web
+
+  adminer:
+    image: adminer:latest
+    container_name: cema-adminer
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  cema-dbdata:

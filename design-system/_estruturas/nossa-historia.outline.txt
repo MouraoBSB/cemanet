@@ -1,0 +1,702 @@
+# Estrutura (esqueleto) de snapshot/cemanet.org.br/nossa-historia/index.html
+
+a.skip-link.screen-reader-text  «Ir para o conteúdo»
+header.elementor.elementor-21493.elementor-location-header
+  div.elementor-element.elementor-element-703790e.e-flex.e-con-boxed.e-con.e-parent
+    div.e-con-inner
+      div.elementor-element.elementor-element-ff1aaaf.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-68bb67f.elementor-widget.elementor-widget-image
+          a
+            img.attachment-large.size-large.wp-image-13
+      div.elementor-element.elementor-element-9149c75.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-260d646.elementor-widget__width-inherit.elementor-widget.elementor-widget-jet-search
+          div.elementor-widget-container
+            div.elementor-jet-search.jet-blocks
+              div.jet-search
+                form.jet-search__form
+                  label.jet-search__label
+                    span.screen-reader-text  «Pesquisar …»
+                    input.jet-search__field
+                  button.jet-search__submit
+                    span.jet-search__submit-icon.jet-blocks-icon
+      div.elementor-element.elementor-element-1f8b1fe.e-con-full.elementor-hidden-tablet.elementor-hidden-mobile.e-flex
+        div.elementor-element.elementor-element-3bcc3ab.elementor-hidden-tablet.elementor-hidden-mobile.elementor-widget.elementor-widget-jet-auth-links
+          div.elementor-widget-container
+            div.elementor-jet-auth-links.jet-blocks
+              div.jet-auth-links
+                div.jet-auth-links__section.jet-auth-links__login
+                  div.jet-auth-links__prefix  «Possui uma conta?»
+                  a.jet-auth-links__item
+                    span.jet-auth-links__item-icon.jet-blocks-icon
+                    span.jet-auth-links__item-text  «Entrar»
+                div.jet-auth-links__section.jet-auth-links__register
+                  div.jet-auth-links__prefix  «ou»
+                  a.jet-auth-links__item
+                    span.jet-auth-links__item-icon.jet-blocks-icon
+                    span.jet-auth-links__item-text  «Cadastrar»
+      div.elementor-element.elementor-element-cc3bc02.e-con-full.elementor-hidden-desktop.e-flex.e-con
+        div.elementor-element.elementor-element-e587ab0.elementor-view-default.elementor-widget.elementor-widget-icon
+          div.elementor-icon-wrapper
+            a.elementor-icon
+              i.huge.huge-menu-07
+  header.elementor-element.elementor-element-596622a.elementor-hidden-tablet.elementor-hidden-mobile.e-flex.e-con-boxed
+    div.e-con-inner
+      div.elementor-element.elementor-element-c913db1.jet-nav-align-center.elementor-widget.elementor-widget-jet-nav-menu
+        div.elementor-widget-container
+          nav.jet-nav-wrap.m-layout-mobile.jet-mobile-menu.jet-mobile-menu--default
+            div.jet-nav__mobile-trigger.jet-nav-mobile-trigger-align-left
+              span.jet-nav__mobile-trigger-open.jet-blocks-icon
+              span.jet-nav__mobile-trigger-close.jet-blocks-icon
+            div.menu-menu-principal-container
+              div.jet-nav.m-layout-mobile.jet-nav--horizontal
+                div.menu-item.menu-item-type-post_type.menu-item-object-page.current-menu-ancestor.current-menu-parent.current_page_parent
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Institucional»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26597.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Nossa Estrutura»
+                    div.menu-item.menu-item-type-post_type.menu-item-object-page.current-menu-item.page_item.page-item-111
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Nossa História»
+                    div.menu-item.menu-item-type-post_type.menu-item-object-page.jet-nav__item-25597.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Contato»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-26594.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Palestras»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-24866.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Palestras Públicas»
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-24867.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Palestrantes»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-24167.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Mensagens Mediúnicas»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26595.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Mensagens»
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-24865.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Autores Espirituais»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-24868.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Eventos»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26598.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Nossos Eventos»
+                div.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.jet-nav__item-24871.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Vibração»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26599.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Caixinha de Vibração»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-24869.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Agenda»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26600.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Agenda Reforma Íntima»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-24870.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Evangelho»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26601.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Evangelho da Semana»
+                    div.menu-item.menu-item-type-post_type.menu-item-object-page.jet-nav__item-25969.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Evangelho no Lar»
+                div.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.jet-nav__item-130.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Sementeira»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-26602.jet-nav__item
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Blog Espírita»
+                        div.jet-nav-arrow
+                      div.jet-nav__sub.jet-nav-depth-1
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26608.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «Reflexões e Espiritualidade»
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26609.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «CEMA em Ação»
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26610.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «Estudando a Mediunidade»
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26611.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «Datas Comemorativas»
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26612.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «Prática de Amor ao Próximo»
+  div.elementor-element.elementor-element-ca1779c.e-flex.e-con-boxed.e-con.e-parent
+    div.e-con-inner
+      div.elementor-element.elementor-element-c60c42a.elementor-widget.elementor-widget-off-canvas
+        div#off-canvas-c60c42a.e-off-canvas
+          div.e-off-canvas__overlay
+          div.e-off-canvas__main
+            div.e-off-canvas__content
+              div.elementor-element.elementor-element-84807df.e-con-full.e-flex.e-con.e-child
+                div.elementor-element.elementor-element-b59e0d6.elementor-view-default.elementor-widget.elementor-widget-icon
+                  div.elementor-icon-wrapper
+                    a.elementor-icon
+                div.elementor-element.elementor-element-8644c44.e-flex.e-con-boxed.e-con.e-child
+                  div.e-con-inner
+                    div.elementor-element.elementor-element-6aa2eca.jedv-enabled--yes.elementor-widget.elementor-widget-image
+                      img.attachment-large.size-large.wp-image-13
+                    div.elementor-element.elementor-element-b15207d.e-con-full.jedv-enabled--yes.e-flex.e-con
+                      div.elementor-element.elementor-element-e256036.elementor-widget.elementor-widget-button
+                        a.elementor-button.elementor-button-link.elementor-size-sm
+                          span.elementor-button-content-wrapper
+                            span.elementor-button-icon
+                              i.huge.huge-login-circle-01
+                            span.elementor-button-text  «Fazer Login?»
+                      div.elementor-element.elementor-element-fbf9519.elementor-widget.elementor-widget-button
+                        a.elementor-button.elementor-button-link.elementor-size-sm
+                          span.elementor-button-content-wrapper
+                            span.elementor-button-icon
+                              i.huge.huge-user-unlock-01
+                            span.elementor-button-text  «Criar Conta?»
+                div.elementor-element.elementor-element-e73793f.elementor-widget.elementor-widget-heading
+                  h2.elementor-heading-title.elementor-size-default  «Menu»
+                div.elementor-element.elementor-element-32e76e8.elementor-nav-menu--dropdown-mobile.elementor-nav-menu--stretch.elementor-nav-menu__text-align-aside.elementor-nav-menu--toggle
+                  nav.elementor-nav-menu--main.elementor-nav-menu__container.elementor-nav-menu--layout-vertical.e--pointer-underline.e--animation-fade
+                    ul#menu-1-32e76e8.elementor-nav-menu.sm-vertical
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.current-menu-ancestor.current-menu-parent.current_page_parent
+                        a.elementor-item  «Institucional»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26597
+                            a.elementor-sub-item  «Nossa Estrutura»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.current-menu-item.page_item.page-item-111
+                            a.elementor-sub-item.elementor-item-active  «Nossa História»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-25597
+                            a.elementor-sub-item  «Contato»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-26594
+                        a.elementor-item  «Palestras»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24866
+                            a.elementor-sub-item  «Palestras Públicas»
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24867
+                            a.elementor-sub-item  «Palestrantes»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24167
+                        a.elementor-item  «Mensagens Mediúnicas»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26595
+                            a.elementor-sub-item  «Mensagens»
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24865
+                            a.elementor-sub-item  «Autores Espirituais»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24868
+                        a.elementor-item  «Eventos»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26598
+                            a.elementor-sub-item  «Nossos Eventos»
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.menu-item-24871
+                        a.elementor-item  «Vibração»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26599
+                            a.elementor-sub-item  «Caixinha de Vibração»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24869
+                        a.elementor-item  «Agenda»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26600
+                            a.elementor-sub-item  «Agenda Reforma Íntima»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24870
+                        a.elementor-item  «Evangelho»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26601
+                            a.elementor-sub-item  «Evangelho da Semana»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-25969
+                            a.elementor-sub-item  «Evangelho no Lar»
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.menu-item-130
+                        a.elementor-item  «Sementeira»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-26602
+                            a.elementor-sub-item  «Blog Espírita»
+                            ul.sub-menu.elementor-nav-menu--dropdown
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26608
+                                a.elementor-sub-item  «Reflexões e Espiritualidade»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26609
+                                a.elementor-sub-item  «CEMA em Ação»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26610
+                                a.elementor-sub-item  «Estudando a Mediunidade»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26611
+                                a.elementor-sub-item  «Datas Comemorativas»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26612
+                                a.elementor-sub-item  «Prática de Amor ao Próximo»
+                  div.elementor-menu-toggle
+                  nav.elementor-nav-menu--dropdown.elementor-nav-menu__container
+                    ul#menu-2-32e76e8.elementor-nav-menu.sm-vertical
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.current-menu-ancestor.current-menu-parent.current_page_parent
+                        a.elementor-item  «Institucional»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26597
+                            a.elementor-sub-item  «Nossa Estrutura»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.current-menu-item.page_item.page-item-111
+                            a.elementor-sub-item.elementor-item-active  «Nossa História»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-25597
+                            a.elementor-sub-item  «Contato»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-26594
+                        a.elementor-item  «Palestras»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24866
+                            a.elementor-sub-item  «Palestras Públicas»
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24867
+                            a.elementor-sub-item  «Palestrantes»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24167
+                        a.elementor-item  «Mensagens Mediúnicas»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26595
+                            a.elementor-sub-item  «Mensagens»
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24865
+                            a.elementor-sub-item  «Autores Espirituais»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24868
+                        a.elementor-item  «Eventos»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26598
+                            a.elementor-sub-item  «Nossos Eventos»
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.menu-item-24871
+                        a.elementor-item  «Vibração»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26599
+                            a.elementor-sub-item  «Caixinha de Vibração»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24869
+                        a.elementor-item  «Agenda»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26600
+                            a.elementor-sub-item  «Agenda Reforma Íntima»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24870
+                        a.elementor-item  «Evangelho»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26601
+                            a.elementor-sub-item  «Evangelho da Semana»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-25969
+                            a.elementor-sub-item  «Evangelho no Lar»
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.menu-item-130
+                        a.elementor-item  «Sementeira»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-26602
+                            a.elementor-sub-item  «Blog Espírita»
+                            ul.sub-menu.elementor-nav-menu--dropdown
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26608
+                                a.elementor-sub-item  «Reflexões e Espiritualidade»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26609
+                                a.elementor-sub-item  «CEMA em Ação»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26610
+                                a.elementor-sub-item  «Estudando a Mediunidade»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26611
+                                a.elementor-sub-item  «Datas Comemorativas»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26612
+                                a.elementor-sub-item  «Prática de Amor ao Próximo»
+div.elementor.elementor-111
+  section.jet-tricks-particles-section.elementor-element.elementor-element-00e2508.section-xxl.e-flex.e-con-boxed
+    div.e-con-inner
+      div.elementor-shape.elementor-shape-bottom
+      div.elementor-element.elementor-element-52530c4.elementor-widget.elementor-widget-heading
+        h1.elementor-heading-title.elementor-size-default  «Nossa História»
+      div.elementor-element.elementor-element-97f971a.elementor-widget-divider--view-line.elementor-widget.elementor-widget-divider
+        div.elementor-divider
+          span.elementor-divider-separator
+      div.elementor-element.elementor-element-171ee19.elementor-widget.elementor-widget-heading
+        h2.elementor-heading-title.elementor-size-default  «O CEMA e sua linda história ao longo das décadas»
+  section.elementor-element.elementor-element-d88922b.section-narrow-xs.e-flex.e-con-boxed.e-con
+    div.e-con-inner
+      div.elementor-element.elementor-element-676c3fc.elementor-widget.elementor-widget-jet-breadcrumbs
+        div.elementor-widget-container
+          div.elementor-jet-breadcrumbs.jet-blocks
+            div.jet-breadcrumbs
+              div.jet-breadcrumbs__content
+                div.jet-breadcrumbs__wrap
+                  div.jet-breadcrumbs__item
+                    a.jet-breadcrumbs__item-link.is-home  «Início»
+                  div.jet-breadcrumbs__item
+                    div.jet-breadcrumbs__item-sep
+                      span.jet-blocks-icon
+                  div.jet-breadcrumbs__item
+                    span.jet-breadcrumbs__item-target  «Nossa História»
+  section#inicio.elementor-element.elementor-element-0760d10.section-l.e-flex.e-con-boxed.e-con
+    div.e-con-inner
+      div.elementor-element.elementor-element-5ef561c.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-c93f892.elementor-widget.elementor-widget-heading
+          h2.elementor-heading-title.elementor-size-default  «O Início de Tudo»
+        div.elementor-element.elementor-element-72f8e3c.e-con-full.e-flex.e-con.e-child
+          div.elementor-element.elementor-element-69813ba.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-68ba8ce.elementor-widget.elementor-widget-image
+              a
+                img.attachment-large.size-large.wp-image-20639
+          div.elementor-element.elementor-element-7d7f82f.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-1884a01.elementor-widget.elementor-widget-text-editor
+              p  «Em 29 de fevereiro de 1908, na cidade de Barra Mansa no Estado do Rio »
+              p  «O jovem cresceu e viveu ali com a sua mãe, seu pai Camilo Lélis Alves »
+                strong  «José Alves dos Santos»
+                strong  «Francisca Gomes da Silva»
+              p  «Em 1930, o jovem casal muda para o município de Garças, estado de São »
+              p  «Dos dez que tiveram, oito nasceram em São Paulo, foram eles por ordem »
+              p  «A vida de lutas prosseguia, mas a esperança estava sempre presente, a »
+              p  «Em busca de tratamento, José encontrou algo que jamais sonhara, mas qu»
+  section#primeiro.elementor-element.elementor-element-7b39ccd.section-l.e-flex.e-con-boxed.e-con
+    div.e-con-inner
+      div.elementor-element.elementor-element-df5c5ad.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-a89c4e1.elementor-widget.elementor-widget-heading
+          h2.elementor-heading-title.elementor-size-default  «O primeiro contato com o Espiritismo»
+        div.elementor-element.elementor-element-50da7c4.e-con-full.e-flex.e-con.e-child
+          div.elementor-element.elementor-element-b824808.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-8d80e2c.elementor-widget.elementor-widget-image
+              a
+                img.attachment-large.size-large.wp-image-20643
+            div.elementor-element.elementor-element-51604b0.elementor-widget.elementor-widget-image
+              a
+                img.attachment-large.size-large.wp-image-20644
+          div.elementor-element.elementor-element-8f29f91.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-e8ec526.elementor-widget.elementor-widget-text-editor
+              p  «Chegando a Bauru/SP, em busca de recursos para o seu problema na vista»
+              p  «Iniciados os cuidados médicos, a expectativa de recuperação da saúde e»
+              p  «Certa noite, José se encontrava triste, pensativo e abatido na varanda»
+              p
+                em  «– Desculpe a ousadia, mas posso lhe fazer uma pergunta?»
+              p  «Após a resposta afirmativa de José o desconhecido indagou:»
+              p
+                em  «– O Sr. está passando mal?»
+              p
+                em  «– Sim, respondeu José.»
+              p
+                em  «– Vou lhe fazer uma proposta.»
+              p  «Se o senhor quiser acertar as contas com o hotel e a clínica e me acom»
+              p  «Chegando no rancho, o carroceiro pediu à esposa que colocasse na mesa »
+                strong
+                  em  «“O Evangelho Segundo o Espiritismo”»
+              p  «Aquele líquido, esclareceu a médium, impedia que a medicação utilizada»
+              p  «E assim, na presença de um José assustado e atento, o senhor travou um»
+              p  «Finalmente conseguiria dormir à noite, pensava ele. Mas, afinal de con»
+  section#ceres.elementor-element.elementor-element-7f99584.section-l.e-flex.e-con-boxed.e-con
+    div.e-con-inner
+      div.elementor-element.elementor-element-588d467.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-06b2584.elementor-widget.elementor-widget-heading
+          h2.elementor-heading-title.elementor-size-default  «O Centro Espírita Maria Madalena em Ceres/GO»
+        div.elementor-element.elementor-element-ceae1d2.e-con-full.e-flex.e-con.e-child
+          div.elementor-element.elementor-element-bc1d4ce.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-c8e0ef7.elementor-widget.elementor-widget-image
+              a
+                img.attachment-large.size-large.wp-image-20647
+          div.elementor-element.elementor-element-5fce5a5.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-0c66593.elementor-widget.elementor-widget-text-editor
+              p  «Após o tratamento recebido, José foi dormir com a recomendação de que »
+              p  «Como pressentira, dormiu como há muito não fazia. Na casa do novo amig»
+              p
+                em  «– Vou passar agora uma receitinha. Leve como presente e compre os quat»
+                  strong  «“O Livro dos Espíritos”»
+              p  «No caminho de volta para casa, José pensava que graças à Deus e a ajud»
+              p  «Em 1948, José resolveu mudar com a família para a Colônia Agrícola Nac»
+                em  «2 de fevereiro de 1950»
+                strong  «Centro Espírita Maria Madalena»
+              p  «Não era difícil ver do lado de fora do Centro até sessenta cavalos dos»
+              p  «O salão estava ficando pequeno para tanta procura e outras Casas Espír»
+                em  «1954»
+              p
+                em  «– Pode levá-lo para casa, pois não há mais o que fazer.»
+              p  «José estava desenganado pelos médicos. Foi aí, em meio a novas dificul»
+  section#jeronimo.elementor-element.elementor-element-d69602b.section-l.e-flex.e-con-boxed.e-con
+    div.e-con-inner
+      div.elementor-element.elementor-element-75023a2.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-c529e0c.elementor-widget.elementor-widget-heading
+          h2.elementor-heading-title.elementor-size-default  «O Encontro com Jerônimo Candinho em Palmelo/GO e a nova mudança»
+        div.elementor-element.elementor-element-09c0b37.e-con-full.e-flex.e-con.e-child
+          div.elementor-element.elementor-element-0981298.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-7bdb24f.elementor-widget.elementor-widget-image
+              a
+                img.attachment-large.size-large.wp-image-20651
+            div.elementor-element.elementor-element-ec1c213.elementor-widget.elementor-widget-image
+              a
+                img.attachment-large.size-large.wp-image-20649
+          div.elementor-element.elementor-element-41a425a.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-3e873f2.elementor-widget.elementor-widget-text-editor
+              p  «No ano de 1954, mesmo desenganado pelos médicos em decorrência da grav»
+              p  «José, que já ouvira falar do extraordinário trabalho espiritual realiz»
+                a  «Jerônimo Candinho»
+                em  «(foto ao lado)»
+              p  «Foram pouco mais de trinta dias de tratamento, observações, aprendizad»
+              p  «No retorno a Ceres, a saúde estava completamente recuperada e a convic»
+                em  «05 de janeiro de 1958»
+                strong  «O Evangelho Segundo o Espiritismo»
+              p  «No dia seguinte, José se instalava em uma casa alugada na Rua Eugênio »
+              p  «Determinado a prosseguir com o trabalho espiritual iniciado em Ceres/G»
+  section#dificuldades.elementor-element.elementor-element-d1db275.section-l.e-flex.e-con-boxed.e-con
+    div.e-con-inner
+      div.elementor-element.elementor-element-fa43965.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-085fc44.elementor-widget.elementor-widget-heading
+          h2.elementor-heading-title.elementor-size-default  «As primeiras dificuldades e a fundação do CEMA em Planaltina/DF»
+        div.elementor-element.elementor-element-e51f6c2.e-con-full.e-flex.e-con.e-child
+          div.elementor-element.elementor-element-879028d.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-15c666e.elementor-widget.elementor-widget-image
+              a
+                img.attachment-large.size-large.wp-image-20654
+          div.elementor-element.elementor-element-7511abc.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-77c9a22.elementor-widget.elementor-widget-text-editor
+              p  «Após sete meses no Setor Tradicional de Planaltina, José conseguiu com»
+                em  «julho de 1958.»
+              p  «Neste local construiu a sua residência e um pequeno salão, no qual, em»
+              p  «Aos poucos o, grupo inicial de trabalhadores foi se constituindo. Pess»
+              p  «Apesar de tudo, a fé de José Paulista só aumentava. Em 1961 adquiriu d»
+              p  «No dia 24 de junho de 1961, às 12h, na presença de mais de sessenta pe»
+                strong  «José Alves dos Santos»
+                em  «Presidente»
+              ul
+                li
+                  strong  «Tubertino Gomes»
+                  ul
+                    li
+                      em  «Vice-Presidente»
+                li
+                  strong  «Luiz Nunes Ferraz»
+                  ul
+                    li
+                      em  «1º Secretário»
+                li
+                  strong  «Raimundo Marques de Almeida»
+                  ul
+                    li
+                      em  «2º Secretário»
+                li
+                  strong  «Felix Morais Cardoso»
+                  ul
+                    li
+                      em  «1º Tesoureiro»
+                li
+                  strong  «Gumercino Vieira Rocha»
+                  ul
+                    li  «2º Tesoureiro»
+              p  «Bem como um , composto por:»
+                em  «Conselho Fiscal»
+              ul
+                li
+                  strong  «Oswaldo Ramos»
+                li  «(D.Chiquinha)»
+                  strong  «Francisca dos Santos Silva»
+                li
+                  strong  «Gerônimo Pires de Souza»
+                li
+                  strong  «Dorcelina Gomes»
+              p  «Paralelamente, iniciava, com recursos próprios, a edificação da sede d»
+                em  «abril de 1963»
+              p  «Centenas de necessitados surgiam em busca de lenitivo às suas dores. T»
+              p  «Estaria o CEMA com os dias contados?»
+          div.elementor-element.elementor-element-918b2b2.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-85f0e0c.elementor-skin-carousel.elementor-arrows-yes.elementor-pagination-type-bullets.elementor-pagination-position-outside
+              div.elementor-main-swiper.swiper
+                div.swiper-wrapper
+                  div.swiper-slide
+                    a
+                      div.elementor-carousel-image
+                  div.swiper-slide
+                    a
+                      div.elementor-carousel-image
+                  div.swiper-slide
+                    a
+                      div.elementor-carousel-image
+                  div.swiper-slide
+                    a
+                      div.elementor-carousel-image
+                div.elementor-swiper-button.elementor-swiper-button-prev
+                div.elementor-swiper-button.elementor-swiper-button-next
+                div.swiper-pagination
+  section#transformacoes.elementor-element.elementor-element-a09da76.section-l.e-flex.e-con-boxed.e-con
+    div.e-con-inner
+      div.elementor-element.elementor-element-be40005.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-e1f1e7f.elementor-widget.elementor-widget-heading
+          h2.elementor-heading-title.elementor-size-default  «Grandes transformações para o CEMA»
+        div.elementor-element.elementor-element-236782a.e-con-full.e-flex.e-con.e-child
+          div.elementor-element.elementor-element-edfc8ef.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-b0dd66f.elementor-widget.elementor-widget-image
+              a
+                img.attachment-large.size-large.wp-image-20662
+            div.elementor-element.elementor-element-3aeafac.elementor-widget.elementor-widget-image
+              a
+                img.attachment-large.size-large.wp-image-20627
+            div.elementor-element.elementor-element-af82be4.elementor-widget.elementor-widget-image
+              a
+                img.attachment-large.size-large.wp-image-20663
+          div.elementor-element.elementor-element-9348c40.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-1b38d04.elementor-widget.elementor-widget-text-editor
+              p  «Passados quase vinte anos desde a fundação do CEMA em Planaltina, as f»
+              p  «Após muito lutar para encontrar um substituto para a direção, seu filh»
+              p  «Uma nova fase estaria, então, por acontecer. A partir daí, muitos fora»
+                em  «– incentivada por José Paulista –»
+              p  «Diversas diretorias foram constituídas e o trabalho prosseguiu sob as »
+              ul
+                li  «A organização dos primeiros cursos sistematizados»
+                li  «A evangelização infantil, juvenil e de adulto»
+                li  «A inauguração da Casa da Sopa Emmanuel»
+                li  «A criação da Campanha de Fraternidade Auta de Souza»
+                li  «O Posto de Assistência no Buritis II (que mais tarde se transformaria »
+                  a  «CECAP»
+                li  «A inicialização da construção da atual sede e a criação do grupo de Te»
+              p  «Com a saúde debilitada, Zé Paulista é internado no hospital de Planalt»
+                a  «IGESDF»
+                a  «HUB»
+              p  «Vítima de complicações, devido a um Acidente Vascular Cerebral, José A»
+                em  «22 de junho de 1985.»
+              p  «Trabalhador incansável, que muitas vezes lutou solitariamente, acredit»
+              p  «Dizia que a sua finalidade única era .»
+                em  «“demonstrar aos planaltinenses que espiritismo é caridade, é renúncia »
+              p  «Após o sepultamento, o então amigo, Jorge Cauhy, revela aos familiares»
+              p  «Na década de 90, trabalhadores do CEMA criam o Posto de Assistência Au»
+                a  «CESAS»
+              p  «No ano de 1995, Dona Chiquinha, companheira dedicada que conviveu dura»
+                em  «17 de setembro»
+              p  «Um dos objetivos da reunião é de que os laços familiares não se enfraq»
+  section#colaboradores.elementor-element.elementor-element-7a3b9e4.section-l.e-flex.e-con-boxed.e-con
+    div.e-con-inner
+      div.elementor-element.elementor-element-96f8712.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-25b18f9.elementor-widget.elementor-widget-heading
+          h2.elementor-heading-title.elementor-size-default  «Os Colaboradores do CEMA ao longo da sua história»
+        div.elementor-element.elementor-element-8abd8c7.e-con-full.e-flex.e-con.e-child
+          div.elementor-element.elementor-element-1584897.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-88f34a2.elementor-widget.elementor-widget-heading
+              h3.elementor-heading-title.elementor-size-default  «Conforme os registros nos livros de ata, o CEMA foi dirigido por equip»
+          div.elementor-element.elementor-element-71d889d.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-6239353.elementor-widget.elementor-widget-jet-dynamic-table
+              div.elementor-widget-container
+                div.jet-dynamic-table-wrapper
+                  table.jet-dynamic-table
+                    thead.jet-dynamic-table__header
+                      tr.jet-dynamic-table__row.jet-dynamic-table__row--header
+                        th.jet-dynamic-table__col.jet-dynamic-table__col--diretorpresidente  «Diretor Presidente»
+                        th.jet-dynamic-table__col.jet-dynamic-table__col--perodo  «Período»
+                        th.jet-dynamic-table__col.jet-dynamic-table__col--durao  «Duração»
+                    tbody.jet-dynamic-table__body
+                      tr.jet-dynamic-table__row.jet-dynamic-table__row--header
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--diretorpresidente  «José Alves dos Santos (✟)»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--perodo  «1961 a 1980»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--durao  «19 anos»
+                      tr.jet-dynamic-table__row.jet-dynamic-table__row--header
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--diretorpresidente  «Orlando Alves dos Santos (✟)»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--perodo  «1981 a 1980»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--durao  «05 anos»
+                      tr.jet-dynamic-table__row.jet-dynamic-table__row--header
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--diretorpresidente  «Maria Fernandes dos Santos (Tia Vera) (✟)»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--perodo  «1986 a 1987»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--durao  «02 anos»
+                      tr.jet-dynamic-table__row.jet-dynamic-table__row--header
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--diretorpresidente  «Roberto Lino do Nascimento»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--perodo  «1988 a 1992»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--durao  «05 anos»
+                      tr.jet-dynamic-table__row.jet-dynamic-table__row--header
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--diretorpresidente  «Renan Caputo de Faria»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--perodo  «1993 a 1995»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--durao  «03 anos»
+                      tr.jet-dynamic-table__row.jet-dynamic-table__row--header
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--diretorpresidente  «José Murilo Cruz Brito»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--perodo  «1996 a 2001»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--durao  «06 anos»
+                      tr.jet-dynamic-table__row.jet-dynamic-table__row--header
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--diretorpresidente  «Halvécio Machado Paiva»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--perodo  «2002 a 2004»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--durao  «03 anos»
+                      tr.jet-dynamic-table__row.jet-dynamic-table__row--header
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--diretorpresidente  «Elizeu Pereira de Carvalho»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--perodo  «2005 a 2006»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--durao  «02 anos»
+                      tr.jet-dynamic-table__row.jet-dynamic-table__row--header
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--diretorpresidente  «Elizabete Maria Gasparotto»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--perodo  «2007 a 2022»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--durao  «15 anos»
+                      tr.jet-dynamic-table__row.jet-dynamic-table__row--header
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--diretorpresidente  «Aury Cleide Parente»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--perodo  «2023 a …»
+                        td.jet-dynamic-table__col.jet-dynamic-table__col--durao  «Atual»
+        div.elementor-element.elementor-element-0f5ddc3.e-con-full.e-flex.e-con.e-child
+          div.elementor-element.elementor-element-16a4e8f.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-4f4d76a.elementor-widget.elementor-widget-image
+              a
+                img.attachment-large.size-large.wp-image-20666
+          div.elementor-element.elementor-element-38704ac.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-8ec647f.elementor-widget.elementor-widget-text-editor
+              p  «É importante ressaltar que todos os trabalhos desenvolvidos no CEMA fo»
+            div.elementor-element.elementor-element-dfaff4d.elementor-widget.elementor-widget-text-editor
+              p
+                strong
+                  em  «“Cada companheiro é indicado à tarefa precisa; cada qual assume a feiç»
+  section#homenagem.elementor-element.elementor-element-a7db791.section-l.e-flex.e-con-boxed.e-con
+    div.e-con-inner
+      div.elementor-element.elementor-element-e80cbd3.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-9b33ffa.elementor-widget.elementor-widget-heading
+          h2.elementor-heading-title.elementor-size-default  «Homenagem ao Seu Zé Paulista»
+        div.elementor-element.elementor-element-13fd94c.e-con-full.e-flex.e-con.e-child
+          div.elementor-element.elementor-element-eb116cc.e-con-full.e-flex.e-con.e-child
+            div.elementor-element.elementor-element-5684175.elementor-widget.elementor-widget-text-editor
+              p  «Foi Deus!…»
+              p  «Ah! Que ninguém jamais duvide: foi Deus!»
+              p  «Assim como a exemplo de Moisés e Josué a caminho da Terra Prometida, s»
+              p  «Deus realmente não escolhe os preparados, mas prepara os escolhidos.»
+              p  «Assim como Moisés, homem de pequena estatura e dificuldade de expressã»
+              p  «Falar, pensar e principalmente exercitar os princípios kardequianos à »
+              p  «Foi nesse cenário que o Sr. José Paulista, cognome de José Alves dos S»
+              p  «Por isso, neste dia 29 de fevereiro de 2008, mais que justo a homenage»
+              p  «Estamos todos convictos de que o Sr. José Paulista, bem como sua compa»
+              p  «Orgulhosamente, no mais legítimo e verdadeiro sentido, nesta data, agr»
+              p  «Que a paz de nosso senhor Jesus Cristo…»
+              p  «Que a paz de todos os nossos queridos mentores espirituais que nos ass»
+              p  «Que a paz de Deus, nosso pai de infinito amor e bondade, seja com todo»
+              p  «hoje, agora e sempre…»
+              p  «E que assim seja!»
+            div.elementor-element.elementor-element-8ccd266.elementor-widget.elementor-widget-heading
+              h3.elementor-heading-title.elementor-size-default  «JORGE ALVES DOS SANTOS FILHO»
+            div.elementor-element.elementor-element-8752e6b.elementor-widget.elementor-widget-image
+              img.attachment-large.size-large.wp-image-21557
+  div.elementor-element.elementor-element-8d62012.e-flex.e-con-boxed.e-con.e-parent
+    div.e-con-inner
+      div.elementor-element.elementor-element-5485770.elementor-widget.elementor-widget-jet-scroll-navigation
+        div.elementor-widget-container
+          div.elementor-jet-scroll-navigation.jet-elements
+            div.jet-scroll-navigation.jet-scroll-navigation--position-right.jet-scroll-navigation--show-active-hint
+              div.jet-scroll-navigation__inner
+                div.jet-scroll-navigation__item
+                  div.jet-scroll-navigation__dot
+                  div.jet-scroll-navigation__item-hint
+                div.jet-scroll-navigation__item
+                  div.jet-scroll-navigation__dot
+                  div.jet-scroll-navigation__item-hint
+                div.jet-scroll-navigation__item
+                  div.jet-scroll-navigation__dot
+                  div.jet-scroll-navigation__item-hint
+                div.jet-scroll-navigation__item
+                  div.jet-scroll-navigation__dot
+                  div.jet-scroll-navigation__item-hint
+                div.jet-scroll-navigation__item
+                  div.jet-scroll-navigation__dot
+                  div.jet-scroll-navigation__item-hint
+                div.jet-scroll-navigation__item
+                  div.jet-scroll-navigation__dot
+                  div.jet-scroll-navigation__item-hint
+                div.jet-scroll-navigation__item
+                  div.jet-scroll-navigation__dot
+                  div.jet-scroll-navigation__item-hint
+                div.jet-scroll-navigation__item
+                  div.jet-scroll-navigation__dot
+                  div.jet-scroll-navigation__item-hint
+footer.elementor.elementor-21504.elementor-location-footer
+  section.elementor-element.elementor-element-031605f.e-con-full.section-m.e-flex.e-con
+    div.elementor-element.elementor-element-38d732f.e-con-full.e-flex.e-con.e-child
+      div.elementor-element.elementor-element-4c4c76e.elementor-widget.elementor-widget-image
+        a
+          img.attachment-large.size-large.wp-image-200
+    div.elementor-element.elementor-element-52cc244.e-con-full.e-flex.e-con.e-child
+      div.elementor-element.elementor-element-4541a2b.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width.elementor-widget.elementor-widget-icon-list
+        ul.elementor-icon-list-items
+          li.elementor-icon-list-item
+            a

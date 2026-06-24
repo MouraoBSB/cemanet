@@ -1,0 +1,812 @@
+{
+  "gerado_em": "2026-06-22T21:49:32.835Z",
+  "base": "cemanet.org.br",
+  "cobertura": {
+    "arquivos_css": 211,
+    "css_kb": 3475,
+    "arquivos_html": 51
+  },
+  "elementor_global": {
+    "--e-global-color-primary": "#4E4483",
+    "--e-global-color-secondary": "#6E9FCB",
+    "--e-global-color-text": "#000000",
+    "--e-global-color-accent": "#89AB98",
+    "--e-global-color-8f94d2f": "#E79048",
+    "--e-global-color-122e678": "#FFFFFF",
+    "--e-global-color-df1ab48": "#C33A36",
+    "--e-global-color-690ff94": "#008000",
+    "--e-global-color-0e34899": "#F3EDDD",
+    "--e-global-color-a77cb79": "#414141",
+    "--e-global-color-820879e": "#F6F6F6",
+    "--e-global-color-918c512": "#E4E4E4",
+    "--e-global-color-5831f52": "#EBE8E8",
+    "--e-global-color-5cd695e": "#7A8A8A",
+    "--e-global-typography-primary-font-family": "\"Roboto\"",
+    "--e-global-typography-primary-font-weight": "600",
+    "--e-global-typography-secondary-font-family": "\"Roboto Slab\"",
+    "--e-global-typography-secondary-font-weight": "400",
+    "--e-global-typography-text-font-family": "\"Roboto\"",
+    "--e-global-typography-text-font-weight": "400",
+    "--e-global-typography-accent-font-family": "\"Roboto\"",
+    "--e-global-typography-accent-font-weight": "500",
+    "--e-global-typography-b9d7ad7-font-family": "\"Work Sans\"",
+    "--e-global-typography-b9d7ad7-font-size": "clamp(2.027rem, 1.3974rem + 2.0146vw, 3.815rem)",
+    "--e-global-typography-b9d7ad7-font-weight": "600",
+    "--e-global-typography-cad9484-font-family": "\"Work Sans\"",
+    "--e-global-typography-cad9484-font-size": "clamp(1.802rem, 1.3619rem + 1.4085vw, 3.052rem)",
+    "--e-global-typography-cad9484-font-weight": "400",
+    "--e-global-typography-6f40e36-font-family": "\"Work Sans\"",
+    "--e-global-typography-6f40e36-font-size": "clamp(1.602rem, 1.3066rem + 0.9454vw, 2.441rem)",
+    "--e-global-typography-6f40e36-font-weight": "400",
+    "--e-global-typography-0175d09-font-family": "\"Poppins\"",
+    "--e-global-typography-0175d09-font-size": "clamp(1.424rem, 1.3751rem + 0.1566vw, 1.563rem)",
+    "--e-global-typography-0175d09-font-weight": "400",
+    "--e-global-typography-56ab7a7-font-family": "\"Poppins\"",
+    "--e-global-typography-56ab7a7-font-size": "clamp(1.266rem, 1.1614rem + 0.3346vw, 1.563rem)",
+    "--e-global-typography-56ab7a7-font-weight": "400",
+    "--e-global-typography-fc24f5e-font-family": "\"Poppins\"",
+    "--e-global-typography-fc24f5e-font-size": "clamp(1.125rem, 1.081rem + 0.1408vw, 1.25rem)",
+    "--e-global-typography-fc24f5e-font-weight": "400",
+    "--e-global-typography-0554871-font-family": "\"Poppins\"",
+    "--e-global-typography-0554871-font-size": "clamp(1rem, 1rem + 0vw, 1rem)",
+    "--e-global-typography-0554871-font-weight": "400",
+    "--e-global-typography-b2aa2d4-font-family": "\"Poppins\"",
+    "--e-global-typography-b2aa2d4-font-size": "clamp(0.889rem, 0.9203rem + -0.1003vw, 0.8rem)",
+    "--e-global-typography-b2aa2d4-font-weight": "400",
+    "--e-global-typography-0036b10-font-family": "\"Poppins\"",
+    "--e-global-typography-0036b10-font-size": "clamp(0.79rem, 0.8428rem + -0.169vw, 0.64rem)",
+    "--e-global-typography-0036b10-font-weight": "400"
+  },
+  "cores_frequentes": [
+    {
+      "valor": "#000000",
+      "n": 1707
+    },
+    {
+      "valor": "#ffffff",
+      "n": 896
+    },
+    {
+      "valor": "#ff6900",
+      "n": 324
+    },
+    {
+      "valor": "#0693e3",
+      "n": 254
+    },
+    {
+      "valor": "#cf2e2e",
+      "n": 216
+    },
+    {
+      "valor": "#fcb900",
+      "n": 216
+    },
+    {
+      "valor": "#9b51e0",
+      "n": 216
+    },
+    {
+      "valor": "#eeeeee",
+      "n": 190
+    },
+    {
+      "valor": "#00d084",
+      "n": 146
+    },
+    {
+      "valor": "#020381",
+      "n": 146
+    },
+    {
+      "valor": "#2874fc",
+      "n": 146
+    },
+    {
+      "valor": "#dddddd",
+      "n": 130
+    },
+    {
+      "valor": "#abb8c3",
+      "n": 108
+    },
+    {
+      "valor": "#f78da7",
+      "n": 108
+    },
+    {
+      "valor": "#7bdcb5",
+      "n": 108
+    },
+    {
+      "valor": "#8ed1fc",
+      "n": 108
+    },
+    {
+      "valor": "#32373c",
+      "n": 108
+    },
+    {
+      "valor": "#7adcb4",
+      "n": 108
+    },
+    {
+      "valor": "#00d082",
+      "n": 108
+    },
+    {
+      "valor": "#a9b8c3",
+      "n": 108
+    },
+    {
+      "valor": "#4aeadc",
+      "n": 108
+    },
+    {
+      "valor": "#9778d1",
+      "n": 108
+    },
+    {
+      "valor": "#cf2aba",
+      "n": 108
+    },
+    {
+      "valor": "#ee2c82",
+      "n": 108
+    },
+    {
+      "valor": "#fb6962",
+      "n": 108
+    },
+    {
+      "valor": "#fef84c",
+      "n": 108
+    },
+    {
+      "valor": "#ffceec",
+      "n": 108
+    },
+    {
+      "valor": "#9896f0",
+      "n": 108
+    },
+    {
+      "valor": "#fecda5",
+      "n": 108
+    },
+    {
+      "valor": "#fe2d2d",
+      "n": 108
+    },
+    {
+      "valor": "#6b003e",
+      "n": 108
+    },
+    {
+      "valor": "#ffcb70",
+      "n": 108
+    },
+    {
+      "valor": "#c751c0",
+      "n": 108
+    },
+    {
+      "valor": "#4158d0",
+      "n": 108
+    },
+    {
+      "valor": "#fff5cb",
+      "n": 108
+    },
+    {
+      "valor": "#b6e3d4",
+      "n": 108
+    },
+    {
+      "valor": "#33a7b5",
+      "n": 108
+    },
+    {
+      "valor": "#caf880",
+      "n": 108
+    },
+    {
+      "valor": "#71ce7e",
+      "n": 108
+    },
+    {
+      "valor": "#3c434a",
+      "n": 102
+    }
+  ],
+  "fontes": [
+    {
+      "valor": "-apple-system",
+      "n": 202
+    },
+    {
+      "valor": "Roboto",
+      "n": 171
+    },
+    {
+      "valor": "Poppins",
+      "n": 131
+    },
+    {
+      "valor": "Roboto Slab",
+      "n": 64
+    },
+    {
+      "valor": "Work Sans",
+      "n": 57
+    },
+    {
+      "valor": "Helvetica",
+      "n": 50
+    },
+    {
+      "valor": "Roboto Medium",
+      "n": 50
+    },
+    {
+      "valor": "eicons",
+      "n": 9
+    },
+    {
+      "valor": "FontAwesome",
+      "n": 3
+    },
+    {
+      "valor": "Arial",
+      "n": 3
+    },
+    {
+      "valor": "monospace",
+      "n": 3
+    },
+    {
+      "valor": "swiper-icons",
+      "n": 2
+    },
+    {
+      "valor": "dashicons",
+      "n": 2
+    },
+    {
+      "valor": "Consolas",
+      "n": 2
+    },
+    {
+      "valor": "Tahoma",
+      "n": 2
+    }
+  ],
+  "tamanhos_fonte": [
+    {
+      "valor": "16px",
+      "n": 120
+    },
+    {
+      "valor": "17px",
+      "n": 100
+    },
+    {
+      "valor": "1em",
+      "n": 96
+    },
+    {
+      "valor": "14px",
+      "n": 86
+    },
+    {
+      "valor": "20px",
+      "n": 66
+    },
+    {
+      "valor": "18px",
+      "n": 60
+    },
+    {
+      "valor": "2.625em",
+      "n": 38
+    },
+    {
+      "valor": "13px",
+      "n": 23
+    },
+    {
+      "valor": "12px",
+      "n": 22
+    },
+    {
+      "valor": "15px",
+      "n": 17
+    },
+    {
+      "valor": "3em",
+      "n": 14
+    },
+    {
+      "valor": "2rem",
+      "n": 14
+    },
+    {
+      "valor": ".875em",
+      "n": 13
+    },
+    {
+      "valor": "2.25em",
+      "n": 13
+    },
+    {
+      "valor": "8.4em",
+      "n": 13
+    },
+    {
+      "valor": "3rem",
+      "n": 12
+    },
+    {
+      "valor": "10px",
+      "n": 8
+    },
+    {
+      "valor": "1rem",
+      "n": 8
+    },
+    {
+      "valor": "30px",
+      "n": 6
+    },
+    {
+      "valor": "36px",
+      "n": 5
+    },
+    {
+      "valor": "22px",
+      "n": 5
+    },
+    {
+      "valor": ".9em",
+      "n": 5
+    },
+    {
+      "valor": "25px",
+      "n": 4
+    },
+    {
+      "valor": "11px",
+      "n": 4
+    },
+    {
+      "valor": "1.5rem",
+      "n": 4
+    }
+  ],
+  "pesos_fonte": [
+    {
+      "valor": "400",
+      "n": 132
+    },
+    {
+      "valor": "bold",
+      "n": 61
+    },
+    {
+      "valor": "600",
+      "n": 52
+    },
+    {
+      "valor": "100",
+      "n": 51
+    },
+    {
+      "valor": "500",
+      "n": 50
+    },
+    {
+      "valor": "700",
+      "n": 48
+    },
+    {
+      "valor": "300",
+      "n": 40
+    },
+    {
+      "valor": "900",
+      "n": 39
+    },
+    {
+      "valor": "200",
+      "n": 37
+    },
+    {
+      "valor": "800",
+      "n": 37
+    }
+  ],
+  "espacamentos": [
+    {
+      "valor": "0px",
+      "n": 2918
+    },
+    {
+      "valor": "10px",
+      "n": 1088
+    },
+    {
+      "valor": "-0.217rem",
+      "n": 800
+    },
+    {
+      "valor": "2px",
+      "n": 560
+    },
+    {
+      "valor": "5px",
+      "n": 528
+    },
+    {
+      "valor": "20px",
+      "n": 489
+    },
+    {
+      "valor": "24px",
+      "n": 379
+    },
+    {
+      "valor": "1em",
+      "n": 338
+    },
+    {
+      "valor": "15px",
+      "n": 314
+    },
+    {
+      "valor": "2em",
+      "n": 219
+    },
+    {
+      "valor": "0.667em",
+      "n": 216
+    },
+    {
+      "valor": "1.333em",
+      "n": 216
+    },
+    {
+      "valor": "30px",
+      "n": 147
+    },
+    {
+      "valor": "8px",
+      "n": 147
+    },
+    {
+      "valor": "1rem",
+      "n": 114
+    },
+    {
+      "valor": "9.13rem",
+      "n": 100
+    },
+    {
+      "valor": "6.63rem",
+      "n": 100
+    },
+    {
+      "valor": "5.38rem",
+      "n": 100
+    },
+    {
+      "valor": "5rem",
+      "n": 100
+    },
+    {
+      "valor": "3.75rem",
+      "n": 100
+    },
+    {
+      "valor": "2.5rem",
+      "n": 100
+    },
+    {
+      "valor": "1.5rem",
+      "n": 100
+    },
+    {
+      "valor": "1.25rem",
+      "n": 100
+    },
+    {
+      "valor": "6px",
+      "n": 99
+    },
+    {
+      "valor": "-1px",
+      "n": 93
+    },
+    {
+      "valor": "12px",
+      "n": 71
+    },
+    {
+      "valor": ".5em",
+      "n": 67
+    },
+    {
+      "valor": "1px",
+      "n": 64
+    },
+    {
+      "valor": "-5px",
+      "n": 57
+    },
+    {
+      "valor": "0em",
+      "n": 56
+    }
+  ],
+  "breakpoints": [
+    {
+      "valor": "767px",
+      "n": 301
+    },
+    {
+      "valor": "1024px",
+      "n": 235
+    },
+    {
+      "valor": "768px",
+      "n": 72
+    },
+    {
+      "valor": "650px",
+      "n": 50
+    },
+    {
+      "valor": "600px",
+      "n": 44
+    },
+    {
+      "valor": "1025px",
+      "n": 24
+    },
+    {
+      "valor": "782px",
+      "n": 10
+    },
+    {
+      "valor": "576px",
+      "n": 3
+    },
+    {
+      "valor": "992px",
+      "n": 3
+    },
+    {
+      "valor": "991px",
+      "n": 2
+    },
+    {
+      "valor": "1440px",
+      "n": 2
+    },
+    {
+      "valor": "575px",
+      "n": 2
+    },
+    {
+      "valor": "781px",
+      "n": 2
+    },
+    {
+      "valor": "479px",
+      "n": 1
+    },
+    {
+      "valor": "99999px",
+      "n": 1
+    }
+  ],
+  "border_radius": [
+    {
+      "valor": "20px",
+      "n": 113
+    },
+    {
+      "valor": "50%",
+      "n": 88
+    },
+    {
+      "valor": "0px",
+      "n": 79
+    },
+    {
+      "valor": "4px",
+      "n": 70
+    },
+    {
+      "valor": "10px",
+      "n": 68
+    },
+    {
+      "valor": "50px",
+      "n": 55
+    },
+    {
+      "valor": "6px",
+      "n": 53
+    },
+    {
+      "valor": "36px",
+      "n": 50
+    },
+    {
+      "valor": "0",
+      "n": 43
+    },
+    {
+      "valor": "5px",
+      "n": 37
+    },
+    {
+      "valor": "3px",
+      "n": 29
+    },
+    {
+      "valor": "16px",
+      "n": 21
+    },
+    {
+      "valor": "100%",
+      "n": 18
+    },
+    {
+      "valor": "2px",
+      "n": 15
+    },
+    {
+      "valor": "15px",
+      "n": 12
+    }
+  ],
+  "sombras": [
+    {
+      "valor": "none !important",
+      "n": 55
+    },
+    {
+      "valor": "inset 0 0 0 1px #747775",
+      "n": 50
+    },
+    {
+      "valor": "inset 0 0 0 1px #8E918F",
+      "n": 50
+    },
+    {
+      "valor": "0 0 0 1px #000",
+      "n": 50
+    },
+    {
+      "valor": "inset 0 0 0 1px #000",
+      "n": 50
+    },
+    {
+      "valor": "inset 0 0 0 1px #1877F2",
+      "n": 50
+    },
+    {
+      "valor": "inset 0 0 0 1px #191414",
+      "n": 50
+    },
+    {
+      "valor": "inset 0 0 0 1px #DDDDDD",
+      "n": 50
+    },
+    {
+      "valor": "0 0 0 1px rgba(22, 24, 35, 0.12)",
+      "n": 50
+    },
+    {
+      "valor": "inset 0 0 0 1px RGBA(0, 0, 0, .6), 0 0 0 1px RGBA(0, 0, 0, .6)",
+      "n": 50
+    }
+  ],
+  "css_principais": [
+    {
+      "arquivo": "snapshot/cemanet.org.br/wp-content/plugins/happy-elementor-addons/assets/fonts/huge-icons/huge-icons.min.css",
+      "kb": 166.2
+    },
+    {
+      "arquivo": "snapshot/cemanet.org.br/wp-content/plugins/jet-blog/assets/css/jet-blog.css",
+      "kb": 125.8
+    },
+    {
+      "arquivo": "snapshot/cemanet.org.br/wp-content/uploads/elementor/google-fonts/css/roboto.css",
+      "kb": 99.3
+    },
+    {
+      "arquivo": "snapshot/cemanet.org.br/wp-content/uploads/elementor/css/post-23574.css",
+      "kb": 95.9
+    },
+    {
+      "arquivo": "snapshot/cemanet.org.br/wp-content/uploads/elementor/css/post-24225.css",
+      "kb": 90.8
+    },
+    {
+      "arquivo": "snapshot/cemanet.org.br/wp-content/uploads/elementor/css/post-24114.css",
+      "kb": 89.5
+    },
+    {
+      "arquivo": "snapshot/cemanet.org.br/wp-content/uploads/elementor/css/post-24157.css",
+      "kb": 89.5
+    },
+    {
+      "arquivo": "snapshot/cemanet.org.br/wp-content/uploads/elementor/css/post-24173.css",
+      "kb": 89.5
+    },
+    {
+      "arquivo": "snapshot/cemanet.org.br/wp-content/uploads/elementor/css/post-21902.css",
+      "kb": 78.3
+    },
+    {
+      "arquivo": "snapshot/cemanet.org.br/wp-content/plugins/jet-smart-filters/assets/css/public.css",
+      "kb": 62
+    }
+  ],
+  "html_representativos": [
+    "snapshot/cemanet.org.br/index.html",
+    "snapshot/cemanet.org.br/contato/index.html",
+    "snapshot/cemanet.org.br/quem-somos/index.html",
+    "snapshot/cemanet.org.br/nossa-historia/index.html",
+    "snapshot/cemanet.org.br/historia/index.html",
+    "snapshot/cemanet.org.br/palestra_publica/16403/index.html",
+    "snapshot/cemanet.org.br/evangelho/semana-1/index.html",
+    "snapshot/cemanet.org.br/palestrantes/abadio-rodrigues/index.html",
+    "snapshot/cemanet.org.br/_evento/10o-encontro-da-familia/index.html",
+    "snapshot/cemanet.org.br/agenda-reforma/01-de-junho-de-2026/index.html"
+  ],
+  "estruturas": [
+    {
+      "pagina": "snapshot/cemanet.org.br/index.html",
+      "outline": "design-system/_estruturas/index.html.outline.txt"
+    },
+    {
+      "pagina": "snapshot/cemanet.org.br/contato/index.html",
+      "outline": "design-system/_estruturas/contato.outline.txt"
+    },
+    {
+      "pagina": "snapshot/cemanet.org.br/quem-somos/index.html",
+      "outline": "design-system/_estruturas/quem-somos.outline.txt"
+    },
+    {
+      "pagina": "snapshot/cemanet.org.br/nossa-historia/index.html",
+      "outline": "design-system/_estruturas/nossa-historia.outline.txt"
+    },
+    {
+      "pagina": "snapshot/cemanet.org.br/historia/index.html",
+      "outline": "design-system/_estruturas/historia.outline.txt"
+    },
+    {
+      "pagina": "snapshot/cemanet.org.br/palestra_publica/16403/index.html",
+      "outline": "design-system/_estruturas/palestra_publica_16403.outline.txt"
+    },
+    {
+      "pagina": "snapshot/cemanet.org.br/evangelho/semana-1/index.html",
+      "outline": "design-system/_estruturas/evangelho_semana-1.outline.txt"
+    },
+    {
+      "pagina": "snapshot/cemanet.org.br/palestrantes/abadio-rodrigues/index.html",
+      "outline": "design-system/_estruturas/palestrantes_abadio-rodrigues.outline.txt"
+    },
+    {
+      "pagina": "snapshot/cemanet.org.br/_evento/10o-encontro-da-familia/index.html",
+      "outline": "design-system/_estruturas/_evento_10o-encontro-da-familia.outline.txt"
+    },
+    {
+      "pagina": "snapshot/cemanet.org.br/agenda-reforma/01-de-junho-de-2026/index.html",
+      "outline": "design-system/_estruturas/agenda-reforma_01-de-junho-de-2026.outline.txt"
+    }
+  ]
+}

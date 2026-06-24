@@ -1,0 +1,702 @@
+# Estrutura (esqueleto) de snapshot/cemanet.org.br/agenda-reforma/01-de-junho-de-2026/index.html
+
+a.skip-link.screen-reader-text  «Ir para o conteúdo»
+header.elementor.elementor-21493.elementor-location-header
+  div.elementor-element.elementor-element-703790e.e-flex.e-con-boxed.e-con.e-parent
+    div.e-con-inner
+      div.elementor-element.elementor-element-ff1aaaf.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-68bb67f.elementor-widget.elementor-widget-image
+          a
+            img.attachment-large.size-large.wp-image-13
+      div.elementor-element.elementor-element-9149c75.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-260d646.elementor-widget__width-inherit.elementor-widget.elementor-widget-jet-search
+          div.elementor-widget-container
+            div.elementor-jet-search.jet-blocks
+              div.jet-search
+                form.jet-search__form
+                  label.jet-search__label
+                    span.screen-reader-text  «Pesquisar …»
+                    input.jet-search__field
+                  button.jet-search__submit
+                    span.jet-search__submit-icon.jet-blocks-icon
+      div.elementor-element.elementor-element-1f8b1fe.e-con-full.elementor-hidden-tablet.elementor-hidden-mobile.e-flex
+        div.elementor-element.elementor-element-3bcc3ab.elementor-hidden-tablet.elementor-hidden-mobile.elementor-widget.elementor-widget-jet-auth-links
+          div.elementor-widget-container
+            div.elementor-jet-auth-links.jet-blocks
+              div.jet-auth-links
+                div.jet-auth-links__section.jet-auth-links__login
+                  div.jet-auth-links__prefix  «Possui uma conta?»
+                  a.jet-auth-links__item
+                    span.jet-auth-links__item-icon.jet-blocks-icon
+                    span.jet-auth-links__item-text  «Entrar»
+                div.jet-auth-links__section.jet-auth-links__register
+                  div.jet-auth-links__prefix  «ou»
+                  a.jet-auth-links__item
+                    span.jet-auth-links__item-icon.jet-blocks-icon
+                    span.jet-auth-links__item-text  «Cadastrar»
+      div.elementor-element.elementor-element-cc3bc02.e-con-full.elementor-hidden-desktop.e-flex.e-con
+        div.elementor-element.elementor-element-e587ab0.elementor-view-default.elementor-widget.elementor-widget-icon
+          div.elementor-icon-wrapper
+            a.elementor-icon
+              i.huge.huge-menu-07
+  header.elementor-element.elementor-element-596622a.elementor-hidden-tablet.elementor-hidden-mobile.e-flex.e-con-boxed
+    div.e-con-inner
+      div.elementor-element.elementor-element-c913db1.jet-nav-align-center.elementor-widget.elementor-widget-jet-nav-menu
+        div.elementor-widget-container
+          nav.jet-nav-wrap.m-layout-mobile.jet-mobile-menu.jet-mobile-menu--default
+            div.jet-nav__mobile-trigger.jet-nav-mobile-trigger-align-left
+              span.jet-nav__mobile-trigger-open.jet-blocks-icon
+              span.jet-nav__mobile-trigger-close.jet-blocks-icon
+            div.menu-menu-principal-container
+              div.jet-nav.m-layout-mobile.jet-nav--horizontal
+                div.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.jet-nav__item-133.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Institucional»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26597.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Nossa Estrutura»
+                    div.menu-item.menu-item-type-post_type.menu-item-object-page.jet-nav__item-132.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Nossa História»
+                    div.menu-item.menu-item-type-post_type.menu-item-object-page.jet-nav__item-25597.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Contato»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-26594.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Palestras»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-24866.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Palestras Públicas»
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-24867.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Palestrantes»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-24167.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Mensagens Mediúnicas»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26595.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Mensagens»
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-24865.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Autores Espirituais»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-24868.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Eventos»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26598.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Nossos Eventos»
+                div.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.jet-nav__item-24871.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Vibração»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26599.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Caixinha de Vibração»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-24869.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Agenda»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26600.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Agenda Reforma Íntima»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-24870.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Evangelho»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26601.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Evangelho da Semana»
+                    div.menu-item.menu-item-type-post_type.menu-item-object-page.jet-nav__item-25969.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Evangelho no Lar»
+                div.menu-item.menu-item-type-post_type.menu-item-object-page.current_page_parent.menu-item-has-children.jet-nav__item-130
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Sementeira»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-26602.jet-nav__item
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Blog Espírita»
+                        div.jet-nav-arrow
+                      div.jet-nav__sub.jet-nav-depth-1
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26608.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «Reflexões e Espiritualidade»
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26609.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «CEMA em Ação»
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26610.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «Estudando a Mediunidade»
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26611.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «Datas Comemorativas»
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26612.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «Prática de Amor ao Próximo»
+  div.elementor-element.elementor-element-ca1779c.e-flex.e-con-boxed.e-con.e-parent
+    div.e-con-inner
+      div.elementor-element.elementor-element-c60c42a.elementor-widget.elementor-widget-off-canvas
+        div#off-canvas-c60c42a.e-off-canvas
+          div.e-off-canvas__overlay
+          div.e-off-canvas__main
+            div.e-off-canvas__content
+              div.elementor-element.elementor-element-84807df.e-con-full.e-flex.e-con.e-child
+                div.elementor-element.elementor-element-b59e0d6.elementor-view-default.elementor-widget.elementor-widget-icon
+                  div.elementor-icon-wrapper
+                    a.elementor-icon
+                div.elementor-element.elementor-element-8644c44.e-flex.e-con-boxed.e-con.e-child
+                  div.e-con-inner
+                    div.elementor-element.elementor-element-6aa2eca.jedv-enabled--yes.elementor-widget.elementor-widget-image
+                      img.attachment-large.size-large.wp-image-13
+                    div.elementor-element.elementor-element-b15207d.e-con-full.jedv-enabled--yes.e-flex.e-con
+                      div.elementor-element.elementor-element-e256036.elementor-widget.elementor-widget-button
+                        a.elementor-button.elementor-button-link.elementor-size-sm
+                          span.elementor-button-content-wrapper
+                            span.elementor-button-icon
+                              i.huge.huge-login-circle-01
+                            span.elementor-button-text  «Fazer Login?»
+                      div.elementor-element.elementor-element-fbf9519.elementor-widget.elementor-widget-button
+                        a.elementor-button.elementor-button-link.elementor-size-sm
+                          span.elementor-button-content-wrapper
+                            span.elementor-button-icon
+                              i.huge.huge-user-unlock-01
+                            span.elementor-button-text  «Criar Conta?»
+                div.elementor-element.elementor-element-e73793f.elementor-widget.elementor-widget-heading
+                  h2.elementor-heading-title.elementor-size-default  «Menu»
+                div.elementor-element.elementor-element-32e76e8.elementor-nav-menu--dropdown-mobile.elementor-nav-menu--stretch.elementor-nav-menu__text-align-aside.elementor-nav-menu--toggle
+                  nav.elementor-nav-menu--main.elementor-nav-menu__container.elementor-nav-menu--layout-vertical.e--pointer-underline.e--animation-fade
+                    ul#menu-1-32e76e8.elementor-nav-menu.sm-vertical
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.menu-item-133
+                        a.elementor-item  «Institucional»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26597
+                            a.elementor-sub-item  «Nossa Estrutura»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-132
+                            a.elementor-sub-item  «Nossa História»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-25597
+                            a.elementor-sub-item  «Contato»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-26594
+                        a.elementor-item  «Palestras»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24866
+                            a.elementor-sub-item  «Palestras Públicas»
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24867
+                            a.elementor-sub-item  «Palestrantes»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24167
+                        a.elementor-item  «Mensagens Mediúnicas»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26595
+                            a.elementor-sub-item  «Mensagens»
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24865
+                            a.elementor-sub-item  «Autores Espirituais»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24868
+                        a.elementor-item  «Eventos»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26598
+                            a.elementor-sub-item  «Nossos Eventos»
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.menu-item-24871
+                        a.elementor-item  «Vibração»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26599
+                            a.elementor-sub-item  «Caixinha de Vibração»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24869
+                        a.elementor-item  «Agenda»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26600
+                            a.elementor-sub-item  «Agenda Reforma Íntima»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24870
+                        a.elementor-item  «Evangelho»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26601
+                            a.elementor-sub-item  «Evangelho da Semana»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-25969
+                            a.elementor-sub-item  «Evangelho no Lar»
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.current_page_parent.menu-item-has-children.menu-item-130
+                        a.elementor-item  «Sementeira»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-26602
+                            a.elementor-sub-item  «Blog Espírita»
+                            ul.sub-menu.elementor-nav-menu--dropdown
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26608
+                                a.elementor-sub-item  «Reflexões e Espiritualidade»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26609
+                                a.elementor-sub-item  «CEMA em Ação»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26610
+                                a.elementor-sub-item  «Estudando a Mediunidade»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26611
+                                a.elementor-sub-item  «Datas Comemorativas»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26612
+                                a.elementor-sub-item  «Prática de Amor ao Próximo»
+                  div.elementor-menu-toggle
+                  nav.elementor-nav-menu--dropdown.elementor-nav-menu__container
+                    ul#menu-2-32e76e8.elementor-nav-menu.sm-vertical
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.menu-item-133
+                        a.elementor-item  «Institucional»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26597
+                            a.elementor-sub-item  «Nossa Estrutura»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-132
+                            a.elementor-sub-item  «Nossa História»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-25597
+                            a.elementor-sub-item  «Contato»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-26594
+                        a.elementor-item  «Palestras»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24866
+                            a.elementor-sub-item  «Palestras Públicas»
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24867
+                            a.elementor-sub-item  «Palestrantes»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24167
+                        a.elementor-item  «Mensagens Mediúnicas»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26595
+                            a.elementor-sub-item  «Mensagens»
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24865
+                            a.elementor-sub-item  «Autores Espirituais»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24868
+                        a.elementor-item  «Eventos»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26598
+                            a.elementor-sub-item  «Nossos Eventos»
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.menu-item-24871
+                        a.elementor-item  «Vibração»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26599
+                            a.elementor-sub-item  «Caixinha de Vibração»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24869
+                        a.elementor-item  «Agenda»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26600
+                            a.elementor-sub-item  «Agenda Reforma Íntima»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24870
+                        a.elementor-item  «Evangelho»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26601
+                            a.elementor-sub-item  «Evangelho da Semana»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-25969
+                            a.elementor-sub-item  «Evangelho no Lar»
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.current_page_parent.menu-item-has-children.menu-item-130
+                        a.elementor-item  «Sementeira»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-26602
+                            a.elementor-sub-item  «Blog Espírita»
+                            ul.sub-menu.elementor-nav-menu--dropdown
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26608
+                                a.elementor-sub-item  «Reflexões e Espiritualidade»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26609
+                                a.elementor-sub-item  «CEMA em Ação»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26610
+                                a.elementor-sub-item  «Estudando a Mediunidade»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26611
+                                a.elementor-sub-item  «Datas Comemorativas»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26612
+                                a.elementor-sub-item  «Prática de Amor ao Próximo»
+div.elementor.elementor-24545.elementor-location-single.post-27243.agenda-reforma.type-agenda-reforma
+  section.jet-tricks-particles-section.elementor-element.elementor-element-3cce431.section-xxl.e-flex.e-con-boxed
+    div.e-con-inner
+      div.elementor-element.elementor-element-79754a5.elementor-widget.elementor-widget-heading
+        h1.elementor-heading-title.elementor-size-default  «Agenda Reforma Íntima»
+      div.elementor-element.elementor-element-69f7d45.elementor-widget-divider--view-line.elementor-widget.elementor-widget-divider
+        div.elementor-divider
+          span.elementor-divider-separator
+      div.elementor-element.elementor-element-316bbe4.elementor-widget.elementor-widget-heading
+        h2.elementor-heading-title.elementor-size-default  «Transforme-se com a Agenda Reforma Íntima: Reflexões Diárias e Metas E»
+  section.elementor-element.elementor-element-a1a05d6.section-m.gap-s.e-flex.e-con-boxed
+    div.e-con-inner
+      div.elementor-element.elementor-element-a052178.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-b2947fb.e-con-full.e-flex.e-con.e-child
+          div.elementor-element.elementor-element-53fdd6b.elementor-widget.elementor-widget-jet-listing-dynamic-field
+            div.jet-listing.jet-listing-dynamic-field.display-inline
+              div.jet-listing-dynamic-field__inline-wrap
+                div.jet-listing-dynamic-field__content  «segunda-feira, 01 de junho de 2026»
+        div.elementor-element.elementor-element-8c09e40.e-con-full.e-flex.e-con.e-child
+          div.elementor-element.elementor-element-440ecda.elementor-widget.elementor-widget-heading
+            span.elementor-heading-title.elementor-size-default  «Reflexão e Vivência em torno do Evangelho:»
+          div.elementor-element.elementor-element-2f96f7c.elementor-widget.elementor-widget-jet-listing-dynamic-field
+            div.jet-listing.jet-listing-dynamic-field.display-inline
+              div.jet-listing-dynamic-field__inline-wrap
+                div.jet-listing-dynamic-field__content
+                  p  «“Se alguém te bater numa face, apresenta-lhe a outra; se alguém te tir»
+        div.elementor-element.elementor-element-ce96679.jedv-enabled--yes.e-con-full.e-flex.e-con
+          div.elementor-element.elementor-element-8d7628f.elementor-widget.elementor-widget-heading
+            h2.elementor-heading-title.elementor-size-default  «Meta do Mês:»
+          div.elementor-element.elementor-element-50b3b22.elementor-widget.elementor-widget-jet-listing-dynamic-field
+            div.jet-listing.jet-listing-dynamic-field.display-inline
+              div.jet-listing-dynamic-field__inline-wrap
+                div.jet-listing-dynamic-field__content  «Combater o egoísmo: indiferença e ingratidão»
+          div.elementor-element.elementor-element-bde920c.elementor-widget.elementor-widget-jet-listing-dynamic-field
+            div.jet-listing.jet-listing-dynamic-field.display-inline
+              div.jet-listing-dynamic-field__inline-wrap
+                div.jet-listing-dynamic-field__content
+                  p  «“Oh! meus amigos, que de misérias, que de lágrimas, quanto tendes de f»
+        div.elementor-element.elementor-element-35bc1f3.jedv-enabled--yes.e-con-full.e-flex.e-con
+          div.elementor-element.elementor-element-51d0cee.elementor-widget.elementor-widget-heading
+            h2.elementor-heading-title.elementor-size-default  «Meta do Dia:»
+          div.elementor-element.elementor-element-624e107.elementor-widget.elementor-widget-jet-listing-dynamic-field
+            div.jet-listing.jet-listing-dynamic-field.display-inline
+              div.jet-listing-dynamic-field__inline-wrap
+                div.jet-listing-dynamic-field__content  «Combater a Indiferença»
+          div.elementor-element.elementor-element-30fc94a.jedv-enabled--yes.elementor-widget.elementor-widget-jet-listing-dynamic-field
+            div.jet-listing.jet-listing-dynamic-field.display-inline
+              div.jet-listing-dynamic-field__inline-wrap
+                div.jet-listing-dynamic-field__content
+                  p  «Enternecer-se ante o sofrimento do próximo.»
+        div.elementor-element.elementor-element-58b004c.e-con-full.e-flex.e-con.e-child
+          div.elementor-element.elementor-element-b27ff3c.elementor-widget.elementor-widget-heading
+            h2.elementor-heading-title.elementor-size-default  «Sugestão para a sua prece diária:»
+          div.elementor-element.elementor-element-e695a21.elementor-widget.elementor-widget-jet-listing-dynamic-field
+            div.jet-listing.jet-listing-dynamic-field.display-inline
+              div.jet-listing-dynamic-field__inline-wrap
+                div.jet-listing-dynamic-field__content
+                  p  «Prece em favor dos desesperados e cansados do caminho.»
+        div.elementor-element.elementor-element-efb59a8.e-con-full.e-flex.e-con.e-child
+          div.elementor-element.elementor-element-c7e5779.elementor-position-inline-start.elementor-mobile-position-inline-start.elementor-view-default.elementor-widget
+            div.elementor-icon-box-wrapper
+              div.elementor-icon-box-icon
+                span.elementor-icon
+              div.elementor-icon-box-content
+                h3.elementor-icon-box-title
+                  span  «Compartilhar»
+          div.elementor-element.elementor-element-059dbe5.elementor-share-buttons--view-icon.elementor-share-buttons--skin-framed.elementor-share-buttons--shape-circle.elementor-grid-0
+            div.elementor-grid
+              div.elementor-grid-item
+                div.elementor-share-btn.elementor-share-btn_whatsapp
+                  span.elementor-share-btn__icon
+              div.elementor-grid-item
+                div.elementor-share-btn.elementor-share-btn_facebook
+                  span.elementor-share-btn__icon
+      div.elementor-element.elementor-element-3ffdcf7.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-887c392.elementor-widget.elementor-widget-jet-listing-calendar
+          div.jet-calendar.jet-listing-calendar.jet-listing-grid--24522
+            table.jet-calendar-grid
+              caption.jet-calendar-caption
+                div.jet-calendar-caption__wrap.wrap-layout-3
+                  div.jet-calendar-caption__name  «junho 2026»
+                  div.jet-calendar-nav__link.nav-link-prev
+                  div.jet-calendar-nav__link.nav-link-next
+              thead.jet-calendar-header
+                tr.jet-calendar-header__week
+                  th.jet-calendar-header__week-day  «dom»
+                  th.jet-calendar-header__week-day  «seg»
+                  th.jet-calendar-header__week-day  «ter»
+                  th.jet-calendar-header__week-day  «qua»
+                  th.jet-calendar-header__week-day  «qui»
+                  th.jet-calendar-header__week-day  «sex»
+                  th.jet-calendar-header__week-day  «sáb»
+              tbody
+                tr.jet-calendar-week
+                  td.jet-calendar-week__day.day-pad.has-events
+                    div.jet-calendar-week__day-wrap
+                      div.jet-calendar-week__day-header
+                        div.jet-calendar-week__day-date  «31»
+                      div.jet-calendar-week__day-mobile-wrap
+                        div.jet-calendar-week__day-mobile-overlay
+                        div.jet-calendar-week__day-mobile-trigger
+                      div.jet-calendar-week__day-content
+                        div.jet-calendar-week__day-event.jet-listing-dynamic-post-27087
+                          div.elementor.elementor-24522
+                            div.elementor-element.elementor-element-a5269b4.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                                div.elementor-element.elementor-element-99648f7.elementor-hidden-desktop.elementor-hidden-tablet.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width
+                                  ul.elementor-icon-list-items
+                                    li.elementor-icon-list-item
+                                      a
+                                        span.elementor-icon-list-icon
+                                        span.elementor-icon-list-text  «Ver Agenda»
+                                div.elementor-element.elementor-element-dd84374.elementor-hidden-mobile.elementor-view-default.elementor-widget.elementor-widget-icon
+                                  div.elementor-icon-wrapper
+                                    a.elementor-icon
+                            div.elementor-element.elementor-element-75b4d95.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                  td.jet-calendar-week__day.has-events
+                    div.jet-calendar-week__day-wrap
+                      div.jet-calendar-week__day-header
+                        div.jet-calendar-week__day-date  «1»
+                      div.jet-calendar-week__day-mobile-wrap
+                        div.jet-calendar-week__day-mobile-overlay
+                        div.jet-calendar-week__day-mobile-trigger
+                      div.jet-calendar-week__day-content
+                        div.jet-calendar-week__day-event.jet-listing-dynamic-post-27243
+                          div.elementor.elementor-24522
+                            div.elementor-element.elementor-element-a5269b4.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                                div.elementor-element.elementor-element-99648f7.elementor-hidden-desktop.elementor-hidden-tablet.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width
+                                  ul.elementor-icon-list-items
+                                    li.elementor-icon-list-item
+                                      a
+                                        span.elementor-icon-list-icon
+                                        span.elementor-icon-list-text  «Ver Agenda»
+                                div.elementor-element.elementor-element-dd84374.elementor-hidden-mobile.elementor-view-default.elementor-widget.elementor-widget-icon
+                                  div.elementor-icon-wrapper
+                                    a.elementor-icon
+                            div.elementor-element.elementor-element-75b4d95.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                  td.jet-calendar-week__day.has-events
+                    div.jet-calendar-week__day-wrap
+                      div.jet-calendar-week__day-header
+                        div.jet-calendar-week__day-date  «2»
+                      div.jet-calendar-week__day-mobile-wrap
+                        div.jet-calendar-week__day-mobile-overlay
+                        div.jet-calendar-week__day-mobile-trigger
+                      div.jet-calendar-week__day-content
+                        div.jet-calendar-week__day-event.jet-listing-dynamic-post-27244
+                          div.elementor.elementor-24522
+                            div.elementor-element.elementor-element-a5269b4.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                                div.elementor-element.elementor-element-99648f7.elementor-hidden-desktop.elementor-hidden-tablet.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width
+                                  ul.elementor-icon-list-items
+                                    li.elementor-icon-list-item
+                                      a
+                                        span.elementor-icon-list-icon
+                                        span.elementor-icon-list-text  «Ver Agenda»
+                                div.elementor-element.elementor-element-dd84374.elementor-hidden-mobile.elementor-view-default.elementor-widget.elementor-widget-icon
+                                  div.elementor-icon-wrapper
+                                    a.elementor-icon
+                            div.elementor-element.elementor-element-75b4d95.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                  td.jet-calendar-week__day.has-events
+                    div.jet-calendar-week__day-wrap
+                      div.jet-calendar-week__day-header
+                        div.jet-calendar-week__day-date  «3»
+                      div.jet-calendar-week__day-mobile-wrap
+                        div.jet-calendar-week__day-mobile-overlay
+                        div.jet-calendar-week__day-mobile-trigger
+                      div.jet-calendar-week__day-content
+                        div.jet-calendar-week__day-event.jet-listing-dynamic-post-27245
+                          div.elementor.elementor-24522
+                            div.elementor-element.elementor-element-a5269b4.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                                div.elementor-element.elementor-element-99648f7.elementor-hidden-desktop.elementor-hidden-tablet.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width
+                                  ul.elementor-icon-list-items
+                                    li.elementor-icon-list-item
+                                      a
+                                        span.elementor-icon-list-icon
+                                        span.elementor-icon-list-text  «Ver Agenda»
+                                div.elementor-element.elementor-element-dd84374.elementor-hidden-mobile.elementor-view-default.elementor-widget.elementor-widget-icon
+                                  div.elementor-icon-wrapper
+                                    a.elementor-icon
+                            div.elementor-element.elementor-element-75b4d95.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                  td.jet-calendar-week__day.has-events
+                    div.jet-calendar-week__day-wrap
+                      div.jet-calendar-week__day-header
+                        div.jet-calendar-week__day-date  «4»
+                      div.jet-calendar-week__day-mobile-wrap
+                        div.jet-calendar-week__day-mobile-overlay
+                        div.jet-calendar-week__day-mobile-trigger
+                      div.jet-calendar-week__day-content
+                        div.jet-calendar-week__day-event.jet-listing-dynamic-post-27246
+                          div.elementor.elementor-24522
+                            div.elementor-element.elementor-element-a5269b4.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                                div.elementor-element.elementor-element-99648f7.elementor-hidden-desktop.elementor-hidden-tablet.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width
+                                  ul.elementor-icon-list-items
+                                    li.elementor-icon-list-item
+                                      a
+                                        span.elementor-icon-list-icon
+                                        span.elementor-icon-list-text  «Ver Agenda»
+                                div.elementor-element.elementor-element-dd84374.elementor-hidden-mobile.elementor-view-default.elementor-widget.elementor-widget-icon
+                                  div.elementor-icon-wrapper
+                                    a.elementor-icon
+                            div.elementor-element.elementor-element-75b4d95.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                  td.jet-calendar-week__day.has-events
+                    div.jet-calendar-week__day-wrap
+                      div.jet-calendar-week__day-header
+                        div.jet-calendar-week__day-date  «5»
+                      div.jet-calendar-week__day-mobile-wrap
+                        div.jet-calendar-week__day-mobile-overlay
+                        div.jet-calendar-week__day-mobile-trigger
+                      div.jet-calendar-week__day-content
+                        div.jet-calendar-week__day-event.jet-listing-dynamic-post-27247
+                          div.elementor.elementor-24522
+                            div.elementor-element.elementor-element-a5269b4.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                                div.elementor-element.elementor-element-99648f7.elementor-hidden-desktop.elementor-hidden-tablet.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width
+                                  ul.elementor-icon-list-items
+                                    li.elementor-icon-list-item
+                                      a
+                                        span.elementor-icon-list-icon
+                                        span.elementor-icon-list-text  «Ver Agenda»
+                                div.elementor-element.elementor-element-dd84374.elementor-hidden-mobile.elementor-view-default.elementor-widget.elementor-widget-icon
+                                  div.elementor-icon-wrapper
+                                    a.elementor-icon
+                            div.elementor-element.elementor-element-75b4d95.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                  td.jet-calendar-week__day.has-events
+                    div.jet-calendar-week__day-wrap
+                      div.jet-calendar-week__day-header
+                        div.jet-calendar-week__day-date  «6»
+                      div.jet-calendar-week__day-mobile-wrap
+                        div.jet-calendar-week__day-mobile-overlay
+                        div.jet-calendar-week__day-mobile-trigger
+                      div.jet-calendar-week__day-content
+                        div.jet-calendar-week__day-event.jet-listing-dynamic-post-27248
+                          div.elementor.elementor-24522
+                            div.elementor-element.elementor-element-a5269b4.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                                div.elementor-element.elementor-element-99648f7.elementor-hidden-desktop.elementor-hidden-tablet.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width
+                                  ul.elementor-icon-list-items
+                                    li.elementor-icon-list-item
+                                      a
+                                        span.elementor-icon-list-icon
+                                        span.elementor-icon-list-text  «Ver Agenda»
+                                div.elementor-element.elementor-element-dd84374.elementor-hidden-mobile.elementor-view-default.elementor-widget.elementor-widget-icon
+                                  div.elementor-icon-wrapper
+                                    a.elementor-icon
+                            div.elementor-element.elementor-element-75b4d95.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                tr.jet-calendar-week
+                  td.jet-calendar-week__day.has-events
+                    div.jet-calendar-week__day-wrap
+                      div.jet-calendar-week__day-header
+                        div.jet-calendar-week__day-date  «7»
+                      div.jet-calendar-week__day-mobile-wrap
+                        div.jet-calendar-week__day-mobile-overlay
+                        div.jet-calendar-week__day-mobile-trigger
+                      div.jet-calendar-week__day-content
+                        div.jet-calendar-week__day-event.jet-listing-dynamic-post-27249
+                          div.elementor.elementor-24522
+                            div.elementor-element.elementor-element-a5269b4.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                                div.elementor-element.elementor-element-99648f7.elementor-hidden-desktop.elementor-hidden-tablet.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width
+                                  ul.elementor-icon-list-items
+                                    li.elementor-icon-list-item
+                                      a
+                                        span.elementor-icon-list-icon
+                                        span.elementor-icon-list-text  «Ver Agenda»
+                                div.elementor-element.elementor-element-dd84374.elementor-hidden-mobile.elementor-view-default.elementor-widget.elementor-widget-icon
+                                  div.elementor-icon-wrapper
+                                    a.elementor-icon
+                            div.elementor-element.elementor-element-75b4d95.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                  td.jet-calendar-week__day.has-events
+                    div.jet-calendar-week__day-wrap
+                      div.jet-calendar-week__day-header
+                        div.jet-calendar-week__day-date  «8»
+                      div.jet-calendar-week__day-mobile-wrap
+                        div.jet-calendar-week__day-mobile-overlay
+                        div.jet-calendar-week__day-mobile-trigger
+                      div.jet-calendar-week__day-content
+                        div.jet-calendar-week__day-event.jet-listing-dynamic-post-27250
+                          div.elementor.elementor-24522
+                            div.elementor-element.elementor-element-a5269b4.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                                div.elementor-element.elementor-element-99648f7.elementor-hidden-desktop.elementor-hidden-tablet.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width
+                                  ul.elementor-icon-list-items
+                                    li.elementor-icon-list-item
+                                      a
+                                        span.elementor-icon-list-icon
+                                        span.elementor-icon-list-text  «Ver Agenda»
+                                div.elementor-element.elementor-element-dd84374.elementor-hidden-mobile.elementor-view-default.elementor-widget.elementor-widget-icon
+                                  div.elementor-icon-wrapper
+                                    a.elementor-icon
+                            div.elementor-element.elementor-element-75b4d95.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                  td.jet-calendar-week__day.has-events
+                    div.jet-calendar-week__day-wrap
+                      div.jet-calendar-week__day-header
+                        div.jet-calendar-week__day-date  «9»
+                      div.jet-calendar-week__day-mobile-wrap
+                        div.jet-calendar-week__day-mobile-overlay
+                        div.jet-calendar-week__day-mobile-trigger
+                      div.jet-calendar-week__day-content
+                        div.jet-calendar-week__day-event.jet-listing-dynamic-post-27251
+                          div.elementor.elementor-24522
+                            div.elementor-element.elementor-element-a5269b4.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                                div.elementor-element.elementor-element-99648f7.elementor-hidden-desktop.elementor-hidden-tablet.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width
+                                  ul.elementor-icon-list-items
+                                    li.elementor-icon-list-item
+                                      a
+                                        span.elementor-icon-list-icon
+                                        span.elementor-icon-list-text  «Ver Agenda»
+                                div.elementor-element.elementor-element-dd84374.elementor-hidden-mobile.elementor-view-default.elementor-widget.elementor-widget-icon
+                                  div.elementor-icon-wrapper
+                                    a.elementor-icon
+                            div.elementor-element.elementor-element-75b4d95.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                  td.jet-calendar-week__day.has-events
+                    div.jet-calendar-week__day-wrap
+                      div.jet-calendar-week__day-header
+                        div.jet-calendar-week__day-date  «10»
+                      div.jet-calendar-week__day-mobile-wrap
+                        div.jet-calendar-week__day-mobile-overlay
+                        div.jet-calendar-week__day-mobile-trigger
+                      div.jet-calendar-week__day-content
+                        div.jet-calendar-week__day-event.jet-listing-dynamic-post-27252
+                          div.elementor.elementor-24522
+                            div.elementor-element.elementor-element-a5269b4.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                                div.elementor-element.elementor-element-99648f7.elementor-hidden-desktop.elementor-hidden-tablet.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width
+                                  ul.elementor-icon-list-items
+                                    li.elementor-icon-list-item
+                                      a
+                                        span.elementor-icon-list-icon
+                                        span.elementor-icon-list-text  «Ver Agenda»
+                                div.elementor-element.elementor-element-dd84374.elementor-hidden-mobile.elementor-view-default.elementor-widget.elementor-widget-icon
+                                  div.elementor-icon-wrapper
+                                    a.elementor-icon
+                            div.elementor-element.elementor-element-75b4d95.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                  td.jet-calendar-week__day.has-events
+                    div.jet-calendar-week__day-wrap
+                      div.jet-calendar-week__day-header
+                        div.jet-calendar-week__day-date  «11»
+                      div.jet-calendar-week__day-mobile-wrap
+                        div.jet-calendar-week__day-mobile-overlay
+                        div.jet-calendar-week__day-mobile-trigger
+                      div.jet-calendar-week__day-content
+                        div.jet-calendar-week__day-event.jet-listing-dynamic-post-27253
+                          div.elementor.elementor-24522
+                            div.elementor-element.elementor-element-a5269b4.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                                div.elementor-element.elementor-element-99648f7.elementor-hidden-desktop.elementor-hidden-tablet.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width
+                                  ul.elementor-icon-list-items
+                                    li.elementor-icon-list-item
+                                      a
+                                        span.elementor-icon-list-icon
+                                        span.elementor-icon-list-text  «Ver Agenda»
+                                div.elementor-element.elementor-element-dd84374.elementor-hidden-mobile.elementor-view-default.elementor-widget.elementor-widget-icon
+                                  div.elementor-icon-wrapper
+                                    a.elementor-icon
+                            div.elementor-element.elementor-element-75b4d95.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                  td.jet-calendar-week__day.has-events
+                    div.jet-calendar-week__day-wrap
+                      div.jet-calendar-week__day-header
+                        div.jet-calendar-week__day-date  «12»
+                      div.jet-calendar-week__day-mobile-wrap
+                        div.jet-calendar-week__day-mobile-overlay
+                        div.jet-calendar-week__day-mobile-trigger
+                      div.jet-calendar-week__day-content
+                        div.jet-calendar-week__day-event.jet-listing-dynamic-post-27254
+                          div.elementor.elementor-24522
+                            div.elementor-element.elementor-element-a5269b4.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                                div.elementor-element.elementor-element-99648f7.elementor-hidden-desktop.elementor-hidden-tablet.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width
+                                  ul.elementor-icon-list-items
+                                    li.elementor-icon-list-item
+                                      a
+                                        span.elementor-icon-list-icon
+                                        span.elementor-icon-list-text  «Ver Agenda»
+                                div.elementor-element.elementor-element-dd84374.elementor-hidden-mobile.elementor-view-default.elementor-widget.elementor-widget-icon
+                                  div.elementor-icon-wrapper
+                                    a.elementor-icon
+                            div.elementor-element.elementor-element-75b4d95.e-flex.e-con-boxed.e-con.e-parent
+                              div.e-con-inner
+                  td.jet-calendar-week__day.has-events
+                    div.jet-calendar-week__day-wrap
+                      div.jet-calendar-week__day-header

@@ -1,0 +1,71 @@
+# CI mínimo do novo site do CEMA — lint (Pint) + testes (PHPUnit) sobre MySQL 8.
+# Espelha a stack local: PHP 8.3, Node 20, MySQL 8.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    name: Lint e testes
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_DATABASE: cema
+          MYSQL_USER: cema
+          MYSQL_PASSWORD: secret
+          MYSQL_ROOT_PASSWORD: secret
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -psecret"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      # No runner o MySQL é alcançado via localhost (não pelo nome de serviço do Docker Compose).
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configurar PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_mysql, mbstring, zip, gd, bcmath, exif, intl
+          coverage: none
+
+      - name: Configurar Node 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Instalar dependências PHP
+        run: composer install --no-interaction --prefer-dist --no-progress
+
+      - name: Preparar ambiente
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Build dos assets (Vite + Tailwind)
+        run: |
+          npm ci
+          npm run build
+
+      - name: Migrar banco
+        run: php artisan migrate --force
+
+      - name: Lint (Pint)
+        run: ./vendor/bin/pint --test
+
+      - name: Testes (PHPUnit)
+        run: php artisan test

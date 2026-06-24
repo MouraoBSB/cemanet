@@ -1,0 +1,31 @@
+# Dependências
+/vendor/
+/node_modules/
+
+# Build / assets gerados
+/public/build/
+/public/hot
+/public/storage
+/bootstrap/cache/*.php
+
+# Ambiente e segredos (NUNCA versionar)
+.env
+.env.*.local
+*.secret
+auth.json
+
+# Laravel
+/storage/*.key
+/storage/framework/cache/*
+/storage/framework/sessions/*
+/storage/framework/views/*
+/storage/logs/*
+.phpunit.result.cache
+/.phpunit.cache
+/storage/pail
+
+# Editores / SO
+/.idea
+/.vscode
+.DS_Store
+Thumbs.db

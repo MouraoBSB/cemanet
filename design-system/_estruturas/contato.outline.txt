@@ -1,0 +1,702 @@
+# Estrutura (esqueleto) de snapshot/cemanet.org.br/contato/index.html
+
+a.skip-link.screen-reader-text  «Ir para o conteúdo»
+header.elementor.elementor-21493.elementor-location-header
+  div.elementor-element.elementor-element-703790e.e-flex.e-con-boxed.e-con.e-parent
+    div.e-con-inner
+      div.elementor-element.elementor-element-ff1aaaf.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-68bb67f.elementor-widget.elementor-widget-image
+          a
+            img.attachment-large.size-large.wp-image-13
+      div.elementor-element.elementor-element-9149c75.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-260d646.elementor-widget__width-inherit.elementor-widget.elementor-widget-jet-search
+          div.elementor-widget-container
+            div.elementor-jet-search.jet-blocks
+              div.jet-search
+                form.jet-search__form
+                  label.jet-search__label
+                    span.screen-reader-text  «Pesquisar …»
+                    input.jet-search__field
+                  button.jet-search__submit
+                    span.jet-search__submit-icon.jet-blocks-icon
+      div.elementor-element.elementor-element-1f8b1fe.e-con-full.elementor-hidden-tablet.elementor-hidden-mobile.e-flex
+        div.elementor-element.elementor-element-3bcc3ab.elementor-hidden-tablet.elementor-hidden-mobile.elementor-widget.elementor-widget-jet-auth-links
+          div.elementor-widget-container
+            div.elementor-jet-auth-links.jet-blocks
+              div.jet-auth-links
+                div.jet-auth-links__section.jet-auth-links__login
+                  div.jet-auth-links__prefix  «Possui uma conta?»
+                  a.jet-auth-links__item
+                    span.jet-auth-links__item-icon.jet-blocks-icon
+                    span.jet-auth-links__item-text  «Entrar»
+                div.jet-auth-links__section.jet-auth-links__register
+                  div.jet-auth-links__prefix  «ou»
+                  a.jet-auth-links__item
+                    span.jet-auth-links__item-icon.jet-blocks-icon
+                    span.jet-auth-links__item-text  «Cadastrar»
+      div.elementor-element.elementor-element-cc3bc02.e-con-full.elementor-hidden-desktop.e-flex.e-con
+        div.elementor-element.elementor-element-e587ab0.elementor-view-default.elementor-widget.elementor-widget-icon
+          div.elementor-icon-wrapper
+            a.elementor-icon
+              i.huge.huge-menu-07
+  header.elementor-element.elementor-element-596622a.elementor-hidden-tablet.elementor-hidden-mobile.e-flex.e-con-boxed
+    div.e-con-inner
+      div.elementor-element.elementor-element-c913db1.jet-nav-align-center.elementor-widget.elementor-widget-jet-nav-menu
+        div.elementor-widget-container
+          nav.jet-nav-wrap.m-layout-mobile.jet-mobile-menu.jet-mobile-menu--default
+            div.jet-nav__mobile-trigger.jet-nav-mobile-trigger-align-left
+              span.jet-nav__mobile-trigger-open.jet-blocks-icon
+              span.jet-nav__mobile-trigger-close.jet-blocks-icon
+            div.menu-menu-principal-container
+              div.jet-nav.m-layout-mobile.jet-nav--horizontal
+                div.menu-item.menu-item-type-post_type.menu-item-object-page.current-menu-ancestor.current-menu-parent.current_page_parent
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Institucional»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26597.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Nossa Estrutura»
+                    div.menu-item.menu-item-type-post_type.menu-item-object-page.jet-nav__item-132.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Nossa História»
+                    div.menu-item.menu-item-type-post_type.menu-item-object-page.current-menu-item.page_item.page-item-113
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Contato»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-26594.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Palestras»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-24866.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Palestras Públicas»
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-24867.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Palestrantes»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-24167.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Mensagens Mediúnicas»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26595.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Mensagens»
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-24865.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Autores Espirituais»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-24868.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Eventos»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26598.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Nossos Eventos»
+                div.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.jet-nav__item-24871.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Vibração»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26599.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Caixinha de Vibração»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-24869.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Agenda»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26600.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Agenda Reforma Íntima»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-24870.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Evangelho»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26601.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Evangelho da Semana»
+                    div.menu-item.menu-item-type-post_type.menu-item-object-page.jet-nav__item-25969.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Evangelho no Lar»
+                div.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.jet-nav__item-130.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Sementeira»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-26602.jet-nav__item
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Blog Espírita»
+                        div.jet-nav-arrow
+                      div.jet-nav__sub.jet-nav-depth-1
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26608.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «Reflexões e Espiritualidade»
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26609.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «CEMA em Ação»
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26610.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «Estudando a Mediunidade»
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26611.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «Datas Comemorativas»
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26612.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «Prática de Amor ao Próximo»
+  div.elementor-element.elementor-element-ca1779c.e-flex.e-con-boxed.e-con.e-parent
+    div.e-con-inner
+      div.elementor-element.elementor-element-c60c42a.elementor-widget.elementor-widget-off-canvas
+        div#off-canvas-c60c42a.e-off-canvas
+          div.e-off-canvas__overlay
+          div.e-off-canvas__main
+            div.e-off-canvas__content
+              div.elementor-element.elementor-element-84807df.e-con-full.e-flex.e-con.e-child
+                div.elementor-element.elementor-element-b59e0d6.elementor-view-default.elementor-widget.elementor-widget-icon
+                  div.elementor-icon-wrapper
+                    a.elementor-icon
+                div.elementor-element.elementor-element-8644c44.e-flex.e-con-boxed.e-con.e-child
+                  div.e-con-inner
+                    div.elementor-element.elementor-element-6aa2eca.jedv-enabled--yes.elementor-widget.elementor-widget-image
+                      img.attachment-large.size-large.wp-image-13
+                    div.elementor-element.elementor-element-b15207d.e-con-full.jedv-enabled--yes.e-flex.e-con
+                      div.elementor-element.elementor-element-e256036.elementor-widget.elementor-widget-button
+                        a.elementor-button.elementor-button-link.elementor-size-sm
+                          span.elementor-button-content-wrapper
+                            span.elementor-button-icon
+                              i.huge.huge-login-circle-01
+                            span.elementor-button-text  «Fazer Login?»
+                      div.elementor-element.elementor-element-fbf9519.elementor-widget.elementor-widget-button
+                        a.elementor-button.elementor-button-link.elementor-size-sm
+                          span.elementor-button-content-wrapper
+                            span.elementor-button-icon
+                              i.huge.huge-user-unlock-01
+                            span.elementor-button-text  «Criar Conta?»
+                div.elementor-element.elementor-element-e73793f.elementor-widget.elementor-widget-heading
+                  h2.elementor-heading-title.elementor-size-default  «Menu»
+                div.elementor-element.elementor-element-32e76e8.elementor-nav-menu--dropdown-mobile.elementor-nav-menu--stretch.elementor-nav-menu__text-align-aside.elementor-nav-menu--toggle
+                  nav.elementor-nav-menu--main.elementor-nav-menu__container.elementor-nav-menu--layout-vertical.e--pointer-underline.e--animation-fade
+                    ul#menu-1-32e76e8.elementor-nav-menu.sm-vertical
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.current-menu-ancestor.current-menu-parent.current_page_parent
+                        a.elementor-item  «Institucional»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26597
+                            a.elementor-sub-item  «Nossa Estrutura»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-132
+                            a.elementor-sub-item  «Nossa História»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.current-menu-item.page_item.page-item-113
+                            a.elementor-sub-item.elementor-item-active  «Contato»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-26594
+                        a.elementor-item  «Palestras»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24866
+                            a.elementor-sub-item  «Palestras Públicas»
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24867
+                            a.elementor-sub-item  «Palestrantes»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24167
+                        a.elementor-item  «Mensagens Mediúnicas»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26595
+                            a.elementor-sub-item  «Mensagens»
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24865
+                            a.elementor-sub-item  «Autores Espirituais»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24868
+                        a.elementor-item  «Eventos»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26598
+                            a.elementor-sub-item  «Nossos Eventos»
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.menu-item-24871
+                        a.elementor-item  «Vibração»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26599
+                            a.elementor-sub-item  «Caixinha de Vibração»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24869
+                        a.elementor-item  «Agenda»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26600
+                            a.elementor-sub-item  «Agenda Reforma Íntima»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24870
+                        a.elementor-item  «Evangelho»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26601
+                            a.elementor-sub-item  «Evangelho da Semana»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-25969
+                            a.elementor-sub-item  «Evangelho no Lar»
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.menu-item-130
+                        a.elementor-item  «Sementeira»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-26602
+                            a.elementor-sub-item  «Blog Espírita»
+                            ul.sub-menu.elementor-nav-menu--dropdown
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26608
+                                a.elementor-sub-item  «Reflexões e Espiritualidade»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26609
+                                a.elementor-sub-item  «CEMA em Ação»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26610
+                                a.elementor-sub-item  «Estudando a Mediunidade»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26611
+                                a.elementor-sub-item  «Datas Comemorativas»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26612
+                                a.elementor-sub-item  «Prática de Amor ao Próximo»
+                  div.elementor-menu-toggle
+                  nav.elementor-nav-menu--dropdown.elementor-nav-menu__container
+                    ul#menu-2-32e76e8.elementor-nav-menu.sm-vertical
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.current-menu-ancestor.current-menu-parent.current_page_parent
+                        a.elementor-item  «Institucional»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26597
+                            a.elementor-sub-item  «Nossa Estrutura»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-132
+                            a.elementor-sub-item  «Nossa História»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.current-menu-item.page_item.page-item-113
+                            a.elementor-sub-item.elementor-item-active  «Contato»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-26594
+                        a.elementor-item  «Palestras»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24866
+                            a.elementor-sub-item  «Palestras Públicas»
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24867
+                            a.elementor-sub-item  «Palestrantes»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24167
+                        a.elementor-item  «Mensagens Mediúnicas»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26595
+                            a.elementor-sub-item  «Mensagens»
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24865
+                            a.elementor-sub-item  «Autores Espirituais»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24868
+                        a.elementor-item  «Eventos»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26598
+                            a.elementor-sub-item  «Nossos Eventos»
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.menu-item-24871
+                        a.elementor-item  «Vibração»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26599
+                            a.elementor-sub-item  «Caixinha de Vibração»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24869
+                        a.elementor-item  «Agenda»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26600
+                            a.elementor-sub-item  «Agenda Reforma Íntima»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24870
+                        a.elementor-item  «Evangelho»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26601
+                            a.elementor-sub-item  «Evangelho da Semana»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-25969
+                            a.elementor-sub-item  «Evangelho no Lar»
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.menu-item-130
+                        a.elementor-item  «Sementeira»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-26602
+                            a.elementor-sub-item  «Blog Espírita»
+                            ul.sub-menu.elementor-nav-menu--dropdown
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26608
+                                a.elementor-sub-item  «Reflexões e Espiritualidade»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26609
+                                a.elementor-sub-item  «CEMA em Ação»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26610
+                                a.elementor-sub-item  «Estudando a Mediunidade»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26611
+                                a.elementor-sub-item  «Datas Comemorativas»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26612
+                                a.elementor-sub-item  «Prática de Amor ao Próximo»
+div.elementor.elementor-113
+  section.jet-tricks-particles-section.elementor-element.elementor-element-ae69177.section-xxl.e-flex.e-con-boxed
+    div.e-con-inner
+      div.elementor-shape.elementor-shape-bottom
+      div.elementor-element.elementor-element-150c21a.elementor-widget.elementor-widget-heading
+        h1.elementor-heading-title.elementor-size-default  «Contato»
+      div.elementor-element.elementor-element-1d62954.elementor-widget-divider--view-line.elementor-widget.elementor-widget-divider
+        div.elementor-divider
+          span.elementor-divider-separator
+      div.elementor-element.elementor-element-2eacd44.elementor-widget.elementor-widget-heading
+        h2.elementor-heading-title.elementor-size-default  «Entre em contato»
+  section.elementor-element.elementor-element-c77a443.section-narrow-xs.e-flex.e-con-boxed.e-con
+    div.e-con-inner
+      div.elementor-element.elementor-element-5d1dc7c.elementor-widget.elementor-widget-jet-breadcrumbs
+        div.elementor-widget-container
+          div.elementor-jet-breadcrumbs.jet-blocks
+            div.jet-breadcrumbs
+              div.jet-breadcrumbs__content
+                div.jet-breadcrumbs__wrap
+                  div.jet-breadcrumbs__item
+                    a.jet-breadcrumbs__item-link.is-home  «Início»
+                  div.jet-breadcrumbs__item
+                    div.jet-breadcrumbs__item-sep
+                      span.jet-blocks-icon
+                  div.jet-breadcrumbs__item
+                    span.jet-breadcrumbs__item-target  «Contato»
+  section.elementor-element.elementor-element-65c91a8.section-m.e-flex.e-con-boxed.e-con
+    div.e-con-inner
+      div.elementor-element.elementor-element-2a9595f.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-5e019e2.elementor-widget.elementor-widget-image
+          img.attachment-large.size-large.wp-image-21000
+      div.elementor-element.elementor-element-20f14aa.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-863631f.elementor-widget.elementor-widget-text-editor
+          p  «Com uma trajetória que atravessa décadas, o CEMA segue firme em seu co»
+          p  «Você pode falar conosco de várias formas:»
+          ul
+            li
+              p  «: inscreva-se no nosso canal oficial no WhatsApp e receba em primeira »
+                strong  «Radar CEMA»
+            li
+              p  «: escreva para»
+                strong  «E-mail»
+                a.decorated-link.cursor-pointer
+                  span.__cf_email__  «[email protected]»
+            li
+              p  «: se preferir, envie sua mensagem pelo formulário de contato disponíve»
+                strong  «Formulário»
+          p  «Estamos prontos para ouvir você, esclarecer dúvidas e ajudar em sua ca»
+        div.elementor-element.elementor-element-45fb10b.elementor-widget.elementor-widget-jet-listing-dynamic-field
+          div.jet-listing.jet-listing-dynamic-field.display-inline
+            div.jet-listing-dynamic-field__inline-wrap
+              div.jet-listing-dynamic-field__icon.is-svg-icon
+              div.jet-listing-dynamic-field__content  «Se preferir, entre em contato diretamente no nosso»
+                a  «WhatsApp»
+  section.elementor-element.elementor-element-a38d499.section-l.e-flex.e-con-boxed.e-con
+    div.e-con-inner
+      div.elementor-element.elementor-element-fb729c9.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-3c331ac.elementor-widget.elementor-widget-heading
+          h3.elementor-heading-title.elementor-size-default  «Siga-nos nas Nossas Redes Sociais»
+        div.elementor-element.elementor-element-a91194d.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width.elementor-widget.elementor-widget-icon-list
+          ul.elementor-icon-list-items
+            li.elementor-icon-list-item
+              a
+                span.elementor-icon-list-icon
+                span.elementor-icon-list-text  «CEMA TV»
+            li.elementor-icon-list-item
+              a
+                span.elementor-icon-list-icon
+                span.elementor-icon-list-text  «Instagram»
+            li.elementor-icon-list-item
+              a
+                span.elementor-icon-list-icon
+                span.elementor-icon-list-text  «Facebook»
+        div.elementor-element.elementor-element-1c57cf1.elementor-widget.elementor-widget-heading
+          h3.elementor-heading-title.elementor-size-default  «Entre no Radar e fique por dentro de todas as novidades!»
+        div.elementor-element.elementor-element-f7bc988.elementor-widget.elementor-widget-image
+          a
+            img.attachment-large.size-large.wp-image-16
+        div.elementor-element.elementor-element-898eb4c.elementor-align-end.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width.elementor-widget
+          ul.elementor-icon-list-items
+            li.elementor-icon-list-item
+              span.elementor-icon-list-icon
+              span.elementor-icon-list-text  «Comunidade no Whatsapp»
+      div.elementor-element.elementor-element-7fd5140.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-1e4255d.elementor-widget.elementor-widget-heading
+          h2.elementor-heading-title.elementor-size-default  «Formulário de Contato»
+        div.elementor-element.elementor-element-e785b50.elementor-widget.elementor-widget-jet-form-builder-form
+          div.elementor-widget-container
+            form.jet-form-builder.layout-column.submit-type-reload
+              input
+              input.jet-form-builder__field.hidden-field
+              input.jet-form-builder__field.hidden-field
+              input.jet-form-builder__field.hidden-field
+              input.jet-form-builder__field.hidden-field
+              div.jet-form-builder-row.field-type-text-field
+                div.jet-form-builder__label
+                  div.jet-form-builder__label-text  «Nome»
+                    span.jet-form-builder__required  «*»
+                div.jet-form-builder__field-wrap
+                  input#nome_assunto.jet-form-builder__field.text-field
+              div.jet-form-builder-row.field-type-text-field
+                div.jet-form-builder__label
+                  div.jet-form-builder__label-text  «Email»
+                    span.jet-form-builder__required  «*»
+                div.jet-form-builder__field-wrap
+                  input#email_assunto.jet-form-builder__field.text-field
+              div.jet-form-builder-row.field-type-text-field
+                div.jet-form-builder__label
+                  div.jet-form-builder__label-text  «Whastapp»
+                div.jet-form-builder__field-wrap
+                  input#zap_assunto.jet-form-builder__field.text-field.jet-form-builder__masked-field
+              div.jet-form-builder-row.field-type-select-field.wp-block-jet-forms-select-field
+                div.jet-form-builder__label
+                  div.jet-form-builder__label-text  «Assunto»
+                div.jet-form-builder__field-wrap
+                  select#assunto.jet-form-builder__field.select-field
+                    option  «Atendimento Fraterno»
+                    option  «Doação»
+                    option  «Estudo Sistematizado»
+                    option  «Livraria»
+                    option  «Mediunidade»
+                    option  «Os Tutelados de Maria»
+                    option  «Palestras Públicas»
+                    option  «Pedido de Ajuda»
+                    option  «Pedido de Prece»
+                    option  «Outros»
+              div.jet-form-builder-row.field-type-wysiwyg-field.wp-block-jet-forms-wysiwyg-field
+                div.jet-form-builder__label
+                  div.jet-form-builder__label-text  «Menssagem»
+                div.jet-form-builder__field-wrap
+                  div.jet-form-builder__field.wysiwyg-field
+                    div#wp-wp_editor_message-wrap.wp-core-ui.wp-editor-wrap.html-active
+                      div#wp-wp_editor_message-editor-container.wp-editor-container
+                        textarea#wp_editor_message.wp-editor-area
+              input.captcha-token
+              div.jet-form-builder-row.field-type-submit-field
+                div.jet-form-builder__action-button-wrapper.jet-form-builder__submit-wrap
+                  button.jet-form-builder__action-button.jet-form-builder__submit.submit-type-reload  «Enviar»
+              p.wp-block-paragraph
+              div.jet-form-builder-messages-wrap
+  section.elementor-element.elementor-element-35e8e10.section-l.e-flex.e-con-boxed.e-con
+    div.e-con-inner
+      div.elementor-element.elementor-element-30e70cc.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-c742958.elementor-widget.elementor-widget-image
+          img.attachment-large.size-large.wp-image-25008
+      div.elementor-element.elementor-element-c337ae6.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-ef0003d.elementor-widget.elementor-widget-text-editor
+          p  «O CEMA tem o prazer de oferecer uma biblioteca com um vasto acervo de »
+          p  «Além da leitura no local, disponibilizamos um serviço de , permitindo »
+            strong  «empréstimo de livros»
+          p  «Em breve, nosso catálogo estará disponível online para facilitar ainda»
+          p  «Venha conhecer e aproveitar este espaço que inspira, transforma e fort»
+footer.elementor.elementor-21504.elementor-location-footer
+  section.elementor-element.elementor-element-031605f.e-con-full.section-m.e-flex.e-con
+    div.elementor-element.elementor-element-38d732f.e-con-full.e-flex.e-con.e-child
+      div.elementor-element.elementor-element-4c4c76e.elementor-widget.elementor-widget-image
+        a
+          img.attachment-large.size-large.wp-image-200
+    div.elementor-element.elementor-element-52cc244.e-con-full.e-flex.e-con.e-child
+      div.elementor-element.elementor-element-4541a2b.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width.elementor-widget.elementor-widget-icon-list
+        ul.elementor-icon-list-items
+          li.elementor-icon-list-item
+            a
+              span.elementor-icon-list-icon
+              span.elementor-icon-list-text  «Instituição»
+          li.elementor-icon-list-item
+            a
+              span.elementor-icon-list-icon
+                i.huge.huge-house-01
+              span.elementor-icon-list-text  «História do CEMA»
+          li.elementor-icon-list-item
+            a
+              span.elementor-icon-list-icon
+              span.elementor-icon-list-text  «Nosso Blog»
+          li.elementor-icon-list-item
+            a
+              span.elementor-icon-list-icon
+              span.elementor-icon-list-text  «Notícias do CEMA»
+      div.elementor-element.elementor-element-9f9c171.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width.elementor-widget.elementor-widget-icon-list
+        ul.elementor-icon-list-items
+          li.elementor-icon-list-item
+            a
+              span.elementor-icon-list-icon
+              span.elementor-icon-list-text  «Vibração Virtual»
+          li.elementor-icon-list-item
+            a
+              span.elementor-icon-list-icon
+              span.elementor-icon-list-text  «Palestras Públicas»
+          li.elementor-icon-list-item
+            a
+              span.elementor-icon-list-icon
+                i.hm.hm-speaker
+              span.elementor-icon-list-text  «Palestrantes»
+          li.elementor-icon-list-item
+            a
+              span.elementor-icon-list-icon
+              span.elementor-icon-list-text  «Mensagens Mediúnicas»
+          li.elementor-icon-list-item
+            a
+              span.elementor-icon-list-icon
+                i.huge.huge-book-open-02
+              span.elementor-icon-list-text  «Evangelho da Semana»
+          li.elementor-icon-list-item
+            a
+              span.elementor-icon-list-icon
+              span.elementor-icon-list-text  «Agenda Reforma Íntima»
+      div.elementor-element.elementor-element-b7e444d.elementor-icon-list--layout-traditional.elementor-list-item-link-full_width.elementor-widget.elementor-widget-icon-list
+        ul.elementor-icon-list-items
+          li.elementor-icon-list-item
+            a
+              span.elementor-icon-list-icon
+                i.huge.huge-dashboard-square-03
+              span.elementor-icon-list-text  «Minha Conta»
+          li.elementor-icon-list-item
+            a
+              span.elementor-icon-list-icon
+              span.elementor-icon-list-text  «Política de Privacidade»
+          li.elementor-icon-list-item
+            a
+              span.elementor-icon-list-icon
+                i.huge.huge-cookie
+              span.elementor-icon-list-text  «Política de Cookies»
+          li.elementor-icon-list-item
+            a
+              span.elementor-icon-list-icon
+                i.hm.hm-pen-paper
+              span.elementor-icon-list-text  «Termos e Condições»
+          li.elementor-icon-list-item
+            a
+              span.elementor-icon-list-icon
+                i.huge.huge-contact
+              span.elementor-icon-list-text  «Contato»
+    div.elementor-element.elementor-element-fd643fa.e-con-full.e-flex.e-con.e-child
+      div.elementor-element.elementor-element-72b07e7.elementor-widget.elementor-widget-heading
+        h2.elementor-heading-title.elementor-size-default  «Inscreva-se no Newsletter»
+      div.elementor-element.elementor-element-e7291ad.elementor-widget.elementor-widget-jet-form-builder-form
+        div.elementor-widget-container
+          form.jet-form-builder.layout-column.submit-type-ajax
+            input#_wpnonce
+            input
+            input
+            input.jet-form-builder__field.hidden-field
+            input.jet-form-builder__field.hidden-field
+            input.jet-form-builder__field.hidden-field
+            input.jet-form-builder__field.hidden-field
+            div.jet-form-builder-row.field-type-text-field
+              div.jet-form-builder__label
+                div.jet-form-builder__label-text  «Nome»
+              div.jet-form-builder__field-wrap
+                input#nome_lead.jet-form-builder__field.text-field
+            div.jet-form-builder-row.field-type-text-field
+              div.jet-form-builder__label
+                div.jet-form-builder__label-text  «Email»
+              div.jet-form-builder__field-wrap
+                input#email_newsletter.jet-form-builder__field.text-field
+            input.captcha-token
+            div.jet-form-builder-row.field-type-submit-field
+              div.jet-form-builder__action-button-wrapper.jet-form-builder__submit-wrap
+                button.jet-form-builder__action-button.jet-form-builder__submit.submit-type-reload  «Inscrever»
+            div.jet-form-builder-messages-wrap
+      div.elementor-element.elementor-element-cb2fa4b.elementor-widget.elementor-widget-text-editor
+        p  «Ao se Inscrever você concorda com os e desse site.»
+          a  «Termos e Condições»
+          a  «Políticas de Privacidade»
+  section.elementor-element.elementor-element-31d7e50.section-xxs.e-flex.e-con-boxed.e-con
+    div.e-con-inner
+      div.elementor-element.elementor-element-b88ea54.e-flex.e-con-boxed.e-con.e-child
+        div.e-con-inner
+          div.elementor-element.elementor-element-d01c5eb.e-grid.e-con-full.e-con.e-child
+            div.elementor-element.elementor-element-3d412aa.elementor-view-default.elementor-widget.elementor-widget-icon
+              div.elementor-icon-wrapper
+                a.elementor-icon
+            div.elementor-element.elementor-element-adc3768.elementor-view-default.elementor-widget.elementor-widget-icon
+              div.elementor-icon-wrapper
+                a.elementor-icon
+            div.elementor-element.elementor-element-4d93fbb.elementor-view-default.elementor-widget.elementor-widget-icon
+              div.elementor-icon-wrapper
+                a.elementor-icon
+            div.elementor-element.elementor-element-3ad819b.elementor-view-default.elementor-widget.elementor-widget-icon
+              div.elementor-icon-wrapper
+                a.elementor-icon
+            div.elementor-element.elementor-element-14ddb8c.elementor-widget.elementor-widget-image
+              a
+                img.attachment-large.size-large.wp-image-16
+          div.elementor-element.elementor-element-c99c59c.e-grid.e-con-full.e-con.e-child
+            div.elementor-element.elementor-element-b7c6ecd.elementor-widget.elementor-widget-image
+              a
+                img.attachment-large.size-large.wp-image-187
+            div.elementor-element.elementor-element-95d29dd.elementor-widget.elementor-widget-image
+              a
+                img.attachment-large.size-large.wp-image-185
+  section.elementor-element.elementor-element-e25abd8.section-xxs.e-flex.e-con-boxed.e-con
+    div.e-con-inner
+      div.elementor-element.elementor-element-33a5b1b.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-5c748f1.e-con-full.e-flex.e-con.e-child
+          div.elementor-element.elementor-element-c8fc7d3.elementor-widget.elementor-widget-jet-listing-dynamic-field
+            div.jet-listing.jet-listing-dynamic-field.display-inline
+              div.jet-listing-dynamic-field__inline-wrap
+                div.jet-listing-dynamic-field__icon.is-svg-icon
+                div.jet-listing-dynamic-field__content  «Quadra 02, Lote 16, Vila Vicentina, Planaltina, Brasília-DF. CEP 73.32»
+          div.elementor-element.elementor-element-dddef93.elementor-widget.elementor-widget-jet-listing-dynamic-field
+            div.jet-listing.jet-listing-dynamic-field.display-inline
+              div.jet-listing-dynamic-field__inline-wrap
+                div.jet-listing-dynamic-field__content  «CNPJ: 01.600.089/0001-90»
+          div.elementor-element.elementor-element-7982002.elementor-widget.elementor-widget-heading
+            p.elementor-heading-title.elementor-size-default  «© 2026 Todos os direitos reservados.»
+          div.elementor-element.elementor-element-cffd8bd.elementor-widget.elementor-widget-heading
+            p.elementor-heading-title.elementor-size-default  «Desenvolvido por DECOM - Departamento de Comunicação e Multimídia»
+          div.elementor-element.elementor-element-58ef03d.elementor-widget.elementor-widget-heading
+            p.elementor-heading-title.elementor-size-default  «DECOM - A Voz do CEMA nas Redes!»
+        div.elementor-element.elementor-element-3bc1835.e-con-full.e-flex.e-con.e-child
+          div.elementor-element.elementor-element-8efcd5d.elementor-widget.elementor-widget-text-editor
+            p  «O é um site que pertence e é gerido pelo CEMA, assim como o site e»
+              a  «Cemanet»
+              a  «Cursos CEMA»
+              a  «CEMA Livraria»
+div#jet-popup-21087.jet-popup.jet-popup--front-mode.jet-popup--hide-state.jet-popup--animation-fade
+  div.jet-popup__inner
+    div.jet-popup__overlay
+    div.jet-popup__container
+      div.jet-popup__container-inner
+        div.jet-popup__container-overlay
+        div.jet-popup__container-content
+          div.elementor.elementor-21087
+            section.elementor-element.elementor-element-80deb11.section-hero.e-flex.e-con-boxed.e-con
+              div.e-con-inner
+                div.elementor-element.elementor-element-2fecd49.elementor-widget.elementor-widget-jet-animated-text
+                  div.elementor-widget-container
+                    div.elementor-jet-animated-text.jet-elements
+                      div.jet-animated-text.jet-animated-text--effect-fx1
+                        div.jet-animated-text__before-text
+                          span  «Mensagem»
+                        div.jet-animated-text__animated-text
+                          div.jet-animated-text__animated-text-item.active.visible
+                            span  «E»
+                            span  «n»
+                            span  «v»
+                            span  «i»
+                            span  «a»
+                            span  «d»
+                            span  «a»
+                          div.jet-animated-text__animated-text-item
+                            span  «A»
+                            span  «n»
+                            span  «i»
+                            span  «m»
+                            span  «a»
+                            span  «t»
+                            span  «e»
+                        div.jet-animated-text__after-text
+                          span  «Com»
+                          span  «Sucesso»
+                div.elementor-element.elementor-element-68fef98.elementor-widget.elementor-widget-heading
+                  p.elementor-heading-title.elementor-size-default  «Olá, recebemos o seu contato e agradecemos por nos mandar essa mensage»
+      button.jet-popup__close-button
+div#jet-popup-22281.jet-popup.jet-popup--front-mode.jet-popup--hide-state.jet-popup--animation-fade
+  div.jet-popup__inner
+    div.jet-popup__overlay
+    div.jet-popup__container
+      div.jet-popup__container-inner
+        div.jet-popup__container-overlay
+        div.jet-popup__container-content
+          div.elementor.elementor-22281
+            div.elementor-element.elementor-element-0a1ccdf.e-flex.e-con-boxed.e-con.e-parent
+              div.e-con-inner
+                div.elementor-element.elementor-element-c70db03.e-con-full.e-flex.e-con.e-child
+                  div.elementor-element.elementor-element-4e1c670.elementor-widget.elementor-widget-image
+                    img.attachment-large.size-large.wp-image-14
+                  div.elementor-element.elementor-element-2c2e5f4.elementor-widget.elementor-widget-heading
+                    h2.elementor-heading-title.elementor-size-default  «Recebemos a sua solicitação»
+            div.elementor-element.elementor-element-b48cd18.e-flex.e-con-boxed.e-con.e-parent
+              div.e-con-inner
+                div.elementor-element.elementor-element-7cb5811.elementor-widget.elementor-widget-shortcode
+                  div.elementor-shortcode  «Em breve vamos entrar em contato com você, mas, se preferir, pode mand»
+                    a  «WhatsApp»
+                    a  «Email»
+      button.jet-popup__close-button
+div#jet-popup-23866.jet-popup.jet-popup--front-mode.jet-popup--hide-state.jet-popup--animation-fade
+  div.jet-popup__inner
+    div.jet-popup__overlay
+      div.jet-popup-loader
+    div.jet-popup__container
+      div.jet-popup__container-inner
+        div.jet-popup__container-overlay
+        div.jet-popup__container-content
+      button.jet-popup__close-button
+div#jet-popup-24792.jet-popup.jet-popup--front-mode.jet-popup--hide-state.jet-popup--animation-fade
+  div.jet-popup__inner
+    div.jet-popup__overlay
+      div.jet-popup-loader
+    div.jet-popup__container
+      div.jet-popup__container-inner
+        div.jet-popup__container-overlay
+        div.jet-popup__container-content
+      button.jet-popup__close-button
+div#jet-popup-23563.jet-popup.jet-popup--front-mode.jet-popup--hide-state.jet-popup--animation-fade
+  div.jet-popup__inner

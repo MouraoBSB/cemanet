@@ -1,0 +1,702 @@
+# Estrutura (esqueleto) de snapshot/cemanet.org.br/palestrantes/abadio-rodrigues/index.html
+
+a.skip-link.screen-reader-text  «Ir para o conteúdo»
+header.elementor.elementor-21493.elementor-location-header
+  div.elementor-element.elementor-element-703790e.e-flex.e-con-boxed.e-con.e-parent
+    div.e-con-inner
+      div.elementor-element.elementor-element-ff1aaaf.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-68bb67f.elementor-widget.elementor-widget-image
+          a
+            img.attachment-large.size-large.wp-image-13
+      div.elementor-element.elementor-element-9149c75.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-260d646.elementor-widget__width-inherit.elementor-widget.elementor-widget-jet-search
+          div.elementor-widget-container
+            div.elementor-jet-search.jet-blocks
+              div.jet-search
+                form.jet-search__form
+                  label.jet-search__label
+                    span.screen-reader-text  «Pesquisar …»
+                    input.jet-search__field
+                  button.jet-search__submit
+                    span.jet-search__submit-icon.jet-blocks-icon
+      div.elementor-element.elementor-element-1f8b1fe.e-con-full.elementor-hidden-tablet.elementor-hidden-mobile.e-flex
+        div.elementor-element.elementor-element-3bcc3ab.elementor-hidden-tablet.elementor-hidden-mobile.elementor-widget.elementor-widget-jet-auth-links
+          div.elementor-widget-container
+            div.elementor-jet-auth-links.jet-blocks
+              div.jet-auth-links
+                div.jet-auth-links__section.jet-auth-links__login
+                  div.jet-auth-links__prefix  «Possui uma conta?»
+                  a.jet-auth-links__item
+                    span.jet-auth-links__item-icon.jet-blocks-icon
+                    span.jet-auth-links__item-text  «Entrar»
+                div.jet-auth-links__section.jet-auth-links__register
+                  div.jet-auth-links__prefix  «ou»
+                  a.jet-auth-links__item
+                    span.jet-auth-links__item-icon.jet-blocks-icon
+                    span.jet-auth-links__item-text  «Cadastrar»
+      div.elementor-element.elementor-element-cc3bc02.e-con-full.elementor-hidden-desktop.e-flex.e-con
+        div.elementor-element.elementor-element-e587ab0.elementor-view-default.elementor-widget.elementor-widget-icon
+          div.elementor-icon-wrapper
+            a.elementor-icon
+              i.huge.huge-menu-07
+  header.elementor-element.elementor-element-596622a.elementor-hidden-tablet.elementor-hidden-mobile.e-flex.e-con-boxed
+    div.e-con-inner
+      div.elementor-element.elementor-element-c913db1.jet-nav-align-center.elementor-widget.elementor-widget-jet-nav-menu
+        div.elementor-widget-container
+          nav.jet-nav-wrap.m-layout-mobile.jet-mobile-menu.jet-mobile-menu--default
+            div.jet-nav__mobile-trigger.jet-nav-mobile-trigger-align-left
+              span.jet-nav__mobile-trigger-open.jet-blocks-icon
+              span.jet-nav__mobile-trigger-close.jet-blocks-icon
+            div.menu-menu-principal-container
+              div.jet-nav.m-layout-mobile.jet-nav--horizontal
+                div.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.jet-nav__item-133.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Institucional»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26597.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Nossa Estrutura»
+                    div.menu-item.menu-item-type-post_type.menu-item-object-page.jet-nav__item-132.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Nossa História»
+                    div.menu-item.menu-item-type-post_type.menu-item-object-page.jet-nav__item-25597.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Contato»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-26594.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Palestras»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-24866.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Palestras Públicas»
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-24867.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Palestrantes»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-24167.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Mensagens Mediúnicas»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26595.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Mensagens»
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-24865.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Autores Espirituais»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-24868.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Eventos»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26598.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Nossos Eventos»
+                div.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.jet-nav__item-24871.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Vibração»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26599.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Caixinha de Vibração»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-24869.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Agenda»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26600.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Agenda Reforma Íntima»
+                div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-24870.jet-nav__item
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Evangelho»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26601.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Evangelho da Semana»
+                    div.menu-item.menu-item-type-post_type.menu-item-object-page.jet-nav__item-25969.jet-nav__item.jet-nav-item-sub
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Evangelho no Lar»
+                div.menu-item.menu-item-type-post_type.menu-item-object-page.current_page_parent.menu-item-has-children.jet-nav__item-130
+                  a.menu-item-link.menu-item-link-depth-0.menu-item-link-top
+                    span.jet-nav-link-text  «Sementeira»
+                    div.jet-nav-arrow
+                  div.jet-nav__sub.jet-nav-depth-0
+                    div.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.jet-nav__item-26602.jet-nav__item
+                      a.menu-item-link.menu-item-link-depth-1.menu-item-link-sub
+                        span.jet-nav-link-text  «Blog Espírita»
+                        div.jet-nav-arrow
+                      div.jet-nav__sub.jet-nav-depth-1
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26608.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «Reflexões e Espiritualidade»
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26609.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «CEMA em Ação»
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26610.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «Estudando a Mediunidade»
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26611.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «Datas Comemorativas»
+                        div.menu-item.menu-item-type-custom.menu-item-object-custom.jet-nav__item-26612.jet-nav__item.jet-nav-item-sub
+                          a.menu-item-link.menu-item-link-depth-2.menu-item-link-sub
+                            span.jet-nav-link-text  «Prática de Amor ao Próximo»
+  div.elementor-element.elementor-element-ca1779c.e-flex.e-con-boxed.e-con.e-parent
+    div.e-con-inner
+      div.elementor-element.elementor-element-c60c42a.elementor-widget.elementor-widget-off-canvas
+        div#off-canvas-c60c42a.e-off-canvas
+          div.e-off-canvas__overlay
+          div.e-off-canvas__main
+            div.e-off-canvas__content
+              div.elementor-element.elementor-element-84807df.e-con-full.e-flex.e-con.e-child
+                div.elementor-element.elementor-element-b59e0d6.elementor-view-default.elementor-widget.elementor-widget-icon
+                  div.elementor-icon-wrapper
+                    a.elementor-icon
+                div.elementor-element.elementor-element-8644c44.e-flex.e-con-boxed.e-con.e-child
+                  div.e-con-inner
+                    div.elementor-element.elementor-element-6aa2eca.jedv-enabled--yes.elementor-widget.elementor-widget-image
+                      img.attachment-large.size-large.wp-image-13
+                    div.elementor-element.elementor-element-b15207d.e-con-full.jedv-enabled--yes.e-flex.e-con
+                      div.elementor-element.elementor-element-e256036.elementor-widget.elementor-widget-button
+                        a.elementor-button.elementor-button-link.elementor-size-sm
+                          span.elementor-button-content-wrapper
+                            span.elementor-button-icon
+                              i.huge.huge-login-circle-01
+                            span.elementor-button-text  «Fazer Login?»
+                      div.elementor-element.elementor-element-fbf9519.elementor-widget.elementor-widget-button
+                        a.elementor-button.elementor-button-link.elementor-size-sm
+                          span.elementor-button-content-wrapper
+                            span.elementor-button-icon
+                              i.huge.huge-user-unlock-01
+                            span.elementor-button-text  «Criar Conta?»
+                div.elementor-element.elementor-element-e73793f.elementor-widget.elementor-widget-heading
+                  h2.elementor-heading-title.elementor-size-default  «Menu»
+                div.elementor-element.elementor-element-32e76e8.elementor-nav-menu--dropdown-mobile.elementor-nav-menu--stretch.elementor-nav-menu__text-align-aside.elementor-nav-menu--toggle
+                  nav.elementor-nav-menu--main.elementor-nav-menu__container.elementor-nav-menu--layout-vertical.e--pointer-underline.e--animation-fade
+                    ul#menu-1-32e76e8.elementor-nav-menu.sm-vertical
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.menu-item-133
+                        a.elementor-item  «Institucional»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26597
+                            a.elementor-sub-item  «Nossa Estrutura»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-132
+                            a.elementor-sub-item  «Nossa História»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-25597
+                            a.elementor-sub-item  «Contato»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-26594
+                        a.elementor-item  «Palestras»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24866
+                            a.elementor-sub-item  «Palestras Públicas»
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24867
+                            a.elementor-sub-item  «Palestrantes»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24167
+                        a.elementor-item  «Mensagens Mediúnicas»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26595
+                            a.elementor-sub-item  «Mensagens»
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24865
+                            a.elementor-sub-item  «Autores Espirituais»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24868
+                        a.elementor-item  «Eventos»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26598
+                            a.elementor-sub-item  «Nossos Eventos»
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.menu-item-24871
+                        a.elementor-item  «Vibração»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26599
+                            a.elementor-sub-item  «Caixinha de Vibração»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24869
+                        a.elementor-item  «Agenda»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26600
+                            a.elementor-sub-item  «Agenda Reforma Íntima»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24870
+                        a.elementor-item  «Evangelho»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26601
+                            a.elementor-sub-item  «Evangelho da Semana»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-25969
+                            a.elementor-sub-item  «Evangelho no Lar»
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.current_page_parent.menu-item-has-children.menu-item-130
+                        a.elementor-item  «Sementeira»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-26602
+                            a.elementor-sub-item  «Blog Espírita»
+                            ul.sub-menu.elementor-nav-menu--dropdown
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26608
+                                a.elementor-sub-item  «Reflexões e Espiritualidade»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26609
+                                a.elementor-sub-item  «CEMA em Ação»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26610
+                                a.elementor-sub-item  «Estudando a Mediunidade»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26611
+                                a.elementor-sub-item  «Datas Comemorativas»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26612
+                                a.elementor-sub-item  «Prática de Amor ao Próximo»
+                  div.elementor-menu-toggle
+                  nav.elementor-nav-menu--dropdown.elementor-nav-menu__container
+                    ul#menu-2-32e76e8.elementor-nav-menu.sm-vertical
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.menu-item-133
+                        a.elementor-item  «Institucional»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26597
+                            a.elementor-sub-item  «Nossa Estrutura»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-132
+                            a.elementor-sub-item  «Nossa História»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-25597
+                            a.elementor-sub-item  «Contato»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-26594
+                        a.elementor-item  «Palestras»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24866
+                            a.elementor-sub-item  «Palestras Públicas»
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24867
+                            a.elementor-sub-item  «Palestrantes»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24167
+                        a.elementor-item  «Mensagens Mediúnicas»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26595
+                            a.elementor-sub-item  «Mensagens»
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-24865
+                            a.elementor-sub-item  «Autores Espirituais»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24868
+                        a.elementor-item  «Eventos»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26598
+                            a.elementor-sub-item  «Nossos Eventos»
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-has-children.menu-item-24871
+                        a.elementor-item  «Vibração»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26599
+                            a.elementor-sub-item  «Caixinha de Vibração»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24869
+                        a.elementor-item  «Agenda»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26600
+                            a.elementor-sub-item  «Agenda Reforma Íntima»
+                      li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-24870
+                        a.elementor-item  «Evangelho»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26601
+                            a.elementor-sub-item  «Evangelho da Semana»
+                          li.menu-item.menu-item-type-post_type.menu-item-object-page.menu-item-25969
+                            a.elementor-sub-item  «Evangelho no Lar»
+                      li.menu-item.menu-item-type-post_type.menu-item-object-page.current_page_parent.menu-item-has-children.menu-item-130
+                        a.elementor-item  «Sementeira»
+                        ul.sub-menu.elementor-nav-menu--dropdown
+                          li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-has-children.menu-item-26602
+                            a.elementor-sub-item  «Blog Espírita»
+                            ul.sub-menu.elementor-nav-menu--dropdown
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26608
+                                a.elementor-sub-item  «Reflexões e Espiritualidade»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26609
+                                a.elementor-sub-item  «CEMA em Ação»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26610
+                                a.elementor-sub-item  «Estudando a Mediunidade»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26611
+                                a.elementor-sub-item  «Datas Comemorativas»
+                              li.menu-item.menu-item-type-custom.menu-item-object-custom.menu-item-26612
+                                a.elementor-sub-item  «Prática de Amor ao Próximo»
+div.elementor.elementor-23671.elementor-location-single.post-22943.palestrantes.type-palestrantes
+  section.elementor-element.elementor-element-31c57402.section-hero.gap-m.e-flex.e-con-boxed
+    div.e-con-inner
+      div.elementor-shape.elementor-shape-bottom
+      div.elementor-element.elementor-element-7fd02c33.e-con-full.e-flex.e-con.e-child
+        div.elementor-element.elementor-element-637d45f2.elementor-hidden-mobile.elementor-widget.elementor-widget-jet-blog-text-ticker
+          div.elementor-widget-container
+            div.elementor-jet-blog-text-ticker.jet-blog
+              div.jet-text-ticker
+                div.jet-text-ticker__posts-wrap
+                  div.jet-text-ticker__posts
+                    div.jet-text-ticker__item
+                      div.jet-text-ticker__item-content.jet-use-typing.jet-multiline-typing
+                        img.jet-text-ticker__post-thumb.jet-blog-hidden-tablet.jet-blog-hidden-mobile.wp-post-image
+                        div.jet-text-ticker__post-date.jet-blog-hidden-tablet.jet-blog-hidden-mobile  «08:00»
+                        div.jet-text-ticker__item-typed-wrap
+                          a.jet-text-ticker__item-typed
+                            span.jet-text-ticker__item-typed-inner  «Dia dos Namorados: o amor que se constrói todos os dias»
+                    div.jet-text-ticker__item
+                      div.jet-text-ticker__item-content.jet-use-typing.jet-multiline-typing
+                        img.jet-text-ticker__post-thumb.jet-blog-hidden-tablet.jet-blog-hidden-mobile.wp-post-image
+                        div.jet-text-ticker__post-date.jet-blog-hidden-tablet.jet-blog-hidden-mobile  «11:12»
+                        div.jet-text-ticker__item-typed-wrap
+                          a.jet-text-ticker__item-typed
+                            span.jet-text-ticker__item-typed-inner  «Campanha do Agasalho do CEMA: aqueça um inverno que não é o seu»
+                    div.jet-text-ticker__item
+                      div.jet-text-ticker__item-content.jet-use-typing.jet-multiline-typing
+                        img.jet-text-ticker__post-thumb.jet-blog-hidden-tablet.jet-blog-hidden-mobile.wp-post-image
+                        div.jet-text-ticker__post-date.jet-blog-hidden-tablet.jet-blog-hidden-mobile  «11:29»
+                        div.jet-text-ticker__item-typed-wrap
+                          a.jet-text-ticker__item-typed
+                            span.jet-text-ticker__item-typed-inner  «12º Encontro da Família CEMA reúne cerca de 200 pessoas em torno da Me»
+                    div.jet-text-ticker__item
+                      div.jet-text-ticker__item-content.jet-use-typing.jet-multiline-typing
+                        img.jet-text-ticker__post-thumb.jet-blog-hidden-tablet.jet-blog-hidden-mobile.wp-post-image
+                        div.jet-text-ticker__post-date.jet-blog-hidden-tablet.jet-blog-hidden-mobile  «08:42»
+                        div.jet-text-ticker__item-typed-wrap
+                          a.jet-text-ticker__item-typed
+                            span.jet-text-ticker__item-typed-inner  «Jesus, Médico das Almas: a Cura Começa no Reconhecimento»
+        div.elementor-element.elementor-element-6bc5b157.elementor-widget.elementor-widget-heading
+          h1.elementor-heading-title.elementor-size-default  «Abadio Rodrigues»
+        div.elementor-element.elementor-element-1112252d.elementor-widget.elementor-widget-jet-breadcrumbs
+          div.elementor-widget-container
+            div.elementor-jet-breadcrumbs.jet-blocks
+              div.jet-breadcrumbs
+                div.jet-breadcrumbs__content
+                  div.jet-breadcrumbs__wrap
+                    div.jet-breadcrumbs__item
+                      a.jet-breadcrumbs__item-link.is-home  «Início»
+                    div.jet-breadcrumbs__item
+                      div.jet-breadcrumbs__item-sep
+                        span.jet-blocks-icon
+                    div.jet-breadcrumbs__item
+                      a.jet-breadcrumbs__item-link  «Palestrantes e Diretores»
+                    div.jet-breadcrumbs__item
+                      div.jet-breadcrumbs__item-sep
+                        span.jet-blocks-icon
+                    div.jet-breadcrumbs__item
+                      span.jet-breadcrumbs__item-target  «Abadio Rodrigues»
+        div.jet-popup-target.elementor-element.elementor-element-3cbc178a.elementor-view-default.elementor-position-block-start.elementor-mobile-position-block-start
+          div.elementor-icon-box-wrapper
+            div.elementor-icon-box-icon
+              span.elementor-icon
+            div.elementor-icon-box-content
+              h3.elementor-icon-box-title
+                span  «Veja o Calendário de Palestras»
+  section.elementor-element.elementor-element-03e8bb8.e-flex.e-con-boxed.e-con.e-parent
+    div.e-con-inner
+      div.elementor-element.elementor-element-e4f3855.elementor-widget.elementor-widget-jet-listing-dynamic-image
+        div.jet-listing.jet-listing-dynamic-image
+          a.jet-listing-dynamic-image__link
+            img.jet-listing-dynamic-image__img.attachment-large.size-large.wp-post-image
+  section.elementor-element.elementor-element-7de5ddfd.gap-s.e-flex.e-con-boxed.e-con
+    div.e-con-inner
+      section.elementor-element.elementor-element-21c8c93b.e-con-full.section-narrow.e-flex.e-con
+        section.elementor-element.elementor-element-3628344e.e-con-full.section-x.e-flex.e-con
+          div.elementor-element.elementor-element-2f03d6d0.elementor-widget.elementor-widget-heading
+            h2.elementor-heading-title.elementor-size-default
+              a  «Palestras»
+          div.elementor-element.elementor-element-373503b.elementor-widget.elementor-widget-jet-listing-grid
+            div.elementor-widget-container
+              div.jet-listing-grid.jet-listing
+                div.jet-listing-grid__slider.swiper-lib.swiper
+                  div.jet-listing-grid__items.grid-col-desk-1.grid-col-tablet-1.grid-col-mobile-1.jet-listing-grid--23510.swiper-wrapper
+                    div.jet-listing-grid__item.jet-listing-dynamic-post-27173.elementor-dcss-11316190380093880
+                      div.elementor.elementor-23510
+                        div.elementor-element.elementor-element-ba866f5.e-flex.e-con-boxed.e-con.e-parent
+                          div.e-con-inner
+                            div.elementor-element.elementor-element-e9ddfb8.e-con-full.e-flex.e-con.e-child
+                              div.elementor-element.elementor-element-2cbd4f3.elementor-widget__width-initial.jedv-enabled--yes.ha-has-bg-overlay.elementor-widget
+                                h2.elementor-heading-title.elementor-size-default  «Em Breve»
+                              div.elementor-element.elementor-element-95d05aa.elementor-widget__width-initial.jedv-enabled--yes.ha-has-bg-overlay.elementor-widget
+                                div.jet-listing.jet-listing-dynamic-field.display-inline
+                                  div.jet-listing-dynamic-field__inline-wrap
+                                    div.jet-listing-dynamic-field__content  «Faltam 1 semana»
+                            div.elementor-element.elementor-element-ba3e6d1.e-con-full.e-flex.e-con.e-child
+                              div.elementor-shape.elementor-shape-bottom
+                              div.elementor-element.elementor-element-e446023.e-con-full.e-flex.e-con.e-child
+                                div.elementor-element.elementor-element-2c32d1a.e-con-full.e-flex.e-con.e-child
+                                  div.elementor-element.elementor-element-827b0d1.elementor-widget.elementor-widget-heading
+                                    h2.elementor-heading-title.elementor-size-default  «Palestra Pública»
+                                  div.elementor-element.elementor-element-405f24a.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «Auxílios do Invisível»
+                                  div.elementor-element.elementor-element-a8b4bf1.ha-has-bg-overlay.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «Wagner Alberto»
+                                  div.elementor-element.elementor-element-6007768.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «28 de junho de 2026»
+                                div.elementor-element.elementor-element-d3878f3.e-con-full.e-flex.e-con.e-child
+                                  div.elementor-shape.elementor-shape-bottom
+                                  div.elementor-element.elementor-element-72c7e3f.elementor-widget.elementor-widget-jet-listing-dynamic-image
+                                    div.jet-listing.jet-listing-dynamic-image
+                                      img.jet-listing-dynamic-image__img.attachment-full.size-full.wp-post-image
+                                  div.elementor-element.elementor-element-48d0596.elementor-widget.elementor-widget-image
+                                    img.attachment-large.size-large.wp-image-13
+                            div.elementor-element.elementor-element-65a027c.e-con-full.e-flex.e-con.e-child
+                              div.elementor-element.elementor-element-3f050a2.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                div.jet-listing.jet-listing-dynamic-field.display-inline
+                                  div.jet-listing-dynamic-field__inline-wrap
+                                    div.jet-listing-dynamic-field__content  «Precisamos fazer a nossa parte»
+                              div.elementor-element.elementor-element-5faeb09.elementor-align-justify.elementor-widget.elementor-widget-button
+                                a.elementor-button.elementor-button-link.elementor-size-sm.elementor-animation-grow
+                                  span.elementor-button-content-wrapper
+                                    span.elementor-button-text  «Ver Palestra»
+                    div.jet-listing-grid__item.jet-listing-dynamic-post-27172.elementor-dcss-11316190441387424
+                      div.elementor.elementor-23510
+                        div.elementor-element.elementor-element-ba866f5.e-flex.e-con-boxed.e-con.e-parent
+                          div.e-con-inner
+                            div.elementor-element.elementor-element-e9ddfb8.e-con-full.e-flex.e-con.e-child
+                              div.elementor-element.elementor-element-2cbd4f3.elementor-widget__width-initial.jedv-enabled--yes.ha-has-bg-overlay.elementor-widget
+                                h2.elementor-heading-title.elementor-size-default  «Em Breve»
+                              div.elementor-element.elementor-element-95d05aa.elementor-widget__width-initial.jedv-enabled--yes.ha-has-bg-overlay.elementor-widget
+                                div.jet-listing.jet-listing-dynamic-field.display-inline
+                                  div.jet-listing-dynamic-field__inline-wrap
+                                    div.jet-listing-dynamic-field__content  «Faltam 5 horas»
+                            div.elementor-element.elementor-element-ba3e6d1.e-con-full.e-flex.e-con.e-child
+                              div.elementor-shape.elementor-shape-bottom
+                              div.elementor-element.elementor-element-e446023.e-con-full.e-flex.e-con.e-child
+                                div.elementor-element.elementor-element-2c32d1a.e-con-full.e-flex.e-con.e-child
+                                  div.elementor-element.elementor-element-827b0d1.elementor-widget.elementor-widget-heading
+                                    h2.elementor-heading-title.elementor-size-default  «Palestra Pública»
+                                  div.elementor-element.elementor-element-405f24a.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «CEMA 65 Anos»
+                                  div.elementor-element.elementor-element-a8b4bf1.ha-has-bg-overlay.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «Murilo Britto»
+                                  div.elementor-element.elementor-element-6007768.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «21 de junho de 2026»
+                                div.elementor-element.elementor-element-d3878f3.e-con-full.e-flex.e-con.e-child
+                                  div.elementor-shape.elementor-shape-bottom
+                                  div.elementor-element.elementor-element-72c7e3f.elementor-widget.elementor-widget-jet-listing-dynamic-image
+                                    div.jet-listing.jet-listing-dynamic-image
+                                      img.jet-listing-dynamic-image__img.attachment-full.size-full.wp-post-image
+                                  div.elementor-element.elementor-element-48d0596.elementor-widget.elementor-widget-image
+                                    img.attachment-large.size-large.wp-image-13
+                            div.elementor-element.elementor-element-65a027c.e-con-full.e-flex.e-con.e-child
+                              div.elementor-element.elementor-element-3f050a2.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                div.jet-listing.jet-listing-dynamic-field.display-inline
+                                  div.jet-listing-dynamic-field__inline-wrap
+                                    div.jet-listing-dynamic-field__content  «A escola de nossas almas»
+                              div.elementor-element.elementor-element-5faeb09.elementor-align-justify.elementor-widget.elementor-widget-button
+                                a.elementor-button.elementor-button-link.elementor-size-sm.elementor-animation-grow
+                                  span.elementor-button-content-wrapper
+                                    span.elementor-button-text  «Ver Palestra»
+                    div.jet-listing-grid__item.jet-listing-dynamic-post-27171.elementor-dcss-11316190522135806
+                      div.elementor.elementor-23510
+                        div.elementor-element.elementor-element-ba866f5.e-flex.e-con-boxed.e-con.e-parent
+                          div.e-con-inner
+                            div.elementor-element.elementor-element-e9ddfb8.e-con-full.e-flex.e-con.e-child
+                            div.elementor-element.elementor-element-ba3e6d1.e-con-full.e-flex.e-con.e-child
+                              div.elementor-shape.elementor-shape-bottom
+                              div.elementor-element.elementor-element-e446023.e-con-full.e-flex.e-con.e-child
+                                div.elementor-element.elementor-element-2c32d1a.e-con-full.e-flex.e-con.e-child
+                                  div.elementor-element.elementor-element-827b0d1.elementor-widget.elementor-widget-heading
+                                    h2.elementor-heading-title.elementor-size-default  «Palestra Pública»
+                                  div.elementor-element.elementor-element-405f24a.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «O Mundo e Jesus»
+                                  div.elementor-element.elementor-element-a8b4bf1.ha-has-bg-overlay.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «Anderson Portugal»
+                                  div.elementor-element.elementor-element-6007768.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «14 de junho de 2026»
+                                div.elementor-element.elementor-element-d3878f3.e-con-full.e-flex.e-con.e-child
+                                  div.elementor-shape.elementor-shape-bottom
+                                  div.elementor-element.elementor-element-72c7e3f.elementor-widget.elementor-widget-jet-listing-dynamic-image
+                                    div.jet-listing.jet-listing-dynamic-image
+                                      img.jet-listing-dynamic-image__img.attachment-full.size-full.wp-post-image
+                                  div.elementor-element.elementor-element-48d0596.elementor-widget.elementor-widget-image
+                                    img.attachment-large.size-large.wp-image-13
+                            div.elementor-element.elementor-element-65a027c.e-con-full.e-flex.e-con.e-child
+                              div.elementor-element.elementor-element-3f050a2.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                div.jet-listing.jet-listing-dynamic-field.display-inline
+                                  div.jet-listing-dynamic-field__inline-wrap
+                                    div.jet-listing-dynamic-field__content  «Jesus como bússola em meio ao mundo acelerado»
+                              div.elementor-element.elementor-element-5faeb09.elementor-align-justify.elementor-widget.elementor-widget-button
+                                a.elementor-button.elementor-button-link.elementor-size-sm.elementor-animation-grow
+                                  span.elementor-button-content-wrapper
+                                    span.elementor-button-text  «Ver Palestra»
+                    div.jet-listing-grid__item.jet-listing-dynamic-post-27170.elementor-dcss-11316190593164294
+                      div.elementor.elementor-23510
+                        div.elementor-element.elementor-element-ba866f5.e-flex.e-con-boxed.e-con.e-parent
+                          div.e-con-inner
+                            div.elementor-element.elementor-element-e9ddfb8.e-con-full.e-flex.e-con.e-child
+                            div.elementor-element.elementor-element-ba3e6d1.e-con-full.e-flex.e-con.e-child
+                              div.elementor-shape.elementor-shape-bottom
+                              div.elementor-element.elementor-element-e446023.e-con-full.e-flex.e-con.e-child
+                                div.elementor-element.elementor-element-2c32d1a.e-con-full.e-flex.e-con.e-child
+                                  div.elementor-element.elementor-element-827b0d1.elementor-widget.elementor-widget-heading
+                                    h2.elementor-heading-title.elementor-size-default  «Palestra Pública»
+                                  div.elementor-element.elementor-element-405f24a.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «A Paz interior em tempos difíc...»
+                                  div.elementor-element.elementor-element-a8b4bf1.ha-has-bg-overlay.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «Josias Bezerra»
+                                  div.elementor-element.elementor-element-6007768.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «07 de junho de 2026»
+                                div.elementor-element.elementor-element-d3878f3.e-con-full.e-flex.e-con.e-child
+                                  div.elementor-shape.elementor-shape-bottom
+                                  div.elementor-element.elementor-element-72c7e3f.elementor-widget.elementor-widget-jet-listing-dynamic-image
+                                    div.jet-listing.jet-listing-dynamic-image
+                                      img.jet-listing-dynamic-image__img.attachment-full.size-full.wp-post-image
+                                  div.elementor-element.elementor-element-48d0596.elementor-widget.elementor-widget-image
+                                    img.attachment-large.size-large.wp-image-13
+                            div.elementor-element.elementor-element-65a027c.e-con-full.e-flex.e-con.e-child
+                              div.elementor-element.elementor-element-3f050a2.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                div.jet-listing.jet-listing-dynamic-field.display-inline
+                                  div.jet-listing-dynamic-field__inline-wrap
+                                    div.jet-listing-dynamic-field__content  «A serenidade que nenhuma tempestade abala»
+                              div.elementor-element.elementor-element-5faeb09.elementor-align-justify.elementor-widget.elementor-widget-button
+                                a.elementor-button.elementor-button-link.elementor-size-sm.elementor-animation-grow
+                                  span.elementor-button-content-wrapper
+                                    span.elementor-button-text  «Ver Palestra»
+                    div.jet-listing-grid__item.jet-listing-dynamic-post-27113.elementor-dcss-11316190673023122
+                      div.elementor.elementor-23510
+                        div.elementor-element.elementor-element-ba866f5.e-flex.e-con-boxed.e-con.e-parent
+                          div.e-con-inner
+                            div.elementor-element.elementor-element-e9ddfb8.e-con-full.e-flex.e-con.e-child
+                            div.elementor-element.elementor-element-ba3e6d1.e-con-full.e-flex.e-con.e-child
+                              div.elementor-shape.elementor-shape-bottom
+                              div.elementor-element.elementor-element-e446023.e-con-full.e-flex.e-con.e-child
+                                div.elementor-element.elementor-element-2c32d1a.e-con-full.e-flex.e-con.e-child
+                                  div.elementor-element.elementor-element-827b0d1.elementor-widget.elementor-widget-heading
+                                    h2.elementor-heading-title.elementor-size-default  «Palestra Pública»
+                                  div.elementor-element.elementor-element-405f24a.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «Cada um tem seu tempo no Camin...»
+                                  div.elementor-element.elementor-element-a8b4bf1.ha-has-bg-overlay.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «Cris Rocha»
+                                  div.elementor-element.elementor-element-6007768.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «31 de maio de 2026»
+                                div.elementor-element.elementor-element-d3878f3.e-con-full.e-flex.e-con.e-child
+                                  div.elementor-shape.elementor-shape-bottom
+                                  div.elementor-element.elementor-element-72c7e3f.elementor-widget.elementor-widget-jet-listing-dynamic-image
+                                    div.jet-listing.jet-listing-dynamic-image
+                                      img.jet-listing-dynamic-image__img.attachment-full.size-full.wp-post-image
+                                  div.elementor-element.elementor-element-48d0596.elementor-widget.elementor-widget-image
+                                    img.attachment-large.size-large.wp-image-13
+                            div.elementor-element.elementor-element-65a027c.e-con-full.e-flex.e-con.e-child
+                              div.elementor-element.elementor-element-3f050a2.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                div.jet-listing.jet-listing-dynamic-field.display-inline
+                                  div.jet-listing-dynamic-field__inline-wrap
+                                    div.jet-listing-dynamic-field__content  «A evolução não tem pressa nem comparação.»
+                              div.elementor-element.elementor-element-5faeb09.elementor-align-justify.elementor-widget.elementor-widget-button
+                                a.elementor-button.elementor-button-link.elementor-size-sm.elementor-animation-grow
+                                  span.elementor-button-content-wrapper
+                                    span.elementor-button-text  «Ver Palestra»
+                    div.jet-listing-grid__item.jet-listing-dynamic-post-27111.elementor-dcss-11316190745487692
+                      div.elementor.elementor-23510
+                        div.elementor-element.elementor-element-ba866f5.e-flex.e-con-boxed.e-con.e-parent
+                          div.e-con-inner
+                            div.elementor-element.elementor-element-e9ddfb8.e-con-full.e-flex.e-con.e-child
+                            div.elementor-element.elementor-element-ba3e6d1.e-con-full.e-flex.e-con.e-child
+                              div.elementor-shape.elementor-shape-bottom
+                              div.elementor-element.elementor-element-e446023.e-con-full.e-flex.e-con.e-child
+                                div.elementor-element.elementor-element-2c32d1a.e-con-full.e-flex.e-con.e-child
+                                  div.elementor-element.elementor-element-827b0d1.elementor-widget.elementor-widget-heading
+                                    h2.elementor-heading-title.elementor-size-default  «Palestra Pública»
+                                  div.elementor-element.elementor-element-405f24a.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «Nós e os Outros - Encontros qu...»
+                                  div.elementor-element.elementor-element-a8b4bf1.ha-has-bg-overlay.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «Kátia Malaquias»
+                                  div.elementor-element.elementor-element-6007768.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «24 de maio de 2026»
+                                div.elementor-element.elementor-element-d3878f3.e-con-full.e-flex.e-con.e-child
+                                  div.elementor-shape.elementor-shape-bottom
+                                  div.elementor-element.elementor-element-72c7e3f.elementor-widget.elementor-widget-jet-listing-dynamic-image
+                                    div.jet-listing.jet-listing-dynamic-image
+                                      img.jet-listing-dynamic-image__img.attachment-full.size-full.wp-post-image
+                                  div.elementor-element.elementor-element-48d0596.elementor-widget.elementor-widget-image
+                                    img.attachment-large.size-large.wp-image-13
+                            div.elementor-element.elementor-element-65a027c.e-con-full.e-flex.e-con.e-child
+                              div.elementor-element.elementor-element-3f050a2.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                div.jet-listing.jet-listing-dynamic-field.display-inline
+                                  div.jet-listing-dynamic-field__inline-wrap
+                                    div.jet-listing-dynamic-field__content  «Conviver é a escola onde a alma evolui»
+                              div.elementor-element.elementor-element-5faeb09.elementor-align-justify.elementor-widget.elementor-widget-button
+                                a.elementor-button.elementor-button-link.elementor-size-sm.elementor-animation-grow
+                                  span.elementor-button-content-wrapper
+                                    span.elementor-button-text  «Ver Palestra»
+                    div.jet-listing-grid__item.jet-listing-dynamic-post-27151.elementor-dcss-11316190813208824
+                      div.elementor.elementor-23510
+                        div.elementor-element.elementor-element-ba866f5.e-flex.e-con-boxed.e-con.e-parent
+                          div.e-con-inner
+                            div.elementor-element.elementor-element-e9ddfb8.e-con-full.e-flex.e-con.e-child
+                            div.elementor-element.elementor-element-ba3e6d1.e-con-full.e-flex.e-con.e-child
+                              div.elementor-shape.elementor-shape-bottom
+                              div.elementor-element.elementor-element-e446023.e-con-full.e-flex.e-con.e-child
+                                div.elementor-element.elementor-element-2c32d1a.e-con-full.e-flex.e-con.e-child
+                                  div.elementor-element.elementor-element-827b0d1.elementor-widget.elementor-widget-heading
+                                    h2.elementor-heading-title.elementor-size-default  «Palestra Pública»
+                                  div.elementor-element.elementor-element-405f24a.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «Reflexões Evangélicas - Curas ...»
+                                  div.elementor-element.elementor-element-a8b4bf1.ha-has-bg-overlay.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «Charles Albert»
+                                  div.elementor-element.elementor-element-6007768.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «17 de maio de 2026»
+                                div.elementor-element.elementor-element-d3878f3.e-con-full.e-flex.e-con.e-child
+                                  div.elementor-shape.elementor-shape-bottom
+                                  div.elementor-element.elementor-element-72c7e3f.elementor-widget.elementor-widget-jet-listing-dynamic-image
+                                    div.jet-listing.jet-listing-dynamic-image
+                                      img.jet-listing-dynamic-image__img.attachment-full.size-full.wp-post-image
+                                  div.elementor-element.elementor-element-48d0596.elementor-widget.elementor-widget-image
+                                    img.attachment-large.size-large.wp-image-13
+                            div.elementor-element.elementor-element-65a027c.e-con-full.e-flex.e-con.e-child
+                              div.elementor-element.elementor-element-3f050a2.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                div.jet-listing.jet-listing-dynamic-field.display-inline
+                                  div.jet-listing-dynamic-field__inline-wrap
+                                    div.jet-listing-dynamic-field__content  «Toda cura externa é metáfora da cura interior»
+                              div.elementor-element.elementor-element-5faeb09.elementor-align-justify.elementor-widget.elementor-widget-button
+                                a.elementor-button.elementor-button-link.elementor-size-sm.elementor-animation-grow
+                                  span.elementor-button-content-wrapper
+                                    span.elementor-button-text  «Ver Palestra»
+                    div.jet-listing-grid__item.jet-listing-dynamic-post-27107.elementor-dcss-11316190887652978
+                      div.elementor.elementor-23510
+                        div.elementor-element.elementor-element-ba866f5.e-flex.e-con-boxed.e-con.e-parent
+                          div.e-con-inner
+                            div.elementor-element.elementor-element-e9ddfb8.e-con-full.e-flex.e-con.e-child
+                            div.elementor-element.elementor-element-ba3e6d1.e-con-full.e-flex.e-con.e-child
+                              div.elementor-shape.elementor-shape-bottom
+                              div.elementor-element.elementor-element-e446023.e-con-full.e-flex.e-con.e-child
+                                div.elementor-element.elementor-element-2c32d1a.e-con-full.e-flex.e-con.e-child
+                                  div.elementor-element.elementor-element-827b0d1.elementor-widget.elementor-widget-heading
+                                    h2.elementor-heading-title.elementor-size-default  «Palestra Pública»
+                                  div.elementor-element.elementor-element-405f24a.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «Maternidade, Por que Deus nos ...»
+                                  div.elementor-element.elementor-element-a8b4bf1.ha-has-bg-overlay.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «Aury Cleide Parente»
+                                  div.elementor-element.elementor-element-6007768.elementor-widget.elementor-widget-jet-listing-dynamic-field
+                                    div.jet-listing.jet-listing-dynamic-field.display-inline
+                                      div.jet-listing-dynamic-field__inline-wrap
+                                        div.jet-listing-dynamic-field__content  «10 de maio de 2026»
+                                div.elementor-element.elementor-element-d3878f3.e-con-full.e-flex.e-con.e-child
+                                  div.elementor-shape.elementor-shape-bottom
+                                  div.elementor-element.elementor-element-72c7e3f.elementor-widget.elementor-widget-jet-listing-dynamic-image
+                                    div.jet-listing.jet-listing-dynamic-image
+                                      img.jet-listing-dynamic-image__img.attachment-full.size-full.wp-post-image

@@ -3,22 +3,22 @@
 Construção incremental, local-first. Cada fase é entregue ponta a ponta e
 verificada antes da seguinte. Marque o estado ao concluir.
 
-## Fase 0 — Fundação  ⬜ a fazer
+## Fase 0 — Fundação  ✅ concluída
 
 Objetivo: ambiente reproduzível rodando, com Laravel + Filament + MySQL.
 
-- [ ] `docker compose up -d` (sobe MySQL, Mailpit, Adminer).
-- [ ] Copiar `.env.example` → `.env` e preencher (incluindo `CEMA_WP_*` para a
+- [x] `docker compose up -d` (sobe MySQL, Mailpit, Adminer).
+- [x] Copiar `.env.example` → `.env` e preencher (incluindo `CEMA_WP_*` para a
       importação — somente leitura).
-- [ ] Scaffold do Laravel na raiz **sem PHP local** (via container composer),
+- [x] Scaffold do Laravel na raiz **sem PHP local** (via container composer),
       preservando os arquivos de planejamento e `design-system/`. Ex.:
       `docker run --rm -v "$PWD":/app -w /app composer:2 create-project laravel/laravel _tmp "13.*"`
       e mesclar `_tmp/` na raiz sem sobrescrever os docs existentes.
-- [ ] `php artisan key:generate`, configurar conexão MySQL e rodar `migrate`.
-- [ ] Instalar **Filament 5** e criar o primeiro usuário admin.
-- [ ] Instalar **Tailwind** e mapear os tokens de `design-system/tokens.json`
+- [x] `php artisan key:generate`, configurar conexão MySQL e rodar `migrate`.
+- [x] Instalar **Filament 5** e criar o primeiro usuário admin.
+- [x] Instalar **Tailwind** e mapear os tokens de `design-system/tokens.json`
       (cores, tipografia Work Sans/Poppins, espaçamentos, breakpoints).
-- [ ] `git` inicializado, primeiro commit, CI mínimo (lint + testes).
+- [x] `git` inicializado, primeiro commit, CI mínimo (lint + testes).
 
 Pronto quando: `localhost` abre o Laravel, o admin do Filament loga e `artisan test` passa.
 

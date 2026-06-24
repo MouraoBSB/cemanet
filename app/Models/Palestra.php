@@ -65,4 +65,9 @@ class Palestra extends Model
             ? $this->palestrantes->firstWhere('pivot.papel', self::PAPEL_DIRETOR)
             : $this->palestrantes()->wherePivot('papel', self::PAPEL_DIRETOR)->first();
     }
+
+    public function destaques(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(PalestraDestaque::class)->orderBy('ordem');
+    }
 }

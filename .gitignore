@@ -24,6 +24,9 @@ auth.json
 /.phpunit.cache
 /storage/pail
 
+# Artefatos de execução SDD (briefs, reports, diffs, ledger) — scratch local
+/.superpowers/
+
 # Editores / SO
 /.idea
 /.vscode

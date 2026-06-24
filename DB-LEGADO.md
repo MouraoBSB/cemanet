@@ -104,9 +104,70 @@ FROM wp_terms t JOIN wp_term_taxonomy tt ON tt.term_id = t.term_id
 WHERE tt.taxonomy = 'assuntos-principais' ORDER BY tt.parent, t.name;
 ```
 
-> **Documentar aqui o resultado** (tabelas relevantes, colunas das relações Jet,
-> chaves de meta por CPT) para virar referência permanente do mapeamento WP→novo,
-> complementando `DATA-MODEL.md`.
+### Resultado da introspecção (2026-06-24) — conexão `legado` validada
+
+Banco `wordpress_cemanet` (**Percona 8.0.45**), 115 tabelas. Usuário `cema_leitor`
+com apenas `SELECT, SHOW VIEW`. Túnel SSH ativo → `host.docker.internal:3307`.
+
+**Inventário de conteúdo (`post_type` / `publish`):**
+
+| CPT | Publicados | Fase |
+|---|--:|---|
+| `palestra_publica` | 123 | 1 (atual) |
+| `palestrantes` | 57 | 1 (palestrante **e** diretor — mesmo cadastro) |
+| `mensagem-mediunicas` | 132 (+47 pending) | 2 |
+| `evangelho` | 102 | 2 |
+| `agenda-reforma` | 55 (+69 future) | 2 |
+| `_evento` | 54 | 2 |
+| `post` (blog) | 44 | 2 |
+| `page` | 21 | 2 |
+| `autores-espirituais` | 19 | 2 |
+| `attachment` (mídia) | 831 | — |
+
+**⚠️ Direção das relações Jet (CRÍTICO — as duas são OPOSTAS):**
+
+`wp_jet_rel_107` e `wp_jet_rel_108`, colunas `parent_object_id` / `child_object_id`.
+
+| Relação | `parent_object_id` | `child_object_id` | Como obter os vínculos de uma palestra |
+|---|---|---|---|
+| **107 (palestrante)** | **palestrante** | **palestra** | `SELECT parent_object_id WHERE child_object_id = {palestra}` |
+| **108 (diretor)** | **palestra** | **diretor** | `SELECT child_object_id WHERE parent_object_id = {palestra}` |
+
+- 107: 130 vínculos. Cardinalidade real: **117 palestras com 1 palestrante, 7 com 2** (regra 1–2 ✓).
+- 108: 72 vínculos (diretor 0–1 por palestra ✓).
+
+**Meta keys do `palestra_publica` (relevantes; cobertura sobre 123 publish):**
+
+| meta_key | Cobertura | Destino | Notas |
+|---|--:|---|---|
+| `data_da_palestra` | 123 | `palestras.data_da_palestra` | **Unix timestamp** (ex.: `1782673200`) → datetime |
+| `link_do_youtube` | 120 | `palestras.link_youtube` | URL (preservar exato) |
+| `escolher_cor_do_fundo` | 63 | `palestras.cor_fundo` | hex (ex.: `#89ab98`) |
+| `palestra_online` | 123 | (novo) `palestras.online` | `"on"`/vazio — flag online/presencial |
+| `publico_online` / `_presencial` / `_total` | 123 / 123 / 51 | colunas correspondentes | inteiros |
+| `assuntos_principais` | 123 | `palestra_destaques` | **PHP serializado** (repeater) — ver abaixo |
+| `descricao` | 54 | (ver nota de descrição) | resumo curto (≤ 776 chars) |
+| `_slides` | 102 | (opcional) | campo protegido |
+
+Campos do post: `post_title` → `titulo`, `post_name` → `slug`, `post_excerpt` → `subtitulo`
+(117/123), `post_content` → `descricao` HTML (59/123). **Descrição tem 3 fontes** (content 59,
+meta `descricao` 54, excerpt 117) → precedência sugerida: `descricao` ← `post_content`,
+`subtitulo` ← `post_excerpt`.
+
+**Repeater `assuntos_principais` (meta, PHP serializado) → `palestra_destaques`:**
+```
+a:5:{s:6:"item-0";a:2:{s:8:"destaque";s:22:"Paternidade na Bíblia";s:5:"texto";s:110:"…";}…}
+```
+Array `item-N` com `{destaque, texto}`; **ordem = índice N**. A importação precisa `unserialize()`.
+
+**Taxonomia `assuntos-principais`:** 141 termos, **46 com `parent ≠ 0` (hierarquia real → manter
+`parent_id`)**. Ligada a 112 palestras / 837 vínculos (N:N, resolver por slug). Outras taxonomias:
+`capitulos-do-evangelho` (31), `nivel-de-acesso` (6, área de membros).
+
+**CPT `palestrantes` (mesmo cadastro p/ palestrante e diretor):** `post_title` → `nome`,
+`post_name` → `slug`, `post_content` → `bio` (HTML), `_thumbnail_id` → `foto` (attachment).
+Meta extra disponível: `email_palestrante`, `telefone_palestrante` (+ flags `mostrar_*`),
+`status_palestrante`.
 
 ## Regras duras
 

@@ -90,6 +90,30 @@ Notas de importação:
 - Importação é **somente leitura** na origem (apenas GET).
 - Campo protegido `_slides` (se necessário no futuro) exige snippet no WP — opcional.
 
+## Confirmado/refinado pela introspecção do banco legado (2026-06-24)
+
+Acesso read-only ao WP atual (detalhe e queries em `DB-LEGADO.md`). Pontos que afetam
+diretamente a importação das palestras:
+
+- **Direção das relações Jet é OPOSTA entre as duas** (atenção ao importar):
+  - **107 (palestrante):** `parent_object_id` = palestrante, `child_object_id` = palestra
+    → palestrantes de uma palestra: `parent WHERE child = {palestra_id}`.
+  - **108 (diretor):** `parent_object_id` = palestra, `child_object_id` = diretor
+    → diretor de uma palestra: `child WHERE parent = {palestra_id}`.
+  - Cardinalidade real confere: 117 palestras com 1 palestrante, 7 com 2 (1–2 ✓); diretor 0–1.
+- **`assuntos-principais` é mesmo hierárquica:** 141 termos, 46 com `parent ≠ 0` → manter `parent_id`.
+- **Repeater `meta.assuntos_principais` é PHP serializado** (`item-N → {destaque, texto}`,
+  ordem = índice) — a importação precisa `unserialize()` para popular `palestra_destaques`.
+- **Descrição tem 3 fontes** (cobertura/123): `post_content` 59, meta `descricao` 54,
+  `post_excerpt` 117. Precedência sugerida: `descricao` ← `post_content`; `subtitulo` ← `post_excerpt`.
+- **Campo extra `meta.palestra_online`** (`"on"`/vazio) — flag online/presencial; avaliar incluir
+  coluna `online` em `palestras`.
+- **`palestrantes` (CPT):** nome ← `post_title`, slug ← `post_name`, bio ← `post_content`,
+  foto ← `_thumbnail_id` (attachment). Meta disponível: `email_palestrante`, `telefone_palestrante`
+  (+ flags `mostrar_*`), `status_palestrante` — incluir no cadastro novo se desejado.
+- **Fonte da importação:** além da REST (GET), o **banco `legado` (read-only)** é fonte direta e
+  mais completa — decidir na Fase 1 qual usar (as relações Jet, por exemplo, são triviais via banco).
+
 ## Próximos módulos (resumo)
 
 Mesma abordagem por CPT: `evangelho`, `mensagem-mediunicas`, `_evento`,

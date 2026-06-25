@@ -6,15 +6,16 @@
     <x-slot:head>
         <script type="application/ld+json">
         @php
-            echo json_encode([
+            echo json_encode(array_filter([
                 '@context' => 'https://schema.org',
                 '@type' => 'Person',
                 'name' => $palestrante->nome,
+                // omite 'image' quando não há foto (null vira chave inválida no schema)
                 'image' => $foto,
                 'description' => \Illuminate\Support\Str::limit(strip_tags($palestrante->bio ?? ''), 200),
                 'url' => route('palestrantes.show', $palestrante->slug),
                 'worksFor' => ['@type' => 'Organization', 'name' => 'Centro Espírita Maria Madalena'],
-            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG);
+            ], fn ($v) => $v !== null && $v !== ''), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG);
         @endphp
         </script>
     </x-slot:head>

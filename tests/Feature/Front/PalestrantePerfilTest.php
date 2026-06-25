@@ -42,6 +42,20 @@ class PalestrantePerfilTest extends TestCase
         $resp->assertDontSee('61999990000');
     }
 
+    public function test_email_oculto_quando_flag_desligada(): void
+    {
+        Palestrante::factory()->ativo()->create([
+            'slug' => 'sem-email-publico', 'email' => 'oculto@cema.org', 'telefone' => '61888880000',
+            'mostrar_email' => false, 'mostrar_telefone' => true,
+        ]);
+
+        $resp = $this->get(route('palestrantes.show', 'sem-email-publico'));
+
+        $resp->assertOk();
+        $resp->assertDontSee('oculto@cema.org'); // mostrar_email=false → e-mail nunca aparece
+        $resp->assertSee('61888880000');         // telefone visível com mostrar_telefone=true
+    }
+
     public function test_inativo_da_404(): void
     {
         Palestrante::factory()->inativo()->create(['slug' => 'oculto']);

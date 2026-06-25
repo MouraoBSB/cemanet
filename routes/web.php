@@ -10,4 +10,4 @@ Route::get('/palestras', [PalestraController::class, 'index'])->name('palestras.
 Route::get('/palestras/{slug}', [PalestraController::class, 'show'])->name('palestras.show');
 
 Route::get('/palestrantes', [PalestranteController::class, 'index'])->name('palestrantes.index');
-Route::get('/palestrantes/{slug}', fn () => abort(404))->name('palestrantes.show');
+Route::get('/palestrantes/{slug}', [PalestranteController::class, 'show'])->name('palestrantes.show');

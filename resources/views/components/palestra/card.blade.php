@@ -12,7 +12,7 @@
                 <img src="{{ $foto }}" alt="{{ $primeiro->nome }}" loading="lazy" width="320" height="200"
                      class="size-full object-cover transition duration-300 group-hover:scale-[1.03]">
             @else
-                <div class="flex size-full items-center justify-center font-mono text-xs text-text-muted">CEMA</div>
+                <div aria-hidden="true" class="flex size-full items-center justify-center font-mono text-xs text-text-muted">CEMA</div>
             @endif
         </div>
         <div class="flex flex-1 flex-col p-5">

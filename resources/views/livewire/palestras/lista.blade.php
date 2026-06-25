@@ -1,7 +1,7 @@
 <div>
     {{-- Busca + filtro --}}
     <form class="mb-8 flex flex-col gap-3 sm:flex-row" wire:submit.prevent>
-        <label for="busca-lista" class="sr-only">Buscar palestras</label>
+        <label for="busca-lista" class="sr-only">Buscar por título ou assunto</label>
         <input id="busca-lista" type="search" wire:model.live.debounce.350ms="q"
                placeholder="Buscar por título ou assunto…"
                class="w-full rounded-pill border border-border bg-white px-5 py-2.5 font-sans text-sm text-text outline-none focus:border-primary">

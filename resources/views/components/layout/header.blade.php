@@ -49,10 +49,10 @@
                     @if (($item['ativo'] ?? false) && ($item['rota'] ?? null))
                         <a href="{{ route($item['rota']) }}"
                            class="flex items-center gap-1 px-4 py-3 font-ui text-sm text-[#efeaf7] hover:bg-white/10"
-                           @if($temItens) aria-haspopup="true" @endif>{{ $item['rotulo'] }}@if($temItens)<span aria-hidden="true" class="text-[9px]">▾</span>@endif</a>
+                           @if($temItens) aria-haspopup="true" aria-expanded="false" @endif>{{ $item['rotulo'] }}@if($temItens)<span aria-hidden="true" class="text-[9px]">▾</span>@endif</a>
                     @else
                         <span class="flex cursor-default items-center gap-1 px-4 py-3 font-ui text-sm text-[#efeaf7]/60"
-                              aria-disabled="true" @if($temItens) aria-haspopup="true" @endif>{{ $item['rotulo'] }}@if($temItens)<span aria-hidden="true" class="text-[9px]">▾</span>@endif</span>
+                              aria-disabled="true" @if($temItens) aria-haspopup="true" aria-expanded="false" @endif>{{ $item['rotulo'] }}@if($temItens)<span aria-hidden="true" class="text-[9px]">▾</span>@endif</span>
                     @endif
 
                     @if($temItens)

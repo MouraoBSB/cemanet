@@ -28,6 +28,9 @@ class LayoutTest extends TestCase
         // item ativo é link; item futuro é placeholder (sem href de rota)
         $resp->assertSee('>Palestras<', false);
         $resp->assertSee('Mensagens Mediúnicas', false);
+        // item futuro deve ser <span aria-disabled>, nunca <a href>
+        $resp->assertSee('aria-disabled="true"', false);
+        $resp->assertDontSee('href="' . route('palestras.index') . '"' . '>Mensagens Mediúnicas', false);
     }
 
     public function test_alpine_carregado_em_pagina_sem_componente_livewire(): void

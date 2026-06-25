@@ -92,7 +92,7 @@ class PalestraResource extends Resource
                         ->searchable()
                         ->rules([
                             fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
-                                if ($value && in_array($value, (array) ($get('ids_palestrantes') ?? []), false)) {
+                                if ($value && in_array($value, (array) ($get('ids_palestrantes') ?? []), true)) {
                                     $fail('A mesma pessoa não pode ser palestrante e diretor da mesma palestra.');
                                 }
                             },

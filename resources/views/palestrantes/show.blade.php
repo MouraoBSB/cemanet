@@ -21,8 +21,8 @@
     </x-slot:head>
 
     {{-- Hero / perfil --}}
-    <section class="relative overflow-hidden text-white">
-        <div class="absolute inset-0 bg-gradient-to-br from-primary to-footer-bg"></div>
+    <section class="relative overflow-hidden bg-gradient-to-br from-primary to-footer-bg text-white">
+        <x-ui.particulas />
         <div class="relative mx-auto max-w-[1100px] px-6 py-16">
             <nav aria-label="Você está em" class="mb-5 flex flex-wrap items-center gap-2 text-xs text-white/70">
                 <a href="{{ route('home') }}" class="hover:text-white">Início</a><span aria-hidden="true">›</span>

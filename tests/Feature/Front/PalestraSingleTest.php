@@ -128,4 +128,20 @@ class PalestraSingleTest extends TestCase
         // A sequência crua '</script> XSS' não deve aparecer no HTML.
         $resp->assertDontSee('</script> XSS', false);
     }
+
+    public function test_hero_e_sempre_roxo_e_ignora_cor_fundo(): void
+    {
+        Palestra::factory()->create([
+            'slug' => 'hero-roxo',
+            'status' => Palestra::STATUS_PUBLICADO,
+            'cor_fundo' => '#abcdef',
+        ]);
+
+        $resp = $this->get(route('palestras.show', 'hero-roxo'));
+
+        $resp->assertOk();
+        $resp->assertSee('from-primary to-footer-bg', false);   // gradiente institucional
+        $resp->assertSee('cema-hero-deco', false);              // partículas (efeito CSS)
+        $resp->assertDontSee('background:#abcdef', false);      // cor_fundo NÃO é aplicada no hero
+    }
 }

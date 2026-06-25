@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Filament\Resources\Palestrantes\Pages;
+// Thiago Mourão — https://github.com/MouraoBSB — 2026-06-25
 
-use App\Filament\Resources\Palestrantes\PalestranteResource;
+namespace App\Filament\Resources\PalestranteResource\Pages;
+
+use App\Filament\Resources\PalestranteResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 

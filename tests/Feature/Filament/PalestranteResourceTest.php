@@ -4,9 +4,9 @@
 
 namespace Tests\Feature\Filament;
 
-use App\Filament\Resources\Palestrantes\Pages\CreatePalestrante;
-use App\Filament\Resources\Palestrantes\Pages\EditPalestrante;
-use App\Filament\Resources\Palestrantes\Pages\ListPalestrantes;
+use App\Filament\Resources\PalestranteResource\Pages\CreatePalestrante;
+use App\Filament\Resources\PalestranteResource\Pages\EditPalestrante;
+use App\Filament\Resources\PalestranteResource\Pages\ListPalestrantes;
 use App\Models\Palestrante;
 use App\Models\User;
 use Filament\Forms\Components\FileUpload;
@@ -90,5 +90,29 @@ class PalestranteResourceTest extends TestCase
             ->assertHasNoFormErrors();
 
         $this->assertDatabaseHas('palestrantes', ['slug' => 'nome-antigo', 'nome' => 'Nome Atualizado']);
+    }
+
+    public function test_cria_palestrante_com_slug_auto_e_bio_sanitizada(): void
+    {
+        Livewire::test(CreatePalestrante::class)
+            ->fillForm([
+                'nome' => 'Maria das Dores',
+                'slug' => 'maria-das-dores',
+                'ativo' => true,
+                'bio' => '<p>Bio</p><script>alert(1)</script>',
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $pessoa = Palestrante::where('slug', 'maria-das-dores')->first();
+        $this->assertNotNull($pessoa);
+        $this->assertStringNotContainsString('<script', (string) $pessoa->bio);
+    }
+
+    public function test_lista_renderiza(): void
+    {
+        Palestrante::factory()->count(3)->create();
+
+        $this->get('/admin/palestrantes')->assertOk();
     }
 }

@@ -22,7 +22,7 @@ Objetivo: ambiente reproduzível rodando, com Laravel + Filament + MySQL.
 
 Pronto quando: `localhost` abre o Laravel, o admin do Filament loga e `artisan test` passa.
 
-## Fase 1 — Módulo Palestras (fatia vertical)  🔄 em andamento
+## Fase 1 — Módulo Palestras (fatia vertical)  ✅ concluída
 
 Objetivo: o módulo Palestras completo, do banco ao público, com dados migrados.
 
@@ -33,20 +33,22 @@ Objetivo: o módulo Palestras completo, do banco ao público, com dados migrados
 - [x] Comando `php artisan cema:importar-palestras` — lê o banco **legado** (read-only),
       faz upsert idempotente das 123 palestras, resolvendo pessoas e assuntos por slug.
       *(Plano 2 — 123 palestras, 57 palestrantes, 141 assuntos importados; idempotente)*
-- [ ] Filament Resources: Palestra e Palestrante (CRUD), com validação das
-      cardinalidades e upload de mídia.
-      **Pré-requisitos de segurança (revisão do Plano 4):** sanitizar `descricao`
-      (HTML do legado/editável) com allow-list na escrita (ex.: HTMLPurifier) e
-      validar `cor_fundo` (formato hex/rgb) — hoje a single renderiza `descricao`
-      com `{!! !!}` confiando em conteúdo de staff; ao abrir edição no admin, isso
-      vira superfície de XSS armazenado.
+- [x] Filament Resources: Palestra, Palestrante e Assunto (CRUD), com validação da
+      cardinalidade (1–2 palestrantes / 0–1 diretor, nunca órfã) e upload de mídia.
+      Sanitização de `descricao`/`bio` (mews/purifier, mutator no model — cobre admin
+      e importador) e validação de `cor_fundo` (hex). *(Plano 5 — 63 testes verdes;
+      painel `/admin` com acesso gateado por ambiente)*
+      **Hardening pendente p/ produção (Fase 2):** gate de acesso ao painel por
+      papel/role (hoje `canAccessPanel` libera local/testing e bloqueia produção);
+      prevenção de ciclos profundos na taxonomia; re-sanitizar as 123 `descricao` já
+      importadas (rodar a importação idempotente 1× pós-deploy normaliza pelo mutator).
 - [x] Front público: listagem `/palestras` (busca/filtro/paginação reativa via
       Livewire 4) + página individual `/palestras/{slug}` (T06, SSR + JSON-LD),
       layout base responsivo (header mega-menu/off-canvas + footer), i18n pt-BR,
       interações Alpine (compartilhar/copiar/curtir). *(Plano 4 — 38 testes verdes;
       rotas 200 e leves: home 21 KB, listagem 54 KB, single 29 KB)*
-- [ ] Testes (unit + feature) e verificação manual no localhost. *(front coberto
-      no Plano 4; admin pendente)*
+- [x] Testes (unit + feature) e verificação manual no localhost. *(front: 38 testes
+      no Plano 4; admin: 63 testes no Plano 5; rotas 200 e leves)*
 
 Pronto quando: as 123 palestras aparecem corretas no público e no admin, com
 testes verdes e página leve.

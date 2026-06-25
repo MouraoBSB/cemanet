@@ -53,10 +53,13 @@ Objetivo: o módulo Palestras completo, do banco ao público, com dados migrados
 Pronto quando: as 123 palestras aparecem corretas no público e no admin, com
 testes verdes e página leve.
 
-## Fase 2+ — Expansão  ⬜ a fazer
+## Fase 2+ — Expansão  🔄 em andamento
 
 Ordem sugerida (cada um como nova fatia vertical):
-- [ ] Palestrantes (página individual e listagem)
+- [x] Palestrantes (página individual e listagem) — listagem `/palestrantes`
+      (busca reativa Livewire) + perfil `/palestrantes/{slug}` (bio, contato
+      condicional, palestras ministradas, `schema.org/Person`); só ativos; menu
+      habilitado; link na single da palestra. *(Plano 6 — 73 testes verdes)*
 - [ ] Evangelho da semana + Capítulos do Evangelho
 - [ ] Eventos
 - [ ] Agenda Reforma Íntima (com calendário)

@@ -98,6 +98,18 @@ class PalestraSingleTest extends TestCase
         $resp->assertSee('Palestra Seguinte');
     }
 
+    public function test_single_linka_perfil_do_palestrante(): void
+    {
+        $palestra = Palestra::factory()->create(['slug' => 'aux-link', 'status' => Palestra::STATUS_PUBLICADO]);
+        $p = Palestrante::factory()->ativo()->create(['nome' => 'João Ativo', 'slug' => 'joao-ativo']);
+        $palestra->palestrantes()->attach($p, ['papel' => Palestra::PAPEL_PALESTRANTE]);
+
+        $resp = $this->get(route('palestras.show', 'aux-link'));
+
+        $resp->assertOk();
+        $resp->assertSee(route('palestrantes.show', 'joao-ativo'), false);
+    }
+
     public function test_jsonld_escapa_tag_de_fechamento_de_script(): void
     {
         // Título com vetor XSS: se JSON_HEX_TAG estiver ausente, o </script>

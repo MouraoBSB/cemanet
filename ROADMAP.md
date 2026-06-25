@@ -30,8 +30,9 @@ Objetivo: o módulo Palestras completo, do banco ao público, com dados migrados
       pivôs `palestra_pessoa` (com `papel`) e `assunto_palestra`, e
       `palestra_destaques`. Ver `DATA-MODEL.md`. *(Plano 1)*
 - [x] Models Eloquent + relações + regras de cardinalidade (107/108). *(Plano 1)*
-- [ ] Comando `php artisan cema:importar-palestras` — lê o banco **legado** (read-only),
+- [x] Comando `php artisan cema:importar-palestras` — lê o banco **legado** (read-only),
       faz upsert idempotente das 123 palestras, resolvendo pessoas e assuntos por slug.
+      *(Plano 2 — 123 palestras, 57 palestrantes, 141 assuntos importados; idempotente)*
 - [ ] Filament Resources: Palestra e Palestrante (CRUD), com validação das
       cardinalidades e upload de mídia.
 - [ ] Front público: listagem de palestras + página individual, responsiva e

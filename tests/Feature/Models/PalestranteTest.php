@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Models;
 
+use App\Models\Palestra;
 use App\Models\Palestrante;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -36,5 +37,19 @@ class PalestranteTest extends TestCase
 
         $this->assertCount(2, Palestrante::all());
         $this->assertCount(1, Palestrante::ativo()->get());
+    }
+
+    public function test_palestras_ministradas_so_traz_papel_palestrante(): void
+    {
+        $pessoa = Palestrante::factory()->ativo()->create();
+        $comoPalestrante = Palestra::factory()->create();
+        $comoDiretor = Palestra::factory()->create();
+        $comoPalestrante->palestrantes()->attach($pessoa, ['papel' => Palestra::PAPEL_PALESTRANTE]);
+        $comoDiretor->palestrantes()->attach($pessoa, ['papel' => Palestra::PAPEL_DIRETOR]);
+
+        $ids = $pessoa->palestrasMinistradas()->pluck('palestras.id')->all();
+
+        $this->assertContains($comoPalestrante->id, $ids);
+        $this->assertNotContains($comoDiretor->id, $ids);
     }
 }

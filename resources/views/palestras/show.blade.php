@@ -1,7 +1,6 @@
 @php
     $palestrantes = $palestra->palestrantesAtivos;
     $data = $palestra->data_da_palestra;
-    $heroStyle = $palestra->cor_fundo ? 'background:'.$palestra->cor_fundo : null;
     $ytId = $palestra->youtube_id;
     $jsonLd = json_encode([
         '@context' => 'https://schema.org',
@@ -27,11 +26,9 @@
         <script type="application/ld+json">{!! $jsonLd !!}</script>
     </x-slot:head>
 
-    {{-- S1: Hero (cor_fundo da palestra quando houver; senão, gradiente roxo) --}}
-    <section class="relative overflow-hidden text-white" @if($heroStyle) style="{{ $heroStyle }}" @endif>
-        @unless ($heroStyle)
-            <div class="absolute inset-0 bg-gradient-to-br from-primary to-footer-bg"></div>
-        @endunless
+    {{-- S1: Hero (sempre roxo institucional; partículas suaves quebram a rigidez) --}}
+    <section class="relative overflow-hidden bg-gradient-to-br from-primary to-footer-bg text-white">
+        <x-ui.particulas />
         <div class="relative mx-auto max-w-[1100px] px-6 py-16">
             <nav aria-label="Você está em" class="mb-5 flex flex-wrap items-center gap-2 text-xs text-white/70">
                 <a href="{{ route('home') }}" class="hover:text-white">Início</a><span aria-hidden="true">›</span>

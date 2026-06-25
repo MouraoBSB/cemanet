@@ -21,9 +21,11 @@ class TransformadorLegadoTest extends TestCase
 
     public function test_unix_para_data_no_fuso_de_brasilia(): void
     {
-        // 1782673200 = domingo 2026-06-28 16:00 em America/Sao_Paulo (-03)
+        // O legado guarda o horário de parede (19:00) como se fosse UTC.
+        // 1782673200 → relógio UTC = 2026-06-28 19:00 → reinterpretado como SP 19:00.
         $data = TransformadorLegado::unixParaData('1782673200');
-        $this->assertSame('2026-06-28 16:00:00', $data->format('Y-m-d H:i:s'));
+        $this->assertSame('2026-06-28 19:00:00', $data->format('Y-m-d H:i:s'));
+        $this->assertSame('America/Sao_Paulo', $data->timezoneName);
         $this->assertSame('Sunday', $data->format('l'));
         $this->assertNull(TransformadorLegado::unixParaData(null));
         $this->assertNull(TransformadorLegado::unixParaData('0'));

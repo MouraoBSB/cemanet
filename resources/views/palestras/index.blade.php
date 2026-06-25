@@ -19,9 +19,12 @@
                 <div class="flex-1 text-center sm:text-left">
                     <h2 class="font-display text-2xl font-semibold">{{ $proxima->titulo }}</h2>
                     @if ($proxima->data_da_palestra)
-                        <p class="mt-1 text-white/85">{{ $proxima->data_da_palestra->translatedFormat('d \d\e F \d\e Y') }}</p>
+                        <p class="mt-1 text-white/85">{{ $proxima->data_da_palestra->translatedFormat('d \d\e F \d\e Y · H\hi') }}</p>
                     @endif
                     @if ($pp)<p class="mt-1 text-sm text-white/80">{{ $pp->nome }}</p>@endif
+                    <div class="mt-4 flex justify-center sm:justify-start">
+                        <x-ui.countdown :data="$proxima->data_da_palestra" />
+                    </div>
                 </div>
                 <a href="{{ route('palestras.show', $proxima->slug) }}"
                    class="shrink-0 rounded-pill bg-white px-6 py-3 font-ui font-semibold text-accent transition hover:bg-white/90">Ver Palestra</a>

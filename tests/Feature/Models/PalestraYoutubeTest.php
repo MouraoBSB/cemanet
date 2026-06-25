@@ -17,6 +17,8 @@ class PalestraYoutubeTest extends TestCase
             'https://youtu.be/ABC123defGH' => 'ABC123defGH',
             'https://www.youtube.com/live/ABC123defGH' => 'ABC123defGH',
             'https://www.youtube.com/embed/ABC123defGH' => 'ABC123defGH',
+            'https://www.youtube.com/shorts/ABC123defGH' => 'ABC123defGH',
+            'https://youtu.be/ABC123defGH?si=XYZ123' => 'ABC123defGH', // ignora query string
         ];
         foreach ($casos as $url => $id) {
             $p = Palestra::factory()->make(['link_youtube' => $url]);

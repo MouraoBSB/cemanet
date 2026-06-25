@@ -42,11 +42,12 @@ Objetivo: o módulo Palestras completo, do banco ao público, com dados migrados
       papel/role (hoje `canAccessPanel` libera local/testing e bloqueia produção);
       prevenção de ciclos profundos na taxonomia; re-sanitizar as 123 `descricao` já
       importadas (rodar a importação idempotente 1× pós-deploy normaliza pelo mutator).
-- [x] Front público: listagem `/palestras` (busca/filtro/paginação reativa via
-      Livewire 4) + página individual `/palestras/{slug}` (T06, SSR + JSON-LD),
-      layout base responsivo (header mega-menu/off-canvas + footer), i18n pt-BR,
-      interações Alpine (compartilhar/copiar/curtir). *(Plano 4 — 38 testes verdes;
-      rotas 200 e leves: home 21 KB, listagem 54 KB, single 29 KB)*
+- [x] Front público: listagem + página individual em **`/palestra_publica`** (URL
+      compatível com o WP; redirect 301 de `/palestras`), layout base responsivo
+      (header mega-menu/off-canvas + footer), i18n pt-BR, interações Alpine.
+      *(Plano 4 — base; Plano 7 — redesign: destaque da próxima palestra, cards
+      menores com capa do YouTube, filtros reativos título/data/palestrante/assunto +
+      total; 85 testes verdes)*
 - [x] Testes (unit + feature) e verificação manual no localhost. *(front: 38 testes
       no Plano 4; admin: 63 testes no Plano 5; rotas 200 e leves)*
 

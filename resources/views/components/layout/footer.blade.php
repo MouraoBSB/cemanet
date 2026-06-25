@@ -44,7 +44,7 @@
                         class="w-full cursor-not-allowed rounded-md bg-gold px-4 py-2 font-ui font-semibold text-footer-bg opacity-80">Inscrever</button>
             </form>
             <ul class="mt-4 flex gap-3" aria-label="Redes sociais">
-                @foreach (['YouTube' => '#', 'Instagram' => '#', 'Facebook' => '#', 'WhatsApp' => '#'] as $rede => $url)
+                @foreach (['YouTube', 'Instagram', 'Facebook', 'WhatsApp'] as $rede)
                     <li><span class="text-xs text-[#bdb4dd]" aria-disabled="true">{{ $rede }}</span></li>
                 @endforeach
             </ul>

@@ -23,17 +23,29 @@ class PalestraController extends Controller
 
         $base = Palestra::query()->publicado();
 
-        $anterior = (clone $base)
-            ->whereNotNull('data_da_palestra')
-            ->where('data_da_palestra', '<', $palestra->data_da_palestra)
-            ->orderByDesc('data_da_palestra')
-            ->first();
+        if ($palestra->data_da_palestra === null) {
+            $anterior = (clone $base)
+                ->where('id', '<', $palestra->id)
+                ->orderByDesc('id')
+                ->first();
 
-        $proxima = (clone $base)
-            ->whereNotNull('data_da_palestra')
-            ->where('data_da_palestra', '>', $palestra->data_da_palestra)
-            ->orderBy('data_da_palestra')
-            ->first();
+            $proxima = (clone $base)
+                ->where('id', '>', $palestra->id)
+                ->orderBy('id')
+                ->first();
+        } else {
+            $anterior = (clone $base)
+                ->whereNotNull('data_da_palestra')
+                ->where('data_da_palestra', '<', $palestra->data_da_palestra)
+                ->orderByDesc('data_da_palestra')
+                ->first();
+
+            $proxima = (clone $base)
+                ->whereNotNull('data_da_palestra')
+                ->where('data_da_palestra', '>', $palestra->data_da_palestra)
+                ->orderBy('data_da_palestra')
+                ->first();
+        }
 
         return view('palestras.show', compact('palestra', 'anterior', 'proxima'));
     }

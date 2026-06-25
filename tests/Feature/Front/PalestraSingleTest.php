@@ -70,6 +70,34 @@ class PalestraSingleTest extends TestCase
         $resp->assertSee('"@type":"Event"', false);
     }
 
+    public function test_navegacao_funciona_quando_palestra_nao_tem_data(): void
+    {
+        // 3 palestras publicadas; a do meio (por id) sem data_da_palestra.
+        Palestra::factory()->create([
+            'titulo' => 'Palestra Anterior',
+            'slug' => 'palestra-anterior',
+            'status' => Palestra::STATUS_PUBLICADO,
+        ]);
+        $semData = Palestra::factory()->create([
+            'titulo' => 'Paz e Nós',
+            'slug' => 'paz-e-nos',
+            'status' => Palestra::STATUS_PUBLICADO,
+            'data_da_palestra' => null,
+        ]);
+        Palestra::factory()->create([
+            'titulo' => 'Palestra Seguinte',
+            'slug' => 'palestra-seguinte',
+            'status' => Palestra::STATUS_PUBLICADO,
+        ]);
+
+        $resp = $this->get(route('palestras.show', 'paz-e-nos'));
+
+        $resp->assertOk();
+        // A navegação deve exibir os títulos da anterior e da próxima.
+        $resp->assertSee('Palestra Anterior');
+        $resp->assertSee('Palestra Seguinte');
+    }
+
     public function test_jsonld_escapa_tag_de_fechamento_de_script(): void
     {
         // Título com vetor XSS: se JSON_HEX_TAG estiver ausente, o </script>
@@ -85,5 +113,7 @@ class PalestraSingleTest extends TestCase
         $resp->assertOk();
         // Com JSON_HEX_TAG, o '<' do título vira '<' — nunca '</script>' literal no HTML.
         $resp->assertSee('<', false);
+        // A sequência crua '</script> XSS' não deve aparecer no HTML.
+        $resp->assertDontSee('</script> XSS', false);
     }
 }

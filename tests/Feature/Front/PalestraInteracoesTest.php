@@ -12,7 +12,11 @@ class PalestraInteracoesTest extends TestCase
 
     public function test_barra_de_acoes_tem_compartilhar_e_curtir(): void
     {
-        Palestra::factory()->create(['slug' => 'auxilios-do-invisivel', 'status' => Palestra::STATUS_PUBLICADO]);
+        $palestra = Palestra::factory()->create([
+            'titulo' => 'Auxílios do Invisível',
+            'slug' => 'auxilios-do-invisivel',
+            'status' => Palestra::STATUS_PUBLICADO,
+        ]);
 
         $resp = $this->get(route('palestras.show', 'auxilios-do-invisivel'));
 
@@ -21,5 +25,7 @@ class PalestraInteracoesTest extends TestCase
         $resp->assertSee('facebook.com/sharer', false);                // Facebook
         $resp->assertSee('Copiar link', false);                        // copiar
         $resp->assertSee('x-data', false);                             // Alpine presente
+        // O título da palestra deve aparecer urlencoded no parâmetro ?text= do WhatsApp
+        $resp->assertSee(urlencode($palestra->titulo), false);
     }
 }

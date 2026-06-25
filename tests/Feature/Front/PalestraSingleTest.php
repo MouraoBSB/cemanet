@@ -69,4 +69,21 @@ class PalestraSingleTest extends TestCase
         $resp->assertSee('application/ld+json', false);
         $resp->assertSee('"@type":"Event"', false);
     }
+
+    public function test_jsonld_escapa_tag_de_fechamento_de_script(): void
+    {
+        // Título com vetor XSS: se JSON_HEX_TAG estiver ausente, o </script>
+        // fecha o bloco cedo e o restante do JSON vaza como HTML.
+        Palestra::factory()->create([
+            'titulo' => 'Ataque </script> XSS',
+            'slug' => 'ataque-xss-jsonld',
+            'status' => Palestra::STATUS_PUBLICADO,
+        ]);
+
+        $resp = $this->get(route('palestras.show', 'ataque-xss-jsonld'));
+
+        $resp->assertOk();
+        // Com JSON_HEX_TAG, o '<' do título vira '<' — nunca '</script>' literal no HTML.
+        $resp->assertSee('<', false);
+    }
 }

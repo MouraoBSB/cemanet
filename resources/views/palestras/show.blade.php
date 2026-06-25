@@ -23,7 +23,7 @@
         ],
         'performer' => $palestrantes->map(fn ($p) => ['@type' => 'Person', 'name' => $p->nome])->all(),
         'organizer' => ['@type' => 'Organization', 'name' => 'CEMA'],
-    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG);
 @endphp
 
 <x-layout.app :title="$palestra->titulo" :description="$palestra->subtitulo ?? $palestra->resumo">

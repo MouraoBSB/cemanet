@@ -168,4 +168,43 @@ class PalestraResourceTest extends TestCase
 
         $this->assertDatabaseMissing('palestras', ['slug' => 'pessoa-dupla']);
     }
+
+    public function test_rejeita_cor_fundo_invalido(): void
+    {
+        $palestrante = Palestrante::factory()->ativo()->create();
+
+        Livewire::test(CreatePalestra::class)
+            ->fillForm([
+                'titulo' => 'Cor Inválida',
+                'slug' => 'cor-invalida',
+                'status' => Palestra::STATUS_PUBLICADO,
+                'ids_palestrantes' => [$palestrante->id],
+                'cor_fundo' => 'vermelho',
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['cor_fundo']);
+
+        $this->assertDatabaseMissing('palestras', ['slug' => 'cor-invalida']);
+    }
+
+    public function test_aceita_cor_fundo_hex_valido(): void
+    {
+        $palestrante = Palestrante::factory()->ativo()->create();
+
+        Livewire::test(CreatePalestra::class)
+            ->fillForm([
+                'titulo' => 'Cor Válida',
+                'slug' => 'cor-valida',
+                'status' => Palestra::STATUS_PUBLICADO,
+                'ids_palestrantes' => [$palestrante->id],
+                'cor_fundo' => '#4e4483',
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('palestras', [
+            'slug' => 'cor-valida',
+            'cor_fundo' => '#4e4483',
+        ]);
+    }
 }

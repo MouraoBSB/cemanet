@@ -2,9 +2,9 @@
 
 // Thiago Mourão — https://github.com/MouraoBSB — 2026-06-25
 
-namespace App\Filament\Resources\PalestranteResource\Pages;
+namespace App\Filament\Resources\Palestrantes\Pages;
 
-use App\Filament\Resources\PalestranteResource;
+use App\Filament\Resources\Palestrantes\PalestranteResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 

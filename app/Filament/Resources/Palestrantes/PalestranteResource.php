@@ -2,11 +2,11 @@
 
 // Thiago Mourão — https://github.com/MouraoBSB — 2026-06-25
 
-namespace App\Filament\Resources;
+namespace App\Filament\Resources\Palestrantes;
 
-use App\Filament\Resources\PalestranteResource\Pages\CreatePalestrante;
-use App\Filament\Resources\PalestranteResource\Pages\EditPalestrante;
-use App\Filament\Resources\PalestranteResource\Pages\ListPalestrantes;
+use App\Filament\Resources\Palestrantes\Pages\CreatePalestrante;
+use App\Filament\Resources\Palestrantes\Pages\EditPalestrante;
+use App\Filament\Resources\Palestrantes\Pages\ListPalestrantes;
 use App\Models\Palestrante;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;

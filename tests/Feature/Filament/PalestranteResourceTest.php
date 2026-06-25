@@ -4,9 +4,9 @@
 
 namespace Tests\Feature\Filament;
 
-use App\Filament\Resources\PalestranteResource\Pages\CreatePalestrante;
-use App\Filament\Resources\PalestranteResource\Pages\EditPalestrante;
-use App\Filament\Resources\PalestranteResource\Pages\ListPalestrantes;
+use App\Filament\Resources\Palestrantes\Pages\CreatePalestrante;
+use App\Filament\Resources\Palestrantes\Pages\EditPalestrante;
+use App\Filament\Resources\Palestrantes\Pages\ListPalestrantes;
 use App\Models\Palestrante;
 use App\Models\User;
 use Filament\Forms\Components\FileUpload;

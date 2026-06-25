@@ -46,4 +46,11 @@ class SanitizacaoHtmlTest extends TestCase
 
         $this->assertNull($p->fresh()->descricao);
     }
+
+    public function test_bio_nula_permanece_nula(): void
+    {
+        $pessoa = Palestrante::factory()->create(['bio' => null]);
+
+        $this->assertNull($pessoa->fresh()->bio);
+    }
 }

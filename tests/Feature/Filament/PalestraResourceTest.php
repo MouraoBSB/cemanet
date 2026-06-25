@@ -102,7 +102,7 @@ class PalestraResourceTest extends TestCase
 
         Livewire::test(CreatePalestra::class)
             ->fillForm([
-                'titulo' => 'Tres Palestrantes',
+                'titulo' => 'Três Palestrantes',
                 'slug' => 'tres-palestrantes',
                 'status' => Palestra::STATUS_PUBLICADO,
                 'ids_palestrantes' => $tres,
@@ -126,5 +126,46 @@ class PalestraResourceTest extends TestCase
                 'ids_palestrantes' => [$pal->id],
                 'id_diretor' => $dir->id,
             ]);
+    }
+
+    public function test_edit_troca_palestrante_e_ressincroniza_pivo(): void
+    {
+        $antigo = Palestrante::factory()->ativo()->create();
+        $novo = Palestrante::factory()->ativo()->create();
+
+        $palestra = Palestra::factory()->create();
+        $palestra->palestrantes()->attach($antigo, ['papel' => Palestra::PAPEL_PALESTRANTE]);
+
+        Livewire::test(EditPalestra::class, ['record' => $palestra->getRouteKey()])
+            ->fillForm(['ids_palestrantes' => [$novo->id]])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $palestra->refresh();
+        $ids = $palestra->palestrantes()
+            ->wherePivot('papel', Palestra::PAPEL_PALESTRANTE)
+            ->pluck('palestrantes.id')
+            ->all();
+
+        $this->assertContains($novo->id, $ids, 'O novo palestrante deve estar no pivô');
+        $this->assertNotContains($antigo->id, $ids, 'O antigo palestrante não deve estar mais no pivô');
+    }
+
+    public function test_rejeita_mesma_pessoa_como_palestrante_e_diretor(): void
+    {
+        $x = Palestrante::factory()->ativo()->create();
+
+        Livewire::test(CreatePalestra::class)
+            ->fillForm([
+                'titulo' => 'Pessoa Dupla',
+                'slug' => 'pessoa-dupla',
+                'status' => Palestra::STATUS_PUBLICADO,
+                'ids_palestrantes' => [$x->id],
+                'id_diretor' => $x->id,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['id_diretor']);
+
+        $this->assertDatabaseMissing('palestras', ['slug' => 'pessoa-dupla']);
     }
 }

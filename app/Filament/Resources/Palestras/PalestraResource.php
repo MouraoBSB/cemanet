@@ -25,6 +25,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Tabs;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
@@ -88,7 +89,14 @@ class PalestraResource extends Resource
                     Select::make('id_diretor')
                         ->label('Diretor (opcional)')
                         ->options(fn () => Palestrante::ativo()->orderBy('nome')->pluck('nome', 'id'))
-                        ->searchable(),
+                        ->searchable()
+                        ->rules([
+                            fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
+                                if ($value && in_array($value, (array) ($get('ids_palestrantes') ?? []), false)) {
+                                    $fail('A mesma pessoa não pode ser palestrante e diretor da mesma palestra.');
+                                }
+                            },
+                        ]),
                 ]),
                 Tabs\Tab::make('Dados')->schema([
                     Grid::make(2)->schema([

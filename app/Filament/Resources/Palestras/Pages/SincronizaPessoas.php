@@ -25,8 +25,12 @@ trait SincronizaPessoas
 
     protected function sincronizarPessoas(Palestra $palestra): void
     {
-        $idsPalestrantes = array_values(array_filter((array) ($this->pessoasSelecionadas['ids_palestrantes'] ?? [])));
+        $idsPalestrantes = array_values(array_filter(array_map('intval', (array) ($this->pessoasSelecionadas['ids_palestrantes'] ?? []))));
         $idDiretor = $this->pessoasSelecionadas['id_diretor'] ?? null;
+
+        if ($idDiretor && in_array($idDiretor, $idsPalestrantes, false)) {
+            $idDiretor = null;
+        }
 
         $sync = [];
         foreach ($idsPalestrantes as $id) {

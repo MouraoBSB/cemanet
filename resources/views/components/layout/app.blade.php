@@ -16,6 +16,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
     <link rel="icon" href="{{ asset('images/logos/logo-icone.png') }}" type="image/png">
+    <link rel="preconnect" href="https://i.ytimg.com">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     {{ $head ?? '' }}

@@ -76,6 +76,20 @@ class Palestra extends Model
         return $this->hasMany(PalestraDestaque::class)->orderBy('ordem');
     }
 
+    public function getYoutubeIdAttribute(): ?string
+    {
+        if ($this->link_youtube && preg_match('~(?:v=|youtu\.be/|live/|embed/|shorts/)([A-Za-z0-9_-]{6,})~', $this->link_youtube, $m)) {
+            return $m[1];
+        }
+
+        return null;
+    }
+
+    public function getYoutubeThumbAttribute(): ?string
+    {
+        return $this->youtube_id ? "https://i.ytimg.com/vi/{$this->youtube_id}/mqdefault.jpg" : null;
+    }
+
     protected function descricao(): Attribute
     {
         return Attribute::make(

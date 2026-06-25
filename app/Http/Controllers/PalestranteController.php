@@ -5,15 +5,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Palestrante;
+use Illuminate\Contracts\View\View;
 
 class PalestranteController extends Controller
 {
-    public function index()
+    public function index(): View
     {
         return view('palestrantes.index');
     }
 
-    public function show(string $slug)
+    public function show(string $slug): View
     {
         $palestrante = Palestrante::query()
             ->ativo()

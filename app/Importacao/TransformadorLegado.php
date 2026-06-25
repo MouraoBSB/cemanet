@@ -19,7 +19,24 @@ class TransformadorLegado
     {
         $ts = (int) $unix;
 
-        return $ts > 0 ? Carbon::createFromTimestamp($ts)->setTimezone(self::FUSO) : null;
+        if ($ts <= 0) {
+            return null;
+        }
+
+        // O legado (JetEngine) guarda o horário de parede local (ex.: 19:00) como se
+        // fosse UTC. Lemos esse "relógio" em UTC e o reinterpretamos como horário de
+        // São Paulo, sem deslocar — senão a palestra das 19h apareceria às 16h.
+        $parede = Carbon::createFromTimestamp($ts, 'UTC');
+
+        return Carbon::create(
+            $parede->year,
+            $parede->month,
+            $parede->day,
+            $parede->hour,
+            $parede->minute,
+            $parede->second,
+            self::FUSO,
+        );
     }
 
     public static function destaquesDoRepeater(?string $serializado): array

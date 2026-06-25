@@ -66,3 +66,7 @@
     --spacing-section: 5rem;
     --spacing-section-lg: 9.13rem;
 }
+
+@layer base {
+    [x-cloak] { display: none !important; }
+}

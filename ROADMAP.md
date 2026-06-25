@@ -35,9 +35,18 @@ Objetivo: o módulo Palestras completo, do banco ao público, com dados migrados
       *(Plano 2 — 123 palestras, 57 palestrantes, 141 assuntos importados; idempotente)*
 - [ ] Filament Resources: Palestra e Palestrante (CRUD), com validação das
       cardinalidades e upload de mídia.
-- [ ] Front público: listagem de palestras + página individual, responsiva e
-      fiel ao `design-system/` (ver `paginas.md` → template "Single Palestra").
-- [ ] Testes (unit + feature) e verificação manual no localhost.
+      **Pré-requisitos de segurança (revisão do Plano 4):** sanitizar `descricao`
+      (HTML do legado/editável) com allow-list na escrita (ex.: HTMLPurifier) e
+      validar `cor_fundo` (formato hex/rgb) — hoje a single renderiza `descricao`
+      com `{!! !!}` confiando em conteúdo de staff; ao abrir edição no admin, isso
+      vira superfície de XSS armazenado.
+- [x] Front público: listagem `/palestras` (busca/filtro/paginação reativa via
+      Livewire 4) + página individual `/palestras/{slug}` (T06, SSR + JSON-LD),
+      layout base responsivo (header mega-menu/off-canvas + footer), i18n pt-BR,
+      interações Alpine (compartilhar/copiar/curtir). *(Plano 4 — 38 testes verdes;
+      rotas 200 e leves: home 21 KB, listagem 54 KB, single 29 KB)*
+- [ ] Testes (unit + feature) e verificação manual no localhost. *(front coberto
+      no Plano 4; admin pendente)*
 
 Pronto quando: as 123 palestras aparecem corretas no público e no admin, com
 testes verdes e página leve.
@@ -51,6 +60,13 @@ Ordem sugerida (cada um como nova fatia vertical):
 - [ ] Agenda Reforma Íntima (com calendário)
 - [ ] Mensagens mediúnicas + Autores espirituais
 - [ ] Blog (Sementeira) / Posts + Páginas institucionais
+  - [ ] **Comentários** (sistema próprio, Livewire): abertos **sem conta**
+        (nome + e-mail; e-mail nunca público), **login/Google opcional** com
+        vantagens (selo verificado, editar o próprio, notificação). Moderação
+        no Filament; 1º comentário de um e-mail fica **pendente** e, após
+        aprovado uma vez, os próximos daquele e-mail **auto-publicam**.
+        Anti-spam (honeypot + hCaptcha condicional + rate limit por IP) e
+        **consentimento LGPD**. Sem widget de terceiro. Modelo em `DATA-MODEL.md`.
 - [ ] Área de membros (taxonomia `nivel-de-acesso` → auth + roles/policies)
 - [ ] Busca, formulários (contato/newsletter via Mailpit→SMTP), SEO/sitemap
 - [ ] Deploy Docker no VPS (pipeline, backups do MySQL, observabilidade)

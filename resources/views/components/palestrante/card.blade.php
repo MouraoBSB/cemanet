@@ -18,7 +18,7 @@
             <h3 class="font-display text-lg font-semibold text-primary group-hover:underline">{{ $palestrante->nome }}</h3>
             @isset($palestrante->palestras_ministradas_count)
                 <p class="mt-1 font-mono text-[11px] uppercase tracking-wide text-text-muted">
-                    {{ $palestrante->palestras_ministradas_count }} {{ \Illuminate\Support\Str::plural('palestra', $palestrante->palestras_ministradas_count) }}
+                    {{ $palestrante->palestras_ministradas_count }} {{ $palestrante->palestras_ministradas_count === 1 ? 'palestra' : 'palestras' }}
                 </p>
             @endisset
             @if ($resumoBio)

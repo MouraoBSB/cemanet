@@ -22,4 +22,15 @@ class PalestrantesListaTest extends TestCase
             ->assertSee('Abadio Rodrigues')
             ->assertDontSee('Bezerra de Menezes');
     }
+
+    public function test_busca_nunca_traz_inativo_mesmo_com_nome_correspondente(): void
+    {
+        Palestrante::factory()->ativo()->create(['nome' => 'Abadio Rodrigues']);
+        Palestrante::factory()->inativo()->create(['nome' => 'Abadio Inativo']);
+
+        Livewire::test(Lista::class)
+            ->set('q', 'Abadio')
+            ->assertSee('Abadio Rodrigues')
+            ->assertDontSee('Abadio Inativo'); // o escopo ->ativo() barra inativos na busca
+    }
 }

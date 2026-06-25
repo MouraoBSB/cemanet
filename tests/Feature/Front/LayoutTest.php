@@ -30,7 +30,17 @@ class LayoutTest extends TestCase
         $resp->assertSee('Mensagens Mediúnicas', false);
         // item futuro deve ser <span aria-disabled>, nunca <a href>
         $resp->assertSee('aria-disabled="true"', false);
-        $resp->assertDontSee('href="' . route('palestras.index') . '"' . '>Mensagens Mediúnicas', false);
+        $resp->assertDontSee('href="'.route('palestras.index').'"'.'>Mensagens Mediúnicas', false);
+    }
+
+    public function test_footer_tem_cnpj_e_link_palestras(): void
+    {
+        $resp = $this->get(route('home'));
+
+        $resp->assertOk();
+        $resp->assertSee('01.600.089/0001-90', false);          // CNPJ
+        $resp->assertSee(route('palestras.index'), false);       // link nas atividades
+        $resp->assertSee('Inscreva-se', false);                  // newsletter (visual)
     }
 
     public function test_alpine_carregado_em_pagina_sem_componente_livewire(): void

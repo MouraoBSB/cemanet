@@ -7,6 +7,7 @@ namespace App\Livewire\Palestras;
 use App\Models\Assunto;
 use App\Models\Palestra;
 use App\Models\Palestrante;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Url;
 use Livewire\Component;
@@ -62,15 +63,15 @@ class Lista extends Component
             })
             ->when($this->assunto !== '', fn (Builder $query) => $query->whereHas('assuntos', fn (Builder $a) => $a->where('slug', $this->assunto)))
             ->when($this->palestrante !== '', fn (Builder $query) => $query->whereHas('palestrantesAtivos', fn (Builder $p) => $p->where('palestrantes.slug', $this->palestrante)))
-            ->when($this->dataDe !== '', fn (Builder $query) => $query->whereDate('data_da_palestra', '>=', $this->dataDe))
-            ->when($this->dataAte !== '', fn (Builder $query) => $query->whereDate('data_da_palestra', '<=', $this->dataAte))
+            ->when($this->dataDe !== '' && Carbon::hasFormat($this->dataDe, 'Y-m-d'), fn (Builder $query) => $query->whereDate('data_da_palestra', '>=', $this->dataDe))
+            ->when($this->dataAte !== '' && Carbon::hasFormat($this->dataAte, 'Y-m-d'), fn (Builder $query) => $query->whereDate('data_da_palestra', '<=', $this->dataAte))
             ->orderByRaw('data_da_palestra IS NULL, data_da_palestra '.($this->ordenar === 'antiga' ? 'asc' : 'desc'))
             ->paginate(12);
 
         return view('livewire.palestras.lista', [
             'palestras' => $palestras,
             'palestrantes' => Palestrante::ativo()->orderBy('nome')->get(['nome', 'slug']),
-            'assuntos' => Assunto::whereHas('palestras', fn (Builder $q) => $q->where('status', Palestra::STATUS_PUBLICADO))->orderBy('nome')->get(['nome', 'slug']),
+            'assuntos' => Assunto::whereHas('palestras', fn (Builder $q) => $q->publicado())->orderBy('nome')->get(['nome', 'slug']),
         ]);
     }
 }

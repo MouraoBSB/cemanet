@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Importacao\LeitorLegado;
 use App\Importacao\LeitorLegadoMysql;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,6 +22,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \Illuminate\Support\Carbon::setLocale('pt_BR');
+        Carbon::setLocale('pt_BR');
     }
 }

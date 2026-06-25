@@ -6,4 +6,4 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn () => view('pages.inicio'))->name('home');
 
 Route::get('/palestras', [PalestraController::class, 'index'])->name('palestras.index');
-Route::get('/palestras/{slug}', fn () => abort(404))->name('palestras.show');
+Route::get('/palestras/{slug}', [PalestraController::class, 'show'])->name('palestras.show');

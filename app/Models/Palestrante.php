@@ -40,6 +40,11 @@ class Palestrante extends Model
             ->withTimestamps();
     }
 
+    public function palestrasMinistradas(): BelongsToMany
+    {
+        return $this->palestras()->wherePivot('papel', Palestra::PAPEL_PALESTRANTE);
+    }
+
     protected function bio(): Attribute
     {
         return Attribute::make(

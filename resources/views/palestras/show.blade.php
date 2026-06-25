@@ -108,10 +108,13 @@
                         @endif
                         <div class="p-5">
                             <p class="font-mono text-[11px] uppercase tracking-[0.1em] text-accent">Palestrante</p>
-                            <h2 class="mt-1 font-display text-xl font-semibold text-primary">{{ $p->nome }}</h2>
+                            <h2 class="mt-1 font-display text-xl font-semibold text-primary">
+                                <a href="{{ route('palestrantes.show', $p->slug) }}" class="hover:underline">{{ $p->nome }}</a>
+                            </h2>
                             @if ($p->bio)
                                 <div class="mt-2 line-clamp-4 text-sm text-text-secondary">{!! \Illuminate\Support\Str::limit(strip_tags($p->bio), 220) !!}</div>
                             @endif
+                            <a href="{{ route('palestrantes.show', $p->slug) }}" class="mt-3 inline-block text-sm font-semibold text-secondary hover:underline">Ver perfil completo →</a>
                         </div>
                     </div>
                 @empty

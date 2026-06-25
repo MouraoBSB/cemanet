@@ -16,7 +16,7 @@
                 this.s = Math.floor((t % 60000) / 1000);
             },
         }"
-        x-init="atualiza(); const id = setInterval(() => atualiza(), 1000); $cleanup = () => clearInterval(id)"
+        x-init="atualiza(); setInterval(() => atualiza(), 1000)"
         x-show="ativo"
     >
         @if ($compacto)

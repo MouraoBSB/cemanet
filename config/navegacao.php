@@ -18,7 +18,7 @@ return [
             'ativo' => true,
             'itens' => [
                 ['rotulo' => 'Palestras Públicas', 'rota' => 'palestras.index', 'ativo' => true],
-                ['rotulo' => 'Palestrantes', 'ativo' => false],
+                ['rotulo' => 'Palestrantes', 'rota' => 'palestrantes.index', 'ativo' => true],
             ],
         ],
         ['rotulo' => 'Mensagens Mediúnicas', 'ativo' => false, 'itens' => []],

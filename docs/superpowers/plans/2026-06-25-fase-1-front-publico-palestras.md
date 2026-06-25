@@ -298,11 +298,19 @@ git commit -m "feat(front): instala Livewire e cria base do layout (shell, naveg
 
 **Files:**
 - Modify: `resources/views/components/layout/header.blade.php` (substitui o placeholder)
+- Modify: `resources/views/components/layout/app.blade.php` (incluir `@livewireStyles`/`@livewireScripts` — ver Step 4)
 - Test: `tests/Feature/Front/LayoutTest.php` (acrescenta asserts)
 
 **Interfaces:**
 - Consumes: `config('navegacao.menu')` (Task 1), rota `palestras.index`.
 - Produces: header com `<form role="search" method="GET" action="{{ route('palestras.index') }}">` (input `name="q"`), mega-menu desktop (hover, `aria-haspopup`/`aria-expanded`) e off-canvas mobile (Alpine: `x-data`, foco, `Esc`). A busca alimenta a listagem reativa da Task 4 via query string `?q=`.
+
+> **Alpine em todas as páginas.** O off-canvas usa Alpine. No Livewire 4 os assets só são
+> **auto-injetados** quando um componente Livewire renderiza na requisição (confirmado em
+> `SupportAutoInjectedAssets::shouldInjectLivewireAssets`). Home e single são Blade puro (sem
+> componente Livewire) → sem `@livewireScripts` explícito, o Alpine não carrega nelas. Por isso o
+> Step 4 adiciona `@livewireStyles`/`@livewireScripts` ao layout (carrega Livewire+Alpine sempre;
+> nas páginas com componente, o Livewire detecta a colocação manual e não duplica).
 
 - [ ] **Step 1: Acrescentar asserts ao teste (falha primeiro)**
 
@@ -319,6 +327,16 @@ Em `tests/Feature/Front/LayoutTest.php`, adicionar método:
         // item ativo é link; item futuro é placeholder (sem href de rota)
         $resp->assertSee('>Palestras<', false);
         $resp->assertSee('Mensagens Mediúnicas', false);
+    }
+
+    public function test_alpine_carregado_em_pagina_sem_componente_livewire(): void
+    {
+        // A home é Blade puro (sem componente Livewire); o header usa Alpine.
+        // @livewireScripts no layout garante Livewire+Alpine carregados mesmo aqui.
+        $resp = $this->get(route('home'));
+
+        $resp->assertOk();
+        $resp->assertSee('livewire', false); // tag de script do Livewire (traz o Alpine)
     }
 ```
 
@@ -464,9 +482,27 @@ Estrutura: duas faixas (barra branca com logo+busca+auth+hambúrguer; faixa roxa
 ```
 > `x-cloak` precisa de `[x-cloak]{display:none!important}`. Adicionar essa regra em `resources/css/app.css` (fora do `@theme`): `@layer base { [x-cloak] { display: none !important; } }`. Incluir esse passo aqui.
 
-- [ ] **Step 4: Adicionar regra `x-cloak` ao CSS**
+- [ ] **Step 4: Garantir Alpine global (Livewire directives) + regra `x-cloak`**
 
-Em `resources/css/app.css`, ao final do arquivo:
+(a) Em `resources/views/components/layout/app.blade.php`, adicionar as diretivas do Livewire para
+carregar Livewire+Alpine em TODAS as páginas (sem isso, Home/single não teriam Alpine):
+- `@livewireStyles` logo após o `@vite(...)` no `<head>`;
+- `@livewireScripts` imediatamente antes de `</body>`.
+
+```blade
+    {{-- ...dentro do <head>, após @vite --}}
+    @livewireStyles
+    {{ $head ?? '' }}
+</head>
+```
+```blade
+    <x-layout.footer />
+
+    @livewireScripts
+</body>
+```
+
+(b) Em `resources/css/app.css`, ao final do arquivo:
 ```css
 @layer base {
     [x-cloak] { display: none !important; }
@@ -751,9 +787,18 @@ class PalestrasListaTest extends TestCase
 Run: `docker compose exec -T app php artisan test --filter="PalestrasListagemTest|PalestrasListaTest"`
 Expected: FAIL.
 
+> **API Livewire 4 (instalado: v4.3.1 via Filament).** Diferenças do v3 que valem para esta task:
+> (1) `make:livewire ... --class` gera componente **multi-file** (classe em `app/Livewire`, view em
+> `resources/views/livewire`); sem `--class`, o v4 gera **single-file** por padrão — use `--class`.
+> (2) `wire:model` é **deferred** por padrão no v4; para busca reativa use `wire:model.live` (já está na view).
+> (3) Assets são **auto-injetados** em respostas HTML (o `<x-layout.app>` tem `</head>`/`</body>`), então
+> **não** precisa de `@livewireScripts`/`@livewireStyles`. (4) Paginação default já é **Tailwind** —
+> `->links()` basta. (5) `#[Url]` lê a query string no load inicial, então **não** é preciso passar
+> `:q`/`:assunto` ao embutir o componente. (6) Reset de página via hooks `updatedQ()`/`updatedAssunto()`.
+
 - [ ] **Step 4: Criar o componente Livewire**
 
-Run: `docker compose exec -T app php artisan make:livewire Palestras/Lista`
+Run: `docker compose exec -T app php artisan make:livewire Palestras/Lista --class`
 Substituir `app/Livewire/Palestras/Lista.php` por:
 ```php
 <?php
@@ -771,17 +816,21 @@ class Lista extends Component
 {
     use WithPagination;
 
-    #[Url(as: 'q', keep: false)]
+    #[Url(as: 'q', except: '')]
     public string $q = '';
 
-    #[Url(as: 'assunto', keep: false)]
+    #[Url(as: 'assunto', except: '')]
     public string $assunto = '';
 
-    public function updating($name): void
+    // Livewire 4: resetar a paginação quando o filtro muda (hooks updated*).
+    public function updatedQ(): void
     {
-        if (in_array($name, ['q', 'assunto'], true)) {
-            $this->resetPage();
-        }
+        $this->resetPage();
+    }
+
+    public function updatedAssunto(): void
+    {
+        $this->resetPage();
     }
 
     public function render()
@@ -878,7 +927,8 @@ class PalestraController extends Controller
     </section>
 
     <section class="mx-auto max-w-[1240px] px-6 py-12">
-        <livewire:palestras.lista :q="request('q', '')" :assunto="request('assunto', '')" />
+        {{-- #[Url] lê q/assunto da query string no load inicial; a busca do header (GET ?q=) cai aqui. --}}
+        <livewire:palestras.lista />
     </section>
 </x-layout.app>
 ```

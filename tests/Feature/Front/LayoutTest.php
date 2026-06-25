@@ -16,4 +16,27 @@ class LayoutTest extends TestCase
         // link para a listagem de palestras presente na navegação
         $resp->assertSee(route('palestras.index'), false);
     }
+
+    public function test_header_tem_busca_e_itens_de_menu(): void
+    {
+        $resp = $this->get(route('home'));
+
+        $resp->assertOk();
+        // formulário de busca aponta para a listagem (GET ?q=)
+        $resp->assertSee('action="'.route('palestras.index').'"', false);
+        $resp->assertSee('name="q"', false);
+        // item ativo é link; item futuro é placeholder (sem href de rota)
+        $resp->assertSee('>Palestras<', false);
+        $resp->assertSee('Mensagens Mediúnicas', false);
+    }
+
+    public function test_alpine_carregado_em_pagina_sem_componente_livewire(): void
+    {
+        // A home é Blade puro (sem componente Livewire); o header usa Alpine.
+        // @livewireScripts no layout garante Livewire+Alpine carregados mesmo aqui.
+        $resp = $this->get(route('home'));
+
+        $resp->assertOk();
+        $resp->assertSee('livewire', false); // tag de script do Livewire (traz o Alpine)
+    }
 }

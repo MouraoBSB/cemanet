@@ -22,16 +22,16 @@ Objetivo: ambiente reproduzível rodando, com Laravel + Filament + MySQL.
 
 Pronto quando: `localhost` abre o Laravel, o admin do Filament loga e `artisan test` passa.
 
-## Fase 1 — Módulo Palestras (fatia vertical)  ⬜ a fazer
+## Fase 1 — Módulo Palestras (fatia vertical)  🔄 em andamento
 
 Objetivo: o módulo Palestras completo, do banco ao público, com dados migrados.
 
-- [ ] Migrations: `palestrantes`, `palestras`, `assuntos` (hierárquica),
+- [x] Migrations: `palestrantes`, `palestras`, `assuntos` (hierárquica),
       pivôs `palestra_pessoa` (com `papel`) e `assunto_palestra`, e
-      `palestra_destaques`. Ver `DATA-MODEL.md`.
-- [ ] Models Eloquent + relações + regras de cardinalidade (107/108).
-- [ ] Comando `php artisan cema:importar-palestras` — lê a REST (GET), faz upsert
-      idempotente das 123 palestras, resolvendo pessoas e assuntos por slug.
+      `palestra_destaques`. Ver `DATA-MODEL.md`. *(Plano 1)*
+- [x] Models Eloquent + relações + regras de cardinalidade (107/108). *(Plano 1)*
+- [ ] Comando `php artisan cema:importar-palestras` — lê o banco **legado** (read-only),
+      faz upsert idempotente das 123 palestras, resolvendo pessoas e assuntos por slug.
 - [ ] Filament Resources: Palestra e Palestrante (CRUD), com validação das
       cardinalidades e upload de mídia.
 - [ ] Front público: listagem de palestras + página individual, responsiva e

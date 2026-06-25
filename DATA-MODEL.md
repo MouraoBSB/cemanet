@@ -114,6 +114,38 @@ diretamente a importação das palestras:
 - **Fonte da importação:** além da REST (GET), o **banco `legado` (read-only)** é fonte direta e
   mais completa — decidir na Fase 1 qual usar (as relações Jet, por exemplo, são triviais via banco).
 
+## Comentários do blog (Fase 2)
+
+Comentar **não exige conta**: visitante informa nome + e-mail; quem está logado
+fica vinculado ao usuário. Sistema próprio (Livewire + moderação no Filament),
+sem widget de terceiro. Decisão registrada em `PROJECT.md`.
+
+### `comentarios`
+| Coluna | Tipo | Notas |
+|---|---|---|
+| id | bigint PK | |
+| post_id | FK→posts | postagem comentada |
+| parent_id | bigint null FK→comentarios.id | respostas encadeadas (thread) |
+| usuario_id | bigint null FK→users.id | preenchido **só** se logado (conta opcional) |
+| autor_nome | string | nome exibido (logado ou anônimo) |
+| autor_email | string | **nunca público** — moderação/notificação/avatar |
+| conteudo | text | corpo do comentário |
+| status | enum(`pendente`,`aprovado`,`spam`,`lixeira`) | fluxo de moderação |
+| ip | string null | rate limit / anti-abuso |
+| user_agent | string null | anti-abuso (opcional) |
+| consentimento_lgpd | bool | aceite da política (fluxo anônimo) |
+| timestamps | | |
+
+Regras de negócio (validar na aplicação):
+- **Anônimo permitido**: `autor_nome` + `autor_email` obrigatórios quando não há
+  `usuario_id`; com login, herdar nome/e-mail do usuário.
+- **Moderação progressiva**: 1º comentário de um `autor_email` entra `pendente`;
+  após **um** aprovado, próximos do mesmo e-mail entram `aprovado` automaticamente.
+- **Anti-spam**: honeypot + hCaptcha condicional + rate limit por IP; opcional
+  Akismet/lista de palavras → marca `spam`.
+- **LGPD**: exigir `consentimento_lgpd` no fluxo anônimo; e-mail só interno.
+- Exibir publicamente apenas `status = aprovado`.
+
 ## Próximos módulos (resumo)
 
 Mesma abordagem por CPT: `evangelho`, `mensagem-mediunicas`, `_evento`,

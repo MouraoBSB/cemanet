@@ -38,6 +38,7 @@ admin → páginas públicas → dados migrados) antes de seguir para o próximo
 | Produção | VPS Linux + Docker | Controle e portabilidade |
 | 1º ciclo | Fatia vertical: módulo **Palestras** | Prova a arquitetura inteira num módulo |
 | Acesso ao atual | Snapshot/design-system (design) + REST GET (dados) | Reaproveita o que já temos; sem risco ao WP vivo |
+| Comentários (blog) | Sistema **próprio** (Livewire), **aberto sem conta** (nome+e-mail), login/Google **opcional**, moderado no Filament | Não trava o visitante; dados na casa (LGPD); leve (SEO/perf); sem widget de terceiro (Disqus/Facebook) |
 
 ## Inventário de conteúdo (do site atual, via REST)
 

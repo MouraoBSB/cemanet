@@ -51,6 +51,13 @@ Ordem sugerida (cada um como nova fatia vertical):
 - [ ] Agenda Reforma Íntima (com calendário)
 - [ ] Mensagens mediúnicas + Autores espirituais
 - [ ] Blog (Sementeira) / Posts + Páginas institucionais
+  - [ ] **Comentários** (sistema próprio, Livewire): abertos **sem conta**
+        (nome + e-mail; e-mail nunca público), **login/Google opcional** com
+        vantagens (selo verificado, editar o próprio, notificação). Moderação
+        no Filament; 1º comentário de um e-mail fica **pendente** e, após
+        aprovado uma vez, os próximos daquele e-mail **auto-publicam**.
+        Anti-spam (honeypot + hCaptcha condicional + rate limit por IP) e
+        **consentimento LGPD**. Sem widget de terceiro. Modelo em `DATA-MODEL.md`.
 - [ ] Área de membros (taxonomia `nivel-de-acesso` → auth + roles/policies)
 - [ ] Busca, formulários (contato/newsletter via Mailpit→SMTP), SEO/sitemap
 - [ ] Deploy Docker no VPS (pipeline, backups do MySQL, observabilidade)

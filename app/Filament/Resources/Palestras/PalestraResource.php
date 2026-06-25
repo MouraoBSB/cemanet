@@ -91,8 +91,10 @@ class PalestraResource extends Resource
                         ->options(fn () => Palestrante::ativo()->orderBy('nome')->pluck('nome', 'id'))
                         ->searchable()
                         ->rules([
+                            // Comparação frouxa de propósito: valores de form do Livewire podem vir
+                            // como string ("42") enquanto os ids vêm como int (42); o frouxo casa ambos.
                             fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
-                                if ($value && in_array($value, (array) ($get('ids_palestrantes') ?? []), true)) {
+                                if ($value && in_array($value, (array) ($get('ids_palestrantes') ?? []), false)) {
                                     $fail('A mesma pessoa não pode ser palestrante e diretor da mesma palestra.');
                                 }
                             },

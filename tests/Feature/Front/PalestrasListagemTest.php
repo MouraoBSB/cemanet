@@ -23,6 +23,20 @@ class PalestrasListagemTest extends TestCase
         $resp->assertDontSee('Rascunho Secreto');
     }
 
+    public function test_listagem_exibe_placeholder_quando_palestra_sem_video(): void
+    {
+        Palestra::factory()->create([
+            'status' => Palestra::STATUS_PUBLICADO,
+            'link_youtube' => null,
+        ]);
+
+        $resp = $this->get(route('palestras.index'));
+
+        $resp->assertOk();
+        $resp->assertSee('logo-icone', false);
+        $resp->assertDontSee('i.ytimg.com/vi/', false); // nenhuma capa do YouTube carregada
+    }
+
     public function test_listagem_mostra_so_palestrante_ativo(): void
     {
         $palestra = Palestra::factory()->create();

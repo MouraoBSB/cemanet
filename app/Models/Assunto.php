@@ -7,6 +7,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Assunto extends Model
@@ -23,5 +24,10 @@ class Assunto extends Model
     public function children(): HasMany
     {
         return $this->hasMany(Assunto::class, 'parent_id');
+    }
+
+    public function palestras(): BelongsToMany
+    {
+        return $this->belongsToMany(Palestra::class, 'assunto_palestra', 'assunto_id', 'palestra_id');
     }
 }

@@ -2,11 +2,7 @@
     $palestrantes = $palestra->palestrantesAtivos;
     $data = $palestra->data_da_palestra;
     $heroStyle = $palestra->cor_fundo ? 'background:'.$palestra->cor_fundo : null;
-    // extrai o ID do YouTube de formatos comuns (watch?v=, youtu.be/, live/, embed/)
-    $ytId = null;
-    if ($palestra->link_youtube && preg_match('~(?:v=|youtu\.be/|live/|embed/)([A-Za-z0-9_-]{6,})~', $palestra->link_youtube, $m)) {
-        $ytId = $m[1];
-    }
+    $ytId = $palestra->youtube_id;
     $jsonLd = json_encode([
         '@context' => 'https://schema.org',
         '@type' => 'Event',

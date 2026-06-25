@@ -4,7 +4,11 @@
 
 namespace App\Livewire\Palestras;
 
+use App\Models\Assunto;
 use App\Models\Palestra;
+use App\Models\Palestrante;
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -19,14 +23,28 @@ class Lista extends Component
     #[Url(as: 'assunto', except: '')]
     public string $assunto = '';
 
-    // Livewire 4: resetar a paginação quando o filtro muda (hooks updated*).
-    public function updatedQ(): void
+    #[Url(as: 'palestrante', except: '')]
+    public string $palestrante = '';
+
+    #[Url(as: 'de', except: '')]
+    public string $dataDe = '';
+
+    #[Url(as: 'ate', except: '')]
+    public string $dataAte = '';
+
+    #[Url(as: 'ordenar', except: 'recente')]
+    public string $ordenar = 'recente';
+
+    public function updated(string $name): void
     {
-        $this->resetPage();
+        if (in_array($name, ['q', 'assunto', 'palestrante', 'dataDe', 'dataAte', 'ordenar'], true)) {
+            $this->resetPage();
+        }
     }
 
-    public function updatedAssunto(): void
+    public function limparFiltros(): void
     {
+        $this->reset(['q', 'assunto', 'palestrante', 'dataDe', 'dataAte', 'ordenar']);
         $this->resetPage();
     }
 
@@ -35,20 +53,25 @@ class Lista extends Component
         $palestras = Palestra::query()
             ->publicado()
             ->with(['palestrantesAtivos', 'assuntos'])
-            ->when($this->q !== '', function ($query) {
+            ->when($this->q !== '', function (Builder $query) {
                 $termo = '%'.$this->q.'%';
-                $query->where(function ($q) use ($termo) {
+                $query->where(function (Builder $q) use ($termo) {
                     $q->where('titulo', 'like', $termo)
                         ->orWhere('subtitulo', 'like', $termo)
                         ->orWhere('resumo', 'like', $termo);
                 });
             })
-            ->when($this->assunto !== '', function ($query) {
-                $query->whereHas('assuntos', fn ($a) => $a->where('slug', $this->assunto));
-            })
-            ->orderByRaw('data_da_palestra IS NULL, data_da_palestra DESC')
-            ->paginate(9);
+            ->when($this->assunto !== '', fn (Builder $query) => $query->whereHas('assuntos', fn (Builder $a) => $a->where('slug', $this->assunto)))
+            ->when($this->palestrante !== '', fn (Builder $query) => $query->whereHas('palestrantesAtivos', fn (Builder $p) => $p->where('palestrantes.slug', $this->palestrante)))
+            ->when($this->dataDe !== '' && Carbon::hasFormat($this->dataDe, 'Y-m-d'), fn (Builder $query) => $query->whereDate('data_da_palestra', '>=', $this->dataDe))
+            ->when($this->dataAte !== '' && Carbon::hasFormat($this->dataAte, 'Y-m-d'), fn (Builder $query) => $query->whereDate('data_da_palestra', '<=', $this->dataAte))
+            ->orderByRaw('data_da_palestra IS NULL, data_da_palestra '.($this->ordenar === 'antiga' ? 'asc' : 'desc'))
+            ->paginate(12);
 
-        return view('livewire.palestras.lista', ['palestras' => $palestras]);
+        return view('livewire.palestras.lista', [
+            'palestras' => $palestras,
+            'palestrantes' => Palestrante::ativo()->orderBy('nome')->get(['nome', 'slug']),
+            'assuntos' => Assunto::whereHas('palestras', fn (Builder $q) => $q->publicado())->orderBy('nome')->get(['nome', 'slug']),
+        ]);
     }
 }

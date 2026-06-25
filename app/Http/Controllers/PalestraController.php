@@ -10,7 +10,21 @@ class PalestraController extends Controller
 {
     public function index()
     {
-        return view('palestras.index');
+        $proxima = Palestra::query()
+            ->publicado()
+            ->whereNotNull('data_da_palestra')
+            ->where('data_da_palestra', '>=', now())
+            ->with('palestrantesAtivos')
+            ->orderBy('data_da_palestra')
+            ->first()
+            ?? Palestra::query()
+                ->publicado()
+                ->whereNotNull('data_da_palestra')
+                ->with('palestrantesAtivos')
+                ->orderByDesc('data_da_palestra')
+                ->first();
+
+        return view('palestras.index', compact('proxima'));
     }
 
     public function show(string $slug)

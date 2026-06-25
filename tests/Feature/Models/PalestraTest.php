@@ -38,4 +38,17 @@ class PalestraTest extends TestCase
 
         $this->assertCount(1, Palestra::publicado()->get());
     }
+
+    public function test_pode_ter_data_nula(): void
+    {
+        // Nem toda palestra do legado tem data definida (ex.: "Paz e Nós").
+        $p = Palestra::create([
+            'titulo' => 'Paz e Nós',
+            'slug' => 'homem-chamado-amor',
+            'data_da_palestra' => null,
+            'status' => Palestra::STATUS_PUBLICADO,
+        ]);
+
+        $this->assertNull($p->fresh()->data_da_palestra);
+    }
 }

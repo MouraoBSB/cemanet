@@ -17,9 +17,10 @@
             @endif
         </div>
         <div class="flex flex-1 flex-col p-4">
-            <div class="mb-1.5 flex items-center gap-2 font-mono text-[10px] uppercase tracking-wide text-text-muted">
+            <div class="mb-1.5 flex flex-wrap items-center gap-2 font-mono text-[10px] uppercase tracking-wide text-text-muted">
                 @if ($data)<time datetime="{{ $data->toIso8601String() }}">{{ $data->translatedFormat('d \d\e M Y') }}</time>@endif
                 <span class="rounded-pill bg-surface px-2 py-0.5 text-[10px] text-primary">{{ $palestra->online ? 'Online' : 'Presencial' }}</span>
+                <x-ui.countdown :data="$data" compacto />
             </div>
             <h3 class="line-clamp-2 font-display text-base font-semibold leading-snug text-primary group-hover:underline">{{ $palestra->titulo }}</h3>
             @if ($palestra->palestrantesAtivos->isNotEmpty())

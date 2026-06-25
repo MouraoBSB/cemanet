@@ -27,8 +27,9 @@ trait SincronizaPessoas
     {
         $idsPalestrantes = array_values(array_filter(array_map('intval', (array) ($this->pessoasSelecionadas['ids_palestrantes'] ?? []))));
         $idDiretor = $this->pessoasSelecionadas['id_diretor'] ?? null;
+        $idDiretor = $idDiretor !== null ? (int) $idDiretor : null;
 
-        if ($idDiretor && in_array($idDiretor, $idsPalestrantes, false)) {
+        if ($idDiretor && in_array($idDiretor, $idsPalestrantes, true)) {
             $idDiretor = null;
         }
 

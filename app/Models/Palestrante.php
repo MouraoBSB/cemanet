@@ -5,6 +5,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -37,5 +38,12 @@ class Palestrante extends Model
         return $this->belongsToMany(Palestra::class, 'palestra_pessoa', 'pessoa_id', 'palestra_id')
             ->withPivot('papel')
             ->withTimestamps();
+    }
+
+    protected function bio(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $value) => $value !== null ? clean($value, 'conteudo') : null,
+        );
     }
 }

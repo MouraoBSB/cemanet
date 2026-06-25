@@ -121,7 +121,10 @@ class ImportadorPalestras
                     ]
                 );
 
-                // monta pivô palestra_pessoa (sync substitui sem duplicar)
+                // monta pivô palestra_pessoa (sync substitui sem duplicar).
+                // Assunção (válida nos dados do legado): uma pessoa não é, ao mesmo tempo,
+                // palestrante E diretor da MESMA palestra. Como o mapa é indexado por pessoa_id,
+                // esse caso (inexistente hoje) sobrescreveria um papel pelo outro.
                 $sync = [];
                 foreach ($d['palestrantes_slugs'] as $slug) {
                     $pid = Palestrante::where('slug', $slug)->value('id');

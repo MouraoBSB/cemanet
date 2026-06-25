@@ -82,13 +82,13 @@ class PalestraResource extends Resource
                         ->options(fn () => Palestrante::ativo()->orderBy('nome')->pluck('nome', 'id'))
                         ->multiple()
                         ->searchable()
-                        ->maxItems(2)
-                        ->dehydrated(false),
+                        ->required()
+                        ->minItems(1)
+                        ->maxItems(2),
                     Select::make('id_diretor')
                         ->label('Diretor (opcional)')
                         ->options(fn () => Palestrante::ativo()->orderBy('nome')->pluck('nome', 'id'))
-                        ->searchable()
-                        ->dehydrated(false),
+                        ->searchable(),
                 ]),
                 Tabs\Tab::make('Dados')->schema([
                     Grid::make(2)->schema([

@@ -50,11 +50,48 @@
         </div>
     </section>
 
-    {{-- S2: Barra de ações (markup; comportamento JS na Task 6) --}}
+    {{-- S2: Barra de ações --}}
     <section class="border-b border-border-muted bg-white" data-acoes-palestra>
         <div class="mx-auto flex max-w-[1100px] flex-wrap items-center gap-2.5 px-6 py-4">
             <span class="text-sm text-text-muted">Compartilhar:</span>
-            {{-- preenchido na Task 6 --}}
+            @php($urlAtual = route('palestras.show', $palestra->slug))
+            <div class="flex flex-wrap items-center gap-2.5"
+                 x-data="{
+                     url: @js($urlAtual),
+                     titulo: @js($palestra->titulo),
+                     copiado: false,
+                     curtido: $persist(false).as('curtida_palestra_{{ $palestra->id }}'),
+                     copiar() {
+                         navigator.clipboard.writeText(this.url).then(() => {
+                             this.copiado = true;
+                             setTimeout(() => this.copiado = false, 2000);
+                         });
+                     },
+                     async compartilhar() {
+                         if (navigator.share) { try { await navigator.share({ title: this.titulo, url: this.url }); } catch (e) {} }
+                     }
+                 }">
+                <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($urlAtual) }}" target="_blank" rel="noopener noreferrer"
+                   class="flex items-center gap-2 rounded-pill border border-border bg-white px-4 py-2 text-[13px] font-semibold text-primary hover:bg-surface">
+                    <span class="flex size-5 items-center justify-center rounded-full bg-[#3b5998] text-[12px] font-bold text-white">f</span> Facebook
+                </a>
+                <a href="https://wa.me/?text={{ urlencode($palestra->titulo.' — '.$urlAtual) }}" target="_blank" rel="noopener noreferrer"
+                   class="flex items-center gap-2 rounded-pill border border-border bg-white px-4 py-2 text-[13px] font-semibold text-primary hover:bg-surface">
+                    <span class="flex size-5 items-center justify-center rounded-full bg-[#25d366] text-[11px] font-bold text-white">W</span> WhatsApp
+                </a>
+                <button type="button" @click="compartilhar()" x-show="navigator.share" x-cloak
+                        class="rounded-pill border border-border bg-white px-4 py-2 text-[13px] font-semibold text-primary hover:bg-surface">Compartilhar…</button>
+                <button type="button" @click="copiar()"
+                        class="rounded-pill border border-border bg-white px-4 py-2 text-[13px] font-semibold text-primary hover:bg-surface">
+                    <span x-text="copiado ? 'Link copiado!' : 'Copiar link'">Copiar link</span>
+                </button>
+                <button type="button" @click="curtido = !curtido" :aria-pressed="curtido"
+                        class="ml-auto flex items-center gap-2 rounded-pill border border-border bg-white px-4 py-2 text-[13px] font-semibold transition"
+                        :class="curtido ? 'text-danger border-danger' : 'text-primary'">
+                    <span x-text="curtido ? '♥' : '♡'" aria-hidden="true"></span>
+                    <span x-text="curtido ? 'Curtido' : 'Curtir'">Curtir</span>
+                </button>
+            </div>
         </div>
     </section>
 

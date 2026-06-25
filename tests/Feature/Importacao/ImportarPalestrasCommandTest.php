@@ -19,11 +19,20 @@ class ImportarPalestrasCommandTest extends TestCase
         // injeta um leitor fake no container (evita depender do legado)
         $this->app->bind(LeitorLegado::class, fn () => new class implements LeitorLegado
         {
-            public function assuntos(): array { return [['nome' => 'Fé', 'slug' => 'fe', 'parent_slug' => null]]; }
+            public function assuntos(): array
+            {
+                return [['nome' => 'Fé', 'slug' => 'fe', 'parent_slug' => null]];
+            }
 
-            public function palestrantes(): array { return [['nome' => 'Ana', 'slug' => 'ana', 'bio' => null, 'email' => null, 'telefone' => null, 'mostrar_email' => false, 'mostrar_telefone' => false, 'ativo' => true, 'foto_url' => null]]; }
+            public function palestrantes(): array
+            {
+                return [['nome' => 'Ana', 'slug' => 'ana', 'bio' => null, 'email' => null, 'telefone' => null, 'mostrar_email' => false, 'mostrar_telefone' => false, 'ativo' => true, 'foto_url' => null]];
+            }
 
-            public function palestras(): array { return [['titulo' => 'T', 'slug' => 't', 'subtitulo' => null, 'resumo' => null, 'descricao' => null, 'data_da_palestra' => Carbon::parse('2026-06-28 16:00:00'), 'online' => false, 'link_youtube' => null, 'cor_fundo' => null, 'publico_online' => null, 'publico_presencial' => null, 'publico_total' => null, 'status' => 'publicado', 'palestrantes_slugs' => ['ana'], 'diretor_slug' => null, 'assuntos_slugs' => ['fe'], 'destaques' => []]]; }
+            public function palestras(): array
+            {
+                return [['titulo' => 'T', 'slug' => 't', 'subtitulo' => null, 'resumo' => null, 'descricao' => null, 'data_da_palestra' => Carbon::parse('2026-06-28 16:00:00'), 'online' => false, 'link_youtube' => null, 'cor_fundo' => null, 'publico_online' => null, 'publico_presencial' => null, 'publico_total' => null, 'status' => 'publicado', 'palestrantes_slugs' => ['ana'], 'diretor_slug' => null, 'assuntos_slugs' => ['fe'], 'destaques' => []]];
+            }
         });
 
         $this->artisan('cema:importar-palestras')

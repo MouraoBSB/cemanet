@@ -1,4 +1,5 @@
 <?php
+
 // Thiago Mourão — https://github.com/MouraoBSB — 2026-06-24
 
 namespace App\Importacao;
@@ -33,10 +34,10 @@ class ImportadorPalestras
         $nPalestras = $this->importarPalestras();
 
         return [
-            'assuntos'     => $nAssuntos,
+            'assuntos' => $nAssuntos,
             'palestrantes' => $nPalestrantes,
-            'palestras'    => $nPalestras,
-            'avisos'       => $this->avisos,
+            'palestras' => $nPalestras,
+            'avisos' => $this->avisos,
         ];
     }
 
@@ -76,13 +77,13 @@ class ImportadorPalestras
 
             // campos sem foto para o updateOrCreate
             $campos = [
-                'nome'             => $p['nome'],
-                'bio'              => $p['bio'] ?? null,
-                'email'            => $p['email'] ?? null,
-                'telefone'         => $p['telefone'] ?? null,
-                'mostrar_email'    => $p['mostrar_email'] ?? false,
+                'nome' => $p['nome'],
+                'bio' => $p['bio'] ?? null,
+                'email' => $p['email'] ?? null,
+                'telefone' => $p['telefone'] ?? null,
+                'mostrar_email' => $p['mostrar_email'] ?? false,
                 'mostrar_telefone' => $p['mostrar_telefone'] ?? false,
-                'ativo'            => $p['ativo'] ?? true,
+                'ativo' => $p['ativo'] ?? true,
             ];
 
             // preserva foto existente se o download não retornou nada
@@ -105,18 +106,18 @@ class ImportadorPalestras
                 $palestra = Palestra::updateOrCreate(
                     ['slug' => $d['slug']],
                     [
-                        'titulo'             => $d['titulo'],
-                        'subtitulo'          => $d['subtitulo'] ?? null,
-                        'resumo'             => $d['resumo'] ?? null,
-                        'descricao'          => $d['descricao'] ?? null,
-                        'data_da_palestra'   => $d['data_da_palestra'],
-                        'online'             => $d['online'] ?? false,
-                        'link_youtube'       => $d['link_youtube'] ?? null,
-                        'cor_fundo'          => $d['cor_fundo'] ?? null,
-                        'publico_online'     => $d['publico_online'] ?? null,
+                        'titulo' => $d['titulo'],
+                        'subtitulo' => $d['subtitulo'] ?? null,
+                        'resumo' => $d['resumo'] ?? null,
+                        'descricao' => $d['descricao'] ?? null,
+                        'data_da_palestra' => $d['data_da_palestra'],
+                        'online' => $d['online'] ?? false,
+                        'link_youtube' => $d['link_youtube'] ?? null,
+                        'cor_fundo' => $d['cor_fundo'] ?? null,
+                        'publico_online' => $d['publico_online'] ?? null,
                         'publico_presencial' => $d['publico_presencial'] ?? null,
-                        'publico_total'      => $d['publico_total'] ?? null,
-                        'status'             => $d['status'] ?? 'publicado',
+                        'publico_total' => $d['publico_total'] ?? null,
+                        'status' => $d['status'] ?? 'publicado',
                     ]
                 );
 

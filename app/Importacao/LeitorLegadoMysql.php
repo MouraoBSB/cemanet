@@ -1,13 +1,15 @@
 <?php
+
 // Thiago Mourão — https://github.com/MouraoBSB — 2026-06-24
 
 namespace App\Importacao;
 
+use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\Facades\DB;
 
 class LeitorLegadoMysql implements LeitorLegado
 {
-    private \Illuminate\Database\ConnectionInterface $db;
+    private ConnectionInterface $db;
 
     public function __construct()
     {
@@ -23,7 +25,9 @@ class LeitorLegadoMysql implements LeitorLegado
         );
         // mapa term_id -> slug para resolver o parent
         $slugPorId = [];
-        foreach ($rows as $r) { $slugPorId[(int) $r->term_id] = $r->slug; }
+        foreach ($rows as $r) {
+            $slugPorId[(int) $r->term_id] = $r->slug;
+        }
 
         return array_map(fn ($r) => [
             'nome' => $r->name,
@@ -96,7 +100,11 @@ class LeitorLegadoMysql implements LeitorLegado
     {
         $rows = $this->db->select('SELECT meta_key, meta_value FROM wp_postmeta WHERE post_id = ?', [$postId]);
         $m = [];
-        foreach ($rows as $r) { if (! array_key_exists($r->meta_key, $m)) { $m[$r->meta_key] = $r->meta_value; } }
+        foreach ($rows as $r) {
+            if (! array_key_exists($r->meta_key, $m)) {
+                $m[$r->meta_key] = $r->meta_value;
+            }
+        }
 
         return $m;
     }

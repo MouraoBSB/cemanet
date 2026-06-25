@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Importacao\LeitorLegado;
+use App\Importacao\LeitorLegadoMysql;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -11,7 +13,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        $this->app->bind(\App\Importacao\LeitorLegado::class, \App\Importacao\LeitorLegadoMysql::class);
+        $this->app->bind(LeitorLegado::class, LeitorLegadoMysql::class);
     }
 
     /**

@@ -35,9 +35,18 @@ Objetivo: o módulo Palestras completo, do banco ao público, com dados migrados
       *(Plano 2 — 123 palestras, 57 palestrantes, 141 assuntos importados; idempotente)*
 - [ ] Filament Resources: Palestra e Palestrante (CRUD), com validação das
       cardinalidades e upload de mídia.
-- [ ] Front público: listagem de palestras + página individual, responsiva e
-      fiel ao `design-system/` (ver `paginas.md` → template "Single Palestra").
-- [ ] Testes (unit + feature) e verificação manual no localhost.
+      **Pré-requisitos de segurança (revisão do Plano 4):** sanitizar `descricao`
+      (HTML do legado/editável) com allow-list na escrita (ex.: HTMLPurifier) e
+      validar `cor_fundo` (formato hex/rgb) — hoje a single renderiza `descricao`
+      com `{!! !!}` confiando em conteúdo de staff; ao abrir edição no admin, isso
+      vira superfície de XSS armazenado.
+- [x] Front público: listagem `/palestras` (busca/filtro/paginação reativa via
+      Livewire 4) + página individual `/palestras/{slug}` (T06, SSR + JSON-LD),
+      layout base responsivo (header mega-menu/off-canvas + footer), i18n pt-BR,
+      interações Alpine (compartilhar/copiar/curtir). *(Plano 4 — 38 testes verdes;
+      rotas 200 e leves: home 21 KB, listagem 54 KB, single 29 KB)*
+- [ ] Testes (unit + feature) e verificação manual no localhost. *(front coberto
+      no Plano 4; admin pendente)*
 
 Pronto quando: as 123 palestras aparecem corretas no público e no admin, com
 testes verdes e página leve.

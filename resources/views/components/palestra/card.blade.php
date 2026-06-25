@@ -8,7 +8,7 @@
     <a href="{{ route('palestras.show', $palestra->slug) }}" class="flex h-full flex-col">
         <div class="relative aspect-video overflow-hidden bg-cream" @if($palestra->cor_fundo && ! $thumb) style="background:{{ $palestra->cor_fundo }}" @endif>
             @if ($thumb)
-                <img src="{{ $thumb }}" alt="Capa: {{ $palestra->titulo }}" loading="lazy" width="320" height="180"
+                <img src="{{ $thumb }}" alt="" loading="lazy" width="320" height="180"
                      class="size-full object-cover transition duration-300 group-hover:scale-[1.03]">
             @else
                 <div aria-hidden="true" class="flex size-full items-center justify-center @unless($palestra->cor_fundo) bg-gradient-to-br from-primary to-footer-bg @endunless">

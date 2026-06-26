@@ -46,4 +46,17 @@ class BlogSingleTest extends TestCase
 
         $this->assertSame(1, $post->fresh()->visualizacoes);
     }
+
+    public function test_hero_renderiza_imagem_destacada(): void
+    {
+        Post::factory()->create([
+            'slug' => 'com-capa',
+            'status' => 'publicado',
+            'imagem_destacada' => 'blog/destacada/com-capa.jpg',
+        ]);
+
+        $this->get('/sementeira/com-capa')
+            ->assertOk()
+            ->assertSee('storage/blog/destacada/com-capa.jpg', false);
+    }
 }

@@ -102,6 +102,14 @@
 
     {{-- S1: Herói escuro --}}
     <section class="relative overflow-hidden bg-gradient-to-br from-primary to-footer-bg text-white">
+        {{-- Foto de abertura ao fundo + overlay roxo (variante B) --}}
+        @if ($post->imagem_destacada)
+            <img src="{{ asset('storage/'.$post->imagem_destacada) }}" alt="" aria-hidden="true"
+                 class="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-45">
+            <div aria-hidden="true" class="pointer-events-none absolute inset-0"
+                 style="background:linear-gradient(135deg,rgba(78,68,131,0.82) 0%,rgba(47,41,82,0.92) 100%);"></div>
+        @endif
+
         {{-- Decoração visual: raios dourados e sementes flutuantes (igual ao hero de listagem) --}}
         <div aria-hidden="true" class="pointer-events-none absolute inset-0">
             <div class="sl-hero-raios"></div>

@@ -1,0 +1,130 @@
+<?php
+
+// Thiago Mourão — https://github.com/MouraoBSB — 2026-06-26
+
+namespace Tests\Feature\Filament;
+
+use App\Filament\Pages\ConfiguracoesBlog;
+use App\Filament\Resources\Posts\Pages\CreatePost;
+use App\Filament\Resources\Posts\Pages\ListPosts;
+use App\Models\Categoria;
+use App\Models\Configuracao;
+use App\Models\Post;
+use App\Models\Tag;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Tests\TestCase;
+
+class PostResourceTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->actingAs(User::factory()->create());
+    }
+
+    public function test_lista_renderiza(): void
+    {
+        Post::factory()->count(3)->create();
+
+        $this->get('/admin/posts')->assertOk();
+    }
+
+    public function test_listposts_component_renderiza(): void
+    {
+        Livewire::test(ListPosts::class)->assertOk();
+    }
+
+    public function test_cria_post_simples(): void
+    {
+        Livewire::test(CreatePost::class)
+            ->fillForm([
+                'titulo'          => 'Sementeira de Luz',
+                'slug'            => 'sementeira-de-luz',
+                'status'          => Post::STATUS_PUBLICADO,
+                'data_publicacao' => now()->format('Y-m-d H:i'),
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('posts', ['slug' => 'sementeira-de-luz']);
+    }
+
+    public function test_cria_post_com_categorias_e_faqs(): void
+    {
+        $categoria = Categoria::factory()->create();
+
+        Livewire::test(CreatePost::class)
+            ->fillForm([
+                'titulo'               => 'Post com Categorias',
+                'slug'                 => 'post-com-categorias',
+                'status'               => Post::STATUS_PUBLICADO,
+                'data_publicacao'      => now()->format('Y-m-d H:i'),
+                'categorias'           => [$categoria->id],
+                'categoria_principal_id' => $categoria->id,
+                'faqs'                 => [
+                    ['pergunta' => 'O que é a Sementeira?', 'resposta' => 'É um blog espírita.'],
+                ],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $post = Post::where('slug', 'post-com-categorias')->first();
+        $this->assertNotNull($post);
+        $this->assertTrue($post->categorias->contains($categoria));
+        $this->assertCount(1, $post->faqs);
+        $this->assertSame('O que é a Sementeira?', $post->faqs->first()->pergunta);
+    }
+
+    public function test_cria_post_com_tags(): void
+    {
+        $tag = Tag::factory()->create();
+
+        Livewire::test(CreatePost::class)
+            ->fillForm([
+                'titulo'         => 'Post com Tags',
+                'slug'           => 'post-com-tags',
+                'status'         => Post::STATUS_RASCUNHO,
+                'data_publicacao' => now()->format('Y-m-d H:i'),
+                'tags'           => [$tag->id],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $post = Post::where('slug', 'post-com-tags')->first();
+        $this->assertNotNull($post);
+        $this->assertTrue($post->tags->contains($tag));
+    }
+
+    public function test_slug_e_obrigatorio(): void
+    {
+        Livewire::test(CreatePost::class)
+            ->fillForm([
+                'titulo' => 'Sem Slug',
+                'slug'   => '',
+                'status' => Post::STATUS_RASCUNHO,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['slug']);
+
+        $this->assertDatabaseMissing('posts', ['titulo' => 'Sem Slug']);
+    }
+
+    public function test_configuracoes_blog_grava_reflexao(): void
+    {
+        Livewire::test(ConfiguracoesBlog::class)
+            ->fillForm(['reflexao_do_dia' => 'O amor é a lei maior.'])
+            ->call('salvar')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('O amor é a lei maior.', Configuracao::valor('blog.reflexao_do_dia'));
+    }
+
+    public function test_configuracoes_blog_renderiza(): void
+    {
+        $this->get('/admin/configuracoes-blog')->assertOk();
+    }
+}

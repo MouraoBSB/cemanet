@@ -1,5 +1,82 @@
 {{-- Thiago Mourão — https://github.com/MouraoBSB — 2026-06-26 --}}
-<x-layout.app :title="$post->titulo" :description="$post->resumo">
+@php
+    $org = ['@type' => 'Organization', 'name' => 'Centro Espírita Maria Madalena'];
+    $urlArtigo = $post->canonical ?? route('blog.show', $post->slug);
+
+    $graph = [
+        [
+            '@type'            => 'Article',
+            'headline'         => $post->titulo,
+            'datePublished'    => $post->data_publicacao?->toIso8601String(),
+            'dateModified'     => $post->updated_at?->toIso8601String(),
+            'image'            => $post->imagem_destacada
+                                    ? asset('storage/'.$post->imagem_destacada)
+                                    : null,
+            'author'           => $org,
+            'publisher'        => $org,
+            'mainEntityOfPage' => $urlArtigo,
+            'description'      => $post->seo_descricao ?? $post->resumo,
+        ],
+        [
+            '@type'       => 'BreadcrumbList',
+            'itemListElement' => [
+                ['@type' => 'ListItem', 'position' => 1, 'name' => 'Início', 'item' => route('home')],
+                ['@type' => 'ListItem', 'position' => 2, 'name' => 'Sementeira de Luz', 'item' => route('blog.index')],
+                ['@type' => 'ListItem', 'position' => 3, 'name' => $post->titulo, 'item' => $urlArtigo],
+            ],
+        ],
+    ];
+
+    if ($post->faqs->isNotEmpty()) {
+        $graph[] = [
+            '@type'      => 'FAQPage',
+            'mainEntity' => $post->faqs->map(fn ($f) => [
+                '@type'          => 'Question',
+                'name'           => $f->pergunta,
+                'acceptedAnswer' => ['@type' => 'Answer', 'text' => $f->resposta],
+            ])->all(),
+        ];
+    }
+
+    $jsonLd = json_encode(
+        ['@context' => 'https://schema.org', '@graph' => $graph],
+        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG
+    );
+
+    $ogImagem = $post->og_imagem ?? $post->imagem_destacada;
+@endphp
+
+<x-layout.app
+    :title="$post->seo_titulo ?? ($post->titulo.' — Sementeira de Luz')"
+    :description="$post->seo_descricao ?? $post->resumo">
+
+    <x-slot:head>
+        {{-- Canonical --}}
+        <link rel="canonical" href="{{ $urlArtigo }}">
+
+        {{-- Noindex condicional --}}
+        @if ($post->robots_noindex)
+            <meta name="robots" content="noindex">
+        @endif
+
+        {{-- OpenGraph específico do artigo --}}
+        <meta property="og:type" content="article">
+        <meta property="og:url" content="{{ $urlArtigo }}">
+        @if ($ogImagem)
+            <meta property="og:image" content="{{ asset('storage/'.$ogImagem) }}">
+        @endif
+
+        {{-- Twitter Card --}}
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ $post->seo_titulo ?? $post->titulo }}">
+        <meta name="twitter:description" content="{{ $post->seo_descricao ?? $post->resumo }}">
+        @if ($ogImagem)
+            <meta name="twitter:image" content="{{ asset('storage/'.$ogImagem) }}">
+        @endif
+
+        {{-- JSON-LD --}}
+        <script type="application/ld+json">{!! $jsonLd !!}</script>
+    </x-slot:head>
 
     {{-- Barra de progresso de leitura (fixed, topo) --}}
     <div

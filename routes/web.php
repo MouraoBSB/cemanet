@@ -3,6 +3,7 @@
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\PalestraController;
 use App\Http\Controllers\PalestranteController;
+use App\Http\Controllers\SitemapController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => view('pages.inicio'))->name('home');
@@ -20,6 +21,9 @@ Route::get('/palestrantes/{slug}', [PalestranteController::class, 'show'])->name
 // Blog "Sementeira de Luz"
 Route::get('/sementeira', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/sementeira/{slug}', [BlogController::class, 'show'])->name('blog.show');
+
+// Sitemap (antes do catch-all)
+Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
 
 // Compat: URL antiga de categoria → listagem filtrada (301).
 Route::get('/categoria/{slug}', fn (string $slug) => redirect()->to('/sementeira?categoria='.$slug, 301));

@@ -4,6 +4,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Categoria;
 use Illuminate\Database\Seeder;
 
 class CategoriaSeeder extends Seeder
@@ -20,7 +21,7 @@ class CategoriaSeeder extends Seeder
         ];
 
         foreach ($cats as $c) {
-            \App\Models\Categoria::updateOrCreate(['slug' => $c['slug']], $c);
+            Categoria::updateOrCreate(['slug' => $c['slug']], $c);
         }
     }
 }

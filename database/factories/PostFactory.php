@@ -17,11 +17,11 @@ class PostFactory extends Factory
         $titulo = fake()->unique()->sentence(4);
 
         return [
-            'titulo'           => $titulo,
-            'slug'             => Str::slug($titulo).'-'.fake()->unique()->numberBetween(1, 99999),
-            'conteudo'         => '<p>'.fake()->paragraph().'</p>',
-            'data_publicacao'  => now(),
-            'status'           => 'publicado',
+            'titulo' => $titulo,
+            'slug' => Str::slug($titulo).'-'.fake()->unique()->numberBetween(1, 99999),
+            'conteudo' => '<p>'.fake()->paragraph().'</p>',
+            'data_publicacao' => now(),
+            'status' => 'publicado',
             'tempo_leitura_min' => 1,
         ];
     }
@@ -36,8 +36,8 @@ class PostFactory extends Factory
     public function agendado(): static
     {
         return $this->state([
-            'status'          => 'publicado',
-            'data_publicacao' => now()->addDays(fake()->numberBetween(1, 30)),
+            'status' => 'publicado',
+            'data_publicacao' => now()->addDays(7),
         ]);
     }
 }

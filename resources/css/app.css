@@ -103,4 +103,56 @@
     @media (prefers-reduced-motion: reduce) {
         .cema-hero-deco span { animation: none; opacity: 0.3; }
     }
+
+    /* ===== Hero do blog Sementeira de Luz (variante B) ===== */
+    .sl-hero-raios {
+        position: absolute;
+        top: -80px;
+        right: 8%;
+        width: 520px;
+        height: 560px;
+        background: conic-gradient(
+            from 200deg at 50% 30%,
+            rgba(242,168,30,0) 0deg, rgba(242,168,30,0.18) 24deg, rgba(242,168,30,0) 48deg,
+            rgba(242,168,30,0.14) 78deg, rgba(242,168,30,0) 110deg,
+            rgba(110,159,203,0.12) 150deg, rgba(242,168,30,0) 200deg
+        );
+        pointer-events: none;
+        animation: sl-rays 8s ease-in-out infinite;
+    }
+    .sl-hero-halo {
+        position: absolute;
+        top: 30px;
+        right: 16%;
+        width: 360px;
+        height: 360px;
+        border-radius: 9999px;
+        background: radial-gradient(circle, rgba(242,168,30,0.40) 0%, rgba(242,168,30,0.10) 45%, rgba(242,168,30,0) 70%);
+        pointer-events: none;
+        animation: sl-glow 6s ease-in-out infinite;
+    }
+    .sl-hero-semente {
+        position: absolute;
+        border-radius: 9999px;
+        pointer-events: none;
+        animation: sl-rise 7s linear infinite;
+    }
+    @keyframes sl-glow {
+        0%, 100% { opacity: .45; transform: scale(1); }
+        50%       { opacity: .85; transform: scale(1.06); }
+    }
+    @keyframes sl-rays {
+        0%, 100% { opacity: .25; }
+        50%       { opacity: .6; }
+    }
+    @keyframes sl-rise {
+        0%   { transform: translateY(0);      opacity: 0; }
+        16%  {                                 opacity: .85; }
+        100% { transform: translateY(-180px); opacity: 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .sl-hero-raios,
+        .sl-hero-halo { animation: none; opacity: 0.4; }
+        .sl-hero-semente { animation: none; opacity: 0.3; }
+    }
 }

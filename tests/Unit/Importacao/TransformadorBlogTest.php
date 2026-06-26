@@ -36,6 +36,19 @@ class TransformadorBlogTest extends TestCase
         $this->assertSame(2, TransformadorBlog::tempoLeitura('<p>'.str_repeat('palavra ', 300).'</p>'));
     }
 
+    public function test_tempo_leitura_conta_palavras_acentuadas_corretamente(): void
+    {
+        // 250 palavras acentuadas → ceil(250/200) = 2 minutos.
+        // Com str_word_count, "coração" poderia ser quebrado em múltiplos tokens
+        // inflando a contagem e produzindo resultado incorreto.
+        $html = '<p>' . str_repeat('coração ', 250) . '</p>';
+        $this->assertSame(2, TransformadorBlog::tempoLeitura($html));
+
+        // 4 palavras acentuadas → 1 minuto (ceil(4/200)=1).
+        $html4 = '<p>coração reflexão mediunidade espírito</p>';
+        $this->assertSame(1, TransformadorBlog::tempoLeitura($html4));
+    }
+
     public function test_status_post(): void
     {
         $this->assertSame('publicado', TransformadorBlog::statusPost('publish'));

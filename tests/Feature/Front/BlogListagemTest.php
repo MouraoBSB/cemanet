@@ -2,10 +2,12 @@
 
 namespace Tests\Feature\Front;
 
+use App\Livewire\Blog\Lista;
 use App\Models\Categoria;
 use App\Models\Configuracao;
 use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class BlogListagemTest extends TestCase
@@ -99,5 +101,36 @@ class BlogListagemTest extends TestCase
 
         $resp->assertOk();
         $resp->assertSee('Semeia o bem sem esperar a colheita.');
+    }
+
+    public function test_destaque_fallback_nao_aparece_no_grid_de_posts(): void
+    {
+        // Sem nenhum post com destaque=true, o mais recente vira herói via fallback.
+        // O $posts do grid NÃO deve conter o id do $destaque.
+        $maisRecente = Post::factory()->create([
+            'titulo'          => 'Post Mais Recente',
+            'status'          => Post::STATUS_PUBLICADO,
+            'data_publicacao' => now()->subHour(),
+            'destaque'        => false,
+        ]);
+        Post::factory()->create([
+            'titulo'          => 'Post Mais Antigo',
+            'status'          => Post::STATUS_PUBLICADO,
+            'data_publicacao' => now()->subDays(2),
+            'destaque'        => false,
+        ]);
+
+        $component = Livewire::test(Lista::class);
+        $component->assertOk();
+
+        /** @var \Illuminate\Pagination\LengthAwarePaginator $posts */
+        $posts = $component->viewData('posts');
+        $ids = $posts->pluck('id')->all();
+
+        $this->assertNotContains(
+            $maisRecente->id,
+            $ids,
+            'O post mais recente (herói fallback) não deve aparecer no grid de $posts.'
+        );
     }
 }

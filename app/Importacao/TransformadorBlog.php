@@ -99,7 +99,8 @@ class TransformadorBlog
             return 1;
         }
 
-        $palavras = str_word_count(strip_tags($html));
+        $n = preg_match_all('/\pL+/u', strip_tags($html), $m);
+        $palavras = $n ?: 0;
 
         return max(1, (int) ceil($palavras / 200));
     }

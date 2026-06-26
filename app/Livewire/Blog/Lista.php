@@ -34,6 +34,12 @@ class Lista extends Component
 
     public function render()
     {
+        $destaque = Post::publicado()
+            ->where('destaque', true)
+            ->latest('data_publicacao')
+            ->first()
+            ?? Post::publicado()->latest('data_publicacao')->first();
+
         $posts = Post::publicado()
             ->with('categoriaPrincipal')
             ->when(
@@ -51,6 +57,7 @@ class Lista extends Component
                         ->orWhere('resumo', 'like', "%{$this->q}%")
                 )
             )
+            ->when($destaque, fn (Builder $q) => $q->where('id', '!=', $destaque->id))
             ->orderBy('data_publicacao', $this->ordenar === 'antiga' ? 'asc' : 'desc')
             ->paginate(9);
 
@@ -62,12 +69,6 @@ class Lista extends Component
             ->get();
 
         $maisLidas = Post::maisLidas()->take(5)->get();
-
-        $destaque = Post::publicado()
-            ->where('destaque', true)
-            ->latest('data_publicacao')
-            ->first()
-            ?? Post::publicado()->latest('data_publicacao')->first();
 
         $reflexao = app(FonteReflexao::class)->doDia();
 

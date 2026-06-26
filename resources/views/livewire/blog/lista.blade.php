@@ -62,6 +62,7 @@
 
             <button type="button"
                     wire:click="$set('categoria', '')"
+                    aria-pressed="{{ $categoria === '' ? 'true' : 'false' }}"
                     class="{{ $categoria === '' ? 'bg-primary text-white' : 'border border-border bg-white text-primary hover:border-primary' }} rounded-pill px-4 py-2 font-sans text-[13px] transition">
                 Todas
             </button>
@@ -69,6 +70,7 @@
             @foreach ($categorias as $cat)
                 <button type="button"
                         wire:click="$set('categoria', '{{ $cat->slug }}')"
+                        aria-pressed="{{ $categoria === $cat->slug ? 'true' : 'false' }}"
                         class="{{ $categoria === $cat->slug ? 'bg-primary text-white' : 'border border-border bg-white hover:border-primary' }} rounded-pill px-4 py-2 font-sans text-[13px] transition"
                         style="{{ $categoria === $cat->slug ? '' : 'color:'.($cat->cor ?? '#4E4483') }}">
                     {{ $cat->nome }}
@@ -83,9 +85,17 @@
 
             {{-- Coluna principal --}}
             <div>
-                <div class="mb-6 flex items-baseline justify-between">
+                <div class="mb-6 flex flex-wrap items-baseline justify-between gap-3">
                     <h2 class="font-display text-[22px] font-semibold text-primary">Últimas publicações</h2>
-                    <span class="font-mono text-[11px] text-text-muted">{{ $posts->total() }} publicações</span>
+                    <div class="flex items-center gap-3">
+                        <span class="font-mono text-[11px] text-text-muted">{{ $posts->total() }} publicações</span>
+                        <label for="blog-ordenar" class="sr-only">Ordenar publicações</label>
+                        <select id="blog-ordenar" wire:model.live="ordenar"
+                                class="rounded-md border border-border bg-white px-2 py-1 font-mono text-[11px] text-text-secondary">
+                            <option value="recente">Mais recentes</option>
+                            <option value="antiga">Mais antigas</option>
+                        </select>
+                    </div>
                 </div>
 
                 @if ($posts->isEmpty())

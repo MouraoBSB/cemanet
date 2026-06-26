@@ -51,7 +51,7 @@ class Lista extends Component
                         ->orWhere('resumo', 'like', "%{$this->q}%")
                 )
             )
-            ->orderByDesc('data_publicacao')
+            ->orderBy('data_publicacao', $this->ordenar === 'antiga' ? 'asc' : 'desc')
             ->paginate(9);
 
         $categorias = Categoria::query()

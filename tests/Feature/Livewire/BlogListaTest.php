@@ -114,4 +114,38 @@ class BlogListaTest extends TestCase
             ->assertSee('Fe Raciocinada XZ Unico')
             ->assertDontSee('Mediunidade Servico XZ Unico');
     }
+
+    public function test_ordenar_antiga_inverte_a_ordem_do_grid(): void
+    {
+        // Post em destaque ocupa o herói (fora do grid), isolando a asserção ao grid.
+        Post::factory()->create([
+            'titulo'          => 'Post Destaque Heroi XZ',
+            'status'          => Post::STATUS_PUBLICADO,
+            'destaque'        => true,
+            'visualizacoes'   => 0,
+            'data_publicacao' => now(),
+        ]);
+
+        Post::factory()->create([
+            'titulo'          => 'Post Antigo XZ',
+            'status'          => Post::STATUS_PUBLICADO,
+            'destaque'        => false,
+            'visualizacoes'   => 0,
+            'data_publicacao' => now()->subDays(10),
+        ]);
+        Post::factory()->create([
+            'titulo'          => 'Post Recente XZ',
+            'status'          => Post::STATUS_PUBLICADO,
+            'destaque'        => false,
+            'visualizacoes'   => 0,
+            'data_publicacao' => now()->subDays(1),
+        ]);
+
+        // Default (recente): mais novo antes do mais antigo no grid.
+        Livewire::test(Lista::class)
+            ->assertSeeInOrder(['Post Recente XZ', 'Post Antigo XZ'])
+            // ordenar=antiga: inverte a ordem.
+            ->set('ordenar', 'antiga')
+            ->assertSeeInOrder(['Post Antigo XZ', 'Post Recente XZ']);
+    }
 }

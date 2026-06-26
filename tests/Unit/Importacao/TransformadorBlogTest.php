@@ -15,6 +15,10 @@ class TransformadorBlogTest extends TestCase
         $this->assertSame(['pergunta' => 'P1', 'resposta' => 'R1', 'ordem' => 0], $f[0]);
         $this->assertSame([], TransformadorBlog::faqsDoRepeater(null));
         $this->assertSame([], TransformadorBlog::faqsDoRepeater('lixo'));
+
+        // item parcial (sem '_resposta_faq') é ignorado
+        $parcial = serialize([['_pergunta_faq' => 'P']]);
+        $this->assertSame([], TransformadorBlog::faqsDoRepeater($parcial));
     }
 
     public function test_galeria_do_repeater(): void
@@ -22,6 +26,8 @@ class TransformadorBlogTest extends TestCase
         $s = serialize([0 => ['id' => 10, 'url' => 'https://x/a.jpg'], 1 => ['id' => 11, 'url' => 'https://x/b.jpg']]);
         $g = TransformadorBlog::galeriaDoRepeater($s);
         $this->assertSame(['url' => 'https://x/a.jpg', 'wp_id' => 10, 'ordem' => 0], $g[0]);
+        $this->assertSame([], TransformadorBlog::galeriaDoRepeater(null));
+        $this->assertSame([], TransformadorBlog::galeriaDoRepeater('lixo'));
     }
 
     public function test_tempo_leitura(): void

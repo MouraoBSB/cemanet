@@ -20,7 +20,7 @@ class TransformadorBlog
 
         set_error_handler(static fn () => true);
         try {
-            $dados = unserialize($serial);
+            $dados = unserialize($serial, ['allowed_classes' => false]);
         } finally {
             restore_error_handler();
         }
@@ -41,7 +41,7 @@ class TransformadorBlog
             $faqs[] = [
                 'pergunta' => (string) $item['_pergunta_faq'],
                 'resposta' => (string) $item['_resposta_faq'],
-                'ordem'    => $ordem++,
+                'ordem' => $ordem++,
             ];
         }
 
@@ -62,7 +62,7 @@ class TransformadorBlog
 
         set_error_handler(static fn () => true);
         try {
-            $dados = unserialize($serial);
+            $dados = unserialize($serial, ['allowed_classes' => false]);
         } finally {
             restore_error_handler();
         }
@@ -81,7 +81,7 @@ class TransformadorBlog
                 continue;
             }
             $galeria[] = [
-                'url'   => (string) $item['url'],
+                'url' => (string) $item['url'],
                 'wp_id' => (int) $item['id'],
                 'ordem' => $ordem++,
             ];
@@ -111,8 +111,8 @@ class TransformadorBlog
     {
         return match ($wp) {
             'publish' => 'publicado',
-            'future'  => 'agendado',
-            default   => 'rascunho',
+            'future' => 'agendado',
+            default => 'rascunho',
         };
     }
 }

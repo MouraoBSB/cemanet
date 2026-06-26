@@ -66,9 +66,13 @@ class ImportadorBlogTest extends TestCase
 
         $importador = app(ImportadorBlog::class, ['leitor' => $this->leitorFake()]);
 
-        // roda 2x para garantir idempotência
-        $importador->importar();
-        $resumo = $importador->importar();
+        // roda 2x para garantir idempotência (captura as duas rodadas)
+        $r1 = $importador->importar();
+        $r2 = $importador->importar();
+
+        // contagem de posts processados em ambas as rodadas
+        $this->assertSame(1, $r1['posts']);
+        $this->assertSame(1, $r2['posts']);
 
         // não duplica
         $this->assertSame(1, Post::count());
@@ -93,7 +97,15 @@ class ImportadorBlogTest extends TestCase
         $this->assertSame(123, $post->wp_id);
         $this->assertNull($post->criado_por_id);
 
-        // aviso sobre categoria desconhecida
-        $this->assertNotEmpty($resumo['avisos']);
+        // aviso sobre categoria desconhecida: formato exato e não-acumulação
+        // (1 aviso por rodada — a 2ª NÃO acumula a 1ª, provando o reset de $avisos)
+        $this->assertSame(
+            ['[luz-e-amor] categoria desconhecida: categoria-inexistente'],
+            $r1['avisos'],
+        );
+        $this->assertSame(
+            ['[luz-e-amor] categoria desconhecida: categoria-inexistente'],
+            $r2['avisos'],
+        );
     }
 }

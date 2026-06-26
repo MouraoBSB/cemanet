@@ -11,12 +11,17 @@ class BaixadorImagem
 {
     public function baixar(?string $url, string $slug): ?string
     {
+        return $this->baixarPara($url, 'palestrantes', $slug);
+    }
+
+    public function baixarPara(?string $url, string $pasta, string $nome): ?string
+    {
         if (empty($url)) {
             return null;
         }
 
         $ext = strtolower(pathinfo(parse_url($url, PHP_URL_PATH) ?? '', PATHINFO_EXTENSION)) ?: 'jpg';
-        $caminho = "palestrantes/{$slug}.{$ext}";
+        $caminho = "{$pasta}/{$nome}.{$ext}";
         $disco = Storage::disk('public');
 
         if ($disco->exists($caminho)) {

@@ -114,6 +114,63 @@ diretamente a importação das palestras:
 - **Fonte da importação:** além da REST (GET), o **banco `legado` (read-only)** é fonte direta e
   mais completa — decidir na Fase 1 qual usar (as relações Jet, por exemplo, são triviais via banco).
 
+## Blog "Sementeira de Luz" (Fase 2 — Fatia 1)
+
+Posts editoriais. Editor **RichEditor (TipTap/HTML)** — `conteudo` guarda o HTML do Gutenberg
+preservado (limpo + sanitizado). Modelo **confirmado pela introspecção do legado (2026-06-26)**;
+design e decisões em `docs/superpowers/specs/2026-06-26-blog-sementeira-de-luz-design.md`.
+
+**Introspecção (resumo):** blog no site principal do multisite (`blog_id=1`, prefixo `wp_`).
+44 posts publish. Conteúdo Gutenberg em `post_content` (wrappers JetStyleManager `jet-sm-gb-*` a
+limpar; `_elementor_data` é resíduo). Imagem destacada 100% (`_thumbnail_id`). **FAQ** em meta
+`_faq` (repeater serializado `{_pergunta_faq, _resposta_faq}`, 28/44). **Galeria** em meta
+`_fotos_carrossel_` (serializado `{id, url}`, 14/44). Categorias: taxonomia `category` — 5 reais
++ "Sem categoria"; `post_tag` quase sem uso. SEO: Rank Math (`rank_math_description` 20,
+`rank_math_focus_keyword` 30, `rank_math_primary_category` 30, `rank_math_title` 1) com resíduo
+Yoast. **Sem `nivel-de-acesso`** nos posts → 100% público. **Sem autor público** (blog assinado
+pela instituição; autoria só administrativa). Vínculo **post↔palestra** = Jet `wp_jet_rel_default`
+rel_id=200 (12 vínculos) — deferido (guardar `wp_id`). Permalink atual `/%postname%/` (raiz) →
+nova URL `/sementeira/{slug}` + 301.
+
+### `posts`
+| Coluna | Tipo | Notas |
+|---|---|---|
+| id | bigint PK | |
+| titulo | string | `post_title` |
+| slug | string unique | `post_name` (idempotência) |
+| resumo | text null | dek ← `post_excerpt` |
+| conteudo | longtext | `post_content` (HTML limpo + sanitizado) |
+| imagem_destacada | string null | ← `_thumbnail_id` (re-hospedada no storage) |
+| imagem_destacada_alt | string null | ← `_wp_attachment_image_alt` |
+| criado_por_id | bigint null FK→users | autoria **administrativa** (não pública); null na importação |
+| categoria_principal_id | bigint null FK→categorias | ← `rank_math_primary_category` |
+| destaque | bool default false | herói da listagem (fallback: mais recente) |
+| tempo_leitura_min | smallint | calculado (~200 ppm) |
+| visualizacoes | unsigned int default 0 | "Mais lidas" |
+| data_publicacao | datetime | `post_date` |
+| status | enum(`publicado`,`rascunho`,`agendado`) | `post_status` |
+| wp_id | unsigned bigint unique null | id legado (idempotência + vínculo post↔palestra futuro) |
+| seo_titulo / seo_descricao / seo_keyword | string null | Rank Math → fallback Yoast |
+| og_imagem | string null | ← `rank_math_og_content_image` (fallback: imagem destacada) |
+| robots_noindex | bool default false | controle de indexação |
+| canonical | string null | URL canônica custom (raro) |
+| timestamps | | |
+
+### `categorias`
+`id` · `nome` · `slug` unique · `cor` (hex do design) · `descricao` null · `ordem` · `wp_term_id` null.
+5 reais: Reflexões e Espiritualidade (`#4E4483`), Estudando a Mediunidade (`#6E9FCB`), Prática do
+Amor ao Próximo (`#89AB98`), Datas Comemorativas (`#F2A81E`), CEMA em Ação (`#E79048`) + "Sem categoria".
+
+### `tags`
+`id` · `nome` · `slug` unique · `wp_term_id` null. (Pouco usada no legado — secundária.)
+
+### Pivôs e filhos
+- `categoria_post` (N:N): `post_id` FK · `categoria_id` FK.
+- `post_tag` (N:N): `post_id` FK · `tag_id` FK.
+- `post_faqs`: `id` · `post_id` FK · `pergunta` · `resposta` text · `ordem`. ← meta `_faq`.
+- `post_imagens` (galeria): `id` · `post_id` FK · `caminho` · `url_legado` · `alt` null · `ordem`.
+  ← meta `_fotos_carrossel_` (baixar/re-hospedar cada imagem).
+
 ## Comentários do blog (Fase 2)
 
 Comentar **não exige conta**: visitante informa nome + e-mail; quem está logado

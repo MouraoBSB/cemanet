@@ -5,6 +5,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PostFaq extends Model
 {
@@ -16,4 +17,16 @@ class PostFaq extends Model
         'resposta',
         'ordem',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'ordem' => 'integer',
+        ];
+    }
+
+    public function post(): BelongsTo
+    {
+        return $this->belongsTo(Post::class);
+    }
 }

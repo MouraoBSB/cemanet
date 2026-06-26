@@ -26,6 +26,6 @@ return [
         ['rotulo' => 'Vibração', 'ativo' => false, 'itens' => []],
         ['rotulo' => 'Agenda', 'ativo' => false, 'itens' => []],
         ['rotulo' => 'Evangelho', 'ativo' => false, 'itens' => []],
-        ['rotulo' => 'Sementeira', 'ativo' => false, 'itens' => []],
+        ['rotulo' => 'Sementeira', 'rota' => 'blog.index', 'ativo' => true, 'itens' => []],
     ],
 ];

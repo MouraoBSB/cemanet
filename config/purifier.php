@@ -109,6 +109,18 @@ return [
             'AutoFormat.RemoveEmpty' => true,
             'URI.AllowedSchemes' => ['http' => true, 'https' => true, 'mailto' => true],
         ],
+        // Perfil para conteúdo do blog (estende conteudo: títulos h5, tabelas e iframes seguros)
+        // Nota sobre atributos do iframe: 'frameborder' é nativo do schema HTML 4.01;
+        //       'allowfullscreen' é fornecido via custom_definition.attributes (registrado
+        //       globalmente acima); 'allow' é HTML5 e não é suportado pelo HTMLPurifier.
+        'conteudo_blog' => [
+            'HTML.Allowed' => 'p,br,b,strong,i,em,u,s,h2,h3,h4,h5,ul,ol,li,blockquote,a[href|title|target|rel],img[src|alt|width|height],figure,figcaption,table,thead,tbody,tr,th,td,iframe[src|width|height|frameborder|allowfullscreen]',
+            'HTML.SafeIframe' => true,
+            'URI.SafeIframeRegexp' => '%^(https?:)?//(www\.youtube\.com/embed/|player\.vimeo\.com/video/)%',
+            'HTML.TargetBlank' => true,
+            'AutoFormat.RemoveEmpty' => true,
+            'URI.AllowedSchemes' => ['http' => true, 'https' => true, 'mailto' => true],
+        ],
     ],
 
 ];

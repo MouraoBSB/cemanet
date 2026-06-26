@@ -59,4 +59,22 @@ class BlogSingleTest extends TestCase
             ->assertOk()
             ->assertSee('storage/blog/destacada/com-capa.jpg', false);
     }
+
+    public function test_capa_aparece_no_heroi_e_no_corpo(): void
+    {
+        Post::factory()->create([
+            'slug' => 'capa-dupla',
+            'status' => 'publicado',
+            'imagem_destacada' => 'blog/destacada/capa-dupla.jpg',
+        ]);
+
+        $html = $this->get('/sementeira/capa-dupla')->assertOk()->getContent();
+
+        // a capa entra no fundo do herói E como imagem de abertura no corpo
+        $this->assertGreaterThanOrEqual(
+            2,
+            substr_count($html, 'storage/blog/destacada/capa-dupla.jpg'),
+            'A imagem de capa deve aparecer no herói e no corpo da reportagem.'
+        );
+    }
 }

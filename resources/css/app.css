@@ -118,6 +118,9 @@
             rgba(110,159,203,0.12) 150deg, rgba(242,168,30,0) 200deg
         );
         pointer-events: none;
+        /* máscara radial: dissolve a borda reta do retângulo (sem "quadrado") */
+        -webkit-mask-image: radial-gradient(62% 58% at 50% 30%, #000 26%, transparent 74%);
+        mask-image: radial-gradient(62% 58% at 50% 30%, #000 26%, transparent 74%);
         animation: sl-rays 8s ease-in-out infinite;
     }
     .sl-hero-halo {
@@ -154,5 +157,16 @@
         .sl-hero-raios,
         .sl-hero-halo { animation: none; opacity: 0.4; }
         .sl-hero-semente { animation: none; opacity: 0.3; }
+    }
+
+    /* ===== Drop cap (capitular) no 1º parágrafo da reportagem ===== */
+    .prose-blog > p:first-of-type::first-letter {
+        float: left;
+        margin: 0.05em 0.12em 0 0;
+        font-family: var(--font-display, 'Work Sans', sans-serif);
+        font-size: 3.4em;
+        font-weight: 600;
+        line-height: 0.78;
+        color: var(--color-primary, #4E4483);
     }
 }

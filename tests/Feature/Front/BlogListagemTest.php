@@ -133,4 +133,19 @@ class BlogListagemTest extends TestCase
             'O post mais recente (herói fallback) não deve aparecer no grid de $posts.'
         );
     }
+
+    public function test_destaque_renderiza_imagem_destacada_no_heroi(): void
+    {
+        Post::factory()->create([
+            'titulo'           => 'Destaque Com Capa',
+            'status'           => Post::STATUS_PUBLICADO,
+            'destaque'         => true,
+            'imagem_destacada' => 'blog/destacada/destaque.jpg',
+        ]);
+
+        $resp = $this->get(route('blog.index'));
+
+        $resp->assertOk();
+        $resp->assertSee('storage/blog/destacada/destaque.jpg', false);
+    }
 }

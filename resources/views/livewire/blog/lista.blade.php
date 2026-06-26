@@ -4,6 +4,14 @@
              style="background:linear-gradient(165deg,#2f2952 0%,#3c3468 50%,#4E4483 100%);"
              aria-label="Destaque">
 
+        {{-- Foto de capa do destaque (fundo, lado direito) com véu roxo p/ legibilidade --}}
+        @if ($destaque && $destaque->imagem_destacada)
+            <img src="{{ asset('storage/'.$destaque->imagem_destacada) }}" alt="" aria-hidden="true"
+                 class="pointer-events-none absolute inset-y-0 right-0 h-full w-full object-cover object-center opacity-70 tablet:w-[58%]">
+            <div aria-hidden="true" class="pointer-events-none absolute inset-0"
+                 style="background:linear-gradient(95deg,#2f2952 0%,#2f2952 26%,rgba(47,41,82,0.82) 46%,rgba(60,52,104,0.45) 72%,rgba(78,68,131,0.18) 100%);"></div>
+        @endif
+
         {{-- Raios cônicos + halo dourado (CSS puro, reduced-motion seguro) --}}
         <div class="sl-hero-raios" aria-hidden="true"></div>
         <div class="sl-hero-halo" aria-hidden="true"></div>

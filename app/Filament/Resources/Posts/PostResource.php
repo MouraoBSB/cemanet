@@ -135,7 +135,9 @@ class PostResource extends Resource
                             TextInput::make('nome')
                                 ->label('Nome')
                                 ->required()
-                                ->maxLength(255),
+                                ->maxLength(255)
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(fn (?string $state, callable $set) => $set('slug', Str::slug($state ?? ''))),
                             TextInput::make('slug')
                                 ->label('Slug')
                                 ->required()
@@ -170,6 +172,7 @@ class PostResource extends Resource
                                 ->maxLength(500),
                             Textarea::make('resposta')
                                 ->label('Resposta')
+                                ->required()
                                 ->rows(3),
                         ])
                         ->orderColumn('ordem')
@@ -263,6 +266,11 @@ class PostResource extends Resource
                         Post::STATUS_PUBLICADO => 'Publicado',
                         Post::STATUS_AGENDADO  => 'Agendado',
                     ]),
+                SelectFilter::make('categorias')
+                    ->label('Categoria')
+                    ->relationship('categorias', 'nome')
+                    ->multiple()
+                    ->preload(),
             ])
             ->defaultSort('data_publicacao', 'desc')
             ->recordActions([

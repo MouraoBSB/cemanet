@@ -32,6 +32,7 @@ class SanitizacaoBlogTest extends TestCase
         $iframe = '<iframe src="https://www.youtube.com/embed/abc123" width="560" height="315" allowfullscreen></iframe>';
         $p = Post::factory()->create(['conteudo' => $iframe]);
         $this->assertStringContainsString('youtube.com/embed', $p->conteudo);
+        $this->assertStringContainsString('allowfullscreen', $p->conteudo);
     }
 
     public function test_conteudo_remove_iframe_externo_nao_permitido(): void

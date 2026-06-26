@@ -216,6 +216,16 @@
 
     {{-- S3: Corpo do artigo --}}
     <section class="mx-auto max-w-[780px] px-6 py-12">
+        {{-- Imagem de abertura da reportagem (além do fundo do herói) --}}
+        @if ($post->imagem_destacada)
+            <figure class="mb-9">
+                <img src="{{ asset('storage/'.$post->imagem_destacada) }}"
+                     alt="{{ $post->imagem_destacada_alt ?? $post->titulo }}"
+                     width="780" height="440" loading="lazy"
+                     class="h-auto w-full rounded-2xl object-cover shadow-card">
+            </figure>
+        @endif
+
         {{-- Conteúdo principal (já sanitizado pelo model) --}}
         <div class="prose-blog
             text-text-secondary leading-[1.8] text-[17px]

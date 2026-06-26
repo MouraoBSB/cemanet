@@ -28,8 +28,9 @@
         <span aria-hidden="true" class="sl-hero-semente"
               style="left:82%;bottom:50px;width:5px;height:5px;background:rgba(242,168,30,0.7);animation-delay:3s;animation-duration:7s;"></span>
 
-        {{-- Conteúdo do destaque --}}
-        <div class="relative z-10 max-w-[640px] px-6 pb-14 pt-16 tablet:pl-10">
+        {{-- Conteúdo do destaque (container centralizado, alinhado à página) --}}
+        <div class="relative z-10 mx-auto w-full max-w-[1180px] px-6 pb-14 pt-16">
+          <div class="max-w-[600px]">
             <div class="mb-4 flex flex-wrap items-center gap-2.5">
                 <span class="rounded-pill bg-gold px-3 py-1 font-mono text-[10.5px] tracking-[.2em] uppercase text-footer-bg">Sementeira de Luz</span>
                 <span class="font-mono text-[11px] tracking-[.14em] uppercase text-gold">Em destaque</span>
@@ -60,6 +61,7 @@
                 <h1 class="font-display text-4xl font-semibold text-white">Sementeira de Luz</h1>
                 <p class="mt-3 text-[16px] text-[#d8d2ec]">Consolo, conhecimento e reflexão à luz do Evangelho.</p>
             @endif
+          </div>
         </div>
     </section>
 

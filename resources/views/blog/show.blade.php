@@ -6,14 +6,15 @@
         aria-hidden="true"
         x-data="{
             progresso: 0,
+            reduzido: window.matchMedia('(prefers-reduced-motion: reduce)').matches,
             atualizar() {
                 const alt = document.documentElement.scrollHeight - window.innerHeight;
                 this.progresso = alt > 0 ? Math.min(100, (window.scrollY / alt) * 100) : 0;
             }
         }"
-        x-init="window.addEventListener('scroll', () => atualizar(), { passive: true })"
+        x-init="if (!reduzido) { window.addEventListener('scroll', () => atualizar(), { passive: true }); }"
+        x-show="!reduzido"
         class="fixed left-0 top-0 z-[200] h-[3px] w-full bg-black/10"
-        style="@media (prefers-reduced-motion: reduce) { display: none; }"
     >
         <div
             class="h-full bg-gradient-to-r from-primary to-secondary transition-none"

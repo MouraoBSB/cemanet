@@ -169,6 +169,63 @@ Array `item-N` com `{destaque, texto}`; **ordem = índice N**. A importação pr
 Meta extra disponível: `email_palestrante`, `telefone_palestrante` (+ flags `mostrar_*`),
 `status_palestrante`.
 
+## Usuários no legado (introspecção 2026-06-25, somente leitura)
+
+Base para o módulo "Área de membros". Modelo do site novo em
+[DATA-MODEL.md](DATA-MODEL.md) (seção "Módulo Usuários").
+
+**Volume:** ~147 em `wp_users` (varia — site vivo). **143 não-admin migráveis.**
+
+**Senhas — validadas como migráveis sem reset:**
+- `$wp$` (WP 6.8+, ~80, len 63) = `"$wp"` + bcrypt `$2y$...`, com pré-hash
+  `base64(hash_hmac('sha384', trim(senha), 'wp-sha384', true))`. Verificação:
+  `password_verify($preHash, substr($hash, 3))`. **Testado contra hash real** do
+  `usuario-teste` (uid 185).
+- `$P$` (phpass, ~75, len 34) = MD5 iterado (`crypt_private`, count_log2 do char 4,
+  salt 8 chars). **Validado por round-trip** do algoritmo canônico.
+- Zero MD5 puro / texto plano.
+
+**Papéis (`wp_capabilities`):** frequentador (~69), trabalhador (~49), diretor (~26),
+administrator (4 — **contas técnicas**: DECOM1, n8n-admin-cemanet, fullservice,
+"Agenda Reforma - Claude"; não migram), subscriber (1 — provável lixo).
+
+**Classificação (3 camadas, achatadas):**
+- `locais_de_trabalho_trabalhador` — meta **PHP serializada**, N por user (até 5);
+  17 slugs crus: `atendimento_fraterno, brecho, caravaneiro_de_auta_de_souza,
+  coolaborador_decom, coordenador_da_campanha_auta_de_souza, coralista_do_cemad,
+  corte_de_verdurasopa, evangelizador_da_infancia, evangelizador_da_mocidade,
+  evangelizador_do_ded, harmonizacao, livraria, medium, pamana,
+  passista_passe_magnetico, recepcionista, teluzes`.
+- `locais_de_trabalho_diretor` — 12 cargos: `conselho_diretor, conselho_fiscal,
+  diretor_dda, diretor_decom, diretor_ded, diretor_demapa, diretor_depae,
+  diretor_depro, diretor_dij, diretor_presidente, secretario, tesoureiro`
+  (não há `diretor_das` nem vice-presidente no legado).
+- `_departamentos_tax` (taxonomia, 7 termos: DAS, DDA, DED, DEMAPA, DEPAE, DEPRO,
+  DIJ — DECOM só aparece nos cargos/setores) — hoje aplicada a **eventos**.
+- `nivel-de-acesso` (taxonomia de **conteúdo**, 6 termos) — hoje só em
+  `mensagem-mediunicas` (130 posts).
+- Flags `_socio/_trabalhador/_diretor` **sujas** (true/on/FALSE/vazio → normalizar
+  em 3 estados); `vinculo_com_a_casa` é só uma *tab* do ACF (100% vazio).
+
+**Cobertura dos campos de perfil (% sobre o total):**
+
+| meta_key | Cobertura | Destino |
+|---|--:|---|
+| `_whatsapp` | 73% | migrar |
+| `email_principal` | 76% | **descartar** (100% = `user_email`) |
+| `data_de_nascimento` | 70% | migrar |
+| `_endereco` | 59% | migrar (**texto único** livre) |
+| `cursos_realizados` | 7% | migrar (repeater → tabela 1:N) |
+| `_liberar_whatsapp_publico` | 18% | migrar (flag) |
+| `wp_user_avatar` / `nsl_user_avatar_md5` | 14% / 14% | foto (opcional) |
+| `_foto_de_perfil` | 3% | foto (opcional; guarda `{id,url}`) |
+| `sobre_mim` · `o_que_espera_da_doutrina` | 1% · 1% | descartar |
+| `_instagram/_faceboo/_twitter_usuario` | 2% / 1% / 0% | descartar |
+| `_foto_do_banner` | 2% | descartar |
+
+**E-mails / nomes:** 0 vazios, 0 duplicados → login por e-mail seguro. Nome vem de
+`display_name` (mistura de caixa: TUDO MAIÚSCULO / minúsculo / Title Case) → sanitizar.
+
 ## Regras duras
 
 - Apenas `SELECT`/`SHOW`/`DESCRIBE`. Nada de `INSERT/UPDATE/DELETE/DDL`.

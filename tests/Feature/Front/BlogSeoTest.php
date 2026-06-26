@@ -50,6 +50,17 @@ class BlogSeoTest extends TestCase
         $resp->assertSee('Centro Espírita Maria Madalena', false);
     }
 
+    public function test_jsonld_omite_image_quando_post_sem_imagem_destacada(): void
+    {
+        // Sem imagem destacada o "image":null é inválido para Article (schema.org).
+        $this->postPublicado(['slug' => 'post-sem-imagem', 'imagem_destacada' => null]);
+
+        $resp = $this->get(route('blog.show', 'post-sem-imagem'));
+
+        $resp->assertOk();
+        $resp->assertDontSee('"image":null', false);
+    }
+
     // -----------------------------------------------------------------------
     // FAQPage condicional
     // -----------------------------------------------------------------------

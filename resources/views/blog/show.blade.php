@@ -4,7 +4,8 @@
     $urlArtigo = $post->canonical ?? route('blog.show', $post->slug);
 
     $graph = [
-        [
+        // array_filter omite chaves nulas — "image":null é inválido para Article (schema.org).
+        array_filter([
             '@type'            => 'Article',
             'headline'         => $post->titulo,
             'datePublished'    => $post->data_publicacao?->toIso8601String(),
@@ -16,7 +17,7 @@
             'publisher'        => $org,
             'mainEntityOfPage' => $urlArtigo,
             'description'      => $post->seo_descricao ?? $post->resumo,
-        ],
+        ], fn ($v) => $v !== null),
         [
             '@type'       => 'BreadcrumbList',
             'itemListElement' => [

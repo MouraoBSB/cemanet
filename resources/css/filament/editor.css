@@ -1,0 +1,14 @@
+/* CSS injetado SOMENTE no canvas do RichEditor do blog (escopo .editor-conteudo-blog)
+   para dar preview WYSIWYG e cursor visível. Espelha .conteudo-artigo do front.
+   Publicado via `php artisan filament:assets`. CSS puro (sem Tailwind/tokens do front).
+   Thiago Mourão — https://github.com/MouraoBSB — 2026-06-27 */
+
+/* Cursor (caret) sempre visível na cor da marca; gapcursor (entre blocos) visível. */
+.editor-conteudo-blog .tiptap.ProseMirror {
+    caret-color: #4e4483;
+}
+
+.editor-conteudo-blog .ProseMirror-gapcursor:after {
+    border-top: 2px solid #4e4483;
+    width: 1.25rem;
+}

@@ -101,6 +101,7 @@ class PostResource extends Resource
                             'imagemTamanhoGrande',
                             'imagemTamanhoTotal',
                         ])
+                        ->extraAttributes(['class' => 'editor-conteudo-blog'])
                         ->columnSpanFull(),
                 ]),
 

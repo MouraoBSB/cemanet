@@ -28,15 +28,15 @@ class CapOriginalTest extends TestCase
     #[Test]
     public function original_da_colecao_conteudo_e_capado_em_2000px(): void
     {
-        // Usar 2200×2200 para não exceder o limite de memória (128 M no container)
-        // e ao mesmo tempo ultrapassar o teto de 2000px.
+        // Paisagem 2100×700: largura > teto 2000 com footprint baixo de memória
+        // (≈1,5 Mpx) — reduz contenção de GD/optimizer sob carga da suíte completa.
         $post = Post::factory()->create();
 
         $media = $post
             ->addMediaFromString(
-                UploadedFile::fake()->image('big.jpg', 2200, 2200)->get()
+                UploadedFile::fake()->image('grande.jpg', 2100, 700)->get()
             )
-            ->usingFileName('big.jpg')
+            ->usingFileName('grande.jpg')
             ->toMediaCollection(Post::COLECAO_CONTEUDO);
 
         $dimensoes = @getimagesize($media->getPath());
@@ -74,13 +74,13 @@ class CapOriginalTest extends TestCase
     #[Test]
     public function original_retrato_e_capado_pela_altura(): void
     {
-        // Retrato: largura 900 (≤ 2000) mas altura 2400 (> 2000). O cap deve agir
-        // pelo LADO MAIS LONGO — um cap só por largura deixaria a altura passar.
+        // Retrato 700×2100: largura 700 (≤ 2000) mas altura 2100 (> 2000). O cap deve
+        // agir pelo LADO MAIS LONGO — um cap só por largura deixaria a altura passar.
         $post = Post::factory()->create();
 
         $media = $post
             ->addMediaFromString(
-                UploadedFile::fake()->image('retrato.jpg', 900, 2400)->get()
+                UploadedFile::fake()->image('retrato.jpg', 700, 2100)->get()
             )
             ->usingFileName('retrato.jpg')
             ->toMediaCollection(Post::COLECAO_CONTEUDO);

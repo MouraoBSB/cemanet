@@ -72,6 +72,30 @@ class CapOriginalTest extends TestCase
     }
 
     #[Test]
+    public function original_retrato_e_capado_pela_altura(): void
+    {
+        // Retrato: largura 900 (≤ 2000) mas altura 2400 (> 2000). O cap deve agir
+        // pelo LADO MAIS LONGO — um cap só por largura deixaria a altura passar.
+        $post = Post::factory()->create();
+
+        $media = $post
+            ->addMediaFromString(
+                UploadedFile::fake()->image('retrato.jpg', 900, 2400)->get()
+            )
+            ->usingFileName('retrato.jpg')
+            ->toMediaCollection(Post::COLECAO_CONTEUDO);
+
+        $dimensoes = @getimagesize($media->getPath());
+
+        $this->assertNotFalse($dimensoes, 'Deve ser possível obter dimensões do arquivo salvo.');
+        $this->assertLessThanOrEqual(
+            2000,
+            $dimensoes[1],
+            "Altura do original retrato deve ser ≤ 2000px, obteve {$dimensoes[1]}px."
+        );
+    }
+
+    #[Test]
     public function imagem_pequena_nao_e_redimensionada(): void
     {
         $post = Post::factory()->create();

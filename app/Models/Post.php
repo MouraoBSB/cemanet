@@ -43,7 +43,7 @@ class Post extends Model implements HasMedia, HasRichContent
         'titulo',
         'slug',
         'resumo',
-        'conteudo',
+        'conteudo', // saneado pelo mutator conteudo() — vale também em mass-assignment
         'imagem_destacada',
         'imagem_destacada_alt',
         'criado_por_id',

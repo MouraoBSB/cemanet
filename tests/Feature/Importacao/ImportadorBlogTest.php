@@ -223,4 +223,47 @@ class ImportadorBlogTest extends TestCase
         $this->assertNotFalse($dim, 'Arquivo de mídia OG não é uma imagem válida');
         $this->assertLessThanOrEqual(1200, max($dim[0], $dim[1]));
     }
+
+    public function test_galeria_preserva_a_ordem_das_imagens(): void
+    {
+        Storage::fake('public');
+        Http::fake(['*' => Http::response($this->imagemBytes(), 200)]);
+        $this->seed(CategoriaSeeder::class);
+
+        // Leitor com galeria de 2 itens em ordem; assertamos que a coleção ML
+        // preserva essa ordem (via custom property url_legado).
+        $leitor = new class implements LeitorBlog
+        {
+            public function posts(): array
+            {
+                return [[
+                    'titulo'                   => 'Galeria Ordenada',
+                    'slug'                     => 'galeria-ordenada',
+                    'resumo'                   => null,
+                    'conteudo'                 => '<p>Texto longo o suficiente para calculo.</p>',
+                    'data_publicacao'          => Carbon::parse('2026-01-15'),
+                    'status'                   => 'publicado',
+                    'wp_id'                    => 999,
+                    'imagem_url'               => null,
+                    'imagem_alt'               => null,
+                    'categorias_slugs'         => [],
+                    'categoria_principal_slug' => null,
+                    'tags'                     => [],
+                    'faqs'                     => [],
+                    'galeria'                  => [
+                        ['url' => 'https://example.com/primeira.jpg', 'wp_id' => 1, 'ordem' => 0],
+                        ['url' => 'https://example.com/segunda.jpg', 'wp_id' => 2, 'ordem' => 1],
+                    ],
+                    'seo' => [],
+                ]];
+            }
+        };
+
+        app(ImportadorBlog::class, ['leitor' => $leitor])->importar();
+
+        $galeria = Post::first()->getMedia(Post::COLECAO_GALERIA);
+        $this->assertCount(2, $galeria);
+        $this->assertSame('https://example.com/primeira.jpg', $galeria[0]->getCustomProperty('url_legado'));
+        $this->assertSame('https://example.com/segunda.jpg', $galeria[1]->getCustomProperty('url_legado'));
+    }
 }

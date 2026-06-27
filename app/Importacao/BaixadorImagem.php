@@ -83,14 +83,22 @@ class BaixadorImagem
         $tmp = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'cema_mid_' . uniqid() . '.' . $ext;
         file_put_contents($tmp, $bytes);
 
-        $dim = @getimagesize($tmp);
-        if ($dim !== false && max($dim[0], $dim[1]) > $teto) {
-            Image::load($tmp)->fit(Fit::Max, $teto, $teto)->save();
+        // try/finally garante a limpeza do temp mesmo se o GD falhar ao redimensionar
+        // uma imagem corrompida; nesse caso devolve null (vira aviso no importador) em
+        // vez de propagar a exceção e derrubar a transação do post inteiro.
+        try {
+            $dim = @getimagesize($tmp);
+            if ($dim !== false && max($dim[0], $dim[1]) > $teto) {
+                Image::load($tmp)->fit(Fit::Max, $teto, $teto)->save();
+            }
+
+            return file_get_contents($tmp);
+        } catch (\Throwable $e) {
+            report($e);
+
+            return null;
+        } finally {
+            @unlink($tmp);
         }
-
-        $capado = file_get_contents($tmp);
-        @unlink($tmp);
-
-        return $capado;
     }
 }

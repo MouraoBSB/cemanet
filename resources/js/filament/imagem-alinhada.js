@@ -57,12 +57,38 @@ export default Extension.create({
     },
 
     addCommands() {
-        return {
-            definirAlinhamentoImagem: (align) => ({ commands }) =>
-                commands.updateAttributes('image', { align }),
+        // updateAttributes('image') só age sobre uma imagem DENTRO da seleção. Após
+        // inserir, o cursor vira seleção de TEXTO ao lado da imagem (inline) → seria
+        // no-op. Então, antes de aplicar, garantimos o nó 'image' selecionado:
+        //  - se já é uma NodeSelection de imagem (clique/toolbar flutuante), aplica direto;
+        //  - senão, localiza a imagem inline imediatamente antes/depois do cursor
+        //    (caso recém-inserida) e faz setNodeSelection antes do updateAttributes.
+        const aplicar = (attrs) => ({ state, chain }) => {
+            const { selection } = state
 
-            definirTamanhoImagem: (size) => ({ commands }) =>
-                commands.updateAttributes('image', { size }),
+            if (selection.node && selection.node.type.name === 'image') {
+                return chain().updateAttributes('image', attrs).run()
+            }
+
+            const { $from } = selection
+            let pos = null
+
+            if ($from.nodeBefore && $from.nodeBefore.type.name === 'image') {
+                pos = $from.pos - $from.nodeBefore.nodeSize
+            } else if ($from.nodeAfter && $from.nodeAfter.type.name === 'image') {
+                pos = $from.pos
+            }
+
+            if (pos === null) {
+                return false // nenhuma imagem por perto — nada a fazer
+            }
+
+            return chain().setNodeSelection(pos).updateAttributes('image', attrs).run()
+        }
+
+        return {
+            definirAlinhamentoImagem: (align) => aplicar({ align }),
+            definirTamanhoImagem: (size) => aplicar({ size }),
         }
     },
 })

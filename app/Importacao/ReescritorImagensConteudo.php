@@ -43,7 +43,10 @@ class ReescritorImagensConteudo
                 ->withCustomProperties(['url_legado' => $url])
                 ->toMediaCollection(Post::COLECAO_CONTEUDO);
 
-            $novaUrl = $media->getUrl('web');
+            // Usa o caminho RELATIVO (/storage/...) — independente de host/porta. A URL
+            // fica "assada" no HTML salvo; relativa, ela resolve contra a origem da página
+            // (localhost:8000 no dev, domínio em produção) sem quebrar se o APP_URL mudar.
+            $novaUrl = parse_url($media->getUrl('web'), PHP_URL_PATH) ?: $media->getUrl('web');
 
             // Substitui a URL legada pela URL da Media Library
             $tagReescrita = str_replace($url, $novaUrl, $tagOriginal);

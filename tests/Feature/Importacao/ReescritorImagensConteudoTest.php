@@ -47,8 +47,11 @@ class ReescritorImagensConteudoTest extends TestCase
         // save de um post migrado APAGAR as imagens do corpo (regressão guardada aqui).
         $this->assertStringContainsString('data-id="' . $media->uuid . '"', $out);
 
-        // URL no HTML aponta para a conversão 'web' da mídia
-        $this->assertStringContainsString($media->getUrl('web'), $out);
+        // O src reescrito é o caminho RELATIVO da conversão 'web' (sem host/porta),
+        // para não quebrar se o APP_URL/domínio mudar.
+        $caminhoWeb = parse_url($media->getUrl('web'), PHP_URL_PATH);
+        $this->assertStringContainsString('src="' . $caminhoWeb . '"', $out);
+        $this->assertStringNotContainsString('http://localhost', $out);
     }
 
     public function test_mantem_url_original_em_caso_de_falha(): void

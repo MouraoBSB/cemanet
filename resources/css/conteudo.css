@@ -1,0 +1,145 @@
+/* CSS do conteúdo do artigo (.conteudo-artigo) — cobre saída nova do RichEditor/TipTap
+   e o HTML do Gutenberg migrado: alinhamento/float de imagem, tamanhos responsivos
+   (largura em %, nunca px fixo), legendas, bloco Mídia e Texto, e grid de colunas.
+   Thiago Mourão — https://github.com/MouraoBSB — 2026-06-27 */
+
+/* Clearfix: contém os floats internos */
+.conteudo-artigo::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+/* Imagem nunca estoura o contêiner e mantém a proporção mesmo com largura definida */
+.conteudo-artigo img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Alinhamento / float (editor novo + Gutenberg migrado) */
+.conteudo-artigo .alignleft,
+.conteudo-artigo .align-left,
+.conteudo-artigo figure.alignleft {
+    float: left;
+    margin: 0.25rem 1.5rem 1rem 0;
+}
+
+.conteudo-artigo .alignright,
+.conteudo-artigo .align-right,
+.conteudo-artigo figure.alignright {
+    float: right;
+    margin: 0.25rem 0 1rem 1.5rem;
+}
+
+.conteudo-artigo .aligncenter,
+.conteudo-artigo .align-center,
+.conteudo-artigo figure.aligncenter {
+    display: block;
+    float: none;
+    clear: both;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.conteudo-artigo .alignnone {
+    float: none;
+}
+
+/* Subtítulos sempre começam ABAIXO de uma imagem flutuante */
+.conteudo-artigo h2,
+.conteudo-artigo h3 {
+    clear: both;
+}
+
+/* Legenda (figcaption) */
+.conteudo-artigo figure {
+    margin: 1.5rem 0;
+}
+
+.conteudo-artigo figure.alignleft,
+.conteudo-artigo figure.alignright {
+    margin-top: 0.25rem;
+}
+
+.conteudo-artigo figcaption {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    color: var(--color-text-muted, #7a8a8a);
+    text-align: center;
+}
+
+/* Tamanhos do Gutenberg — largura em %, nunca px fixo */
+.conteudo-artigo .size-thumbnail {
+    max-width: 25%;
+}
+
+.conteudo-artigo .size-medium {
+    max-width: 50%;
+}
+
+.conteudo-artigo .size-large {
+    max-width: 75%;
+}
+
+.conteudo-artigo .size-full {
+    max-width: 100%;
+}
+
+/* Imagem redimensionada pelo editor (TipTap) */
+.conteudo-artigo img.is-resized {
+    max-width: 60%;
+}
+
+/* Bloco "Mídia e Texto" do Gutenberg (foto e texto lado a lado, sem contorno) */
+.conteudo-artigo .wp-block-media-text {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: center;
+    margin: 1.5rem 0;
+}
+
+.conteudo-artigo .wp-block-media-text .wp-block-media-text__media img {
+    width: 100%;
+}
+
+/* Grid de colunas (editor TipTap via Task 9) */
+.conteudo-artigo .colunas {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    align-items: center;
+    margin: 1.5rem 0;
+}
+
+.conteudo-artigo .colunas .coluna {
+    min-width: 0;
+}
+
+/* Responsivo: no mobile tudo empilha (sem float, largura cheia) */
+@media (max-width: 640px) {
+    .conteudo-artigo .alignleft,
+    .conteudo-artigo .align-left,
+    .conteudo-artigo .alignright,
+    .conteudo-artigo .align-right,
+    .conteudo-artigo figure.alignleft,
+    .conteudo-artigo figure.alignright,
+    .conteudo-artigo img.is-resized,
+    .conteudo-artigo .size-medium,
+    .conteudo-artigo .size-large {
+        float: none;
+        max-width: 100% !important;
+        width: 100% !important;
+        margin-left: 0;
+        margin-right: 0;
+    }
+
+    .conteudo-artigo .wp-block-media-text {
+        grid-template-columns: 1fr;
+    }
+
+    .conteudo-artigo .colunas {
+        grid-template-columns: 1fr;
+    }
+}

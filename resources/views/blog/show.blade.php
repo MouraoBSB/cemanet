@@ -226,7 +226,7 @@
         @endif
 
         {{-- Conteúdo principal (já sanitizado pelo model) --}}
-        <div class="prose-blog
+        <div class="conteudo-artigo prose-blog
             text-text-secondary leading-[1.8] text-[17px]
             [&_p]:mb-5
             [&_h2]:mt-10 [&_h2]:mb-4 [&_h2]:font-display [&_h2]:text-2xl [&_h2]:font-semibold [&_h2]:text-primary

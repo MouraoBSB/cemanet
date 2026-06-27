@@ -54,7 +54,11 @@ class LeitorBlogMysql implements LeitorBlog
                 'titulo' => ($meta['rank_math_title'] ?? null) ?: ($meta['_yoast_wpseo_title'] ?? null) ?: null,
                 'descricao' => ($meta['rank_math_description'] ?? null) ?: ($meta['_yoast_wpseo_metadesc'] ?? null) ?: null,
                 'keyword' => ($meta['rank_math_focus_keyword'] ?? null) ?: ($meta['_yoast_wpseo_focuskw'] ?? null) ?: null,
-                'og_imagem' => ($meta['rank_math_og_content_image'] ?? null) ?: null,
+                // O Rank Math às vezes grava aqui um array PHP serializado em vez da URL —
+                // só aceita se for uma URL http(s) de verdade (senão cai no fallback da destacada).
+                'og_imagem' => preg_match('~^https?://~i', (string) ($meta['rank_math_og_content_image'] ?? ''))
+                    ? $meta['rank_math_og_content_image']
+                    : null,
             ];
 
             $out[] = [

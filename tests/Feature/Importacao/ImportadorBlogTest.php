@@ -266,4 +266,16 @@ class ImportadorBlogTest extends TestCase
         $this->assertSame('https://example.com/primeira.jpg', $galeria[0]->getCustomProperty('url_legado'));
         $this->assertSame('https://example.com/segunda.jpg', $galeria[1]->getCustomProperty('url_legado'));
     }
+
+    public function test_baixar_capado_ignora_valor_nao_url_sem_lancar(): void
+    {
+        // Regressão: o og_imagem do legado vinha como array PHP serializado ("a:2:{…}").
+        // Passar isso ao Http::get fazia o Guzzle lançar ("scheme a"), derrubando o import.
+        Http::fake();
+
+        $r = app(\App\Importacao\BaixadorImagem::class)->baixarCapado('a:2:{s:5:"check";b:1;}', 1200);
+
+        $this->assertNull($r);
+        Http::assertNothingSent(); // nem tentou baixar — rejeitado antes do request
+    }
 }

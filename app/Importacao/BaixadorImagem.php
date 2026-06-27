@@ -55,6 +55,18 @@ class BaixadorImagem
             return null;
         }
 
+        // Blindagem: só baixa URLs http(s) reais. O legado às vezes traz lixo no lugar
+        // da URL (ex.: o og_imagem do Rank Math vem como array PHP serializado "a:2:{…}"),
+        // e passar isso ao Http::get faz o Guzzle interpretar o esquema como "a" e lançar,
+        // derrubando a importação inteira. Aqui vira aviso e segue.
+        if (! preg_match('~^https?://~i', $url)) {
+            \Illuminate\Support\Facades\Log::warning('BaixadorImagem: URL inválida ignorada', [
+                'url' => mb_strimwidth($url, 0, 80, '…'),
+            ]);
+
+            return null;
+        }
+
         try {
             $resposta = Http::timeout(30)->get($url);
             if (! $resposta->successful()) {

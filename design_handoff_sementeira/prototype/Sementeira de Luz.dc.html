@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&family=Roboto+Mono:wght@400;500&family=Roboto+Slab:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+::selection{background:#F2A81E;color:#3a3266;}
+@keyframes slGlow{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:.85;transform:scale(1.06)}}
+@keyframes slRays{0%,100%{opacity:.25}50%{opacity:.6}}
+@keyframes slRise{0%{transform:translateY(0);opacity:0}16%{opacity:.85}100%{transform:translateY(-180px);opacity:0}}
+@keyframes slFade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+</style>
+</helmet>
+<div style="font-family:'Poppins',system-ui,sans-serif; color:#26242e; background:#fff; min-height:100vh; line-height:1.6; overflow-x:hidden;">
+
+  <!-- reading progress (single only) -->
+  <sc-if value="{{ isSingle }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; top:0; left:0; right:0; height:3px; background:rgba(78,68,131,0.10); z-index:200;">
+      <div style="{{ barStyle }}"></div>
+    </div>
+  </sc-if>
+
+  <!-- ===== shared header ===== -->
+  <header style="position:sticky; top:0; z-index:80; background:#fff; box-shadow:0 1px 0 #E4E4E4;">
+    <div style="max-width:1240px; margin:0 auto; padding:11px 26px; display:flex; align-items:center; gap:18px;">
+      <img src="assets/logo-horizontal.png" alt="CEMA" style="height:40px; display:block;">
+      <div style="margin-left:auto; display:flex; align-items:center; gap:16px; font-size:13px; color:#7A8A8A;">
+        <span style="display:flex; align-items:center; gap:8px; background:#F6F6F6; border:1px solid #E4E4E4; border-radius:50px; padding:8px 15px;">Pesquisar no site<span style="opacity:.5;">⌕</span></span>
+        <span style="white-space:nowrap;">Possui conta? <a onClick="{{ toastSoon }}" style="cursor:pointer; color:#4E4483; font-weight:600;">Entrar</a></span>
+      </div>
+    </div>
+    <nav style="background:#4E4483;">
+      <ul style="list-style:none; margin:0 auto; padding:0 26px; max-width:1240px; display:flex; align-items:stretch; gap:2px; font-family:'Roboto Mono',monospace;">
+        <li onClick="{{ toastSoon }}" style="cursor:pointer; padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Institucional ▾</li>
+        <li onClick="{{ toastSoon }}" style="cursor:pointer; padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Palestras ▾</li>
+        <li onClick="{{ toastSoon }}" style="cursor:pointer; padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Mensagens Mediúnicas ▾</li>
+        <li onClick="{{ toastSoon }}" style="cursor:pointer; padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Eventos ▾</li>
+        <li onClick="{{ toastSoon }}" style="cursor:pointer; padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Vibração ▾</li>
+        <li onClick="{{ toastSoon }}" style="cursor:pointer; padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Agenda ▾</li>
+        <li onClick="{{ toastSoon }}" style="cursor:pointer; padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Evangelho ▾</li>
+        <li onClick="{{ goList }}" style="cursor:pointer; padding:13px 14px; font-size:12.5px; color:#3a3266; background:#F2A81E; font-weight:500;">Sementeira ▾</li>
+      </ul>
+    </nav>
+  </header>
+
+  <main>
+
+  <!-- ========================================================= -->
+  <!-- =================== LISTING ============================== -->
+  <!-- ========================================================= -->
+  <sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}">
+  <div>
+
+    <!-- ===== Variante A · Luz Serena ===== -->
+    <sc-if value="{{ vSerena }}" hint-placeholder-val="{{ true }}">
+    <div data-screen-label="Sementeira · Notícias (Luz Serena)">
+      <div style="position:relative; background:linear-gradient(180deg,#F6F1E4 0%,#F3EDDD 60%,#fff 100%); padding:62px 26px 30px; overflow:hidden; text-align:center;">
+        <div style="position:absolute; top:-130px; left:50%; transform:translateX(-50%); width:600px; height:600px; border-radius:50%; background:radial-gradient(circle,rgba(242,168,30,0.32) 0%,rgba(242,168,30,0.10) 38%,rgba(242,168,30,0) 68%); animation:slGlow 7s ease-in-out infinite; pointer-events:none;"></div>
+        <div style="position:relative; z-index:2; max-width:720px; margin:0 auto;">
+          <p style="font-family:'Roboto Mono',monospace; font-size:11.5px; letter-spacing:.22em; text-transform:uppercase; color:#89AB98; margin:0 0 16px;">Blog Espírita do CEMA</p>
+          <h1 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(2.6rem,1.8rem+3vw,3.9rem); line-height:1.02; color:#4E4483; margin:0 0 14px; letter-spacing:-0.02em;">Sementeira de Luz</h1>
+          <p style="font-family:'Roboto Slab',Georgia,serif; font-size:18px; color:#5b5766; margin:0 auto; max-width:520px; line-height:1.6;">Cada palavra é uma semente. Consolo, conhecimento e reflexão à luz do Evangelho.</p>
+        </div>
+        <div style="position:relative; z-index:2; margin:30px auto 0; max-width:980px; height:120px; border-radius:14px; overflow:hidden;">
+          <dc-import name="Placeholder" label="faixa ilustrada — copa de árvore emanando luz e sementes ao vento (aquarela suave creme/dourado)" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import>
+        </div>
+      </div>
+
+      <div style="border-bottom:1px solid #EBE8E8; background:#fff;">
+        <div style="max-width:1080px; margin:0 auto; padding:0 26px; display:flex; gap:30px; justify-content:center; flex-wrap:wrap; font-family:'Work Sans',sans-serif; font-size:14px;">
+          <span style="padding:18px 2px; color:#4E4483; font-weight:600; border-bottom:2px solid #4E4483;">Todas</span>
+          <span onClick="{{ toastSoon }}" style="cursor:pointer; padding:18px 2px; color:#5b5766;">Reflexões e Espiritualidade</span>
+          <span onClick="{{ toastSoon }}" style="cursor:pointer; padding:18px 2px; color:#5b5766;">Prática do Amor ao Próximo</span>
+          <span onClick="{{ toastSoon }}" style="cursor:pointer; padding:18px 2px; color:#5b5766;">Estudando a Mediunidade</span>
+          <span onClick="{{ toastSoon }}" style="cursor:pointer; padding:18px 2px; color:#5b5766;">Datas Comemorativas</span>
+          <span onClick="{{ toastSoon }}" style="cursor:pointer; padding:18px 2px; color:#5b5766;">CEMA em Ação</span>
+        </div>
+      </div>
+
+      <section style="max-width:1080px; margin:0 auto; padding:48px 26px 14px;">
+        <article onClick="{{ goSingle }}" style="cursor:pointer; display:grid; grid-template-columns:1.05fr 0.95fr; gap:38px; align-items:center;">
+          <div style="border-radius:16px; overflow:hidden; height:340px; box-shadow:0 14px 36px rgba(78,68,131,0.12);">
+            <dc-import name="Placeholder" label="foto — Zé Paulista plantando a árvore, início dos anos 1960" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import>
+          </div>
+          <div>
+            <p style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#E79048; margin:0 0 14px;">CEMA em Ação · Reportagem especial</p>
+            <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(1.9rem,1.4rem+1.6vw,2.3rem); line-height:1.12; color:#3a3266; margin:0 0 16px; letter-spacing:-0.01em;">65 anos do CEMA: a sementeira que Zé Paulista plantou em Planaltina</h2>
+            <p style="margin:0 0 22px; font-size:15.5px; color:#5b5766; line-height:1.7;">Da pequena muda fincada no cerrado a uma casa que acolhe centenas — a história de fé, trabalho e caridade que floresceu ao longo de seis décadas.</p>
+            <div style="display:flex; align-items:center; gap:12px; font-family:'Roboto Mono',monospace; font-size:11.5px; color:#7A8A8A; margin-bottom:24px;"><span>26 JUN 2026</span><span style="width:3px;height:3px;border-radius:50%;background:#c3bcd0;"></span><span>8 min de leitura</span></div>
+            <span style="display:inline-flex; align-items:center; gap:9px; background:#4E4483; color:#fff; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14.5px; padding:13px 26px; border-radius:50px;" style-hover="{{ ctaHover }}">Ler reportagem <span style="font-size:16px;">→</span></span>
+          </div>
+        </article>
+      </section>
+
+      <section style="max-width:1080px; margin:0 auto; padding:30px 26px 10px;">
+        <div style="display:flex; align-items:baseline; justify-content:space-between; border-bottom:1px solid #EBE8E8; padding-bottom:14px; margin-bottom:30px;">
+          <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:20px; color:#4E4483; margin:0;">Mais recentes</h3>
+          <span style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#7A8A8A;">182 publicações</span>
+        </div>
+        <div style="column-count:3; column-gap:30px;">
+          <article onClick="{{ goSingle }}" style="cursor:pointer; break-inside:avoid; margin:0 0 30px; display:block;">
+            <div style="border-radius:13px; overflow:hidden; height:215px; margin-bottom:15px;"><dc-import name="Placeholder" label="parábola do semeador — campo ao amanhecer" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+            <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#4E4483; margin:0 0 8px;">Reflexões e Espiritualidade</p>
+            <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:20px; line-height:1.2; color:#3a3266; margin:0 0 9px;">Parábola do Semeador: os quatro terrenos do coração</h4>
+            <p style="margin:0 0 11px; font-size:14px; color:#5b5766; line-height:1.6;">O que faz a mesma semente florescer em uns e secar em outros? Um convite a preparar a própria terra interior.</p>
+            <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">22 JUN 2026 · 6 min</div>
+          </article>
+          <article onClick="{{ goSingle }}" style="cursor:pointer; break-inside:avoid; margin:0 0 30px; display:block;">
+            <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#6E9FCB; margin:0 0 8px;">Estudando a Mediunidade</p>
+            <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:18px; line-height:1.22; color:#3a3266; margin:0 0 9px;">A Mediunidade como serviço e vivência do amor</h4>
+            <p style="margin:0 0 11px; font-size:14px; color:#5b5766; line-height:1.6;">A faculdade mediúnica não é privilégio, mas compromisso. Como exercê-la com responsabilidade e caridade.</p>
+            <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">19 JUN 2026 · 7 min</div>
+          </article>
+          <article onClick="{{ goSingle }}" style="cursor:pointer; break-inside:avoid; margin:0 0 30px; display:block;">
+            <div style="border-radius:13px; overflow:hidden; height:155px; margin-bottom:15px;"><dc-import name="Placeholder" label="mãos em prece, luz suave" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+            <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#4E4483; margin:0 0 8px;">Reflexões e Espiritualidade</p>
+            <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:18px; line-height:1.22; color:#3a3266; margin:0 0 9px;">A eficácia da prece que fortalece a alma</h4>
+            <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">17 JUN 2026 · 5 min</div>
+          </article>
+          <article style="break-inside:avoid; margin:0 0 30px; display:block; background:#F3EDDD; border-radius:14px; padding:28px 26px;">
+            <span style="font-family:'Roboto Slab',serif; font-size:40px; color:#F2A81E; line-height:0;">“</span>
+            <p style="font-family:'Roboto Slab',Georgia,serif; font-size:18px; line-height:1.55; color:#4E4483; margin:6px 0 14px;">Semeia o bem sem esperar a colheita; a luz que plantas hoje florescerá em outros corações.</p>
+            <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:#89AB98; margin:0;">Reflexão da semana</p>
+          </article>
+          <article onClick="{{ goSingle }}" style="cursor:pointer; break-inside:avoid; margin:0 0 30px; display:block;">
+            <div style="border-radius:13px; overflow:hidden; height:185px; margin-bottom:15px;"><dc-import name="Placeholder" label="campanha do agasalho — voluntários" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+            <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#89AB98; margin:0 0 8px;">Prática do Amor ao Próximo</p>
+            <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:18px; line-height:1.22; color:#3a3266; margin:0 0 9px;">Campanha do Agasalho: aquecer quem tem frio</h4>
+            <p style="margin:0 0 11px; font-size:14px; color:#5b5766; line-height:1.6;">A casa abre as portas para arrecadar agasalhos e cobertores neste inverno.</p>
+            <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">15 JUN 2026 · 3 min</div>
+          </article>
+          <article onClick="{{ goSingle }}" style="cursor:pointer; break-inside:avoid; margin:0 0 30px; display:block;">
+            <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#F2A81E; margin:0 0 8px;">Datas Comemorativas</p>
+            <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:18px; line-height:1.22; color:#3a3266; margin:0 0 9px;">108 anos de O Livro dos Espíritos</h4>
+            <p style="margin:0 0 11px; font-size:14px; color:#5b5766; line-height:1.6;">A obra que inaugurou a Codificação completa mais de um século iluminando consciências.</p>
+            <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">12 JUN 2026 · 6 min</div>
+          </article>
+          <article onClick="{{ goSingle }}" style="cursor:pointer; break-inside:avoid; margin:0 0 30px; display:block;">
+            <div style="border-radius:13px; overflow:hidden; height:235px; margin-bottom:15px;"><dc-import name="Placeholder" label="12º Encontro da Família CEMA — auditório lotado" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+            <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#E79048; margin:0 0 8px;">CEMA em Ação</p>
+            <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:18px; line-height:1.22; color:#3a3266; margin:0 0 9px;">12º Encontro da Família CEMA reúne centenas</h4>
+            <p style="margin:0 0 11px; font-size:14px; color:#5b5766; line-height:1.6;">Um dia inteiro de estudo, convivência e celebração da fraternidade.</p>
+            <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">09 JUN 2026 · 4 min</div>
+          </article>
+          <article onClick="{{ goSingle }}" style="cursor:pointer; break-inside:avoid; margin:0 0 30px; display:block;">
+            <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#4E4483; margin:0 0 8px;">Reflexões e Espiritualidade</p>
+            <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:18px; line-height:1.22; color:#3a3266; margin:0 0 9px;">Fé raciocinada: como enfrentar as provações</h4>
+            <p style="margin:0 0 11px; font-size:14px; color:#5b5766; line-height:1.6;">A fé que se sustenta não foge da dor — compreende-a como caminho de crescimento.</p>
+            <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">06 JUN 2026 · 5 min</div>
+          </article>
+          <article onClick="{{ goSingle }}" style="cursor:pointer; break-inside:avoid; margin:0 0 30px; display:block;">
+            <div style="border-radius:13px; overflow:hidden; height:165px; margin-bottom:15px;"><dc-import name="Placeholder" label="caminho ao entardecer, paz" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+            <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#4E4483; margin:0 0 8px;">Reflexões e Espiritualidade</p>
+            <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:18px; line-height:1.22; color:#3a3266; margin:0 0 9px;">O Evangelho como caminho para a paz</h4>
+            <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">02 JUN 2026 · 6 min</div>
+          </article>
+        </div>
+        <div style="text-align:center; padding:6px 0 8px;">
+          <span onClick="{{ toastSoon }}" style="cursor:pointer; display:inline-block; border:1px solid #4E4483; color:#4E4483; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14px; padding:13px 34px; border-radius:50px;">Carregar mais publicações</span>
+        </div>
+      </section>
+
+      <section style="background:#4E4483; margin-top:34px;">
+        <div style="max-width:720px; margin:0 auto; padding:60px 26px; text-align:center; color:#fff;">
+          <p style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#F2A81E; margin:0 0 12px;">Receba a sementeira</p>
+          <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:30px; margin:0 0 12px;">Uma reflexão na sua caixa toda semana</h3>
+          <p style="margin:0 auto 26px; color:#d8d2ec; max-width:420px; font-size:15px;">Artigos, agenda e mensagens — sem excesso, só o que ilumina.</p>
+          <form onSubmit="{{ submitNews }}" style="display:flex; gap:10px; max-width:440px; margin:0 auto;">
+            <input type="email" placeholder="Seu melhor e-mail" style="flex:1; border:0; border-radius:50px; padding:14px 20px; font-family:inherit; font-size:14px; outline:none;">
+            <button type="submit" style="background:#F2A81E; color:#3a3266; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14px; border:0; padding:14px 28px; border-radius:50px; cursor:pointer;">Inscrever</button>
+          </form>
+        </div>
+      </section>
+    </div>
+    </sc-if>
+
+    <!-- ===== Variante B · Semente de Luz ===== -->
+    <sc-if value="{{ vSemente }}" hint-placeholder-val="{{ false }}">
+    <div data-screen-label="Sementeira · Notícias (Semente de Luz)">
+      <section style="position:relative; min-height:480px; display:flex; align-items:flex-end; overflow:hidden; background:linear-gradient(165deg,#2f2952 0%,#3c3468 50%,#4E4483 100%);">
+        <div style="position:absolute; top:-80px; right:8%; width:520px; height:560px; background:conic-gradient(from 200deg at 50% 30%, rgba(242,168,30,0) 0deg, rgba(242,168,30,0.18) 24deg, rgba(242,168,30,0) 48deg, rgba(242,168,30,0.14) 78deg, rgba(242,168,30,0) 110deg, rgba(110,159,203,0.12) 150deg, rgba(242,168,30,0) 200deg); animation:slRays 8s ease-in-out infinite; pointer-events:none;"></div>
+        <div style="position:absolute; top:30px; right:16%; width:360px; height:360px; border-radius:50%; background:radial-gradient(circle,rgba(242,168,30,0.40) 0%,rgba(242,168,30,0.10) 45%,rgba(242,168,30,0) 70%); animation:slGlow 6s ease-in-out infinite; pointer-events:none;"></div>
+        <div style="position:absolute; top:0; right:6%; bottom:0; width:430px; opacity:.92;">
+          <dc-import name="Placeholder" label="ilustração — árvore de luz: tronco e raízes luminosos, copa que se desfaz em sementes brilhantes subindo ao céu" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import>
+        </div>
+        <span style="position:absolute; left:62%; bottom:40px; width:6px; height:6px; border-radius:50%; background:rgba(242,168,30,0.8); animation:slRise 6s linear 0s infinite;"></span>
+        <span style="position:absolute; left:70%; bottom:60px; width:5px; height:5px; border-radius:50%; background:rgba(242,168,30,0.7); animation:slRise 7.5s linear 1.2s infinite;"></span>
+        <span style="position:absolute; left:76%; bottom:30px; width:7px; height:7px; border-radius:50%; background:rgba(255,235,190,0.85); animation:slRise 6.8s linear 2.1s infinite;"></span>
+        <span style="position:absolute; left:66%; bottom:80px; width:4px; height:4px; border-radius:50%; background:rgba(110,159,203,0.7); animation:slRise 8s linear 0.6s infinite;"></span>
+        <span style="position:absolute; left:82%; bottom:50px; width:5px; height:5px; border-radius:50%; background:rgba(242,168,30,0.7); animation:slRise 7s linear 3s infinite;"></span>
+        <div style="position:relative; z-index:3; max-width:640px; padding:0 26px 54px 40px;">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:18px;">
+            <span style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:#3a3266; background:#F2A81E; padding:5px 12px; border-radius:50px;">Sementeira de Luz</span>
+            <span style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#F2A81E;">Em destaque</span>
+          </div>
+          <h1 onClick="{{ goSingle }}" style="cursor:pointer; font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(2.1rem,1.5rem+2vw,2.85rem); line-height:1.1; color:#fff; margin:0 0 16px; letter-spacing:-0.01em;">65 anos do CEMA: a sementeira que Zé Paulista plantou em Planaltina</h1>
+          <p style="font-size:16px; color:#d8d2ec; margin:0 0 26px; line-height:1.65; max-width:520px;">Da pequena muda fincada no cerrado a uma casa que acolhe centenas — seis décadas de fé, trabalho e caridade.</p>
+          <div style="display:flex; align-items:center; gap:16px;">
+            <span onClick="{{ goSingle }}" style="cursor:pointer; display:inline-flex; align-items:center; gap:9px; background:#F2A81E; color:#3a3266; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14.5px; padding:13px 26px; border-radius:50px;" style-hover="{{ ctaHover }}">Ler reportagem →</span>
+            <span style="font-family:'Roboto Mono',monospace; font-size:11.5px; color:#bdb4dd;">26 JUN 2026 · 8 min</span>
+          </div>
+        </div>
+      </section>
+
+      <div style="background:#fff; border-bottom:1px solid #EBE8E8; padding:16px 26px;">
+        <div style="max-width:1180px; margin:0 auto; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+          <span style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#7A8A8A; margin-right:4px;">Categorias</span>
+          <span style="background:#4E4483; color:#fff; font-family:'Work Sans',sans-serif; font-weight:500; font-size:13px; padding:8px 16px; border-radius:50px;">Todas</span>
+          <span onClick="{{ toastSoon }}" style="cursor:pointer; background:#fff; border:1px solid #E4E4E4; color:#4E4483; font-size:13px; padding:8px 16px; border-radius:50px;">Reflexões e Espiritualidade</span>
+          <span onClick="{{ toastSoon }}" style="cursor:pointer; background:#fff; border:1px solid #E4E4E4; color:#5f8a72; font-size:13px; padding:8px 16px; border-radius:50px;">Prática do Amor ao Próximo</span>
+          <span onClick="{{ toastSoon }}" style="cursor:pointer; background:#fff; border:1px solid #E4E4E4; color:#6E9FCB; font-size:13px; padding:8px 16px; border-radius:50px;">Estudando a Mediunidade</span>
+          <span onClick="{{ toastSoon }}" style="cursor:pointer; background:#fff; border:1px solid #E4E4E4; color:#c98a2e; font-size:13px; padding:8px 16px; border-radius:50px;">Datas Comemorativas</span>
+          <span onClick="{{ toastSoon }}" style="cursor:pointer; background:#fff; border:1px solid #E4E4E4; color:#E79048; font-size:13px; padding:8px 16px; border-radius:50px;">CEMA em Ação</span>
+        </div>
+      </div>
+
+      <section style="max-width:1180px; margin:0 auto; padding:40px 26px 10px; display:grid; grid-template-columns:1fr 312px; gap:42px; align-items:start;">
+        <div>
+          <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:24px;">
+            <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:22px; color:#4E4483; margin:0;">Últimas publicações</h3>
+            <span style="font-family:'Roboto Mono',monospace; font-size:11px; color:#7A8A8A;">Ordenar: recentes ▾</span>
+          </div>
+          <article onClick="{{ goSingle }}" style="cursor:pointer; display:grid; grid-template-columns:230px 1fr; gap:20px; padding-bottom:26px; margin-bottom:26px; border-bottom:1px solid #EBE8E8;">
+            <div style="border-radius:12px; overflow:hidden; height:160px;"><dc-import name="Placeholder" label="parábola do semeador — campo ao amanhecer" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+            <div>
+              <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#4E4483; margin:0 0 8px;">Reflexões e Espiritualidade</p>
+              <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:21px; line-height:1.18; color:#3a3266; margin:0 0 10px;">Parábola do Semeador: os quatro terrenos do coração</h4>
+              <p style="margin:0 0 12px; font-size:14px; color:#5b5766; line-height:1.6;">O que faz a mesma semente florescer em uns e secar em outros? Um convite a preparar a própria terra interior para receber a Boa Nova.</p>
+              <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">22 JUN 2026 · 6 min · 12 comentários</div>
+            </div>
+          </article>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:26px;">
+            <article onClick="{{ goSingle }}" style="cursor:pointer; display:block;">
+              <div style="border-radius:12px; overflow:hidden; height:170px; margin-bottom:13px; border-left:3px solid #6E9FCB;"><dc-import name="Placeholder" label="médium em concentração, luz" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+              <p style="font-family:'Roboto Mono',monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#6E9FCB; margin:0 0 7px;">Estudando a Mediunidade</p>
+              <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:17px; line-height:1.22; color:#3a3266; margin:0 0 8px;">A Mediunidade como serviço e vivência do amor</h4>
+              <div style="font-family:'Roboto Mono',monospace; font-size:10px; color:#7A8A8A;">19 JUN · 7 min</div>
+            </article>
+            <article onClick="{{ goSingle }}" style="cursor:pointer; display:block;">
+              <div style="border-radius:12px; overflow:hidden; height:170px; margin-bottom:13px;"><dc-import name="Placeholder" label="campanha do agasalho — voluntários" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+              <p style="font-family:'Roboto Mono',monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#5f8a72; margin:0 0 7px;">Prática do Amor ao Próximo</p>
+              <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:17px; line-height:1.22; color:#3a3266; margin:0 0 8px;">Campanha do Agasalho: aquecer quem tem frio</h4>
+              <div style="font-family:'Roboto Mono',monospace; font-size:10px; color:#7A8A8A;">15 JUN · 3 min</div>
+            </article>
+            <article onClick="{{ goSingle }}" style="cursor:pointer; display:block;">
+              <div style="border-radius:12px; overflow:hidden; height:170px; margin-bottom:13px;"><dc-import name="Placeholder" label="12º Encontro da Família CEMA" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+              <p style="font-family:'Roboto Mono',monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#E79048; margin:0 0 7px;">CEMA em Ação</p>
+              <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:17px; line-height:1.22; color:#3a3266; margin:0 0 8px;">12º Encontro da Família CEMA reúne centenas</h4>
+              <div style="font-family:'Roboto Mono',monospace; font-size:10px; color:#7A8A8A;">09 JUN · 4 min</div>
+            </article>
+            <article onClick="{{ goSingle }}" style="cursor:pointer; display:block;">
+              <div style="border-radius:12px; overflow:hidden; height:170px; margin-bottom:13px;"><dc-import name="Placeholder" label="O Livro dos Espíritos, 108 anos" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+              <p style="font-family:'Roboto Mono',monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#c98a2e; margin:0 0 7px;">Datas Comemorativas</p>
+              <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:17px; line-height:1.22; color:#3a3266; margin:0 0 8px;">108 anos de O Livro dos Espíritos</h4>
+              <div style="font-family:'Roboto Mono',monospace; font-size:10px; color:#7A8A8A;">12 JUN · 6 min</div>
+            </article>
+          </div>
+          <div style="text-align:center; padding:30px 0 8px;">
+            <span onClick="{{ toastSoon }}" style="cursor:pointer; display:inline-block; background:#4E4483; color:#fff; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14px; padding:13px 34px; border-radius:50px;">Carregar mais</span>
+          </div>
+        </div>
+
+        <aside style="display:flex; flex-direction:column; gap:26px;">
+          <div style="background:#F6F6F6; border:1px solid #EBE8E8; border-radius:16px; padding:24px 22px;">
+            <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#E79048; margin:0 0 16px;">Mais lidas</p>
+            <div style="display:flex; flex-direction:column; gap:16px;">
+              <div onClick="{{ goSingle }}" style="cursor:pointer; display:flex; gap:13px; align-items:flex-start;"><span style="font-family:'Work Sans',sans-serif; font-weight:700; font-size:22px; color:#e3dcef; line-height:1;">01</span><p style="margin:0; font-family:'Work Sans',sans-serif; font-weight:500; font-size:14px; line-height:1.3; color:#3a3266;">Reforma Íntima: como o pensamento transforma a vida</p></div>
+              <div onClick="{{ goSingle }}" style="cursor:pointer; display:flex; gap:13px; align-items:flex-start;"><span style="font-family:'Work Sans',sans-serif; font-weight:700; font-size:22px; color:#e3dcef; line-height:1;">02</span><p style="margin:0; font-family:'Work Sans',sans-serif; font-weight:500; font-size:14px; line-height:1.3; color:#3a3266;">Fé raciocinada: como enfrentar as provações</p></div>
+              <div onClick="{{ goSingle }}" style="cursor:pointer; display:flex; gap:13px; align-items:flex-start;"><span style="font-family:'Work Sans',sans-serif; font-weight:700; font-size:22px; color:#e3dcef; line-height:1;">03</span><p style="margin:0; font-family:'Work Sans',sans-serif; font-weight:500; font-size:14px; line-height:1.3; color:#3a3266;">A eficácia da prece que fortalece a alma</p></div>
+              <div onClick="{{ goSingle }}" style="cursor:pointer; display:flex; gap:13px; align-items:flex-start;"><span style="font-family:'Work Sans',sans-serif; font-weight:700; font-size:22px; color:#e3dcef; line-height:1;">04</span><p style="margin:0; font-family:'Work Sans',sans-serif; font-weight:500; font-size:14px; line-height:1.3; color:#3a3266;">O Evangelho como caminho para a paz</p></div>
+            </div>
+          </div>
+          <div style="background:linear-gradient(160deg,#4E4483,#3a3266); border-radius:16px; padding:26px 24px; color:#fff; position:relative; overflow:hidden;">
+            <div style="position:absolute; top:-40px; right:-30px; width:160px; height:160px; border-radius:50%; background:radial-gradient(circle,rgba(242,168,30,0.4),rgba(242,168,30,0));"></div>
+            <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#F2A81E; margin:0 0 12px; position:relative;">Reflexão do dia</p>
+            <p style="font-family:'Roboto Slab',Georgia,serif; font-size:17px; line-height:1.55; margin:0; position:relative;">“Semeia o bem sem esperar a colheita; a luz que plantas hoje florescerá em outros corações.”</p>
+          </div>
+          <div style="border:1px solid #EBE8E8; border-radius:16px; padding:24px 22px;">
+            <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#7A8A8A; margin:0 0 14px;">Navegar por categoria</p>
+            <div style="display:flex; flex-direction:column;">
+              <span onClick="{{ toastSoon }}" style="cursor:pointer; display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid #F2F1F4; font-size:13.5px; color:#3a3266;">Reflexões e Espiritualidade <span style="color:#9a93a8;">64</span></span>
+              <span onClick="{{ toastSoon }}" style="cursor:pointer; display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid #F2F1F4; font-size:13.5px; color:#3a3266;">Prática do Amor ao Próximo <span style="color:#9a93a8;">38</span></span>
+              <span onClick="{{ toastSoon }}" style="cursor:pointer; display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid #F2F1F4; font-size:13.5px; color:#3a3266;">Estudando a Mediunidade <span style="color:#9a93a8;">29</span></span>
+              <span onClick="{{ toastSoon }}" style="cursor:pointer; display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid #F2F1F4; font-size:13.5px; color:#3a3266;">Datas Comemorativas <span style="color:#9a93a8;">31</span></span>
+              <span onClick="{{ toastSoon }}" style="cursor:pointer; display:flex; justify-content:space-between; padding:9px 0; font-size:13.5px; color:#3a3266;">CEMA em Ação <span style="color:#9a93a8;">20</span></span>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section style="background:#F3EDDD; margin-top:34px; border-top:1px solid #EBE8E8;">
+        <div style="max-width:1180px; margin:0 auto; padding:46px 26px; display:flex; align-items:center; gap:30px; flex-wrap:wrap;">
+          <div style="flex:1; min-width:280px;">
+            <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:26px; color:#4E4483; margin:0 0 6px;">Receba a sementeira toda semana</h3>
+            <p style="margin:0; color:#5b5766; font-size:15px;">Uma reflexão, a agenda e as novidades da casa — direto no seu e-mail.</p>
+          </div>
+          <form onSubmit="{{ submitNews }}" style="display:flex; gap:10px; min-width:340px;">
+            <input type="email" placeholder="Seu melhor e-mail" style="flex:1; background:#fff; border:1px solid #E4E4E4; border-radius:50px; padding:14px 20px; font-family:inherit; font-size:14px; outline:none;">
+            <button type="submit" style="background:#4E4483; color:#fff; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14px; border:0; padding:14px 28px; border-radius:50px; cursor:pointer;">Inscrever</button>
+          </form>
+        </div>
+      </section>
+    </div>
+    </sc-if>
+
+  </div>
+  </sc-if>
+
+  <!-- ========================================================= -->
+  <!-- =================== SINGLE / ARTICLE ===================== -->
+  <!-- ========================================================= -->
+  <sc-if value="{{ isSingle }}" hint-placeholder-val="{{ false }}">
+  <div data-screen-label="Sementeira · Artigo (single)">
+
+    <!-- hero A -->
+    <sc-if value="{{ vSerena }}" hint-placeholder-val="{{ true }}">
+    <div style="position:relative; background:linear-gradient(180deg,#F6F1E4 0%,#F3EDDD 70%,#fff 100%); overflow:hidden;">
+      <div style="position:absolute; top:-160px; left:50%; transform:translateX(-50%); width:680px; height:680px; border-radius:50%; background:radial-gradient(circle,rgba(242,168,30,0.22) 0%,rgba(242,168,30,0.06) 40%,rgba(242,168,30,0) 68%); animation:slGlow 7s ease-in-out infinite; pointer-events:none;"></div>
+      <div style="position:relative; z-index:2; max-width:760px; margin:0 auto; padding:34px 26px 30px; text-align:center;">
+        <nav style="display:flex; gap:8px; align-items:center; justify-content:center; font-size:12.5px; color:#9a93a8; margin-bottom:24px;">
+          <a onClick="{{ goList }}" style="cursor:pointer; color:#6E9FCB;">Sementeira</a><span>›</span><a onClick="{{ toastSoon }}" style="cursor:pointer; color:#6E9FCB;">CEMA em Ação</a><span>›</span><span style="color:#3a3266;">65 anos do CEMA</span>
+        </nav>
+        <p style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#E79048; margin:0 0 16px;">CEMA em Ação · Reportagem especial</p>
+        <h1 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(2.1rem,1.5rem+2.4vw,3.1rem); line-height:1.08; color:#3a3266; margin:0 0 18px; letter-spacing:-0.02em;">65 anos do CEMA: a sementeira que Zé Paulista plantou em Planaltina</h1>
+        <p style="font-family:'Roboto Slab',Georgia,serif; font-size:19px; color:#5b5766; margin:0 auto 26px; max-width:580px; line-height:1.6;">Da pequena muda fincada no cerrado a uma casa que acolhe centenas — seis décadas de fé, trabalho e caridade.</p>
+        <div style="display:flex; align-items:center; gap:14px; justify-content:center; flex-wrap:wrap; font-size:13.5px; color:#5b5766;">
+          <span style="display:flex; align-items:center; gap:9px;"><span style="width:34px; height:34px; border-radius:50%; background:#4E4483; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Work Sans',sans-serif; font-weight:600; font-size:13px;">D</span>Por DECOM · Comunicação</span>
+          <span style="width:3px; height:3px; border-radius:50%; background:#c3bcd0;"></span>
+          <span style="font-family:'Roboto Mono',monospace; font-size:12px; color:#7A8A8A;">26 JUN 2026</span>
+          <span style="width:3px; height:3px; border-radius:50%; background:#c3bcd0;"></span>
+          <span style="font-family:'Roboto Mono',monospace; font-size:12px; color:#7A8A8A;">8 min de leitura</span>
+        </div>
+      </div>
+      <div style="position:relative; z-index:2; max-width:1080px; margin:0 auto; padding:0 26px;">
+        <div style="border-radius:18px; overflow:hidden; height:440px; box-shadow:0 22px 50px rgba(78,68,131,0.18);"><dc-import name="Placeholder" label="foto de abertura — plantio da árvore símbolo do CEMA, 1961" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- hero B -->
+    <sc-if value="{{ vSemente }}" hint-placeholder-val="{{ false }}">
+    <div style="position:relative; min-height:560px; display:flex; align-items:flex-end; overflow:hidden; background:#2f2952;">
+      <div style="position:absolute; inset:0; opacity:.5;"><dc-import name="Placeholder" label="foto de abertura — plantio da árvore símbolo do CEMA, 1961" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+      <div style="position:absolute; inset:0; background:linear-gradient(180deg,rgba(47,41,82,0.35) 0%,rgba(47,41,82,0.72) 55%,rgba(47,41,82,0.96) 100%);"></div>
+      <div style="position:absolute; top:20px; right:10%; width:360px; height:360px; border-radius:50%; background:radial-gradient(circle,rgba(242,168,30,0.30) 0%,rgba(242,168,30,0.07) 45%,rgba(242,168,30,0) 70%); animation:slGlow 6s ease-in-out infinite; pointer-events:none;"></div>
+      <span style="position:absolute; left:50%; bottom:120px; width:6px; height:6px; border-radius:50%; background:rgba(242,168,30,0.8); animation:slRise 6.5s linear 0s infinite;"></span>
+      <span style="position:absolute; left:58%; bottom:140px; width:5px; height:5px; border-radius:50%; background:rgba(255,235,190,0.85); animation:slRise 7.5s linear 1.6s infinite;"></span>
+      <div style="position:relative; z-index:3; max-width:880px; margin:0 auto; width:100%; padding:0 26px 56px;">
+        <nav style="display:flex; gap:8px; align-items:center; font-size:12.5px; color:#b3aad6; margin-bottom:22px;">
+          <a onClick="{{ goList }}" style="cursor:pointer; color:#b3aad6;">Sementeira</a><span>›</span><a onClick="{{ toastSoon }}" style="cursor:pointer; color:#b3aad6;">CEMA em Ação</a><span>›</span><span style="color:#F2A81E;">65 anos do CEMA</span>
+        </nav>
+        <span style="display:inline-block; font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.18em; text-transform:uppercase; color:#3a3266; background:#F2A81E; padding:5px 12px; border-radius:50px; margin-bottom:18px;">CEMA em Ação · Reportagem especial</span>
+        <h1 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:clamp(2.1rem,1.5rem+2.4vw,3.2rem); line-height:1.08; color:#fff; margin:0 0 18px; letter-spacing:-0.02em; max-width:760px;">65 anos do CEMA: a sementeira que Zé Paulista plantou em Planaltina</h1>
+        <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; font-size:13.5px; color:#d8d2ec;">
+          <span style="display:flex; align-items:center; gap:9px;"><span style="width:34px; height:34px; border-radius:50%; background:#F2A81E; color:#3a3266; display:flex; align-items:center; justify-content:center; font-family:'Work Sans',sans-serif; font-weight:600; font-size:13px;">D</span>Por DECOM · Comunicação</span>
+          <span style="width:3px; height:3px; border-radius:50%; background:#7a72a0;"></span>
+          <span style="font-family:'Roboto Mono',monospace; font-size:12px; color:#bdb4dd;">26 JUN 2026</span>
+          <span style="width:3px; height:3px; border-radius:50%; background:#7a72a0;"></span>
+          <span style="font-family:'Roboto Mono',monospace; font-size:12px; color:#bdb4dd;">8 min de leitura</span>
+        </div>
+      </div>
+    </div>
+    </sc-if>
+
+    <!-- ===== shared reading body ===== -->
+    <section style="max-width:1080px; margin:0 auto; padding:48px 26px 20px; display:grid; grid-template-columns:54px minmax(0,1fr); gap:30px; align-items:start;">
+      <!-- share rail -->
+      <div style="position:sticky; top:96px; display:flex; flex-direction:column; gap:10px;">
+        <button onClick="{{ shareWhats }}" title="WhatsApp" style="cursor:pointer; width:44px; height:44px; border-radius:50%; border:1px solid #E4E4E4; background:#fff; color:#25862e; font-family:'Work Sans',sans-serif; font-weight:700; font-size:15px;">W</button>
+        <button onClick="{{ shareFb }}" title="Facebook" style="cursor:pointer; width:44px; height:44px; border-radius:50%; border:1px solid #E4E4E4; background:#fff; color:#3b5998; font-family:'Work Sans',sans-serif; font-weight:700; font-size:15px;">f</button>
+        <button onClick="{{ copyLink }}" title="Copiar link" style="cursor:pointer; width:44px; height:44px; border-radius:50%; border:1px solid #E4E4E4; background:#fff; color:#4E4483; font-size:16px;">⎘</button>
+        <button onClick="{{ toggleLike }}" title="Curtir" style="{{ likeRailStyle }}">♥</button>
+        <span style="text-align:center; font-family:'Roboto Mono',monospace; font-size:11px; color:#7A8A8A;">{{ likeCount }}</span>
+      </div>
+
+      <!-- article column -->
+      <article style="max-width:720px;">
+        <p style="font-family:'Poppins',sans-serif; font-size:19px; line-height:1.7; color:#3a3266; margin:0 0 24px; font-weight:400;">Era 1961 quando um lavrador de mãos calejadas e fé inteira ajoelhou-se diante de um pedaço de cerrado batido pelo sol e fincou ali uma muda frágil. <strong style="font-weight:600;">José Paulista</strong> — o Zé Paulista, como todos o chamavam — não plantava apenas uma árvore. Plantava um propósito.</p>
+
+        <p style="font-size:16.5px; line-height:1.8; color:#403c4a; margin:0 0 22px;">Naquele tempo, Planaltina ainda era um punhado de casas dispersas e estradas de terra. A ideia de erguer uma casa espírita parecia, para muitos, ousada demais. Mas para o pequeno grupo reunido em torno de Zé Paulista, o tamanho do sonho nunca foi obstáculo — foi convite.</p>
+
+        <p style="font-size:16.5px; line-height:1.8; color:#403c4a; margin:0 0 30px;">As reuniões começaram simples: o Evangelho aberto sobre a mesa, uma vela acesa e o desejo sincero de servir. Da semente do estudo brotou a prática da caridade; da caridade, o acolhimento; do acolhimento, a casa que hoje conhecemos como Centro Espírita Maria Madalena.</p>
+
+        <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:26px; color:#4E4483; margin:8px 0 16px; letter-spacing:-0.01em;">Uma muda, um propósito</h2>
+        <p style="font-size:16.5px; line-height:1.8; color:#403c4a; margin:0 0 22px;">Quem visita a sede hoje encontra, no pátio, uma árvore frondosa cuja sombra abriga conversas, encontros e despedidas. Poucos sabem que ela é a mesma muda plantada por Zé Paulista — testemunha viva de cada palestra, cada prece e cada gesto de amor que passou por ali.</p>
+
+        <figure style="margin:30px 0; padding:30px 30px; background:#F3EDDD; border-radius:16px;">
+          <span style="font-family:'Roboto Slab',serif; font-size:48px; color:#F2A81E; line-height:0;">“</span>
+          <blockquote style="font-family:'Roboto Slab',Georgia,serif; font-size:22px; line-height:1.5; color:#4E4483; margin:8px 0 16px; font-style:italic;">Ele dizia que árvore boa se conhece pelo fruto — e que casa espírita se conhece pela paz de quem entra triste e sai consolado.</blockquote>
+          <figcaption style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#89AB98;">Memória de um antigo frequentador</figcaption>
+        </figure>
+
+        <p style="font-size:16.5px; line-height:1.8; color:#403c4a; margin:0 0 30px;">Ao longo das décadas, mãos diferentes regaram o mesmo solo. Presidentes, trabalhadores voluntários, médiuns, expositores e tantos anônimos — cada um deixou sua folha nessa copa que não para de crescer.</p>
+
+        <!-- gallery -->
+        <p style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:#7A8A8A; margin:0 0 14px;">Seis décadas em imagens</p>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:0 0 14px;">
+          <div onClick="{{ lb1 }}" style="cursor:zoom-in; border-radius:11px; overflow:hidden; height:150px;"><dc-import name="Placeholder" label="Zé Paulista e a primeira muda, anos 1960" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+          <div onClick="{{ lb2 }}" style="cursor:zoom-in; border-radius:11px; overflow:hidden; height:150px;"><dc-import name="Placeholder" label="primeira sede própria, 1972" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+          <div onClick="{{ lb3 }}" style="cursor:zoom-in; border-radius:11px; overflow:hidden; height:150px;"><dc-import name="Placeholder" label="a árvore e a casa hoje, 2026" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+        </div>
+        <p style="font-family:'Roboto Mono',monospace; font-size:11px; color:#9a93a8; margin:0 0 32px;">Clique para ampliar · acervo histórico do CEMA</p>
+
+        <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:26px; color:#4E4483; margin:8px 0 16px; letter-spacing:-0.01em;">A árvore que virou casa</h2>
+        <p style="font-size:16.5px; line-height:1.8; color:#403c4a; margin:0 0 22px;">Hoje, o CEMA mantém palestras públicas semanais, atendimento fraterno, grupos de estudo do Evangelho, mensagens mediúnicas e campanhas de assistência. Mas o espírito é o mesmo daquela tarde de 1961: semear o bem, sem esperar a colheita.</p>
+
+        <div style="border-left:3px solid #89AB98; background:#f3f6f4; border-radius:0 12px 12px 0; padding:20px 24px; margin:0 0 30px;">
+          <p style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#5f8a72; margin:0 0 8px;">Do Evangelho · Mateus 13</p>
+          <p style="font-family:'Roboto Slab',Georgia,serif; font-size:18px; line-height:1.6; color:#3a3266; margin:0; font-style:italic;">“O semeador saiu a semear. E, ao semear, uma parte da semente caiu à beira do caminho… outra em boa terra, e deu fruto.”</p>
+        </div>
+
+        <p style="font-size:16.5px; line-height:1.8; color:#403c4a; margin:0 0 22px;">Aos 65 anos, a sementeira plantada por Zé Paulista segue dando frutos que ele não chegou a ver — e é exatamente assim que ele sonhou. Cada pessoa consolada, cada jovem que descobre o Espiritismo, cada prece feita ali é um novo broto da mesma árvore de luz.</p>
+
+        <p style="font-size:16.5px; line-height:1.8; color:#403c4a; margin:0 0 36px;">Que venham os próximos 65 anos. A terra está preparada, e há sempre mais sementes a lançar.</p>
+
+        <!-- tags + inline share -->
+        <div style="border-top:1px solid #EBE8E8; border-bottom:1px solid #EBE8E8; padding:22px 0; margin:0 0 34px; display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between;">
+          <div style="display:flex; flex-wrap:wrap; gap:8px;">
+            <a onClick="{{ toastSoon }}" style="cursor:pointer; background:#F6F6F6; border:1px solid #E4E4E4; color:#5b5766; font-size:13px; padding:6px 14px; border-radius:50px;">65 anos</a>
+            <a onClick="{{ toastSoon }}" style="cursor:pointer; background:#F6F6F6; border:1px solid #E4E4E4; color:#5b5766; font-size:13px; padding:6px 14px; border-radius:50px;">História do CEMA</a>
+            <a onClick="{{ toastSoon }}" style="cursor:pointer; background:#F6F6F6; border:1px solid #E4E4E4; color:#5b5766; font-size:13px; padding:6px 14px; border-radius:50px;">Caridade</a>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center;">
+            <span style="font-size:13px; color:#7A8A8A; margin-right:2px;">Compartilhar:</span>
+            <button onClick="{{ shareWhats }}" style="cursor:pointer; border:1px solid #E4E4E4; background:#fff; color:#25862e; border-radius:50px; width:38px; height:38px; font-family:'Work Sans',sans-serif; font-weight:700;">W</button>
+            <button onClick="{{ shareFb }}" style="cursor:pointer; border:1px solid #E4E4E4; background:#fff; color:#3b5998; border-radius:50px; width:38px; height:38px; font-family:'Work Sans',sans-serif; font-weight:700;">f</button>
+            <button onClick="{{ copyLink }}" style="cursor:pointer; border:1px solid #E4E4E4; background:#fff; color:#4E4483; border-radius:50px; width:38px; height:38px; font-size:15px;">⎘</button>
+          </div>
+        </div>
+
+        <!-- author box -->
+        <div style="display:flex; gap:18px; align-items:flex-start; background:#F6F6F6; border:1px solid #EBE8E8; border-radius:16px; padding:24px 26px;">
+          <div style="flex-shrink:0; width:60px; height:60px; border-radius:50%; overflow:hidden;"><dc-import name="Placeholder" label="DECOM" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+          <div>
+            <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:#89AB98; margin:0 0 5px;">Autor</p>
+            <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:17px; color:#3a3266; margin:0 0 6px;">DECOM — Departamento de Comunicação e Multimídia</h4>
+            <p style="margin:0; font-size:14px; color:#5b5766; line-height:1.6;">Equipe responsável por registrar e compartilhar a memória, as atividades e as reflexões da casa na Sementeira de Luz.</p>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <!-- prev/next -->
+    <section style="border-top:1px solid #EBE8E8; background:#F6F6F6;">
+      <div style="max-width:1080px; margin:0 auto; padding:22px 26px; display:flex; flex-wrap:wrap; gap:16px; justify-content:space-between;">
+        <a onClick="{{ toastSoon }}" style="cursor:pointer; display:flex; align-items:center; gap:12px; color:#4E4483;"><span style="font-size:20px;">‹</span><span><span style="display:block; font-family:'Roboto Mono',monospace; font-size:10px; text-transform:uppercase; color:#7A8A8A;">Anterior</span><span style="font-weight:600;">A eficácia da prece</span></span></a>
+        <a onClick="{{ toastSoon }}" style="cursor:pointer; display:flex; align-items:center; gap:12px; color:#4E4483; text-align:right;"><span><span style="display:block; font-family:'Roboto Mono',monospace; font-size:10px; text-transform:uppercase; color:#7A8A8A;">Próxima</span><span style="font-weight:600;">Parábola do Semeador</span></span><span style="font-size:20px;">›</span></a>
+      </div>
+    </section>
+
+    <!-- related -->
+    <section style="max-width:1080px; margin:0 auto; padding:50px 26px 70px;">
+      <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:24px; color:#4E4483; margin:0 0 26px;">Continue semeando</h2>
+      <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:24px;">
+        <article onClick="{{ goSingle }}" style="cursor:pointer; background:#fff; border:1px solid #EBE8E8; border-radius:14px; overflow:hidden;" style-hover="{{ cardHover }}">
+          <div style="height:160px;"><dc-import name="Placeholder" label="parábola do semeador" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+          <div style="padding:18px 20px 22px;">
+            <p style="font-family:'Roboto Mono',monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#4E4483; margin:0 0 7px;">Reflexões e Espiritualidade</p>
+            <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:17px; line-height:1.25; color:#3a3266; margin:0;">Parábola do Semeador: os quatro terrenos do coração</h3>
+          </div>
+        </article>
+        <article onClick="{{ goSingle }}" style="cursor:pointer; background:#fff; border:1px solid #EBE8E8; border-radius:14px; overflow:hidden;" style-hover="{{ cardHover }}">
+          <div style="height:160px;"><dc-import name="Placeholder" label="12º Encontro da Família CEMA" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+          <div style="padding:18px 20px 22px;">
+            <p style="font-family:'Roboto Mono',monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#E79048; margin:0 0 7px;">CEMA em Ação</p>
+            <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:17px; line-height:1.25; color:#3a3266; margin:0;">12º Encontro da Família CEMA reúne centenas</h3>
+          </div>
+        </article>
+        <article onClick="{{ goSingle }}" style="cursor:pointer; background:#fff; border:1px solid #EBE8E8; border-radius:14px; overflow:hidden;" style-hover="{{ cardHover }}">
+          <div style="height:160px;"><dc-import name="Placeholder" label="Centro Espírita Maria Madalena, fachada" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+          <div style="padding:18px 20px 22px;">
+            <p style="font-family:'Roboto Mono',monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#c98a2e; margin:0 0 7px;">Datas Comemorativas</p>
+            <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:17px; line-height:1.25; color:#3a3266; margin:0;">Centro Espírita Maria Madalena completa 64 anos</h3>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+  </sc-if>
+
+  </main>
+
+  <!-- ===== shared footer ===== -->
+  <footer style="background:#2f2952; color:#cfc9e4;">
+    <div style="max-width:1240px; margin:0 auto; padding:56px 26px 36px; display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:36px;">
+      <div>
+        <img src="assets/logo-branco.png" alt="CEMA" style="height:64px; margin-bottom:16px; display:block;">
+        <p style="margin:0; font-size:13.5px; color:#a79fce; max-width:240px;">Sementeira de Luz — o blog espírita do Centro Espírita Maria Madalena, em Planaltina, DF.</p>
+      </div>
+      <div>
+        <p style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:#fff; margin:0 0 16px;">Sementeira</p>
+        <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; font-size:14px;">
+          <li><a onClick="{{ goList }}" style="cursor:pointer; color:#cfc9e4; text-decoration:none;">Todas as publicações</a></li>
+          <li><a onClick="{{ toastSoon }}" style="cursor:pointer; color:#cfc9e4; text-decoration:none;">Reflexões e Espiritualidade</a></li>
+          <li><a onClick="{{ toastSoon }}" style="cursor:pointer; color:#cfc9e4; text-decoration:none;">Estudando a Mediunidade</a></li>
+          <li><a onClick="{{ toastSoon }}" style="cursor:pointer; color:#cfc9e4; text-decoration:none;">CEMA em Ação</a></li>
+        </ul>
+      </div>
+      <div>
+        <p style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:#fff; margin:0 0 16px;">Institucional</p>
+        <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px; font-size:14px;">
+          <li><a onClick="{{ toastSoon }}" style="cursor:pointer; color:#cfc9e4; text-decoration:none;">Nossa História</a></li>
+          <li><a onClick="{{ toastSoon }}" style="cursor:pointer; color:#cfc9e4; text-decoration:none;">Palestras Públicas</a></li>
+          <li><a onClick="{{ toastSoon }}" style="cursor:pointer; color:#cfc9e4; text-decoration:none;">Agenda Reforma Íntima</a></li>
+          <li><a onClick="{{ toastSoon }}" style="cursor:pointer; color:#cfc9e4; text-decoration:none;">Contato</a></li>
+        </ul>
+      </div>
+      <div>
+        <p style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:13px; letter-spacing:.06em; text-transform:uppercase; color:#fff; margin:0 0 16px;">Acompanhe</p>
+        <div style="display:flex; gap:9px;">
+          <a onClick="{{ toastSoon }}" title="YouTube" style="cursor:pointer; width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; color:#fff; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14px;">Y</a>
+          <a onClick="{{ toastSoon }}" title="Instagram" style="cursor:pointer; width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; color:#fff; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14px;">I</a>
+          <a onClick="{{ toastSoon }}" title="Facebook" style="cursor:pointer; width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; color:#fff; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14px;">f</a>
+          <a onClick="{{ toastSoon }}" title="WhatsApp" style="cursor:pointer; width:38px; height:38px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; color:#fff; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14px;">W</a>
+        </div>
+      </div>
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,0.1);">
+      <div style="max-width:1240px; margin:0 auto; padding:20px 26px; display:flex; flex-wrap:wrap; gap:8px 24px; align-items:center; justify-content:space-between; font-size:12.5px; color:#9a93c4;">
+        <span>Quadra 02, Lote 16, Vila Vicentina, Planaltina, Brasília-DF · CNPJ 01.600.089/0001-90</span>
+        <span>© 2026 CEMA · Sementeira de Luz · Desenvolvido por DECOM</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- lightbox -->
+  <sc-if value="{{ lightbox }}" hint-placeholder-val="{{ false }}">
+    <div onClick="{{ closeLb }}" style="position:fixed; inset:0; background:rgba(28,24,46,0.88); z-index:150; display:flex; align-items:center; justify-content:center; padding:40px; animation:slFade .2s ease; cursor:zoom-out;">
+      <div style="width:min(900px,92vw); height:min(620px,80vh); border-radius:14px; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,0.5);"><dc-import name="Placeholder" label="{{ lightbox }}" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+      <button onClick="{{ closeLb }}" style="position:fixed; top:24px; right:28px; width:44px; height:44px; border-radius:50%; border:0; background:rgba(255,255,255,0.14); color:#fff; font-size:22px; cursor:pointer;">×</button>
+    </div>
+  </sc-if>
+
+  <!-- prototype switcher -->
+  <div style="position:fixed; left:50%; bottom:18px; transform:translateX(-50%); z-index:120; display:flex; align-items:center; gap:14px; background:rgba(47,41,82,0.96); backdrop-filter:blur(8px); border-radius:50px; padding:7px 10px 7px 14px; box-shadow:0 10px 30px rgba(0,0,0,0.28);">
+    <span style="font-family:'Roboto Mono',monospace; font-size:10px; color:#9a93c4; text-transform:uppercase; letter-spacing:.08em;">Variante</span>
+    <div style="display:flex; gap:3px; background:rgba(255,255,255,0.08); border-radius:50px; padding:3px;">
+      <sc-if value="{{ vSerena }}" hint-placeholder-val="{{ true }}"><button onClick="{{ setSerena }}" style="border:0; cursor:pointer; border-radius:50px; padding:7px 14px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:500; background:#F2A81E; color:#3a3266;">Luz Serena</button></sc-if>
+      <sc-if value="{{ nSerena }}" hint-placeholder-val="{{ false }}"><button onClick="{{ setSerena }}" style="border:0; cursor:pointer; border-radius:50px; padding:7px 14px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:500; background:transparent; color:#cfc9e4;">Luz Serena</button></sc-if>
+      <sc-if value="{{ vSemente }}" hint-placeholder-val="{{ false }}"><button onClick="{{ setSemente }}" style="border:0; cursor:pointer; border-radius:50px; padding:7px 14px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:500; background:#F2A81E; color:#3a3266;">Semente de Luz</button></sc-if>
+      <sc-if value="{{ nSemente }}" hint-placeholder-val="{{ true }}"><button onClick="{{ setSemente }}" style="border:0; cursor:pointer; border-radius:50px; padding:7px 14px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:500; background:transparent; color:#cfc9e4;">Semente de Luz</button></sc-if>
+    </div>
+    <span style="width:1px; height:22px; background:rgba(255,255,255,0.14);"></span>
+    <div style="display:flex; gap:3px; background:rgba(255,255,255,0.08); border-radius:50px; padding:3px;">
+      <sc-if value="{{ isList }}" hint-placeholder-val="{{ true }}"><button onClick="{{ goList }}" style="border:0; cursor:pointer; border-radius:50px; padding:7px 14px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:500; background:#fff; color:#3a3266;">Notícias</button></sc-if>
+      <sc-if value="{{ nList }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goList }}" style="border:0; cursor:pointer; border-radius:50px; padding:7px 14px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:500; background:transparent; color:#cfc9e4;">Notícias</button></sc-if>
+      <sc-if value="{{ isSingle }}" hint-placeholder-val="{{ false }}"><button onClick="{{ goSingle }}" style="border:0; cursor:pointer; border-radius:50px; padding:7px 14px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:500; background:#fff; color:#3a3266;">Artigo</button></sc-if>
+      <sc-if value="{{ nSingle }}" hint-placeholder-val="{{ true }}"><button onClick="{{ goSingle }}" style="border:0; cursor:pointer; border-radius:50px; padding:7px 14px; font-family:'Poppins',sans-serif; font-size:12px; font-weight:500; background:transparent; color:#cfc9e4;">Artigo</button></sc-if>
+    </div>
+  </div>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position:fixed; top:84px; left:50%; transform:translateX(-50%); z-index:160; background:#3a3266; color:#fff; padding:13px 24px; border-radius:50px; font-size:14px; box-shadow:0 10px 30px rgba(0,0,0,0.25); animation:slFade .25s ease; border:1px solid rgba(242,168,30,0.4);">{{ toast }}</div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;variant&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;serena&quot;,&quot;semente&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    const pv = props && props.variant ? props.variant : 'auto';
+    const monthDef = (new Date().getMonth() % 2 === 0) ? 'serena' : 'semente';
+    this.state = {
+      variant: (pv === 'serena' || pv === 'semente') ? pv : monthDef,
+      route: 'list',
+      progress: 0,
+      liked: false,
+      likes: 128,
+      lightbox: null,
+      toast: null,
+    };
+  }
+  componentDidMount(){
+    this._scroll = () => {
+      const h = document.documentElement;
+      const max = h.scrollHeight - window.innerHeight;
+      const p = max > 0 ? Math.min(1, Math.max(0, window.scrollY / max)) : 0;
+      if (Math.abs(p - this.state.progress) > 0.003) this.setState({ progress: p });
+    };
+    window.addEventListener('scroll', this._scroll, { passive: true });
+  }
+  componentWillUnmount(){ window.removeEventListener('scroll', this._scroll); }
+  flash(m){ this.setState({ toast: m }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2400); }
+  nav(route){ this.setState({ route, progress: 0 }); try { window.scrollTo({ top: 0 }); } catch(e){} }
+  renderVals(){
+    const S = this.state;
+    const soon = (e) => { if (e && e.preventDefault) e.preventDefault(); this.flash('Seção de exemplo — protótipo Sementeira de Luz'); };
+    const goSingle = (e) => { if (e && e.preventDefault) e.preventDefault(); this.nav('single'); };
+    const goList = (e) => { if (e && e.preventDefault) e.preventDefault(); this.nav('list'); };
+    const liked = S.liked;
+    return {
+      vSerena: S.variant === 'serena', vSemente: S.variant === 'semente',
+      nSerena: S.variant !== 'serena', nSemente: S.variant !== 'semente',
+      isList: S.route === 'list', isSingle: S.route === 'single',
+      nList: S.route !== 'list', nSingle: S.route !== 'single',
+      setSerena: () => this.setState({ variant: 'serena' }),
+      setSemente: () => this.setState({ variant: 'semente' }),
+      goSingle, goList, toastSoon: soon,
+      submitNews: (e) => { if (e && e.preventDefault) e.preventDefault(); this.flash('Inscrição recebida — bem-vindo à Sementeira!'); },
+      barStyle: { height: '100%', width: Math.round(S.progress * 100) + '%', background: 'linear-gradient(90deg,#F2A81E,#E79048)', transition: 'width .12s linear' },
+      liked, likeCount: liked ? S.likes + 1 : S.likes,
+      toggleLike: (e) => { if (e && e.preventDefault) e.preventDefault(); this.setState({ liked: !liked }); this.flash(liked ? 'Removido dos favoritos' : 'Você curtiu esta publicação'); },
+      likeRailStyle: { cursor: 'pointer', width: '44px', height: '44px', borderRadius: '50%', border: '1px solid ' + (liked ? '#C33A36' : '#E4E4E4'), background: liked ? '#C33A36' : '#fff', color: liked ? '#fff' : '#C33A36', fontSize: '16px' },
+      shareWhats: soon, shareFb: soon,
+      copyLink: (e) => { if (e && e.preventDefault) e.preventDefault(); this.flash('Link copiado para a área de transferência'); },
+      lightbox: S.lightbox, closeLb: () => this.setState({ lightbox: null }),
+      lb1: () => this.setState({ lightbox: 'Zé Paulista e a primeira muda · início dos anos 1960' }),
+      lb2: () => this.setState({ lightbox: 'A primeira sede própria do CEMA · 1972' }),
+      lb3: () => this.setState({ lightbox: 'A árvore símbolo e a casa hoje · 2026' }),
+      cardHover: { transform: 'translateY(-4px)', boxShadow: '0 16px 34px rgba(78,68,131,0.14)' },
+      ctaHover: { transform: 'translateY(-2px)' },
+      toast: S.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>

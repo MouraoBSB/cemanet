@@ -40,15 +40,15 @@ HTML;
     }
 
     /**
-     * O conteúdo armazenado não deve ter atributos style inline nem larguras em px
-     * (o purifier já garante isso; este teste confirma que o pipeline não regrediu).
+     * O purifier deve ATIVAMENTE remover o style inline (largura em px) ao salvar,
+     * preservando só as classes responsivas da allow-list. A fixture entra contaminada
+     * com style="width:50px" para provar a remoção (não basta entrada já limpa).
      */
-    public function test_conteudo_armazenado_sem_style_inline_e_sem_px_fixo(): void
+    public function test_purifier_remove_style_inline_e_px_preservando_classes(): void
     {
         $conteudo = <<<'HTML'
-<figure class="wp-block-image size-large alignleft"><img src="/x.webp" alt="Foto"></figure>
+<figure class="wp-block-image size-large alignleft"><img src="/x.webp" alt="Foto" style="width:50px"></figure>
 <p>Texto do artigo.</p>
-<div class="colunas"><div class="coluna">A</div><div class="coluna">B</div></div>
 HTML;
 
         $post = Post::factory()->create([
@@ -57,8 +57,11 @@ HTML;
             'conteudo' => $conteudo,
         ]);
 
-        // O purifier preserva as classes mas strip inline style; confirmar que não regrediu
+        // O style inline e a largura em px foram removidos...
         $this->assertStringNotContainsString('style=', $post->conteudo);
-        $this->assertStringNotContainsString('px"', $post->conteudo);
+        $this->assertStringNotContainsString('50px', $post->conteudo);
+        // ...mas as classes responsivas da allow-list sobreviveram.
+        $this->assertStringContainsString('size-large', $post->conteudo);
+        $this->assertStringContainsString('alignleft', $post->conteudo);
     }
 }

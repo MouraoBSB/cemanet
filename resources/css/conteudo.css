@@ -126,6 +126,7 @@
     .conteudo-artigo figure.alignleft,
     .conteudo-artigo figure.alignright,
     .conteudo-artigo img.is-resized,
+    .conteudo-artigo .size-thumbnail,
     .conteudo-artigo .size-medium,
     .conteudo-artigo .size-large {
         float: none;

@@ -12,6 +12,8 @@ class EditPost extends EditRecord
 {
     protected static string $resource = PostResource::class;
 
+    public static bool $formActionsAreSticky = true;
+
     protected function getHeaderActions(): array
     {
         return [

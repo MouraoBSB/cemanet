@@ -129,6 +129,12 @@ class PostResourceTest extends TestCase
         $this->get('/admin/configuracoes-blog')->assertOk();
     }
 
+    public function test_paginas_de_post_tem_form_actions_sticky(): void
+    {
+        $this->assertTrue(\App\Filament\Resources\Posts\Pages\EditPost::$formActionsAreSticky);
+        $this->assertTrue(\App\Filament\Resources\Posts\Pages\CreatePost::$formActionsAreSticky);
+    }
+
     public function test_toolbar_do_editor_inclui_botao_paragrafo(): void
     {
         Livewire::test(CreatePost::class)

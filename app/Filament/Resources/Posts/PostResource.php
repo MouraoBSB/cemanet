@@ -15,11 +15,11 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DateTimePicker;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -82,33 +82,35 @@ class PostResource extends Resource
 
                 Tabs\Tab::make('Mídia')->schema([
                     Grid::make(2)->schema([
-                        FileUpload::make('imagem_destacada')
+                        // Imagem de capa: upload via Spatie ML, com editor inline e cap ≤2000px
+                        SpatieMediaLibraryFileUpload::make('destacada')
                             ->label('Imagem destacada')
+                            ->collection(Post::COLECAO_DESTACADA)
                             ->image()
-                            ->disk('public')
-                            ->directory('blog/destacada'),
+                            ->imageEditor()
+                            ->imageResizeMode('contain')
+                            ->imageResizeTargetWidth(2000)
+                            ->imageResizeTargetHeight(2000)
+                            ->conversion('thumb')
+                            ->responsiveImages(),
                         TextInput::make('imagem_destacada_alt')
                             ->label('Alt da imagem destacada')
                             ->maxLength(255),
                     ]),
-                    Repeater::make('imagens')
+                    // Galeria de fotos: múltiplas, reordenáveis via drag-and-drop, cap ≤2000px
+                    SpatieMediaLibraryFileUpload::make('galeria')
                         ->label('Galeria de imagens')
-                        ->relationship('imagens')
-                        ->schema([
-                            FileUpload::make('caminho')
-                                ->label('Imagem')
-                                ->image()
-                                ->disk('public')
-                                ->directory('blog/galeria')
-                                ->required(),
-                            TextInput::make('alt')
-                                ->label('Texto alternativo')
-                                ->maxLength(255),
-                        ])
-                        ->orderColumn('ordem')
-                        ->collapsible()
-                        ->defaultItems(0)
-                        ->addActionLabel('Adicionar imagem')
+                        ->collection(Post::COLECAO_GALERIA)
+                        ->image()
+                        ->multiple()
+                        ->reorderable()
+                        ->appendFiles()
+                        ->maxFiles(50)
+                        ->imageResizeMode('contain')
+                        ->imageResizeTargetWidth(2000)
+                        ->imageResizeTargetHeight(2000)
+                        ->conversion('thumb')
+                        ->responsiveImages()
                         ->columnSpanFull(),
                 ]),
 
@@ -200,11 +202,14 @@ class PostResource extends Resource
                         ->live(onBlur: true)
                         ->columnSpanFull(),
                     Grid::make(2)->schema([
-                        FileUpload::make('og_imagem')
+                        // Imagem OG personalizada via Spatie ML, cap ≤1200px
+                        SpatieMediaLibraryFileUpload::make('og')
                             ->label('Imagem OG (Open Graph)')
+                            ->collection(Post::COLECAO_OG)
                             ->image()
-                            ->disk('public')
-                            ->directory('blog/og'),
+                            ->imageResizeMode('contain')
+                            ->imageResizeTargetWidth(1200)
+                            ->imageResizeTargetHeight(1200),
                         TextInput::make('canonical')
                             ->label('URL canônica')
                             ->url()

@@ -66,6 +66,12 @@ Ordem sugerida (cada um como nova fatia vertical):
 - [ ] Agenda Reforma Íntima (com calendário)
 - [ ] Mensagens mediúnicas + Autores espirituais
 - [ ] Blog (Sementeira) / Posts + Páginas institucionais
+  - [ ] **Editor**: **RichEditor** (TipTap/HTML) nativo do Filament — a migração
+        **preserva o HTML** do Gutenberg. Habilitar **alinhamento/float de imagem**
+        (foto ao lado do texto, com contorno; empilha no mobile) e
+        **redimensionamento** (largura em %/max-width). Estilizar no CSS as classes
+        do Gutenberg (`alignleft`/`alignright`/`aligncenter`/`wp-block-media-text`/
+        `size-*`) p/ preservar o layout dos posts antigos. (Decisão em `PROJECT.md`.)
   - [ ] **Comentários** (sistema próprio, Livewire): abertos **sem conta**
         (nome + e-mail; e-mail nunca público), **login/Google opcional** com
         vantagens (selo verificado, editar o próprio, notificação). Moderação

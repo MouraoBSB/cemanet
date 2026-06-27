@@ -19,6 +19,21 @@ Legenda: `[ ]` aberto · `[x]` feito · **(DECISÃO)** = aguarda OK do cliente.
   TipTap**. Um carrossel inserível precisará de **abordagem própria** (nó/extensão
   TipTap específico, ou uma referência à galeria que materializa no render) — escopo
   a definir quando chegar a vez.
+- [ ] **Tamanho da imagem sem retorno visual no editor** (clica Pequena/Média/Grande e
+  nada muda). Provável: o canvas do editor não carrega o CSS das classes → espelhar
+  `.conteudo-artigo` na área de conteúdo do RichEditor (sem voltar a `style` inline).
+  Detalhes: `2026-06-27-blog-editor-ux.md`.
+- [ ] **Toolbar fixa (sticky)** — acompanhar a rolagem em posts longos. Idem doc.
+- [ ] **Salvar acessível sem rolar** — ação sticky (footer/cabeçalho), não só no rodapé.
+  Idem doc.
+- [ ] **Botão de Parágrafo (P)** na barra (só tem H2/H3) — voltar texto ao normal
+  (`setParagraph`; idealmente seletor de formato). Idem doc.
+- [ ] **Cursor (caret) visível**, inclusive ao redor de imagens (TipTap **Gapcursor** +
+  checar `caret-color`). Idem doc.
+- [ ] **Alinhamento de TEXTO (parágrafo)** — hoje os botões de alinhar são de **imagem** (tooltip
+  "Imagem alinhar…"); não há align de texto. Adicionar **TextAlign** (esq/centro/dir/justificado)
+  + tools com rótulo distinto; e **justificado por padrão** (CSS, com `hyphens:auto`/`lang=pt-BR`
+  e esquerda no mobile). Idem doc.
 
 ## Admin — galeria / upload de imagens
 
@@ -67,6 +82,15 @@ mexer no importador duas vezes.
 - [ ] **Verificar importação de Tags.** Categorias vieram certas; Tags aparece
   vazio. No legado **só 1 post** tinha tag, então pode estar **correto** neste post —
   confirmar que o importador traz tags quando existem (testar no post que tem).
+
+## Admin — biblioteca de mídia reutilizável (DECISÃO pendente)
+
+- [ ] **Biblioteca de mídia reutilizável — DECIDIDO (2026-06-27): Opção B** (sobre a Media Library,
+  por referência). **Fatia própria** (spec→plano→SDD, ~3–5d), **após** o reimport/verificação + os
+  5 ajustes de UX do editor. Inclui: dedup por hash, rastreio de uso com **deleção autoritativa**,
+  tool "Inserir da biblioteca", e **referência de mídia portável** (rota estável p/ sobreviver a
+  migração de storage — vale também p/ as imagens do corpo já existentes). Detalhes:
+  `2026-06-27-blog-biblioteca-de-midia.md`.
 
 ## Admin — FAQ
 

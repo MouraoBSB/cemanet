@@ -35,4 +35,12 @@ class EditorAdminAssetsTest extends TestCase
         $this->assertStringContainsString('.editor-conteudo-blog .tiptap .size-medium', $css);
         $this->assertStringContainsString('.editor-conteudo-blog .tiptap img.is-resized', $css);
     }
+
+    public function test_css_do_editor_fixa_a_toolbar(): void
+    {
+        $css = file_get_contents(resource_path('css/filament/editor.css'));
+
+        $this->assertStringContainsString('.fi-fo-rich-editor-toolbar', $css);
+        $this->assertStringContainsString('position: sticky', $css);
+    }
 }

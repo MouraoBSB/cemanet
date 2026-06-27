@@ -62,3 +62,17 @@
 .editor-conteudo-blog .tiptap .has-text-align-center { text-align: center; hyphens: manual; }
 .editor-conteudo-blog .tiptap .has-text-align-right { text-align: right; hyphens: manual; }
 .editor-conteudo-blog .tiptap .has-text-align-justify { text-align: justify; hyphens: auto; }
+
+/* Toolbar fixa acompanhando a rolagem (item 2). top = altura do topbar (4rem),
+   z-index abaixo do topbar (z-30) e acima do conteúdo. Background opaco obrigatório
+   para a toolbar não ficar transparente sobre o texto que rola por baixo. */
+.editor-conteudo-blog .fi-fo-rich-editor-toolbar {
+    position: sticky;
+    top: 4rem;
+    z-index: 20;
+    background: var(--fi-color-white, #fff);
+}
+
+.dark .editor-conteudo-blog .fi-fo-rich-editor-toolbar {
+    background: #18181b;
+}

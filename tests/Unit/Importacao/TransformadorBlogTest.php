@@ -78,4 +78,21 @@ class TransformadorBlogTest extends TestCase
         $this->assertStringContainsString('size-large', $out);        // tamanho preservado
         $this->assertStringContainsString('wp-block-image', $out);
     }
+
+    public function test_remove_token_jet_sm_gb_sem_destruir_a_tag_img_seguinte(): void
+    {
+        // Regressão: a className jet-sm-gb-<GUID> aplicada à figure vem colada em "><img.
+        // Um regex ganancioso (\S+) engolia jet-sm-gb-GUID"><img e destruía a imagem,
+        // cascateando perda de conteúdo no purifier. [\w-]+ para no aspas/colchete.
+        $guid = '847308d4-0582-4cdf-b0ad-e24241d9f636';
+        $html = '<figure class="wp-block-image size-large jet-sm-gb-wrapper jet-sm-gb-' . $guid . '">'
+            . '<img src="https://x/uploads/foto.png" alt="" class="wp-image-27418"/></figure>';
+
+        $out = TransformadorBlog::limparGutenberg($html);
+
+        $this->assertStringContainsString('<img ', $out);                 // a tag img sobreviveu
+        $this->assertStringContainsString('uploads/foto.png', $out);       // com o src intacto
+        $this->assertStringContainsString('size-large', $out);             // classe da allow-list preservada
+        $this->assertStringNotContainsString('jet-sm-gb', $out);           // tokens jet removidos
+    }
 }

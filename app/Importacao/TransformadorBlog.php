@@ -126,8 +126,11 @@ class TransformadorBlog
         // 1. Remove comentários Gutenberg
         $html = preg_replace('~<!--\s*/?wp:.*?-->~s', '', $html);
 
-        // 2. Remove tokens de classe jet-sm-gb-* dos atributos class
-        $html = preg_replace('~\bjet-sm-gb-\S+~', '', $html);
+        // 2. Remove tokens de classe jet-sm-gb-* dos atributos class.
+        //    Usa [\w-]+ (token de classe) e NÃO \S+: o ganancioso \S+ não para no '"'
+        //    nem no '>', então em `jet-sm-gb-GUID"><img ...` ele engolia o `"><img`,
+        //    destruindo a tag da imagem e cascateando perda de conteúdo no purifier.
+        $html = preg_replace('~\bjet-sm-gb-[\w-]+~', '', $html);
 
         // 3. Converte container de colunas (plural primeiro para evitar colisão com wp-block-column singular)
         $html = preg_replace('~<div\s+class="[^"]*\bwp-block-columns\b[^"]*"[^>]*>~i', '<div class="colunas">', $html);

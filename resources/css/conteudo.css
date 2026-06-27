@@ -117,6 +117,33 @@
     min-width: 0;
 }
 
+/* Alinhamento de texto (parágrafos e títulos) — por classes WP/Gutenberg.
+   Justificado é o PADRÃO do corpo; classes explícitas sobrepõem. */
+.conteudo-artigo p {
+    text-align: justify;
+    hyphens: auto;
+}
+
+.conteudo-artigo .has-text-align-left {
+    text-align: left;
+    hyphens: manual;
+}
+
+.conteudo-artigo .has-text-align-center {
+    text-align: center;
+    hyphens: manual;
+}
+
+.conteudo-artigo .has-text-align-right {
+    text-align: right;
+    hyphens: manual;
+}
+
+.conteudo-artigo .has-text-align-justify {
+    text-align: justify;
+    hyphens: auto;
+}
+
 /* Responsivo: no mobile tudo empilha (sem float, largura cheia) */
 @media (max-width: 640px) {
     .conteudo-artigo .alignleft,
@@ -142,5 +169,12 @@
 
     .conteudo-artigo .colunas {
         grid-template-columns: 1fr;
+    }
+
+    /* Mobile: justificado prejudica leitura em tela estreita — volta à esquerda,
+       mas só nos parágrafos SEM alinhamento explícito. */
+    .conteudo-artigo p:not([class*="has-text-align"]) {
+        text-align: left;
+        hyphens: manual;
     }
 }

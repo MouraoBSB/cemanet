@@ -36,8 +36,15 @@ class Post extends Model implements HasMedia, HasRichContent
 
     public const COLECAO_OG = 'og';
 
-    /** Registrado na Task 4 (rich content); definido aqui para uso antecipado. */
+    /** Uploads NOVOS do corpo via RichEditor (gerenciados: o provider faz cleanup de órfãos). */
     public const COLECAO_CONTEUDO = 'conteudo';
+
+    /**
+     * Imagens MIGRADAS do corpo (importação do legado). Coleção separada de propósito:
+     * o editor faz cleanup de órfãos apenas na `conteudo`, então as migradas (que entram
+     * como <img> simples, sem data-id) NUNCA são apagadas ao editar/salvar um post no admin.
+     */
+    public const COLECAO_CORPO = 'corpo';
 
     protected $fillable = [
         'titulo',
@@ -123,8 +130,23 @@ class Post extends Model implements HasMedia, HasRichContent
                     ->nonQueued();
             });
 
-        // Imagens do corpo do post (RichEditor) — múltiplos arquivos
+        // Uploads novos do corpo via RichEditor (gerenciados pelo provider)
         $this->addMediaCollection(self::COLECAO_CONTEUDO)
+            ->registerMediaConversions(function (Media $media) {
+                $this->addMediaConversion('web')
+                    ->fit(Fit::Max, 1920, 1920)
+                    ->format('webp')
+                    ->quality(82)
+                    ->withResponsiveImages()
+                    ->nonQueued();
+                $this->addMediaConversion('thumb')
+                    ->fit(Fit::Crop, 400, 300)
+                    ->format('webp')
+                    ->queued();
+            });
+
+        // Imagens migradas do corpo (legado) — mesmas conversões, mas fora do cleanup do editor
+        $this->addMediaCollection(self::COLECAO_CORPO)
             ->registerMediaConversions(function (Media $media) {
                 $this->addMediaConversion('web')
                     ->fit(Fit::Max, 1920, 1920)

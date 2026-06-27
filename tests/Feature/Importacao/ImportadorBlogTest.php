@@ -151,7 +151,8 @@ class ImportadorBlogTest extends TestCase
         $importador->importar();
 
         $post = Post::first();
-        $this->assertCount(1, $post->getMedia(Post::COLECAO_CONTEUDO));
+        // Corpo migrado vai para a coleção `corpo` (não `conteudo`), fora do cleanup do editor
+        $this->assertCount(1, $post->getMedia(Post::COLECAO_CORPO));
     }
 
     public function test_idempotencia_nao_duplica_imagens_ml(): void
@@ -177,7 +178,7 @@ class ImportadorBlogTest extends TestCase
         $this->assertCount(1, $post->getMedia(Post::COLECAO_DESTACADA));
         $this->assertCount(1, $post->getMedia(Post::COLECAO_OG));
         $this->assertCount(1, $post->getMedia(Post::COLECAO_GALERIA));
-        $this->assertCount(1, $post->getMedia(Post::COLECAO_CONTEUDO));
+        $this->assertCount(1, $post->getMedia(Post::COLECAO_CORPO));
     }
 
     public function test_cap_imagem_destacada_respeita_teto_2000px(): void

@@ -73,6 +73,7 @@ class PostMediaTest extends TestCase
         $this->assertSame('galeria', Post::COLECAO_GALERIA);
         $this->assertSame('og', Post::COLECAO_OG);
         $this->assertSame('conteudo', Post::COLECAO_CONTEUDO);
+        $this->assertSame('corpo', Post::COLECAO_CORPO);
     }
 
     public function test_accessor_imagem_destacada_url_retorna_null_sem_midia(): void

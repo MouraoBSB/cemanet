@@ -37,15 +37,15 @@ class ReescritorImagensConteudoTest extends TestCase
         // URL legada substituída
         $this->assertStringNotContainsString('cemanet.org.br/wp-content', $out);
 
-        // Mídia gravada na coleção correta
-        $this->assertCount(1, $post->getMedia(Post::COLECAO_CONTEUDO));
+        // Mídia gravada na coleção `corpo` (separada da `conteudo` que o editor gerencia)
+        $this->assertCount(1, $post->getMedia(Post::COLECAO_CORPO));
+        $this->assertCount(0, $post->getMedia(Post::COLECAO_CONTEUDO));
 
-        $media = $post->getFirstMedia(Post::COLECAO_CONTEUDO);
+        $media = $post->getFirstMedia(Post::COLECAO_CORPO);
 
-        // data-id injetado DEVE ser o UUID da mídia — é o que o cleanup de órfãos do
-        // provider do RichEditor compara (whereIn('uuid', ...)). O id numérico faria o
-        // save de um post migrado APAGAR as imagens do corpo (regressão guardada aqui).
-        $this->assertStringContainsString('data-id="' . $media->uuid . '"', $out);
+        // <img> SIMPLES, sem data-id: o cleanup de órfãos do RichEditor só atua na coleção
+        // `conteudo`, então a imagem migrada nunca é apagada ao editar/salvar o post.
+        $this->assertStringNotContainsString('data-id', $out);
 
         // O src reescrito é o caminho RELATIVO da conversão 'web' (sem host/porta),
         // para não quebrar se o APP_URL/domínio mudar.
@@ -66,7 +66,7 @@ class ReescritorImagensConteudoTest extends TestCase
         $out = app(ReescritorImagensConteudo::class)->reescrever($html, 'meu-post', $post);
 
         $this->assertStringContainsString($url, $out);
-        $this->assertCount(0, $post->getMedia(Post::COLECAO_CONTEUDO));
+        $this->assertCount(0, $post->getMedia(Post::COLECAO_CORPO));
     }
 
     public function test_nao_altera_imagens_externas_sem_wp_content(): void
@@ -101,6 +101,6 @@ class ReescritorImagensConteudoTest extends TestCase
         $reescritor->reescrever($html, 'meu-post', $post);
 
         $post->refresh();
-        $this->assertCount(1, $post->getMedia(Post::COLECAO_CONTEUDO));
+        $this->assertCount(1, $post->getMedia(Post::COLECAO_CORPO));
     }
 }

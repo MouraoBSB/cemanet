@@ -37,14 +37,17 @@ class ReescritorImagensConteudoTest extends TestCase
         // URL legada substituída
         $this->assertStringNotContainsString('cemanet.org.br/wp-content', $out);
 
-        // data-id injetado
-        $this->assertMatchesRegularExpression('/data-id="\d+"/', $out);
-
         // Mídia gravada na coleção correta
         $this->assertCount(1, $post->getMedia(Post::COLECAO_CONTEUDO));
 
-        // URL no HTML aponta para a conversão 'web' da mídia
         $media = $post->getFirstMedia(Post::COLECAO_CONTEUDO);
+
+        // data-id injetado DEVE ser o UUID da mídia — é o que o cleanup de órfãos do
+        // provider do RichEditor compara (whereIn('uuid', ...)). O id numérico faria o
+        // save de um post migrado APAGAR as imagens do corpo (regressão guardada aqui).
+        $this->assertStringContainsString('data-id="' . $media->uuid . '"', $out);
+
+        // URL no HTML aponta para a conversão 'web' da mídia
         $this->assertStringContainsString($media->getUrl('web'), $out);
     }
 

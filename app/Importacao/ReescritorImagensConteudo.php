@@ -48,9 +48,11 @@ class ReescritorImagensConteudo
             // Substitui a URL legada pela URL da Media Library
             $tagReescrita = str_replace($url, $novaUrl, $tagOriginal);
 
-            // Injeta data-id se ainda não presente
+            // Injeta o data-id com o UUID da mídia — é o que o provider do RichEditor
+            // compara no cleanup de órfãos (whereIn('uuid', ...)). Usar o id numérico
+            // (getKey) faria o save de um post migrado no admin APAGAR as imagens do corpo.
             if (! str_contains($atributos, 'data-id')) {
-                $tagReescrita = str_replace('<img', '<img data-id="' . $media->getKey() . '"', $tagReescrita);
+                $tagReescrita = str_replace('<img', '<img data-id="' . $media->uuid . '"', $tagReescrita);
             }
 
             return $tagReescrita;

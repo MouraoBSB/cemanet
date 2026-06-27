@@ -12,13 +12,16 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Image\Enums\Fit;
+use Filament\Forms\Components\RichEditor\FileAttachmentProviders\SpatieMediaLibraryFileAttachmentProvider;
+use Filament\Forms\Components\RichEditor\Models\Concerns\InteractsWithRichContent;
+use Filament\Forms\Components\RichEditor\Models\Contracts\HasRichContent;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Post extends Model implements HasMedia
+class Post extends Model implements HasMedia, HasRichContent
 {
-    use HasFactory, InteractsWithMedia;
+    use HasFactory, InteractsWithMedia, InteractsWithRichContent;
 
     public const STATUS_PUBLICADO = 'publicado';
 
@@ -121,6 +124,21 @@ class Post extends Model implements HasMedia
                     ->quality(85)
                     ->nonQueued();
             });
+
+        // Imagens do corpo do post (RichEditor) — múltiplos arquivos
+        $this->addMediaCollection(self::COLECAO_CONTEUDO)
+            ->registerMediaConversions(function (Media $media) {
+                $this->addMediaConversion('web')
+                    ->fit(Fit::Max, 1920, 1920)
+                    ->format('webp')
+                    ->quality(82)
+                    ->withResponsiveImages()
+                    ->nonQueued();
+                $this->addMediaConversion('thumb')
+                    ->fit(Fit::Crop, 400, 300)
+                    ->format('webp')
+                    ->queued();
+            });
     }
 
     /**
@@ -184,5 +202,17 @@ class Post extends Model implements HasMedia
         return Attribute::make(
             set: fn (?string $v) => $v !== null ? clean($v, 'conteudo_blog') : null,
         );
+    }
+
+    /**
+     * Configura o RichEditor para armazenar anexos do corpo na coleção ML 'conteudo'.
+     */
+    protected function setUpRichContent(): void
+    {
+        $this->registerRichContent(self::COLECAO_CONTEUDO)
+            ->fileAttachmentProvider(
+                SpatieMediaLibraryFileAttachmentProvider::make()
+                    ->collection(self::COLECAO_CONTEUDO),
+            );
     }
 }

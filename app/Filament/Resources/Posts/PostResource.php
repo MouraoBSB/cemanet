@@ -76,6 +76,7 @@ class PostResource extends Resource
                     RichEditor::make('conteudo')
                         ->label('Conteúdo')
                         ->live(onBlur: true)
+                        ->preventFileAttachmentPathTampering()
                         ->columnSpanFull(),
                 ]),
 

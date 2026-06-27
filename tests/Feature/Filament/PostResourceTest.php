@@ -136,6 +136,19 @@ class PostResourceTest extends TestCase
                 $campo->hasToolbarButton('paragraph'));
     }
 
+    public function test_toolbar_do_editor_inclui_alinhamento_de_texto(): void
+    {
+        Livewire::test(CreatePost::class)
+            ->assertFormFieldExists('conteudo', function (\Filament\Forms\Components\RichEditor $campo): bool {
+                foreach (['alignStart', 'alignCenter', 'alignEnd', 'alignJustify'] as $tool) {
+                    if (! $campo->hasToolbarButton($tool)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+    }
+
     public function test_cria_post_com_imagem_destacada_na_colecao_ml(): void
     {
         Storage::fake('public');

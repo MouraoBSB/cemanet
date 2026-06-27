@@ -5,6 +5,7 @@
 namespace App\Filament\Resources\Posts;
 
 use App\Filament\RichContent\Plugins\ImagemPlugin;
+use App\Filament\RichContent\Plugins\TextoAlinhamentoPlugin;
 use App\Filament\Resources\Posts\Pages\CreatePost;
 use App\Filament\Resources\Posts\Pages\EditPost;
 use App\Filament\Resources\Posts\Pages\ListPosts;
@@ -78,7 +79,10 @@ class PostResource extends Resource
                         ->label('Conteúdo')
                         ->live(onBlur: true)
                         ->preventFileAttachmentPathTampering()
-                        ->plugins([ImagemPlugin::make()])
+                        ->plugins([
+                            ImagemPlugin::make(),
+                            TextoAlinhamentoPlugin::make(),
+                        ])
                         ->toolbarButtons([
                             'attachFiles',
                             'blockquote',
@@ -94,6 +98,10 @@ class PostResource extends Resource
                             'redo',
                             'strike',
                             'underline',
+                            'alignStart',
+                            'alignCenter',
+                            'alignEnd',
+                            'alignJustify',
                             'undo',
                             'imagemAlinharEsquerda',
                             'imagemAlinharCentro',

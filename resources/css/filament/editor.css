@@ -51,3 +51,14 @@
 .editor-conteudo-blog .tiptap .size-large { max-width: 75%; }
 .editor-conteudo-blog .tiptap .size-full { max-width: 100%; }
 .editor-conteudo-blog .tiptap img.is-resized { max-width: 60%; }
+
+/* Preview de alinhamento de texto no editor (item 6). Espelha o front. */
+.editor-conteudo-blog .tiptap p {
+    text-align: justify;
+    hyphens: auto;
+}
+
+.editor-conteudo-blog .tiptap .has-text-align-left { text-align: left; hyphens: manual; }
+.editor-conteudo-blog .tiptap .has-text-align-center { text-align: center; hyphens: manual; }
+.editor-conteudo-blog .tiptap .has-text-align-right { text-align: right; hyphens: manual; }
+.editor-conteudo-blog .tiptap .has-text-align-justify { text-align: justify; hyphens: auto; }

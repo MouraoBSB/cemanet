@@ -40,7 +40,7 @@ return [
         ],
         'custom_definition' => [
             'id' => 'html5-definitions',
-            'rev' => 1,
+            'rev' => 2,
             'debug' => false,
             'elements' => [
                 // http://developers.whatwg.org/sections.html
@@ -94,6 +94,9 @@ return [
                 ['tr', 'width', 'Text'],
                 ['tr', 'height', 'Text'],
                 ['tr', 'border', 'Text'],
+                // data-id necessário para o provider de mídia do blog não deletar
+                // imagens do corpo como "órfãs" (limpa só se data-id não aparece no HTML)
+                ['img', 'data-id', 'Text'],
             ],
         ],
         'custom_attributes' => [
@@ -113,13 +116,29 @@ return [
         // Nota sobre atributos do iframe: 'frameborder' é nativo do schema HTML 4.01;
         //       'allowfullscreen' é fornecido via custom_definition.attributes (registrado
         //       globalmente acima); 'allow' é HTML5 e não é suportado pelo HTMLPurifier.
+        // 'data-id' em <img> é necessário para o provider de mídia manter imagens do corpo
+        //       (o cleanup de órfãos lê esse atributo; sem ele, as imagens são deletadas).
+        // 'Attr.AllowedClasses' é allow-list fechada — qualquer classe fora da lista é removida.
+        //       'style' inline nunca é permitido; dimensões devem vir via classes CSS.
         'conteudo_blog' => [
-            'HTML.Allowed' => 'p,br,b,strong,i,em,u,s,h2,h3,h4,h5,ul,ol,li,blockquote,a[href|title|target|rel],img[src|alt|width|height],figure,figcaption,table,thead,tbody,tr,th,td,iframe[src|width|height|frameborder|allowfullscreen]',
+            'HTML.Allowed' => 'p,br,b,strong,i,em,u,s,h2,h3,h4,h5,ul,ol,li,blockquote,a[href|title|target|rel],img[src|alt|width|height|class|data-id],figure[class],figcaption,div[class],table,thead,tbody,tr,th,td,iframe[src|width|height|frameborder|allowfullscreen]',
             'HTML.SafeIframe' => true,
             'URI.SafeIframeRegexp' => '%^(https?:)?//(www\.youtube\.com/embed/|player\.vimeo\.com/video/)%',
             'HTML.TargetBlank' => true,
             'AutoFormat.RemoveEmpty' => true,
             'URI.AllowedSchemes' => ['http' => true, 'https' => true, 'mailto' => true],
+            'Attr.AllowedClasses' => [
+                // Alinhamento clássico do WordPress
+                'alignleft', 'alignright', 'aligncenter', 'alignnone',
+                // Alinhamento Gutenberg
+                'has-text-align-left', 'has-text-align-center', 'has-text-align-right',
+                // Tamanhos de imagem do WordPress
+                'size-thumbnail', 'size-medium', 'size-large', 'size-full',
+                // Blocos Gutenberg de imagem
+                'is-resized', 'wp-block-image', 'wp-block-media-text',
+                // Layout de colunas personalizado
+                'colunas', 'coluna',
+            ],
         ],
     ],
 

@@ -25,4 +25,14 @@ class EditorAdminAssetsTest extends TestCase
         $this->assertStringContainsString('caret-color', $css);
         $this->assertStringContainsString('editor-conteudo-blog', $css);
     }
+
+    public function test_css_do_editor_espelha_alinhamento_e_tamanho_de_imagem(): void
+    {
+        $css = file_get_contents(resource_path('css/filament/editor.css'));
+
+        // Escopadas ao canvas do blog, espelhando .conteudo-artigo do front.
+        $this->assertStringContainsString('.editor-conteudo-blog .tiptap .alignleft', $css);
+        $this->assertStringContainsString('.editor-conteudo-blog .tiptap .size-medium', $css);
+        $this->assertStringContainsString('.editor-conteudo-blog .tiptap img.is-resized', $css);
+    }
 }

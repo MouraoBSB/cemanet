@@ -44,28 +44,40 @@ class ImagemPlugin implements RichContentPlugin
     {
         return [
             RichEditorTool::make('imagemAlinharEsquerda')
+                ->label('Imagem: alinhar à esquerda')
                 ->icon(Heroicon::Bars3BottomLeft)
-                ->jsHandler('$getEditor()?.chain().focus().definirAlinhamentoImagem("left").run()'),
+                ->jsHandler('$getEditor()?.chain().focus().definirAlinhamentoImagem("left").run()')
+                ->activeJsExpression('$getEditor()?.isActive("image", { align: "left" })'),
 
             RichEditorTool::make('imagemAlinharCentro')
+                ->label('Imagem: alinhar ao centro')
                 ->icon(Heroicon::Bars3)
-                ->jsHandler('$getEditor()?.chain().focus().definirAlinhamentoImagem("center").run()'),
+                ->jsHandler('$getEditor()?.chain().focus().definirAlinhamentoImagem("center").run()')
+                ->activeJsExpression('$getEditor()?.isActive("image", { align: "center" })'),
 
             RichEditorTool::make('imagemAlinharDireita')
+                ->label('Imagem: alinhar à direita')
                 ->icon(Heroicon::Bars3BottomRight)
-                ->jsHandler('$getEditor()?.chain().focus().definirAlinhamentoImagem("right").run()'),
+                ->jsHandler('$getEditor()?.chain().focus().definirAlinhamentoImagem("right").run()')
+                ->activeJsExpression('$getEditor()?.isActive("image", { align: "right" })'),
 
             RichEditorTool::make('imagemTamanhoMedio')
+                ->label('Imagem: tamanho médio')
                 ->icon(Heroicon::Photo)
-                ->jsHandler('$getEditor()?.chain().focus().definirTamanhoImagem("medium").run()'),
+                ->jsHandler('$getEditor()?.chain().focus().definirTamanhoImagem("medium").run()')
+                ->activeJsExpression('$getEditor()?.isActive("image", { size: "medium" })'),
 
             RichEditorTool::make('imagemTamanhoGrande')
+                ->label('Imagem: tamanho grande')
                 ->icon(Heroicon::ArrowsPointingOut)
-                ->jsHandler('$getEditor()?.chain().focus().definirTamanhoImagem("large").run()'),
+                ->jsHandler('$getEditor()?.chain().focus().definirTamanhoImagem("large").run()')
+                ->activeJsExpression('$getEditor()?.isActive("image", { size: "large" })'),
 
             RichEditorTool::make('imagemTamanhoTotal')
-                ->icon(Heroicon::ArrowsPointingOut)
-                ->jsHandler('$getEditor()?.chain().focus().definirTamanhoImagem("full").run()'),
+                ->label('Imagem: tamanho real')
+                ->icon(Heroicon::ArrowsPointingIn)
+                ->jsHandler('$getEditor()?.chain().focus().definirTamanhoImagem("full").run()')
+                ->activeJsExpression('$getEditor()?.isActive("image", { size: "full" })'),
         ];
     }
 

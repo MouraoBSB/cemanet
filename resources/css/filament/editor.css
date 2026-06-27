@@ -12,3 +12,42 @@
     border-top: 2px solid #4e4483;
     width: 1.25rem;
 }
+
+/* Preview de alinhamento/tamanho de imagem dentro do editor (item 1). */
+.editor-conteudo-blog .tiptap {
+    overflow-wrap: anywhere;
+}
+
+.editor-conteudo-blog .tiptap::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.editor-conteudo-blog .tiptap .alignleft {
+    float: left;
+    margin: 0.25rem 1.5rem 1rem 0;
+}
+
+.editor-conteudo-blog .tiptap .alignright {
+    float: right;
+    margin: 0.25rem 0 1rem 1.5rem;
+}
+
+.editor-conteudo-blog .tiptap .aligncenter {
+    display: block;
+    float: none;
+    clear: both;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.editor-conteudo-blog .tiptap .alignnone {
+    float: none;
+}
+
+.editor-conteudo-blog .tiptap .size-thumbnail { max-width: 25%; }
+.editor-conteudo-blog .tiptap .size-medium { max-width: 50%; }
+.editor-conteudo-blog .tiptap .size-large { max-width: 75%; }
+.editor-conteudo-blog .tiptap .size-full { max-width: 100%; }
+.editor-conteudo-blog .tiptap img.is-resized { max-width: 60%; }

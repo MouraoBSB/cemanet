@@ -12,6 +12,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libpng-dev \
         libonig-dev \
         libicu-dev \
+        jpegoptim \
+        optipng \
+        pngquant \
+        gifsicle \
+        webp \
     && docker-php-ext-install -j"$(nproc)" \
         pdo_mysql \
         mbstring \

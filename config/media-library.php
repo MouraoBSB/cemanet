@@ -203,7 +203,7 @@ return [
         ],
         Cwebp::class => [
             '-q', '80',  // qualidade 80
-            '-m', '6',   // método de compressão mais lento/melhor
+            '-m', '4',   // método de compressão equilibrado (rápido; -m6 travava o attach síncrono)
             '-mt',       // multithreading
         ],
         Avifenc::class => [

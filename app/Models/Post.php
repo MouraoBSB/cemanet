@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Image\Enums\Fit;
-use Filament\Forms\Components\RichEditor\FileAttachmentProviders\SpatieMediaLibraryFileAttachmentProvider;
+use App\Filament\RichContent\ProviderImagemCorpo;
 use Filament\Forms\Components\RichEditor\Models\Concerns\InteractsWithRichContent;
 use Filament\Forms\Components\RichEditor\Models\Contracts\HasRichContent;
 use Spatie\MediaLibrary\HasMedia;
@@ -130,14 +130,16 @@ class Post extends Model implements HasMedia, HasRichContent
                     ->nonQueued();
             });
 
-        // Uploads novos do corpo via RichEditor (gerenciados pelo provider)
+        // Uploads novos do corpo via RichEditor (gerenciados pelo provider).
+        // SEM withResponsiveImages(): a imagem do corpo é servida por <img src> simples
+        // (sem srcset), então gerar ~10 variantes só desperdiçava CPU e travava o attach
+        // síncrono. Uma única WebP 1920 basta. 'thumb' continua enfileirada.
         $this->addMediaCollection(self::COLECAO_CONTEUDO)
             ->registerMediaConversions(function (Media $media) {
                 $this->addMediaConversion('web')
                     ->fit(Fit::Max, 1920, 1920)
                     ->format('webp')
                     ->quality(82)
-                    ->withResponsiveImages()
                     ->nonQueued();
                 $this->addMediaConversion('thumb')
                     ->fit(Fit::Crop, 400, 300)
@@ -226,7 +228,7 @@ class Post extends Model implements HasMedia, HasRichContent
     {
         $this->registerRichContent(self::COLECAO_CONTEUDO)
             ->fileAttachmentProvider(
-                SpatieMediaLibraryFileAttachmentProvider::make()
+                ProviderImagemCorpo::make()
                     ->collection(self::COLECAO_CONTEUDO),
             );
     }

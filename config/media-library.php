@@ -182,7 +182,7 @@ return [
      */
     'image_optimizers' => [
         Jpegoptim::class => [
-            '-m85',            // qualidade máxima 85%
+            '-m80',            // qualidade máxima 80%
             '--strip-all',     // remove EXIF e metadados
             '--all-progressive', // salva como JPEG progressivo
         ],

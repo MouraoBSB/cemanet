@@ -43,4 +43,13 @@ class EditorAdminAssetsTest extends TestCase
         $this->assertStringContainsString('.fi-fo-rich-editor-toolbar', $css);
         $this->assertStringContainsString('position: sticky', $css);
     }
+
+    public function test_css_do_editor_limita_imagem_sem_classe(): void
+    {
+        // Regra-base: imagem recém-inserida (ainda sem size-*) não pode aparecer gigante.
+        $css = file_get_contents(resource_path('css/filament/editor.css'));
+
+        $this->assertStringContainsString('.editor-conteudo-blog .tiptap img', $css);
+        $this->assertStringContainsString('height: auto', $css);
+    }
 }

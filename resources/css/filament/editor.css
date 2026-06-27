@@ -13,6 +13,13 @@
     width: 1.25rem;
 }
 
+/* Regra-base: imagem nunca estoura o canvas (espelha .conteudo-artigo img do front).
+   Sem isto, uma imagem recém-inserida (ainda sem classe size-*) aparece em tamanho real. */
+.editor-conteudo-blog .tiptap img {
+    max-width: 100%;
+    height: auto;
+}
+
 /* Preview de alinhamento/tamanho de imagem dentro do editor (item 1). */
 .editor-conteudo-blog .tiptap {
     overflow-wrap: anywhere;

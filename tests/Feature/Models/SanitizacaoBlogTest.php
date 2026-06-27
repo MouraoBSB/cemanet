@@ -60,6 +60,33 @@ class SanitizacaoBlogTest extends TestCase
         $this->assertStringNotContainsString('style=', $p->conteudo);
     }
 
+    public function test_conteudo_preserva_alinhamento_de_texto_por_classe(): void
+    {
+        $post = Post::factory()->make([
+            'conteudo' => '<p class="has-text-align-justify">Justificado.</p>'
+                . '<h2 class="has-text-align-center">Centro</h2>'
+                . '<p class="has-text-align-right">Direita</p>',
+        ]);
+
+        $html = $post->conteudo;
+
+        $this->assertStringContainsString('has-text-align-justify', $html);
+        $this->assertStringContainsString('has-text-align-center', $html);
+        $this->assertStringContainsString('has-text-align-right', $html);
+    }
+
+    public function test_conteudo_remove_classe_de_paragrafo_fora_da_allowlist(): void
+    {
+        $post = Post::factory()->make([
+            'conteudo' => '<p class="classe-maliciosa has-text-align-left">x</p>',
+        ]);
+
+        $html = $post->conteudo;
+
+        $this->assertStringNotContainsString('classe-maliciosa', $html);
+        $this->assertStringContainsString('has-text-align-left', $html);
+    }
+
     /** perfil 'conteudo' (palestras) deve continuar sem data-id nem classes de imagem */
     public function test_perfil_conteudo_palestras_nao_permite_data_id_nem_classes(): void
     {

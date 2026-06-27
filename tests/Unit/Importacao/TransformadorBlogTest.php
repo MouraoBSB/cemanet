@@ -55,4 +55,27 @@ class TransformadorBlogTest extends TestCase
         $this->assertSame('agendado', TransformadorBlog::statusPost('future'));
         $this->assertSame('rascunho', TransformadorBlog::statusPost('draft'));
     }
+
+    public function test_limpar_gutenberg_null_e_vazio(): void
+    {
+        $this->assertSame('', TransformadorBlog::limparGutenberg(null));
+        $this->assertSame('', TransformadorBlog::limparGutenberg(''));
+    }
+
+    public function test_limpar_gutenberg_converte_colunas_e_preserva_tamanho(): void
+    {
+        $html = '<!-- wp:columns --><div class="wp-block-columns are-vertically-aligned-center">'
+            .'<!-- wp:column {"width":"33.33%"} --><div class="wp-block-column" style="flex-basis:33.33%">'
+            .'<figure class="wp-block-image size-large"><img src="/x.jpg" alt="" class="wp-image-1"/></figure>'
+            .'</div><!-- /wp:column --></div><!-- /wp:columns -->';
+
+        $out = TransformadorBlog::limparGutenberg($html);
+
+        $this->assertStringNotContainsString('wp:columns', $out);     // comentários removidos
+        $this->assertStringNotContainsString('flex-basis', $out);     // sem style inline
+        $this->assertStringContainsString('class="colunas"', $out);   // grid limpo
+        $this->assertStringContainsString('coluna', $out);
+        $this->assertStringContainsString('size-large', $out);        // tamanho preservado
+        $this->assertStringContainsString('wp-block-image', $out);
+    }
 }

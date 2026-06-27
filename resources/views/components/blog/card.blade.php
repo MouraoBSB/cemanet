@@ -3,8 +3,8 @@
 <article {{ $attributes->class(['group flex flex-col']) }}>
     {{-- Imagem destacada --}}
     <a href="{{ $post->urlPublica }}" class="block overflow-hidden rounded-xl" style="height:170px;">
-        @if ($post->imagem_destacada)
-            <img src="{{ asset('storage/'.$post->imagem_destacada) }}"
+        @if ($post->getFirstMedia(\App\Models\Post::COLECAO_DESTACADA))
+            <img src="{{ $post->getFirstMediaUrl(\App\Models\Post::COLECAO_DESTACADA, 'web') }}"
                  alt="{{ $post->imagem_destacada_alt ?? $post->titulo }}"
                  loading="lazy" width="320" height="170"
                  class="size-full object-cover transition duration-300 group-hover:scale-[1.03]">

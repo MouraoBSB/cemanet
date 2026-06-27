@@ -7,6 +7,7 @@ use App\Models\Categoria;
 use App\Models\Configuracao;
 use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -136,16 +137,19 @@ class BlogListagemTest extends TestCase
 
     public function test_destaque_renderiza_imagem_destacada_no_heroi(): void
     {
-        Post::factory()->create([
-            'titulo'           => 'Destaque Com Capa',
-            'status'           => Post::STATUS_PUBLICADO,
-            'destaque'         => true,
-            'imagem_destacada' => 'blog/destacada/destaque.jpg',
+        Storage::fake('public');
+
+        $post = Post::factory()->comImagemDestacada()->create([
+            'titulo'   => 'Destaque Com Capa',
+            'status'   => Post::STATUS_PUBLICADO,
+            'destaque' => true,
         ]);
+
+        $url = $post->getFirstMediaUrl(Post::COLECAO_DESTACADA, 'web');
 
         $resp = $this->get(route('blog.index'));
 
         $resp->assertOk();
-        $resp->assertSee('storage/blog/destacada/destaque.jpg', false);
+        $resp->assertSee($url, false);
     }
 }

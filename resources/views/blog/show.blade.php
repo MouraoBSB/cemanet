@@ -10,9 +10,7 @@
             'headline'         => $post->titulo,
             'datePublished'    => $post->data_publicacao?->toIso8601String(),
             'dateModified'     => $post->updated_at?->toIso8601String(),
-            'image'            => $post->imagem_destacada
-                                    ? asset('storage/'.$post->imagem_destacada)
-                                    : null,
+            'image'            => $post->getFirstMediaUrl(\App\Models\Post::COLECAO_DESTACADA, 'web') ?: null,
             'author'           => $org,
             'publisher'        => $org,
             'mainEntityOfPage' => $urlArtigo,
@@ -44,7 +42,8 @@
         JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG
     );
 
-    $ogImagem = $post->og_imagem ?? $post->imagem_destacada;
+    $ogUrl = $post->getFirstMediaUrl(\App\Models\Post::COLECAO_OG, 'og')
+           ?: $post->getFirstMediaUrl(\App\Models\Post::COLECAO_DESTACADA, 'og');
 @endphp
 
 <x-layout.app
@@ -63,16 +62,16 @@
         {{-- OpenGraph específico do artigo --}}
         <meta property="og:type" content="article">
         <meta property="og:url" content="{{ $urlArtigo }}">
-        @if ($ogImagem)
-            <meta property="og:image" content="{{ asset('storage/'.$ogImagem) }}">
+        @if ($ogUrl)
+            <meta property="og:image" content="{{ $ogUrl }}">
         @endif
 
         {{-- Twitter Card --}}
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="{{ $post->seo_titulo ?? $post->titulo }}">
         <meta name="twitter:description" content="{{ $post->seo_descricao ?? $post->resumo }}">
-        @if ($ogImagem)
-            <meta name="twitter:image" content="{{ asset('storage/'.$ogImagem) }}">
+        @if ($ogUrl)
+            <meta name="twitter:image" content="{{ $ogUrl }}">
         @endif
 
         {{-- JSON-LD --}}
@@ -103,8 +102,8 @@
     {{-- S1: Herói escuro --}}
     <section class="relative overflow-hidden bg-gradient-to-br from-primary to-footer-bg text-white">
         {{-- Foto de abertura ao fundo + overlay roxo (variante B) --}}
-        @if ($post->imagem_destacada)
-            <img src="{{ asset('storage/'.$post->imagem_destacada) }}" alt="" aria-hidden="true"
+        @if ($post->getFirstMedia(\App\Models\Post::COLECAO_DESTACADA))
+            <img src="{{ $post->getFirstMediaUrl(\App\Models\Post::COLECAO_DESTACADA, 'web') }}" alt="" aria-hidden="true"
                  class="pointer-events-none absolute inset-0 h-full w-full object-cover opacity-45">
             <div aria-hidden="true" class="pointer-events-none absolute inset-0"
                  style="background:linear-gradient(135deg,rgba(78,68,131,0.82) 0%,rgba(47,41,82,0.92) 100%);"></div>
@@ -217,9 +216,9 @@
     {{-- S3: Corpo do artigo --}}
     <section class="mx-auto max-w-[780px] px-6 py-12">
         {{-- Imagem de abertura da reportagem (além do fundo do herói) --}}
-        @if ($post->imagem_destacada)
+        @if ($post->getFirstMedia(\App\Models\Post::COLECAO_DESTACADA))
             <figure class="mb-9">
-                <img src="{{ asset('storage/'.$post->imagem_destacada) }}"
+                <img src="{{ $post->getFirstMediaUrl(\App\Models\Post::COLECAO_DESTACADA, 'web') }}"
                      alt="{{ $post->imagem_destacada_alt ?? $post->titulo }}"
                      width="780" height="440" loading="lazy"
                      class="h-auto w-full rounded-2xl object-cover shadow-card">
@@ -243,12 +242,13 @@
         </div>
 
         {{-- Galeria de imagens com lightbox --}}
-        @if ($post->imagens->isNotEmpty())
+        @php($galeriaMedia = $post->getMedia(\App\Models\Post::COLECAO_GALERIA))
+        @if ($galeriaMedia->isNotEmpty())
             <div class="mt-10"
                  x-data="{
                      aberta: false,
                      imgAtual: 0,
-                     imagens: @js($post->imagens->map(fn($i) => ['src' => asset('storage/'.$i->caminho), 'alt' => $i->alt ?? ''])->values()),
+                     imagens: @js($galeriaMedia->map(fn($m) => ['src' => $m->getUrl('web'), 'alt' => $m->getCustomProperty('alt') ?? ''])->values()),
                      abrir(i) { this.imgAtual = i; this.aberta = true; },
                      fechar() { this.aberta = false; },
                      anterior() { this.imgAtual = (this.imgAtual - 1 + this.imagens.length) % this.imagens.length; },
@@ -258,13 +258,13 @@
             >
                 <h2 class="mb-5 font-display text-2xl font-semibold text-primary">Galeria</h2>
                 <div class="grid grid-cols-2 gap-3 tablet:grid-cols-3">
-                    @foreach ($post->imagens as $i => $img)
+                    @foreach ($galeriaMedia as $i => $img)
                         <button type="button"
                                 @click="abrir({{ $i }})"
                                 class="group overflow-hidden rounded-xl focus-visible:outline-2 focus-visible:outline-primary"
                                 aria-label="Ampliar imagem {{ $loop->iteration }}">
-                            <img src="{{ asset('storage/'.$img->caminho) }}"
-                                 alt="{{ $img->alt ?? $post->titulo }}"
+                            <img src="{{ $img->getUrl('thumb') }}"
+                                 alt="{{ $img->getCustomProperty('alt') ?? $post->titulo }}"
                                  loading="lazy"
                                  width="300" height="200"
                                  class="size-full cursor-zoom-in object-cover transition duration-300 group-hover:scale-[1.04]"
@@ -305,7 +305,7 @@
 
                     {{-- Contador --}}
                     <p class="absolute bottom-4 left-1/2 -translate-x-1/2 font-mono text-xs text-white/70">
-                        <span x-text="imgAtual + 1"></span> / {{ $post->imagens->count() }}
+                        <span x-text="imgAtual + 1"></span> / {{ $galeriaMedia->count() }}
                     </p>
                 </div>
             </div>

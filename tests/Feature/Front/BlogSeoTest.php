@@ -8,6 +8,7 @@ use App\Models\Categoria;
 use App\Models\Post;
 use App\Models\PostFaq;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class BlogSeoTest extends TestCase
@@ -52,8 +53,9 @@ class BlogSeoTest extends TestCase
 
     public function test_jsonld_omite_image_quando_post_sem_imagem_destacada(): void
     {
-        // Sem imagem destacada o "image":null é inválido para Article (schema.org).
-        $this->postPublicado(['slug' => 'post-sem-imagem', 'imagem_destacada' => null]);
+        // Sem mídia anexada, "image":null é inválido para Article (schema.org) — deve ser omitido.
+        Storage::fake('public');
+        $this->postPublicado(['slug' => 'post-sem-imagem']);
 
         $resp = $this->get(route('blog.show', 'post-sem-imagem'));
 

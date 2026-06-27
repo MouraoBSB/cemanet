@@ -76,6 +76,8 @@ class PostMediaTest extends TestCase
 
     public function test_accessor_imagem_destacada_url_retorna_null_sem_midia(): void
     {
+        Storage::fake('public');
+
         $post = Post::factory()->create();
 
         $this->assertNull($post->imagem_destacada_url);

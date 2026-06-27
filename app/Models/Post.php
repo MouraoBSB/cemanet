@@ -11,16 +11,30 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Image\Enums\Fit;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Post extends Model
+class Post extends Model implements HasMedia
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia;
 
     public const STATUS_PUBLICADO = 'publicado';
 
     public const STATUS_RASCUNHO = 'rascunho';
 
     public const STATUS_AGENDADO = 'agendado';
+
+    // Coleções de mídia
+    public const COLECAO_DESTACADA = 'destacada';
+
+    public const COLECAO_GALERIA = 'galeria';
+
+    public const COLECAO_OG = 'og';
+
+    /** Registrado na Task 4 (rich content); definido aqui para uso antecipado. */
+    public const COLECAO_CONTEUDO = 'conteudo';
 
     protected $fillable = [
         'titulo',
@@ -54,6 +68,68 @@ class Post extends Model
             'visualizacoes' => 'integer',
             'tempo_leitura_min' => 'integer',
         ];
+    }
+
+    public function registerMediaCollections(): void
+    {
+        // Imagem de capa do post — arquivo único
+        $this->addMediaCollection(self::COLECAO_DESTACADA)
+            ->singleFile()
+            ->registerMediaConversions(function (Media $media) {
+                // Versão web otimizada com srcset responsivo
+                $this->addMediaConversion('web')
+                    ->fit(Fit::Max, 1920, 1920)
+                    ->format('webp')
+                    ->quality(82)
+                    ->withResponsiveImages()
+                    ->nonQueued();
+                // Miniatura para listagens
+                $this->addMediaConversion('thumb')
+                    ->fit(Fit::Crop, 400, 300)
+                    ->format('webp')
+                    ->queued();
+                // OG fallback a partir da capa
+                $this->addMediaConversion('og')
+                    ->fit(Fit::Crop, 1200, 630)
+                    ->format('jpg')
+                    ->quality(85)
+                    ->nonQueued();
+            });
+
+        // Galeria de fotos do post — múltiplos arquivos, ordenáveis
+        $this->addMediaCollection(self::COLECAO_GALERIA)
+            ->registerMediaConversions(function (Media $media) {
+                $this->addMediaConversion('web')
+                    ->fit(Fit::Max, 1920, 1920)
+                    ->format('webp')
+                    ->quality(82)
+                    ->withResponsiveImages()
+                    ->nonQueued();
+                $this->addMediaConversion('thumb')
+                    ->fit(Fit::Crop, 400, 300)
+                    ->format('webp')
+                    ->queued();
+            });
+
+        // Imagem OG personalizada — arquivo único, gerada em 1200×630
+        $this->addMediaCollection(self::COLECAO_OG)
+            ->singleFile()
+            ->registerMediaConversions(function (Media $media) {
+                $this->addMediaConversion('og')
+                    ->fit(Fit::Crop, 1200, 630)
+                    ->format('jpg')
+                    ->quality(85)
+                    ->nonQueued();
+            });
+    }
+
+    /**
+     * URL da conversão 'web' da imagem destacada (WebP otimizado).
+     * Retorna null quando nenhuma mídia foi anexada à coleção.
+     */
+    public function getImagemDestacadaUrlAttribute(): ?string
+    {
+        return $this->getFirstMediaUrl(self::COLECAO_DESTACADA, 'web') ?: null;
     }
 
     public function scopePublicado(Builder $query): Builder

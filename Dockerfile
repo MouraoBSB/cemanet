@@ -12,6 +12,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libpng-dev \
         libonig-dev \
         libicu-dev \
+        libjpeg62-turbo-dev \
+        libwebp-dev \
+        jpegoptim \
+        optipng \
+        pngquant \
+        gifsicle \
+        webp \
+    && docker-php-ext-configure gd \
+        --with-jpeg \
+        --with-webp \
     && docker-php-ext-install -j"$(nproc)" \
         pdo_mysql \
         mbstring \
@@ -21,6 +31,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         exif \
         intl \
     && rm -rf /var/lib/apt/lists/*
+
+# Limite de memória do PHP elevado para o processamento de imagens (Media Library/GD):
+# o padrão 128M estoura ao gerar conversões/responsive de imagens grandes — tanto nos
+# testes de cap quanto na importação em lote dos 45 posts (cema:importar-blog).
+RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/memory-limit.ini
 
 # Composer (binário copiado da imagem oficial).
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer

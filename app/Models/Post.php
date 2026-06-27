@@ -11,10 +11,17 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Image\Enums\Fit;
+use Filament\Forms\Components\RichEditor\FileAttachmentProviders\SpatieMediaLibraryFileAttachmentProvider;
+use Filament\Forms\Components\RichEditor\Models\Concerns\InteractsWithRichContent;
+use Filament\Forms\Components\RichEditor\Models\Contracts\HasRichContent;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Post extends Model
+class Post extends Model implements HasMedia, HasRichContent
 {
-    use HasFactory;
+    use HasFactory, InteractsWithMedia, InteractsWithRichContent;
 
     public const STATUS_PUBLICADO = 'publicado';
 
@@ -22,12 +29,28 @@ class Post extends Model
 
     public const STATUS_AGENDADO = 'agendado';
 
+    // Coleções de mídia
+    public const COLECAO_DESTACADA = 'destacada';
+
+    public const COLECAO_GALERIA = 'galeria';
+
+    public const COLECAO_OG = 'og';
+
+    /** Uploads NOVOS do corpo via RichEditor (gerenciados: o provider faz cleanup de órfãos). */
+    public const COLECAO_CONTEUDO = 'conteudo';
+
+    /**
+     * Imagens MIGRADAS do corpo (importação do legado). Coleção separada de propósito:
+     * o editor faz cleanup de órfãos apenas na `conteudo`, então as migradas (que entram
+     * como <img> simples, sem data-id) NUNCA são apagadas ao editar/salvar um post no admin.
+     */
+    public const COLECAO_CORPO = 'corpo';
+
     protected $fillable = [
         'titulo',
         'slug',
         'resumo',
-        'conteudo',
-        'imagem_destacada',
+        'conteudo', // saneado pelo mutator conteudo() — vale também em mass-assignment
         'imagem_destacada_alt',
         'criado_por_id',
         'categoria_principal_id',
@@ -40,7 +63,6 @@ class Post extends Model
         'seo_titulo',
         'seo_descricao',
         'seo_keyword',
-        'og_imagem',
         'robots_noindex',
         'canonical',
     ];
@@ -54,6 +76,98 @@ class Post extends Model
             'visualizacoes' => 'integer',
             'tempo_leitura_min' => 'integer',
         ];
+    }
+
+    public function registerMediaCollections(): void
+    {
+        // Imagem de capa do post — arquivo único
+        $this->addMediaCollection(self::COLECAO_DESTACADA)
+            ->singleFile()
+            ->registerMediaConversions(function (Media $media) {
+                // Versão web otimizada com srcset responsivo
+                $this->addMediaConversion('web')
+                    ->fit(Fit::Max, 1920, 1920)
+                    ->format('webp')
+                    ->quality(82)
+                    ->withResponsiveImages()
+                    ->nonQueued();
+                // Miniatura para listagens
+                $this->addMediaConversion('thumb')
+                    ->fit(Fit::Crop, 400, 300)
+                    ->format('webp')
+                    ->queued();
+                // OG fallback a partir da capa
+                $this->addMediaConversion('og')
+                    ->fit(Fit::Crop, 1200, 630)
+                    ->format('jpg')
+                    ->quality(85)
+                    ->nonQueued();
+            });
+
+        // Galeria de fotos do post — múltiplos arquivos, ordenáveis
+        $this->addMediaCollection(self::COLECAO_GALERIA)
+            ->registerMediaConversions(function (Media $media) {
+                $this->addMediaConversion('web')
+                    ->fit(Fit::Max, 1920, 1920)
+                    ->format('webp')
+                    ->quality(82)
+                    ->withResponsiveImages()
+                    ->nonQueued();
+                $this->addMediaConversion('thumb')
+                    ->fit(Fit::Crop, 400, 300)
+                    ->format('webp')
+                    ->queued();
+            });
+
+        // Imagem OG personalizada — arquivo único, gerada em 1200×630
+        $this->addMediaCollection(self::COLECAO_OG)
+            ->singleFile()
+            ->registerMediaConversions(function (Media $media) {
+                $this->addMediaConversion('og')
+                    ->fit(Fit::Crop, 1200, 630)
+                    ->format('jpg')
+                    ->quality(85)
+                    ->nonQueued();
+            });
+
+        // Uploads novos do corpo via RichEditor (gerenciados pelo provider)
+        $this->addMediaCollection(self::COLECAO_CONTEUDO)
+            ->registerMediaConversions(function (Media $media) {
+                $this->addMediaConversion('web')
+                    ->fit(Fit::Max, 1920, 1920)
+                    ->format('webp')
+                    ->quality(82)
+                    ->withResponsiveImages()
+                    ->nonQueued();
+                $this->addMediaConversion('thumb')
+                    ->fit(Fit::Crop, 400, 300)
+                    ->format('webp')
+                    ->queued();
+            });
+
+        // Imagens migradas do corpo (legado) — mesmas conversões, mas fora do cleanup do editor
+        $this->addMediaCollection(self::COLECAO_CORPO)
+            ->registerMediaConversions(function (Media $media) {
+                $this->addMediaConversion('web')
+                    ->fit(Fit::Max, 1920, 1920)
+                    ->format('webp')
+                    ->quality(82)
+                    ->withResponsiveImages()
+                    ->nonQueued();
+                $this->addMediaConversion('thumb')
+                    ->fit(Fit::Crop, 400, 300)
+                    ->format('webp')
+                    ->queued();
+            });
+    }
+
+    /**
+     * URL da conversão 'web' da imagem destacada (WebP otimizado).
+     * Retorna null quando nenhuma mídia foi anexada à coleção.
+     */
+    public function getImagemDestacadaUrlAttribute(): ?string
+    {
+        return $this->getFirstMediaUrl(self::COLECAO_DESTACADA, 'web') ?: null;
     }
 
     public function scopePublicado(Builder $query): Builder
@@ -88,11 +202,6 @@ class Post extends Model
         return $this->hasMany(PostFaq::class)->orderBy('ordem');
     }
 
-    public function imagens(): HasMany
-    {
-        return $this->hasMany(PostImagem::class)->orderBy('ordem');
-    }
-
     public function getUrlPublicaAttribute(): string
     {
         return route('blog.show', $this->slug);
@@ -108,5 +217,17 @@ class Post extends Model
         return Attribute::make(
             set: fn (?string $v) => $v !== null ? clean($v, 'conteudo_blog') : null,
         );
+    }
+
+    /**
+     * Configura o RichEditor para armazenar anexos do corpo na coleção ML 'conteudo'.
+     */
+    protected function setUpRichContent(): void
+    {
+        $this->registerRichContent(self::COLECAO_CONTEUDO)
+            ->fileAttachmentProvider(
+                SpatieMediaLibraryFileAttachmentProvider::make()
+                    ->collection(self::COLECAO_CONTEUDO),
+            );
     }
 }

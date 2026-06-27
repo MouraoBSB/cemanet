@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Work+Sans:wght@400;500;600;700&family=Poppins:wght@300;400;500;600&family=Roboto+Mono:wght@400;500&family=Roboto+Slab:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+@keyframes slGlow{0%,100%{opacity:.45;transform:scale(1)}50%{opacity:.85;transform:scale(1.06)}}
+@keyframes slRays{0%,100%{opacity:.25}50%{opacity:.6}}
+@keyframes slRise{0%{transform:translateY(0);opacity:0}16%{opacity:.85}100%{transform:translateY(-180px);opacity:0}}
+</style>
+</helmet>
+
+<!-- ============ DIREÇÃO A — LUZ SERENA ============ -->
+<div style="position:absolute; left:80px; top:88px; width:1280px;">
+  <div data-drags-parent="1" style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+    <span style="font-family:'Roboto Mono',monospace; font-size:12px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:#4E4483;">Direção A</span>
+    <span style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:16px; color:#3a3266;">Luz Serena</span>
+    <span style="font-family:'Poppins',sans-serif; font-size:13px; color:#7A8A8A;">editorial · creme · respiro · tipografia protagonista</span>
+  </div>
+
+  <div data-screen-label="Notícias — Direção A" style="background:#fff; border-radius:3px; box-shadow:0 1px 3px rgba(0,0,0,.08); overflow:hidden; font-family:'Poppins',sans-serif; color:#26242e;">
+
+    <!-- site top bar -->
+    <div style="background:#fff; border-bottom:1px solid #EBE8E8; padding:11px 30px; display:flex; align-items:center; gap:18px;">
+      <img src="assets/logo-horizontal.png" alt="CEMA" style="height:38px; display:block;">
+      <div style="margin-left:auto; display:flex; align-items:center; gap:18px; font-size:13px; color:#7A8A8A;">
+        <span style="display:flex; align-items:center; gap:7px; background:#F6F6F6; border:1px solid #E4E4E4; border-radius:50px; padding:7px 14px;">Pesquisar no site<span style="opacity:.5;">⌕</span></span>
+        <span style="color:#7A8A8A;">Possui conta? <span style="color:#4E4483; font-weight:600;">Entrar</span></span>
+      </div>
+    </div>
+    <nav style="background:#4E4483; padding:0 30px;">
+      <ul style="list-style:none; margin:0; padding:0; display:flex; align-items:stretch; gap:2px; font-family:'Roboto Mono',monospace;">
+        <li style="padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Institucional ▾</li>
+        <li style="padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Palestras ▾</li>
+        <li style="padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Mensagens Mediúnicas ▾</li>
+        <li style="padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Eventos ▾</li>
+        <li style="padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Vibração ▾</li>
+        <li style="padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Agenda ▾</li>
+        <li style="padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Evangelho ▾</li>
+        <li style="padding:13px 13px; font-size:12.5px; color:#3a3266; background:#F2A81E; font-weight:500;">Sementeira ▾</li>
+      </ul>
+    </nav>
+
+    <!-- masthead (cream, serene, subtle tree of light) -->
+    <div style="position:relative; background:linear-gradient(180deg,#F6F1E4 0%,#F3EDDD 60%,#fff 100%); padding:62px 30px 30px; overflow:hidden; text-align:center;">
+      <div style="position:absolute; top:-120px; left:50%; transform:translateX(-50%); width:560px; height:560px; border-radius:50%; background:radial-gradient(circle,rgba(242,168,30,0.32) 0%,rgba(242,168,30,0.10) 38%,rgba(242,168,30,0) 68%); animation:slGlow 7s ease-in-out infinite; pointer-events:none;"></div>
+      <div style="position:relative; z-index:2; max-width:720px; margin:0 auto;">
+        <p style="font-family:'Roboto Mono',monospace; font-size:11.5px; letter-spacing:.22em; text-transform:uppercase; color:#89AB98; margin:0 0 16px;">Blog Espírita do CEMA</p>
+        <h1 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:60px; line-height:1.02; color:#4E4483; margin:0 0 14px; letter-spacing:-0.02em;">Sementeira de Luz</h1>
+        <p style="font-family:'Roboto Slab',Georgia,serif; font-size:18px; color:#5b5766; margin:0 auto; max-width:520px; line-height:1.6;">Cada palavra é uma semente. Consolo, conhecimento e reflexão à luz do Evangelho.</p>
+      </div>
+      <!-- subtle illustrated band: tree emanating light -->
+      <div style="position:relative; z-index:2; margin:30px auto 0; max-width:980px; height:118px; border-radius:14px; overflow:hidden; opacity:.96;">
+        <dc-import name="Placeholder" label="faixa ilustrada — copa de árvore emanando luz e sementes ao vento (aquarela suave, tons creme/dourado)" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import>
+      </div>
+    </div>
+
+    <!-- category tabs -->
+    <div style="border-bottom:1px solid #EBE8E8; background:#fff;">
+      <div style="max-width:1080px; margin:0 auto; padding:0 30px; display:flex; gap:30px; justify-content:center; flex-wrap:wrap; font-family:'Work Sans',sans-serif; font-size:14px;">
+        <span style="padding:18px 2px; color:#4E4483; font-weight:600; border-bottom:2px solid #4E4483;">Todas</span>
+        <span style="padding:18px 2px; color:#5b5766;">Reflexões e Espiritualidade</span>
+        <span style="padding:18px 2px; color:#5b5766;">Prática do Amor ao Próximo</span>
+        <span style="padding:18px 2px; color:#5b5766;">Estudando a Mediunidade</span>
+        <span style="padding:18px 2px; color:#5b5766;">Datas Comemorativas</span>
+        <span style="padding:18px 2px; color:#5b5766;">CEMA em Ação</span>
+      </div>
+    </div>
+
+    <!-- featured -->
+    <section style="max-width:1080px; margin:0 auto; padding:48px 30px 14px;">
+      <div style="display:grid; grid-template-columns:1.05fr 0.95fr; gap:38px; align-items:center;">
+        <div style="border-radius:16px; overflow:hidden; height:340px; box-shadow:0 14px 36px rgba(78,68,131,0.12);">
+          <dc-import name="Placeholder" label="foto — Zé Paulista plantando a árvore, 1961 · 65 anos do CEMA" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import>
+        </div>
+        <div>
+          <p style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#E79048; margin:0 0 14px;">CEMA em Ação · Reportagem especial</p>
+          <h2 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:34px; line-height:1.12; color:#3a3266; margin:0 0 16px; letter-spacing:-0.01em;">65 anos do CEMA: a sementeira que Zé Paulista plantou em Planaltina</h2>
+          <p style="margin:0 0 22px; font-size:15.5px; color:#5b5766; line-height:1.7;">Da pequena muda fincada no cerrado a uma casa que acolhe centenas — a história de fé, trabalho e caridade que floresceu ao longo de seis décadas.</p>
+          <div style="display:flex; align-items:center; gap:14px; font-family:'Roboto Mono',monospace; font-size:11.5px; color:#7A8A8A; margin-bottom:24px;"><span>26 JUN 2026</span><span style="width:3px;height:3px;border-radius:50%;background:#cbb;"></span><span>8 min de leitura</span></div>
+          <span style="display:inline-flex; align-items:center; gap:9px; background:#4E4483; color:#fff; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14.5px; padding:13px 26px; border-radius:50px;">Ler reportagem <span style="font-size:16px;">→</span></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- masonry editorial grid -->
+    <section style="max-width:1080px; margin:0 auto; padding:30px 30px 10px;">
+      <div style="display:flex; align-items:baseline; justify-content:space-between; border-bottom:1px solid #EBE8E8; padding-bottom:14px; margin-bottom:30px;">
+        <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:20px; color:#4E4483; margin:0;">Mais recentes</h3>
+        <span style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#7A8A8A;">182 publicações</span>
+      </div>
+      <div style="column-count:3; column-gap:30px;">
+
+        <article style="break-inside:avoid; margin:0 0 30px; display:block;">
+          <div style="border-radius:13px; overflow:hidden; height:215px; margin-bottom:15px;"><dc-import name="Placeholder" label="parábola do semeador — campo ao amanhecer" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+          <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#4E4483; margin:0 0 8px;">Reflexões e Espiritualidade</p>
+          <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:20px; line-height:1.2; color:#3a3266; margin:0 0 9px;">Parábola do Semeador: os quatro terrenos do coração</h4>
+          <p style="margin:0 0 11px; font-size:14px; color:#5b5766; line-height:1.6;">O que faz a mesma semente florescer em uns e secar em outros? Um convite a preparar a própria terra interior.</p>
+          <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">22 JUN 2026 · 6 min</div>
+        </article>
+
+        <article style="break-inside:avoid; margin:0 0 30px; display:block;">
+          <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#6E9FCB; margin:0 0 8px;">Estudando a Mediunidade</p>
+          <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:18px; line-height:1.22; color:#3a3266; margin:0 0 9px;">A Mediunidade como serviço e vivência do amor</h4>
+          <p style="margin:0 0 11px; font-size:14px; color:#5b5766; line-height:1.6;">A faculdade mediúnica não é privilégio, mas compromisso. Como exercê-la com responsabilidade e caridade.</p>
+          <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">19 JUN 2026 · 7 min</div>
+        </article>
+
+        <article style="break-inside:avoid; margin:0 0 30px; display:block;">
+          <div style="border-radius:13px; overflow:hidden; height:155px; margin-bottom:15px;"><dc-import name="Placeholder" label="mãos em prece, luz suave" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+          <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#4E4483; margin:0 0 8px;">Reflexões e Espiritualidade</p>
+          <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:18px; line-height:1.22; color:#3a3266; margin:0 0 9px;">A eficácia da prece que fortalece a alma</h4>
+          <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">17 JUN 2026 · 5 min</div>
+        </article>
+
+        <!-- quote/text card -->
+        <article style="break-inside:avoid; margin:0 0 30px; display:block; background:#F3EDDD; border-radius:14px; padding:28px 26px;">
+          <span style="font-family:'Roboto Slab',serif; font-size:40px; color:#F2A81E; line-height:0;">“</span>
+          <p style="font-family:'Roboto Slab',Georgia,serif; font-size:18px; line-height:1.55; color:#4E4483; margin:6px 0 14px;">Semeia o bem sem esperar a colheita; a luz que plantas hoje florescerá em outros corações.</p>
+          <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:#89AB98; margin:0;">Reflexão da semana</p>
+        </article>
+
+        <article style="break-inside:avoid; margin:0 0 30px; display:block;">
+          <div style="border-radius:13px; overflow:hidden; height:185px; margin-bottom:15px;"><dc-import name="Placeholder" label="campanha do agasalho — voluntários" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+          <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#89AB98; margin:0 0 8px;">Prática do Amor ao Próximo</p>
+          <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:18px; line-height:1.22; color:#3a3266; margin:0 0 9px;">Campanha do Agasalho: aquecer quem tem frio</h4>
+          <p style="margin:0 0 11px; font-size:14px; color:#5b5766; line-height:1.6;">A casa abre as portas para arrecadar agasalhos e cobertores neste inverno.</p>
+          <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">15 JUN 2026 · 3 min</div>
+        </article>
+
+        <article style="break-inside:avoid; margin:0 0 30px; display:block;">
+          <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#F2A81E; margin:0 0 8px;">Datas Comemorativas</p>
+          <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:18px; line-height:1.22; color:#3a3266; margin:0 0 9px;">108 anos de O Livro dos Espíritos</h4>
+          <p style="margin:0 0 11px; font-size:14px; color:#5b5766; line-height:1.6;">A obra que inaugurou a Codificação completa mais de um século iluminando consciências.</p>
+          <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">12 JUN 2026 · 6 min</div>
+        </article>
+
+        <article style="break-inside:avoid; margin:0 0 30px; display:block;">
+          <div style="border-radius:13px; overflow:hidden; height:235px; margin-bottom:15px;"><dc-import name="Placeholder" label="12º Encontro da Família CEMA — auditório lotado" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+          <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#E79048; margin:0 0 8px;">CEMA em Ação</p>
+          <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:18px; line-height:1.22; color:#3a3266; margin:0 0 9px;">12º Encontro da Família CEMA reúne centenas</h4>
+          <p style="margin:0 0 11px; font-size:14px; color:#5b5766; line-height:1.6;">Um dia inteiro de estudo, convivência e celebração da fraternidade.</p>
+          <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">09 JUN 2026 · 4 min</div>
+        </article>
+
+        <article style="break-inside:avoid; margin:0 0 30px; display:block;">
+          <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#4E4483; margin:0 0 8px;">Reflexões e Espiritualidade</p>
+          <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:18px; line-height:1.22; color:#3a3266; margin:0 0 9px;">Fé raciocinada: como enfrentar as provações</h4>
+          <p style="margin:0 0 11px; font-size:14px; color:#5b5766; line-height:1.6;">A fé que se sustenta não foge da dor — compreende-a como caminho de crescimento.</p>
+          <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">06 JUN 2026 · 5 min</div>
+        </article>
+
+        <article style="break-inside:avoid; margin:0 0 30px; display:block;">
+          <div style="border-radius:13px; overflow:hidden; height:165px; margin-bottom:15px;"><dc-import name="Placeholder" label="caminho ao entardecer, paz" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+          <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#4E4483; margin:0 0 8px;">Reflexões e Espiritualidade</p>
+          <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:18px; line-height:1.22; color:#3a3266; margin:0 0 9px;">O Evangelho como caminho para a paz</h4>
+          <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">02 JUN 2026 · 6 min</div>
+        </article>
+
+      </div>
+      <div style="text-align:center; padding:6px 0 8px;">
+        <span style="display:inline-block; border:1px solid #4E4483; color:#4E4483; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14px; padding:13px 34px; border-radius:50px;">Carregar mais publicações</span>
+      </div>
+    </section>
+
+    <!-- newsletter -->
+    <section style="background:#4E4483; margin-top:34px;">
+      <div style="max-width:720px; margin:0 auto; padding:60px 30px; text-align:center; color:#fff;">
+        <p style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:#F2A81E; margin:0 0 12px;">Receba a sementeira</p>
+        <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:30px; margin:0 0 12px;">Uma reflexão na sua caixa toda semana</h3>
+        <p style="margin:0 auto 26px; color:#d8d2ec; max-width:420px; font-size:15px;">Artigos, agenda e mensagens — sem excesso, só o que ilumina.</p>
+        <div style="display:flex; gap:10px; max-width:440px; margin:0 auto;">
+          <span style="flex:1; background:#fff; border-radius:50px; padding:14px 20px; text-align:left; color:#9a93a8; font-size:14px;">Seu melhor e-mail</span>
+          <span style="background:#F2A81E; color:#3a3266; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14px; padding:14px 28px; border-radius:50px;">Inscrever</span>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<!-- ============ DIREÇÃO B — SEMENTE DE LUZ ============ -->
+<div style="position:absolute; left:1480px; top:88px; width:1280px;">
+  <div data-drags-parent="1" style="display:flex; align-items:center; gap:12px; margin-bottom:16px;">
+    <span style="font-family:'Roboto Mono',monospace; font-size:12px; font-weight:500; letter-spacing:.14em; text-transform:uppercase; color:#4E4483;">Direção B</span>
+    <span style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:16px; color:#3a3266;">Semente de Luz</span>
+    <span style="font-family:'Poppins',sans-serif; font-size:13px; color:#7A8A8A;">portal vivo · herói imersivo · barra lateral · mais energia</span>
+  </div>
+
+  <div data-screen-label="Notícias — Direção B" style="background:#fff; border-radius:3px; box-shadow:0 1px 3px rgba(0,0,0,.08); overflow:hidden; font-family:'Poppins',sans-serif; color:#26242e;">
+
+    <!-- site top bar -->
+    <div style="background:#fff; border-bottom:1px solid #EBE8E8; padding:11px 30px; display:flex; align-items:center; gap:18px;">
+      <img src="assets/logo-horizontal.png" alt="CEMA" style="height:38px; display:block;">
+      <div style="margin-left:auto; display:flex; align-items:center; gap:18px; font-size:13px; color:#7A8A8A;">
+        <span style="display:flex; align-items:center; gap:7px; background:#F6F6F6; border:1px solid #E4E4E4; border-radius:50px; padding:7px 14px;">Pesquisar no site<span style="opacity:.5;">⌕</span></span>
+        <span style="color:#7A8A8A;">Possui conta? <span style="color:#4E4483; font-weight:600;">Entrar</span></span>
+      </div>
+    </div>
+    <nav style="background:#4E4483; padding:0 30px;">
+      <ul style="list-style:none; margin:0; padding:0; display:flex; align-items:stretch; gap:2px; font-family:'Roboto Mono',monospace;">
+        <li style="padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Institucional ▾</li>
+        <li style="padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Palestras ▾</li>
+        <li style="padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Mensagens Mediúnicas ▾</li>
+        <li style="padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Eventos ▾</li>
+        <li style="padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Vibração ▾</li>
+        <li style="padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Agenda ▾</li>
+        <li style="padding:13px 13px; font-size:12.5px; color:#cfc7e8;">Evangelho ▾</li>
+        <li style="padding:13px 13px; font-size:12.5px; color:#3a3266; background:#F2A81E; font-weight:500;">Sementeira ▾</li>
+      </ul>
+    </nav>
+
+    <!-- immersive hero: tree of light -->
+    <section style="position:relative; min-height:480px; display:flex; align-items:flex-end; overflow:hidden; background:linear-gradient(165deg,#2f2952 0%,#3c3468 50%,#4E4483 100%);">
+      <!-- light rays -->
+      <div style="position:absolute; top:-80px; right:8%; width:520px; height:560px; background:conic-gradient(from 200deg at 50% 30%, rgba(242,168,30,0) 0deg, rgba(242,168,30,0.18) 24deg, rgba(242,168,30,0) 48deg, rgba(242,168,30,0.14) 78deg, rgba(242,168,30,0) 110deg, rgba(110,159,203,0.12) 150deg, rgba(242,168,30,0) 200deg); animation:slRays 8s ease-in-out infinite; pointer-events:none;"></div>
+      <!-- glow halo -->
+      <div style="position:absolute; top:30px; right:16%; width:360px; height:360px; border-radius:50%; background:radial-gradient(circle,rgba(242,168,30,0.40) 0%,rgba(242,168,30,0.10) 45%,rgba(242,168,30,0) 70%); animation:slGlow 6s ease-in-out infinite; pointer-events:none;"></div>
+      <!-- tree illustration -->
+      <div style="position:absolute; top:0; right:6%; bottom:0; width:430px; opacity:.92;">
+        <dc-import name="Placeholder" label="ilustração — árvore de luz: tronco e raízes luminosos, copa que se desfaz em sementes brilhantes subindo ao céu" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import>
+      </div>
+      <!-- rising seed particles -->
+      <span style="position:absolute; left:62%; bottom:40px; width:6px; height:6px; border-radius:50%; background:rgba(242,168,30,0.8); animation:slRise 6s linear 0s infinite;"></span>
+      <span style="position:absolute; left:70%; bottom:60px; width:5px; height:5px; border-radius:50%; background:rgba(242,168,30,0.7); animation:slRise 7.5s linear 1.2s infinite;"></span>
+      <span style="position:absolute; left:76%; bottom:30px; width:7px; height:7px; border-radius:50%; background:rgba(255,235,190,0.85); animation:slRise 6.8s linear 2.1s infinite;"></span>
+      <span style="position:absolute; left:66%; bottom:80px; width:4px; height:4px; border-radius:50%; background:rgba(110,159,203,0.7); animation:slRise 8s linear 0.6s infinite;"></span>
+      <span style="position:absolute; left:82%; bottom:50px; width:5px; height:5px; border-radius:50%; background:rgba(242,168,30,0.7); animation:slRise 7s linear 3s infinite;"></span>
+
+      <div style="position:relative; z-index:3; max-width:640px; padding:0 30px 54px 40px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:18px;">
+          <span style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.2em; text-transform:uppercase; color:#3a3266; background:#F2A81E; padding:5px 12px; border-radius:50px;">Sementeira de Luz</span>
+          <span style="font-family:'Roboto Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:#F2A81E;">Em destaque</span>
+        </div>
+        <h1 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:42px; line-height:1.1; color:#fff; margin:0 0 16px; letter-spacing:-0.01em;">65 anos do CEMA: a sementeira que Zé Paulista plantou em Planaltina</h1>
+        <p style="font-size:16px; color:#d8d2ec; margin:0 0 26px; line-height:1.65; max-width:520px;">Da pequena muda fincada no cerrado a uma casa que acolhe centenas — seis décadas de fé, trabalho e caridade.</p>
+        <div style="display:flex; align-items:center; gap:16px;">
+          <span style="display:inline-flex; align-items:center; gap:9px; background:#F2A81E; color:#3a3266; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14.5px; padding:13px 26px; border-radius:50px;">Ler reportagem →</span>
+          <span style="font-family:'Roboto Mono',monospace; font-size:11.5px; color:#bdb4dd;">26 JUN 2026 · 8 min</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- category chips -->
+    <div style="background:#fff; border-bottom:1px solid #EBE8E8; padding:16px 30px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <span style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#7A8A8A; margin-right:4px;">Categorias</span>
+      <span style="background:#4E4483; color:#fff; font-family:'Work Sans',sans-serif; font-weight:500; font-size:13px; padding:8px 16px; border-radius:50px;">Todas</span>
+      <span style="background:#fff; border:1px solid #E4E4E4; color:#4E4483; font-size:13px; padding:8px 16px; border-radius:50px;">Reflexões e Espiritualidade</span>
+      <span style="background:#fff; border:1px solid #E4E4E4; color:#89AB98; font-size:13px; padding:8px 16px; border-radius:50px;">Prática do Amor ao Próximo</span>
+      <span style="background:#fff; border:1px solid #E4E4E4; color:#6E9FCB; font-size:13px; padding:8px 16px; border-radius:50px;">Estudando a Mediunidade</span>
+      <span style="background:#fff; border:1px solid #E4E4E4; color:#c98a2e; font-size:13px; padding:8px 16px; border-radius:50px;">Datas Comemorativas</span>
+      <span style="background:#fff; border:1px solid #E4E4E4; color:#E79048; font-size:13px; padding:8px 16px; border-radius:50px;">CEMA em Ação</span>
+    </div>
+
+    <!-- body: main + sidebar -->
+    <section style="max-width:1180px; margin:0 auto; padding:40px 30px 10px; display:grid; grid-template-columns:1fr 312px; gap:42px; align-items:start;">
+
+      <!-- main column -->
+      <div>
+        <div style="display:flex; align-items:baseline; justify-content:space-between; margin-bottom:24px;">
+          <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:22px; color:#4E4483; margin:0;">Últimas publicações</h3>
+          <span style="font-family:'Roboto Mono',monospace; font-size:11px; color:#7A8A8A;">Ordenar: recentes ▾</span>
+        </div>
+
+        <!-- lead row: horizontal card -->
+        <article style="display:grid; grid-template-columns:230px 1fr; gap:20px; padding-bottom:26px; margin-bottom:26px; border-bottom:1px solid #EBE8E8;">
+          <div style="border-radius:12px; overflow:hidden; height:160px;"><dc-import name="Placeholder" label="parábola do semeador — campo ao amanhecer" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+          <div>
+            <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#4E4483; margin:0 0 8px;">Reflexões e Espiritualidade</p>
+            <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:21px; line-height:1.18; color:#3a3266; margin:0 0 10px;">Parábola do Semeador: os quatro terrenos do coração</h4>
+            <p style="margin:0 0 12px; font-size:14px; color:#5b5766; line-height:1.6;">O que faz a mesma semente florescer em uns e secar em outros? Um convite a preparar a própria terra interior para receber a Boa Nova.</p>
+            <div style="font-family:'Roboto Mono',monospace; font-size:10.5px; color:#7A8A8A;">22 JUN 2026 · 6 min · 12 comentários</div>
+          </div>
+        </article>
+
+        <!-- 2-col grid of cards -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:26px;">
+          <article style="display:block;">
+            <div style="border-radius:12px; overflow:hidden; height:170px; margin-bottom:13px; border-left:3px solid #6E9FCB;"><dc-import name="Placeholder" label="médium em concentração, luz" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+            <p style="font-family:'Roboto Mono',monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#6E9FCB; margin:0 0 7px;">Estudando a Mediunidade</p>
+            <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:17px; line-height:1.22; color:#3a3266; margin:0 0 8px;">A Mediunidade como serviço e vivência do amor</h4>
+            <div style="font-family:'Roboto Mono',monospace; font-size:10px; color:#7A8A8A;">19 JUN · 7 min</div>
+          </article>
+          <article style="display:block;">
+            <div style="border-radius:12px; overflow:hidden; height:170px; margin-bottom:13px;"><dc-import name="Placeholder" label="campanha do agasalho — voluntários" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+            <p style="font-family:'Roboto Mono',monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#89AB98; margin:0 0 7px;">Prática do Amor ao Próximo</p>
+            <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:17px; line-height:1.22; color:#3a3266; margin:0 0 8px;">Campanha do Agasalho: aquecer quem tem frio</h4>
+            <div style="font-family:'Roboto Mono',monospace; font-size:10px; color:#7A8A8A;">15 JUN · 3 min</div>
+          </article>
+          <article style="display:block;">
+            <div style="border-radius:12px; overflow:hidden; height:170px; margin-bottom:13px;"><dc-import name="Placeholder" label="12º Encontro da Família CEMA" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+            <p style="font-family:'Roboto Mono',monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#E79048; margin:0 0 7px;">CEMA em Ação</p>
+            <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:17px; line-height:1.22; color:#3a3266; margin:0 0 8px;">12º Encontro da Família CEMA reúne centenas</h4>
+            <div style="font-family:'Roboto Mono',monospace; font-size:10px; color:#7A8A8A;">09 JUN · 4 min</div>
+          </article>
+          <article style="display:block;">
+            <div style="border-radius:12px; overflow:hidden; height:170px; margin-bottom:13px;"><dc-import name="Placeholder" label="O Livro dos Espíritos, 108 anos" hint-size="100%,100%" style="display:block; width:100%; height:100%;"></dc-import></div>
+            <p style="font-family:'Roboto Mono',monospace; font-size:10px; letter-spacing:.12em; text-transform:uppercase; color:#c98a2e; margin:0 0 7px;">Datas Comemorativas</p>
+            <h4 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:17px; line-height:1.22; color:#3a3266; margin:0 0 8px;">108 anos de O Livro dos Espíritos</h4>
+            <div style="font-family:'Roboto Mono',monospace; font-size:10px; color:#7A8A8A;">12 JUN · 6 min</div>
+          </article>
+        </div>
+
+        <div style="text-align:center; padding:30px 0 8px;">
+          <span style="display:inline-block; background:#4E4483; color:#fff; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14px; padding:13px 34px; border-radius:50px;">Carregar mais</span>
+        </div>
+      </div>
+
+      <!-- sidebar -->
+      <aside style="display:flex; flex-direction:column; gap:26px;">
+        <div style="background:#F6F6F6; border:1px solid #EBE8E8; border-radius:16px; padding:24px 22px;">
+          <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#E79048; margin:0 0 16px;">Mais lidas</p>
+          <div style="display:flex; flex-direction:column; gap:16px;">
+            <div style="display:flex; gap:13px; align-items:flex-start;"><span style="font-family:'Work Sans',sans-serif; font-weight:700; font-size:22px; color:#e3dcef; line-height:1;">01</span><p style="margin:0; font-family:'Work Sans',sans-serif; font-weight:500; font-size:14px; line-height:1.3; color:#3a3266;">Reforma Íntima: como o pensamento transforma a vida</p></div>
+            <div style="display:flex; gap:13px; align-items:flex-start;"><span style="font-family:'Work Sans',sans-serif; font-weight:700; font-size:22px; color:#e3dcef; line-height:1;">02</span><p style="margin:0; font-family:'Work Sans',sans-serif; font-weight:500; font-size:14px; line-height:1.3; color:#3a3266;">Fé raciocinada: como enfrentar as provações</p></div>
+            <div style="display:flex; gap:13px; align-items:flex-start;"><span style="font-family:'Work Sans',sans-serif; font-weight:700; font-size:22px; color:#e3dcef; line-height:1;">03</span><p style="margin:0; font-family:'Work Sans',sans-serif; font-weight:500; font-size:14px; line-height:1.3; color:#3a3266;">A eficácia da prece que fortalece a alma</p></div>
+            <div style="display:flex; gap:13px; align-items:flex-start;"><span style="font-family:'Work Sans',sans-serif; font-weight:700; font-size:22px; color:#e3dcef; line-height:1;">04</span><p style="margin:0; font-family:'Work Sans',sans-serif; font-weight:500; font-size:14px; line-height:1.3; color:#3a3266;">O Evangelho como caminho para a paz</p></div>
+          </div>
+        </div>
+
+        <div style="background:linear-gradient(160deg,#4E4483,#3a3266); border-radius:16px; padding:26px 24px; color:#fff; position:relative; overflow:hidden;">
+          <div style="position:absolute; top:-40px; right:-30px; width:160px; height:160px; border-radius:50%; background:radial-gradient(circle,rgba(242,168,30,0.4),rgba(242,168,30,0));"></div>
+          <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#F2A81E; margin:0 0 12px; position:relative;">Reflexão do dia</p>
+          <p style="font-family:'Roboto Slab',Georgia,serif; font-size:17px; line-height:1.55; margin:0 0 8px; position:relative;">“Semeia o bem sem esperar a colheita; a luz que plantas hoje florescerá em outros corações.”</p>
+        </div>
+
+        <div style="border:1px solid #EBE8E8; border-radius:16px; padding:24px 22px;">
+          <p style="font-family:'Roboto Mono',monospace; font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#7A8A8A; margin:0 0 14px;">Navegar por categoria</p>
+          <div style="display:flex; flex-direction:column;">
+            <span style="display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid #F2F1F4; font-size:13.5px; color:#3a3266;">Reflexões e Espiritualidade <span style="color:#9a93a8;">64</span></span>
+            <span style="display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid #F2F1F4; font-size:13.5px; color:#3a3266;">Prática do Amor ao Próximo <span style="color:#9a93a8;">38</span></span>
+            <span style="display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid #F2F1F4; font-size:13.5px; color:#3a3266;">Estudando a Mediunidade <span style="color:#9a93a8;">29</span></span>
+            <span style="display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid #F2F1F4; font-size:13.5px; color:#3a3266;">Datas Comemorativas <span style="color:#9a93a8;">31</span></span>
+            <span style="display:flex; justify-content:space-between; padding:9px 0; font-size:13.5px; color:#3a3266;">CEMA em Ação <span style="color:#9a93a8;">20</span></span>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- newsletter -->
+    <section style="background:#F3EDDD; margin-top:34px; border-top:1px solid #EBE8E8;">
+      <div style="max-width:1180px; margin:0 auto; padding:46px 30px; display:flex; align-items:center; gap:30px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:280px;">
+          <h3 style="font-family:'Work Sans',sans-serif; font-weight:600; font-size:26px; color:#4E4483; margin:0 0 6px;">Receba a sementeira toda semana</h3>
+          <p style="margin:0; color:#5b5766; font-size:15px;">Uma reflexão, a agenda e as novidades da casa — direto no seu e-mail.</p>
+        </div>
+        <div style="display:flex; gap:10px; min-width:340px;">
+          <span style="flex:1; background:#fff; border:1px solid #E4E4E4; border-radius:50px; padding:14px 20px; color:#9a93a8; font-size:14px;">Seu melhor e-mail</span>
+          <span style="background:#4E4483; color:#fff; font-family:'Work Sans',sans-serif; font-weight:600; font-size:14px; padding:14px 28px; border-radius:50px;">Inscrever</span>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

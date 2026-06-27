@@ -106,6 +106,42 @@ class TransformadorBlog
     }
 
     /**
+     * Remove resíduos do editor Gutenberg do HTML e converte blocos de colunas
+     * para as classes internas do sistema (`colunas` / `coluna`).
+     *
+     * Ordem de processamento:
+     *   1. Remove comentários <!-- wp:… --> e <!-- /wp:… -->
+     *   2. Remove tokens de classe `jet-sm-gb-*`
+     *   3. Converte <div class="wp-block-columns …"> → <div class="colunas">
+     *   4. Converte <div class="wp-block-column …" style="flex-basis:…"> → <div class="coluna">
+     *
+     * Figuras/imagens (wp-block-image, size-*, aligncenter) não são tocadas.
+     */
+    public static function limparGutenberg(?string $html): string
+    {
+        if (empty($html)) {
+            return '';
+        }
+
+        // 1. Remove comentários Gutenberg
+        $html = preg_replace('~<!--\s*/?wp:.*?-->~s', '', $html);
+
+        // 2. Remove tokens de classe jet-sm-gb-* dos atributos class.
+        //    Usa [\w-]+ (token de classe) e NÃO \S+: o ganancioso \S+ não para no '"'
+        //    nem no '>', então em `jet-sm-gb-GUID"><img ...` ele engolia o `"><img`,
+        //    destruindo a tag da imagem e cascateando perda de conteúdo no purifier.
+        $html = preg_replace('~\bjet-sm-gb-[\w-]+~', '', $html);
+
+        // 3. Converte container de colunas (plural primeiro para evitar colisão com wp-block-column singular)
+        $html = preg_replace('~<div\s+class="[^"]*\bwp-block-columns\b[^"]*"[^>]*>~i', '<div class="colunas">', $html);
+
+        // 4. Converte cada coluna individual (também descarta o style="flex-basis:…" ao reescrever a tag inteira)
+        $html = preg_replace('~<div\s+class="[^"]*\bwp-block-column\b[^"]*"[^>]*>~i', '<div class="coluna">', $html);
+
+        return $html;
+    }
+
+    /**
      * Converte o status do WordPress para o status interno do sistema.
      */
     public static function statusPost(string $wp): string

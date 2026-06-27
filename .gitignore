@@ -6,6 +6,7 @@
 /public/build/
 /public/hot
 /public/storage
+/public/js/app/
 /bootstrap/cache/*.php
 
 # Ambiente e segredos (NUNCA versionar)
@@ -20,6 +21,7 @@ auth.json
 /storage/framework/sessions/*
 /storage/framework/views/*
 /storage/logs/*
+/storage/media-library/
 .phpunit.result.cache
 /.phpunit.cache
 /storage/pail

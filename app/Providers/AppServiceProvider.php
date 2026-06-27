@@ -6,10 +6,13 @@ use App\Importacao\LeitorBlog;
 use App\Importacao\LeitorBlogMysql;
 use App\Importacao\LeitorLegado;
 use App\Importacao\LeitorLegadoMysql;
+use App\Listeners\CaparOriginalDaMidia;
 use App\Support\Blog\FonteReflexao;
 use App\Support\Blog\ReflexaoConfig;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider;
+use Spatie\MediaLibrary\MediaCollections\Events\MediaHasBeenAddedEvent;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -29,5 +32,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Carbon::setLocale('pt_BR');
+
+        Event::listen(MediaHasBeenAddedEvent::class, CaparOriginalDaMidia::class);
     }
 }

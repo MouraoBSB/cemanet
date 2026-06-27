@@ -7,6 +7,7 @@ namespace Tests\Feature\Front;
 use App\Models\Categoria;
 use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class BlogSingleTest extends TestCase
@@ -15,12 +16,13 @@ class BlogSingleTest extends TestCase
 
     public function test_single_publicado_200_com_faq_e_galeria(): void
     {
+        Storage::fake('public');
+
         $cat = Categoria::factory()->create(['slug' => 'reflexoes-e-espiritualidade', 'cor' => '#4E4483']);
-        $post = Post::factory()->create(['slug' => 'meu-post', 'status' => 'publicado']);
+        $post = Post::factory()->comGaleria(1)->create(['slug' => 'meu-post', 'status' => 'publicado']);
         $post->categorias()->attach($cat);
         $post->update(['categoria_principal_id' => $cat->id]);
         $post->faqs()->create(['pergunta' => 'P?', 'resposta' => 'R.', 'ordem' => 0]);
-        $post->imagens()->create(['caminho' => 'blog/galeria/x.jpg', 'ordem' => 0]);
 
         $r = $this->get('/sementeira/meu-post');
 
@@ -49,31 +51,37 @@ class BlogSingleTest extends TestCase
 
     public function test_hero_renderiza_imagem_destacada(): void
     {
-        Post::factory()->create([
-            'slug' => 'com-capa',
+        Storage::fake('public');
+
+        $post = Post::factory()->comImagemDestacada()->create([
+            'slug'   => 'com-capa',
             'status' => 'publicado',
-            'imagem_destacada' => 'blog/destacada/com-capa.jpg',
         ]);
+
+        $url = $post->getFirstMediaUrl(Post::COLECAO_DESTACADA, 'web');
 
         $this->get('/sementeira/com-capa')
             ->assertOk()
-            ->assertSee('storage/blog/destacada/com-capa.jpg', false);
+            ->assertSee($url, false);
     }
 
     public function test_capa_aparece_no_heroi_e_no_corpo(): void
     {
-        Post::factory()->create([
-            'slug' => 'capa-dupla',
+        Storage::fake('public');
+
+        $post = Post::factory()->comImagemDestacada()->create([
+            'slug'   => 'capa-dupla',
             'status' => 'publicado',
-            'imagem_destacada' => 'blog/destacada/capa-dupla.jpg',
         ]);
+
+        $url = $post->getFirstMediaUrl(Post::COLECAO_DESTACADA, 'web');
 
         $html = $this->get('/sementeira/capa-dupla')->assertOk()->getContent();
 
-        // a capa entra no fundo do herói E como imagem de abertura no corpo
+        // a URL da conversão 'web' entra no fundo do herói E como imagem de abertura no corpo
         $this->assertGreaterThanOrEqual(
             2,
-            substr_count($html, 'storage/blog/destacada/capa-dupla.jpg'),
+            substr_count($html, $url),
             'A imagem de capa deve aparecer no herói e no corpo da reportagem.'
         );
     }

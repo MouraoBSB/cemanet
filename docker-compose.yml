@@ -38,6 +38,20 @@ services:
       timeout: 5s
       retries: 10
 
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: cema-worker
+    restart: unless-stopped
+    working_dir: /var/www/html
+    volumes:
+      - ./:/var/www/html
+    depends_on:
+      db:
+        condition: service_healthy
+    command: php artisan queue:work --sleep=1 --tries=3 --max-time=3600
+
   mailpit:
     image: axllent/mailpit:latest
     container_name: cema-mailpit

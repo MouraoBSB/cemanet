@@ -5,7 +5,6 @@ namespace Tests\Feature\Models;
 use App\Models\Categoria;
 use App\Models\Post;
 use App\Models\PostFaq;
-use App\Models\PostImagem;
 use App\Models\Tag;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
@@ -90,15 +89,22 @@ class PostTest extends TestCase
         $this->assertSame('A?', $faqs->first()->pergunta);
     }
 
-    public function test_relacao_imagens_ordenada(): void
+    public function test_galeria_media_ordenada(): void
     {
-        $post = Post::factory()->create();
-        PostImagem::create(['post_id' => $post->id, 'caminho' => 'b.jpg', 'ordem' => 2]);
-        PostImagem::create(['post_id' => $post->id, 'caminho' => 'a.jpg', 'ordem' => 1]);
+        \Illuminate\Support\Facades\Storage::fake('public');
 
-        $imagens = $post->imagens()->get();
-        $this->assertCount(2, $imagens);
-        $this->assertSame('a.jpg', $imagens->first()->caminho);
+        $post = Post::factory()->create();
+
+        $img1 = \Illuminate\Http\UploadedFile::fake()->image('primeira.jpg', 100, 100)->getContent();
+        $img2 = \Illuminate\Http\UploadedFile::fake()->image('segunda.jpg', 100, 100)->getContent();
+
+        $post->addMediaFromString($img1)->usingFileName('primeira.jpg')->toMediaCollection(Post::COLECAO_GALERIA);
+        $post->addMediaFromString($img2)->usingFileName('segunda.jpg')->toMediaCollection(Post::COLECAO_GALERIA);
+
+        $galeria = $post->getMedia(Post::COLECAO_GALERIA);
+        $this->assertCount(2, $galeria);
+        $this->assertSame('primeira.jpg', $galeria->first()->file_name);
+        $this->assertSame('segunda.jpg', $galeria->last()->file_name);
     }
 
     public function test_cor_categoria_retorna_cor_da_principal(): void

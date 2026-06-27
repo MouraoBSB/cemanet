@@ -5,8 +5,8 @@
              aria-label="Destaque">
 
         {{-- Foto de capa do destaque (fundo, lado direito) com véu roxo p/ legibilidade --}}
-        @if ($destaque && $destaque->imagem_destacada)
-            <img src="{{ asset('storage/'.$destaque->imagem_destacada) }}" alt="" aria-hidden="true"
+        @if ($destaque && $destaque->getFirstMedia(\App\Models\Post::COLECAO_DESTACADA))
+            <img src="{{ $destaque->getFirstMediaUrl(\App\Models\Post::COLECAO_DESTACADA, 'web') }}" alt="" aria-hidden="true"
                  class="pointer-events-none absolute inset-y-0 right-0 h-full w-full object-cover object-center opacity-70 tablet:w-[58%]">
             <div aria-hidden="true" class="pointer-events-none absolute inset-0"
                  style="background:linear-gradient(95deg,#2f2952 0%,#2f2952 26%,rgba(47,41,82,0.82) 46%,rgba(60,52,104,0.45) 72%,rgba(78,68,131,0.18) 100%);"></div>
@@ -117,10 +117,10 @@
                     @php($primeiro = $posts->first())
                     <article class="mb-6 grid cursor-pointer grid-cols-1 gap-5 border-b border-border-muted pb-6 tablet:grid-cols-[230px_1fr]"
                              wire:key="post-destaque-{{ $primeiro->id }}">
-                        @if ($primeiro->imagem_destacada)
+                        @if ($primeiro->getFirstMedia(\App\Models\Post::COLECAO_DESTACADA))
                             <a href="{{ $primeiro->urlPublica }}" class="block overflow-hidden rounded-xl"
                                style="height:160px;">
-                                <img src="{{ asset('storage/'.$primeiro->imagem_destacada) }}"
+                                <img src="{{ $primeiro->getFirstMediaUrl(\App\Models\Post::COLECAO_DESTACADA, 'web') }}"
                                      alt="{{ $primeiro->imagem_destacada_alt ?? $primeiro->titulo }}"
                                      loading="lazy" width="230" height="160"
                                      class="size-full object-cover transition duration-300 hover:scale-[1.03]">

@@ -29,37 +29,88 @@ class ImportadorBlog
 
         foreach ($posts as $d) {
             DB::transaction(function () use ($d, $log) {
-                // 1. Reescrever conteúdo (imagens internas)
-                $conteudo = $this->reescritor->reescrever($d['conteudo'] ?? '', $d['slug']);
+                // 1. Converter colunas Gutenberg antes de qualquer uso
+                $conteudoLimpo = TransformadorBlog::limparGutenberg($d['conteudo'] ?? '');
 
-                // 2. Baixar imagem destacada
-                $imagem = $this->baixador->baixarPara($d['imagem_url'] ?? null, 'blog/destacada', $d['slug']);
-
-                // 3. updateOrCreate pelo slug
+                // 2. Montar campos SEM imagem_destacada e og_imagem (vão para a ML)
                 $campos = [
                     'titulo'               => $d['titulo'],
                     'resumo'               => $d['resumo'] ?? null,
-                    'conteudo'             => $conteudo,
+                    'conteudo'             => $conteudoLimpo,
                     'data_publicacao'      => $d['data_publicacao'],
                     'status'               => $d['status'],
                     'wp_id'                => $d['wp_id'],
                     'imagem_destacada_alt' => $d['imagem_alt'] ?? null,
                     'criado_por_id'        => null,
-                    'tempo_leitura_min'    => TransformadorBlog::tempoLeitura($conteudo),
+                    'tempo_leitura_min'    => TransformadorBlog::tempoLeitura($conteudoLimpo),
                     'seo_titulo'           => $d['seo']['titulo'] ?? null,
                     'seo_descricao'        => $d['seo']['descricao'] ?? null,
                     'seo_keyword'          => $d['seo']['keyword'] ?? null,
-                    'og_imagem'            => $d['seo']['og_imagem'] ?? null,
                 ];
 
-                // só sobrescreve imagem_destacada se o download teve sucesso
-                if ($imagem !== null) {
-                    $campos['imagem_destacada'] = $imagem;
-                }
-
+                // 3. Persistir / atualizar o post
                 $post = Post::updateOrCreate(['slug' => $d['slug']], $campos);
 
-                // 4. Categorias
+                // 4. Idempotência: limpa coleções que serão reprocessadas
+                $post->clearMediaCollection(Post::COLECAO_DESTACADA);
+                $post->clearMediaCollection(Post::COLECAO_OG);
+                $post->clearMediaCollection(Post::COLECAO_GALERIA);
+
+                // 5. Imagem destacada
+                $urlDestacada = $d['imagem_url'] ?? null;
+                if ($urlDestacada) {
+                    $bytes = $this->baixador->baixarCapado($urlDestacada, 2000);
+                    if ($bytes !== null) {
+                        $post->addMediaFromString($bytes)
+                            ->usingFileName(basename(parse_url($urlDestacada, PHP_URL_PATH) ?? 'capa.jpg'))
+                            ->withCustomProperties([
+                                'alt'        => $d['imagem_alt'] ?? null,
+                                'url_legado' => $urlDestacada,
+                            ])
+                            ->toMediaCollection(Post::COLECAO_DESTACADA);
+                    } else {
+                        $this->avisos[] = "[{$d['slug']}] falha ao baixar imagem destacada";
+                    }
+                }
+
+                // 6. Imagem OG
+                $urlOg = $d['seo']['og_imagem'] ?? null;
+                if ($urlOg) {
+                    $bytes = $this->baixador->baixarCapado($urlOg, 1200);
+                    if ($bytes !== null) {
+                        $post->addMediaFromString($bytes)
+                            ->usingFileName(basename(parse_url($urlOg, PHP_URL_PATH) ?? 'og.jpg'))
+                            ->withCustomProperties(['url_legado' => $urlOg])
+                            ->toMediaCollection(Post::COLECAO_OG);
+                    } else {
+                        $this->avisos[] = "[{$d['slug']}] falha ao baixar imagem og";
+                    }
+                }
+
+                // 7. Galeria (ordem respeitada pela inserção sequencial)
+                foreach ($d['galeria'] ?? [] as $item) {
+                    $bytes = $this->baixador->baixarCapado($item['url'], 2000);
+                    if ($bytes === null) {
+                        $this->avisos[] = "[{$d['slug']}] falha ao baixar imagem da galeria (ordem {$item['ordem']})";
+
+                        continue;
+                    }
+                    $post->addMediaFromString($bytes)
+                        ->usingFileName(basename(parse_url($item['url'], PHP_URL_PATH) ?? 'galeria.jpg'))
+                        ->withCustomProperties([
+                            'alt'        => $item['alt'] ?? null,
+                            'url_legado' => $item['url'],
+                        ])
+                        ->toMediaCollection(Post::COLECAO_GALERIA);
+                }
+
+                // 8. Corpo: reescreve imagens internas e atualiza o conteúdo final
+                $conteudoFinal = $this->reescritor->reescrever($conteudoLimpo, $d['slug'], $post);
+                if ($conteudoFinal !== $post->conteudo) {
+                    $post->update(['conteudo' => $conteudoFinal]);
+                }
+
+                // 9. Categorias
                 $slugsConhecidos = $d['categorias_slugs'] ?? [];
                 $categorias = Categoria::whereIn('slug', $slugsConhecidos)->get();
                 $slugsEncontrados = $categorias->pluck('slug')->all();
@@ -80,7 +131,7 @@ class ImportadorBlog
                 }
                 $post->update(['categoria_principal_id' => $principalId]);
 
-                // 5. Tags
+                // 10. Tags
                 $tagIds = [];
                 foreach ($d['tags'] ?? [] as $t) {
                     $tag = Tag::firstOrCreate(['slug' => $t['slug']], ['nome' => $t['nome']]);
@@ -88,27 +139,10 @@ class ImportadorBlog
                 }
                 $post->tags()->sync($tagIds);
 
-                // 6. FAQs (delete + recreate)
+                // 11. FAQs (delete + recreate)
                 $post->faqs()->delete();
                 foreach ($d['faqs'] ?? [] as $faq) {
                     $post->faqs()->create($faq);
-                }
-
-                // 7. Galeria (delete + recreate)
-                $post->imagens()->delete();
-                foreach ($d['galeria'] ?? [] as $item) {
-                    $ordem = $item['ordem'];
-                    $caminho = $this->baixador->baixarPara($item['url'], 'blog/galeria', $d['slug'].'-'.$ordem);
-                    if ($caminho === null) {
-                        $this->avisos[] = "[{$d['slug']}] falha ao baixar imagem da galeria (ordem {$ordem})";
-
-                        continue;
-                    }
-                    $post->imagens()->create([
-                        'caminho'    => $caminho,
-                        'url_legado' => $item['url'],
-                        'ordem'      => $ordem,
-                    ]);
                 }
 
                 $log("Post importado: {$d['slug']}");

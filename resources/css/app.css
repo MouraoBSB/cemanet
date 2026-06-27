@@ -5,6 +5,7 @@
    font-sans = Poppins (corpo); títulos usam font-display (Work Sans).
    Thiago Mourão — https://github.com/MouraoBSB — 2026-06-24 */
 @import 'tailwindcss';
+@import './conteudo.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';

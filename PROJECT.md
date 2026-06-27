@@ -39,6 +39,10 @@ admin → páginas públicas → dados migrados) antes de seguir para o próximo
 | 1º ciclo | Fatia vertical: módulo **Palestras** | Prova a arquitetura inteira num módulo |
 | Acesso ao atual | Snapshot/design-system (design) + REST GET (dados) | Reaproveita o que já temos; sem risco ao WP vivo |
 | Comentários (blog) | Sistema **próprio** (Livewire), **aberto sem conta** (nome+e-mail), login/Google **opcional**, moderado no Filament | Não trava o visitante; dados na casa (LGPD); leve (SEO/perf); sem widget de terceiro (Disqus/Facebook) |
+| Editor do blog | **RichEditor** (TipTap/HTML) nativo do Filament 5, com **alinhamento/float e redimensionamento de imagem** | Migração simples (preserva o HTML do Gutenberg); edição tipo Word; foto **ao lado do texto** (contorno) e **tamanho ajustável**; layouts ricos via bloco/extensão quando necessário |
+| Mídia/imagens | **Spatie Media Library** (+ image-optimizer): resize, WebP, srcset, remoção de EXIF; upload múltiplo e reordenável no Filament. **Capa na entrada (~2000px) e NÃO guarda o original** | "Joga e mastiga" — otimiza no upload e resolve a UX da galeria num só lugar; padrão Laravel; melhor a longo prazo; acervo em alta fica fora do sistema (ex.: Drive) |
+| Biblioteca de mídia | **Sobre a Media Library (Opção B):** pool central, imagens **referenciadas por URL** (não posse do post); dedup por hash; tool "Inserir da biblioteca" no editor | Um só sistema de mídia; reusa cap+conversões; **generaliza o fix do corpo** (referência → some a classe de bug do editor); Curator traria 2º sistema sem ganho turnkey no editor |
+| Referência de mídia portável | Mídia usada **no conteúdo** é servida por **rota estável do app** (resolve o storage atual), não por caminho cru `/storage/...` | Permite migrar o storage (S3/CDN) no futuro **sem quebrar** as imagens já dentro dos posts |
 
 ## Inventário de conteúdo (do site atual, via REST)
 

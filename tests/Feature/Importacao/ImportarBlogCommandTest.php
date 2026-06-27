@@ -6,6 +6,7 @@ use App\Importacao\LeitorBlog;
 use App\Models\Post;
 use Database\Seeders\CategoriaSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
@@ -18,11 +19,14 @@ class ImportarBlogCommandTest extends TestCase
     public function test_comando_importa_usando_o_leitor_injetado(): void
     {
         Storage::fake('public');
-        Http::fake();
+
+        // Bytes reais para que o importador processe sem erros de mime/dimensões
+        $bytes = UploadedFile::fake()->image('img.jpg', 800, 600)->getContent();
+        Http::fake(['*' => Http::response($bytes, 200)]);
 
         $this->seed(CategoriaSeeder::class);
 
-        // injeta um leitor fake no container (evita depender do legado)
+        // Injeta um leitor fake no container (evita depender do legado)
         $this->app->bind(LeitorBlog::class, fn () => new class implements LeitorBlog
         {
             public function posts(): array

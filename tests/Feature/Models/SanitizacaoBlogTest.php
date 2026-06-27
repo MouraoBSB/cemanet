@@ -41,4 +41,36 @@ class SanitizacaoBlogTest extends TestCase
         $p = Post::factory()->create(['conteudo' => $iframe]);
         $this->assertStringNotContainsString('evil.com', $p->conteudo);
     }
+
+    /** data-id sobrevive; classes da allow-list sobrevivem; classe proibida e style somem */
+    public function test_sanitiza_mantem_data_id_e_classes_de_imagem(): void
+    {
+        $html = '<figure class="wp-block-image size-large alignleft x">'
+            . '<img src="/s/1/a.webp" data-id="42" alt="" class="alignright evil" style="width:9px"></figure>';
+
+        $p = Post::factory()->create(['conteudo' => $html]);
+
+        $this->assertStringContainsString('data-id="42"', $p->conteudo);
+
+        foreach (['wp-block-image', 'size-large', 'alignleft', 'alignright'] as $classe) {
+            $this->assertStringContainsString($classe, $p->conteudo);
+        }
+
+        $this->assertStringNotContainsString('evil', $p->conteudo);
+        $this->assertStringNotContainsString('style=', $p->conteudo);
+    }
+
+    /** perfil 'conteudo' (palestras) deve continuar sem data-id nem classes de imagem */
+    public function test_perfil_conteudo_palestras_nao_permite_data_id_nem_classes(): void
+    {
+        $html = '<figure class="wp-block-image alignleft">'
+            . '<img src="/s/1/a.webp" data-id="42" alt="" class="alignright"></figure>';
+
+        $limpo = clean($html, 'conteudo');
+
+        $this->assertStringNotContainsString('data-id', $limpo);
+        $this->assertStringNotContainsString('alignright', $limpo);
+        $this->assertStringNotContainsString('alignleft', $limpo);
+        $this->assertStringNotContainsString('wp-block-image', $limpo);
+    }
 }

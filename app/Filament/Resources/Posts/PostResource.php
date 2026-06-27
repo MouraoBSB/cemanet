@@ -4,6 +4,7 @@
 
 namespace App\Filament\Resources\Posts;
 
+use App\Filament\RichContent\Plugins\ImagemPlugin;
 use App\Filament\Resources\Posts\Pages\CreatePost;
 use App\Filament\Resources\Posts\Pages\EditPost;
 use App\Filament\Resources\Posts\Pages\ListPosts;
@@ -77,6 +78,24 @@ class PostResource extends Resource
                         ->label('Conteúdo')
                         ->live(onBlur: true)
                         ->preventFileAttachmentPathTampering()
+                        ->plugins([ImagemPlugin::make()])
+                        ->toolbarButtons([
+                            'attachFiles',
+                            'blockquote',
+                            'bold',
+                            'bulletList',
+                            'codeBlock',
+                            'h2',
+                            'h3',
+                            'italic',
+                            'link',
+                            'orderedList',
+                            'redo',
+                            'strike',
+                            'underline',
+                            'undo',
+                            'imagemAlinharEsquerda',
+                        ])
                         ->columnSpanFull(),
                 ]),
 

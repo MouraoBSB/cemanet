@@ -85,6 +85,7 @@ class PostResource extends Resource
                             'bold',
                             'bulletList',
                             'codeBlock',
+                            'paragraph',
                             'h2',
                             'h3',
                             'italic',

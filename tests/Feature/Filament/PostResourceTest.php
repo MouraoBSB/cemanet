@@ -129,6 +129,13 @@ class PostResourceTest extends TestCase
         $this->get('/admin/configuracoes-blog')->assertOk();
     }
 
+    public function test_toolbar_do_editor_inclui_botao_paragrafo(): void
+    {
+        Livewire::test(CreatePost::class)
+            ->assertFormFieldExists('conteudo', fn (\Filament\Forms\Components\RichEditor $campo): bool =>
+                $campo->hasToolbarButton('paragraph'));
+    }
+
     public function test_cria_post_com_imagem_destacada_na_colecao_ml(): void
     {
         Storage::fake('public');

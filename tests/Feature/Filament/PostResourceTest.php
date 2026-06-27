@@ -13,7 +13,6 @@ use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -134,15 +133,11 @@ class PostResourceTest extends TestCase
     {
         Storage::fake('public');
 
-        $img = UploadedFile::fake()->image('hero.jpg', 1000, 800);
-
-        // O SpatieMediaLibraryFileUpload espera o UUID do arquivo temporário do Livewire
-        // no fillForm — o teste verifica que o formulário é submetido sem erros e que
-        // o post existe; a asserção de mídia depende do harness de upload do Filament/Livewire.
-        // Nota: fillForm com UploadedFile diretamente não aciona o pipeline de ML em testes
-        // unitários (o Livewire/Filament precisa do ciclo de upload temporário). Por isso,
-        // verificamos a persistência do post e ausência de erros de formulário como garantia
-        // determinística; a verificação real de mídia na coleção é coberta manualmente.
+        // O SpatieMediaLibraryFileUpload depende do ciclo de upload temporário do
+        // Livewire/Filament, que não roda em teste unitário; passar um UploadedFile no
+        // fillForm não aciona o pipeline de ML. Aqui garantimos de forma determinística
+        // que o formulário submete sem erros e o post persiste; a anexação real de mídia
+        // na coleção é coberta por PostMediaTest/PostFactoryMediaTest e verificação manual.
         Livewire::test(CreatePost::class)
             ->fillForm([
                 'titulo'          => 'Post com Imagem Destacada',

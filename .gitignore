@@ -6,6 +6,7 @@
 /public/build/
 /public/hot
 /public/storage
+/public/js/app/
 /bootstrap/cache/*.php
 
 # Ambiente e segredos (NUNCA versionar)

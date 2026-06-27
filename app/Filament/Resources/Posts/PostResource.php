@@ -95,6 +95,11 @@ class PostResource extends Resource
                             'underline',
                             'undo',
                             'imagemAlinharEsquerda',
+                            'imagemAlinharCentro',
+                            'imagemAlinharDireita',
+                            'imagemTamanhoMedio',
+                            'imagemTamanhoGrande',
+                            'imagemTamanhoTotal',
                         ])
                         ->columnSpanFull(),
                 ]),

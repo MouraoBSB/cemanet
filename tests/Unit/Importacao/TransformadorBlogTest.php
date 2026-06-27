@@ -73,8 +73,8 @@ class TransformadorBlogTest extends TestCase
 
         $this->assertStringNotContainsString('wp:columns', $out);     // comentários removidos
         $this->assertStringNotContainsString('flex-basis', $out);     // sem style inline
-        $this->assertStringContainsString('class="colunas"', $out);   // grid limpo
-        $this->assertStringContainsString('coluna', $out);
+        $this->assertStringContainsString('class="colunas"', $out);   // container do grid
+        $this->assertStringContainsString('class="coluna"', $out);    // coluna individual (não subconjunto de "colunas")
         $this->assertStringContainsString('size-large', $out);        // tamanho preservado
         $this->assertStringContainsString('wp-block-image', $out);
     }

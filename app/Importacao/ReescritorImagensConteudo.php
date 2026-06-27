@@ -4,8 +4,8 @@
 
 namespace App\Importacao;
 
+use App\Models\Post;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class ReescritorImagensConteudo
 {
@@ -13,24 +13,47 @@ class ReescritorImagensConteudo
         private readonly BaixadorImagem $baixador,
     ) {}
 
-    public function reescrever(string $html, string $slugPost): string
+    public function reescrever(string $html, string $slugPost, Post $post): string
     {
-        $regex = '~<img[^>]+src=["\']([^"\']+wp-content/uploads/[^"\']+)["\']~i';
+        // Idempotência: limpa imagens anteriores do corpo antes de reprocessar
+        $post->clearMediaCollection(Post::COLECAO_CONTEUDO);
 
-        return preg_replace_callback($regex, function (array $m) use ($slugPost, &$html): string {
-            $url = $m[1];
-            $caminho = $this->baixador->baixarPara($url, 'blog/conteudo', md5($url));
+        $regex = '~<img([^>]+)src=["\']([^"\']+wp-content/uploads/[^"\']+)["\']~i';
 
-            if ($caminho === null) {
+        return preg_replace_callback($regex, function (array $m) use ($slugPost, $post): string {
+            $atributos = $m[1];
+            $url = $m[2];
+            $tagOriginal = $m[0];
+
+            $bytes = $this->baixador->baixarCapado($url, 2000);
+
+            if ($bytes === null) {
                 Log::warning('ReescritorImagensConteudo: falha ao baixar imagem', [
-                    'url' => $url,
+                    'url'       => $url,
                     'slug_post' => $slugPost,
                 ]);
 
-                return $m[0];
+                return $tagOriginal;
             }
 
-            return str_replace($url, Storage::url($caminho), $m[0]);
+            $nomeArquivo = basename(parse_url($url, PHP_URL_PATH) ?? 'img.jpg');
+
+            $media = $post->addMediaFromString($bytes)
+                ->usingFileName($nomeArquivo)
+                ->withCustomProperties(['url_legado' => $url])
+                ->toMediaCollection(Post::COLECAO_CONTEUDO);
+
+            $novaUrl = $media->getUrl('web');
+
+            // Substitui a URL legada pela URL da Media Library
+            $tagReescrita = str_replace($url, $novaUrl, $tagOriginal);
+
+            // Injeta data-id se ainda não presente
+            if (! str_contains($atributos, 'data-id')) {
+                $tagReescrita = str_replace('<img', '<img data-id="' . $media->getKey() . '"', $tagReescrita);
+            }
+
+            return $tagReescrita;
         }, $html) ?? $html;
     }
 }

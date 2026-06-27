@@ -155,6 +155,20 @@ class PostResourceTest extends TestCase
             });
     }
 
+    public function test_editor_tem_toolbar_flutuante_para_imagem(): void
+    {
+        // Affordance do BUG 1: ao selecionar a imagem, as ferramentas de imagem
+        // aparecem numa barra flutuante junto do nó.
+        Livewire::test(CreatePost::class)
+            ->assertFormFieldExists('conteudo', function (\Filament\Forms\Components\RichEditor $campo): bool {
+                $flutuantes = $campo->getFloatingToolbars();
+
+                return isset($flutuantes['image'])
+                    && in_array('imagemAlinharEsquerda', $flutuantes['image'], true)
+                    && in_array('imagemTamanhoTotal', $flutuantes['image'], true);
+            });
+    }
+
     public function test_cria_post_com_imagem_destacada_na_colecao_ml(): void
     {
         Storage::fake('public');

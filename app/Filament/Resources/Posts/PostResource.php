@@ -110,6 +110,23 @@ class PostResource extends Resource
                             'imagemTamanhoGrande',
                             'imagemTamanhoTotal',
                         ])
+                        // Barra flutuante ao SELECIONAR uma imagem: as 6 ferramentas de
+                        // imagem aparecem junto do nó (affordance — sem isso o usuário não
+                        // sabe que precisa selecionar a imagem para alinhar/redimensionar).
+                        // 'table' preserva o padrão do Filament (caso tabelas sejam habilitadas).
+                        ->floatingToolbars([
+                            'image' => [
+                                'imagemAlinharEsquerda', 'imagemAlinharCentro', 'imagemAlinharDireita',
+                                'imagemTamanhoMedio', 'imagemTamanhoGrande', 'imagemTamanhoTotal',
+                            ],
+                            'table' => [
+                                'tableAddColumnBefore', 'tableAddColumnAfter', 'tableDeleteColumn',
+                                'tableAddRowBefore', 'tableAddRowAfter', 'tableDeleteRow',
+                                'tableMergeCells', 'tableSplitCell',
+                                'tableToggleHeaderRow', 'tableToggleHeaderCell',
+                                'tableDelete',
+                            ],
+                        ])
                         ->extraAttributes(['class' => 'editor-conteudo-blog'])
                         ->columnSpanFull(),
                 ]),

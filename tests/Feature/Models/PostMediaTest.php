@@ -5,6 +5,7 @@ namespace Tests\Feature\Models;
 use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -103,5 +104,13 @@ class PostMediaTest extends TestCase
         $post = new Post;
 
         $this->assertInstanceOf(\Spatie\MediaLibrary\HasMedia::class, $post);
+    }
+
+    public function test_colunas_imagem_antigas_removidas_do_schema(): void
+    {
+        $this->assertFalse(Schema::hasColumn('posts', 'imagem_destacada'));
+        $this->assertFalse(Schema::hasColumn('posts', 'og_imagem'));
+        $this->assertTrue(Schema::hasColumn('posts', 'imagem_destacada_alt'));
+        $this->assertFalse(Schema::hasTable('post_imagens'));
     }
 }

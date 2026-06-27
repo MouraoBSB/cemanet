@@ -44,7 +44,6 @@ class Post extends Model implements HasMedia, HasRichContent
         'slug',
         'resumo',
         'conteudo', // saneado pelo mutator conteudo() — vale também em mass-assignment
-        'imagem_destacada',
         'imagem_destacada_alt',
         'criado_por_id',
         'categoria_principal_id',
@@ -57,7 +56,6 @@ class Post extends Model implements HasMedia, HasRichContent
         'seo_titulo',
         'seo_descricao',
         'seo_keyword',
-        'og_imagem',
         'robots_noindex',
         'canonical',
     ];
@@ -180,11 +178,6 @@ class Post extends Model implements HasMedia, HasRichContent
     public function faqs(): HasMany
     {
         return $this->hasMany(PostFaq::class)->orderBy('ordem');
-    }
-
-    public function imagens(): HasMany
-    {
-        return $this->hasMany(PostImagem::class)->orderBy('ordem');
     }
 
     public function getUrlPublicaAttribute(): string

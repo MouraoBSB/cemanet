@@ -17,7 +17,7 @@ class BlogController extends Controller
     {
         $post = Post::publicado()
             ->where('slug', $slug)
-            ->with(['categorias', 'tags', 'faqs', 'imagens', 'categoriaPrincipal'])
+            ->with(['categorias', 'tags', 'faqs', 'categoriaPrincipal'])
             ->firstOrFail();
 
         // Incrementa visualização apenas 1× por sessão

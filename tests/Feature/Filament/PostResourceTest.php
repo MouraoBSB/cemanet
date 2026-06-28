@@ -54,6 +54,37 @@ class PostResourceTest extends TestCase
         $this->assertDatabaseHas('posts', ['slug' => 'sementeira-de-luz']);
     }
 
+    public function test_cria_rascunho_sem_data_de_publicacao(): void
+    {
+        // Rascunho pode existir sem data (coluna nullable; data exigida só ao publicar).
+        Livewire::test(CreatePost::class)
+            ->fillForm([
+                'titulo'          => 'Rascunho sem data',
+                'slug'            => 'rascunho-sem-data',
+                'status'          => Post::STATUS_RASCUNHO,
+                'data_publicacao' => null,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('posts', ['slug' => 'rascunho-sem-data', 'data_publicacao' => null]);
+    }
+
+    public function test_publicar_exige_data_de_publicacao(): void
+    {
+        Livewire::test(CreatePost::class)
+            ->fillForm([
+                'titulo'          => 'Publicado sem data',
+                'slug'            => 'publicado-sem-data',
+                'status'          => Post::STATUS_PUBLICADO,
+                'data_publicacao' => null,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['data_publicacao']);
+
+        $this->assertDatabaseMissing('posts', ['slug' => 'publicado-sem-data']);
+    }
+
     public function test_cria_post_com_categorias_e_faqs(): void
     {
         $categoria = Categoria::factory()->create();

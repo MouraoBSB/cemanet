@@ -215,6 +215,7 @@ class PostResource extends Resource
                         Select::make('status')
                             ->label('Status')
                             ->required()
+                            ->live()
                             ->options([
                                 Post::STATUS_RASCUNHO  => 'Rascunho',
                                 Post::STATUS_PUBLICADO => 'Publicado',
@@ -223,7 +224,15 @@ class PostResource extends Resource
                             ->default(Post::STATUS_RASCUNHO),
                         DateTimePicker::make('data_publicacao')
                             ->label('Data de publicação')
-                            ->seconds(false),
+                            ->seconds(false)
+                            // Pré-preenche para não dar atrito; rascunho pode ficar sem data,
+                            // mas publicar/agendar exige (senão o post não aparece no front).
+                            ->default(now())
+                            ->required(fn ($get): bool => in_array(
+                                $get('status'),
+                                [Post::STATUS_PUBLICADO, Post::STATUS_AGENDADO],
+                                true,
+                            )),
                     ]),
                 ]),
 

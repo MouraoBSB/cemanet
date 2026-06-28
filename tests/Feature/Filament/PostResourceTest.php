@@ -70,8 +70,9 @@ class PostResourceTest extends TestCase
         $this->assertDatabaseHas('posts', ['slug' => 'rascunho-sem-data', 'data_publicacao' => null]);
     }
 
-    public function test_publicar_exige_data_de_publicacao(): void
+    public function test_publicar_sem_data_usa_o_instante_atual(): void
     {
+        // "Publicar agora": publicar sem data não bloqueia — preenche o instante atual.
         Livewire::test(CreatePost::class)
             ->fillForm([
                 'titulo'          => 'Publicado sem data',
@@ -80,9 +81,28 @@ class PostResourceTest extends TestCase
                 'data_publicacao' => null,
             ])
             ->call('create')
+            ->assertHasNoFormErrors();
+
+        $post = Post::where('slug', 'publicado-sem-data')->first();
+        $this->assertNotNull($post);
+        $this->assertSame(Post::STATUS_PUBLICADO, $post->status);
+        $this->assertNotNull($post->data_publicacao);
+    }
+
+    public function test_agendar_exige_data_de_publicacao(): void
+    {
+        // Agendado é um agendamento futuro — exige data.
+        Livewire::test(CreatePost::class)
+            ->fillForm([
+                'titulo'          => 'Agendado sem data',
+                'slug'            => 'agendado-sem-data',
+                'status'          => Post::STATUS_AGENDADO,
+                'data_publicacao' => null,
+            ])
+            ->call('create')
             ->assertHasFormErrors(['data_publicacao']);
 
-        $this->assertDatabaseMissing('posts', ['slug' => 'publicado-sem-data']);
+        $this->assertDatabaseMissing('posts', ['slug' => 'agendado-sem-data']);
     }
 
     public function test_cria_post_com_categorias_e_faqs(): void

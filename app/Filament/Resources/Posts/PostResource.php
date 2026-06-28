@@ -228,11 +228,9 @@ class PostResource extends Resource
                             // Pré-preenche para não dar atrito; rascunho pode ficar sem data,
                             // mas publicar/agendar exige (senão o post não aparece no front).
                             ->default(now())
-                            ->required(fn ($get): bool => in_array(
-                                $get('status'),
-                                [Post::STATUS_PUBLICADO, Post::STATUS_AGENDADO],
-                                true,
-                            )),
+                            // Só Agendado exige data (é um agendamento futuro). Ao Publicar
+                            // sem data, as páginas preenchem now() → "publicar agora" sem atrito.
+                            ->required(fn ($get): bool => $get('status') === Post::STATUS_AGENDADO),
                     ]),
                 ]),
 

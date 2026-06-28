@@ -5,6 +5,7 @@
 namespace App\Filament\Resources\Posts\Pages;
 
 use App\Filament\Resources\Posts\PostResource;
+use App\Models\Post;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
@@ -19,5 +20,15 @@ class EditPost extends EditRecord
         return [
             DeleteAction::make(),
         ];
+    }
+
+    /** "Publicar agora": ao publicar sem data, usa o instante atual. */
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        if (($data['status'] ?? null) === Post::STATUS_PUBLICADO && blank($data['data_publicacao'] ?? null)) {
+            $data['data_publicacao'] = now();
+        }
+
+        return $data;
     }
 }

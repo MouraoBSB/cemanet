@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development. Steps usam checkbox (`- [ ]`). **Pré-requisito:** Fatia A mesclada/verificada. **Merge próprio.**
 
-**Goal:** Pool central de mídia reutilizável: no editor, **escolher uma imagem já enviada** (sem re-subir), servida por uma **rota estável**; imagens novas do corpo viram **referência por URL portável** → conserta a imagem do corpo no front (#2) para conteúdo novo e remove a classe de bug "editor apaga imagem". Dedup por hash; deleção autoritativa.
+**Goal:** Pool central de mídia reutilizável: no editor, **escolher uma imagem já enviada** (sem re-subir), servida por uma **rota estável**; imagens novas do corpo viram **referência por URL portável** → conserta a imagem do corpo no front (#2) para conteúdo novo e remove a classe de bug "editor apaga imagem". Dedup por hash; deleção autoritativa. **Inclui o fix fundacional #1** (Task B0): uploads do painel (destacada/galeria/og) hoje gravam no disco **`local`** privado → 404 no front; passam a gravar no **`public`**.
 
 **Architecture:** Singleton `Biblioteca` (HasMedia) dono da coleção `biblioteca`. Rota `GET /midia/{media}/{conversao?}` **restrita à coleção `biblioteca`**, servindo a WebP `web` (cache `immutable`) com fallback ao original (cache curto). Tool **"Inserir da biblioteca"** via `Action` (modal busca/preview) → insere `<img src="/midia/{id}/web">` (sem `data-id`). Dedup SHA-256 (hash pós-cap). Conversões **síncronas** (rápidas, pivô da Fatia A) → a `web` já existe ao servir. Reaproveita `CaparOriginalDaMidia` e o padrão de Resource.
 
@@ -17,6 +17,8 @@
 - **NÃO TOCAR na cadeia de dimensionamento de imagem** (já corrigida e validada): `resources/js/filament/imagem-alinhada.js`, `floatingToolbars`/toolbar do `PostResource`, `resources/css/filament/editor.css`. A Task B5 mexe no mesmo `PostResource` — apenas **acrescentar** plugin/tool, sem alterar o bloco de imagem; **UAT** após (selecionar imagem → tamanho/alinhamento ainda funcionam).
 - **Dedup por SHA-256 do arquivo CAPADO** (listener após `CaparOriginalDaMidia`), em `custom_properties['sha256']`.
 - **Deleção autoritativa**: `Post::whereRaw('conteudo LIKE ?', ["%/midia/{id}/%"])` (com a **barra final** → `12` não casa `123`; teste de fronteira). Bloquear/avisar se em uso.
+- **#1 (disco) — fundacional, Task B0:** os 3 `SpatieMediaLibraryFileUpload` (destacada/galeria/og) precisam fixar `->disk('public')`. Causa-raiz: o disco default do Filament é `config('filesystems.default')`=`local` (FILESYSTEM_DISK ausente) → upload cai no `local` privado (`storage/app/private/`) e o Spatie gera URL `/storage` (public) → 404. Migrados e corpo vão a public via default do Spatie (por isso renderizam).
+- **#2 (corpo) — diagnóstico:** o clipe `attachFiles` salva o corpo **sem `<img>`** (a imagem inserida perde a referência no save → purifier remove; `conteudo` fica só com texto). A solução desta fatia é a tool **"Inserir da biblioteca"** (B5), que insere `<img src="/midia/{id}/web">` — caminho funcional e portável. **Durante a B, avaliar** se o botão `attachFiles` do corpo deve ser removido/ajustado para não recriar o bug (decisão a confirmar com o dono).
 - pt-BR; cabeçalho de autoria; commits com `Co-Authored-By: Claude Opus 4.8`. Testes/assets/migrations via Docker; `restart app` após PHP (opcache).
 
 ## Fora de escopo (adiado — confirmado pelo dono)
@@ -27,7 +29,33 @@
 ## File Structure
 
 **Criar:** `app/Models/Biblioteca.php` + migration `bibliotecas`; `app/Listeners/CalcularHashMidia.php`; `app/Support/Biblioteca/RegistraMidiaBiblioteca.php`; `app/Http/Controllers/MidiaController.php`; `app/Filament/RichContent/Actions/InserirDaBibliotecaAction.php`; `app/Filament/RichContent/Plugins/BibliotecaMidiaPlugin.php`; `app/Filament/Resources/Bibliotecas/BibliotecaResource.php` (+ Pages); testes.
-**Modificar:** `routes/web.php`; `app/Providers/AppServiceProvider.php`; `app/Filament/Resources/Posts/PostResource.php` (só acrescentar plugin/tool).
+**Modificar:** `routes/web.php`; `app/Providers/AppServiceProvider.php`; `app/Filament/Resources/Posts/PostResource.php` (B0: fixar `->disk('public')`; B5: acrescentar plugin/tool).
+
+---
+
+### Task B0: Disco correto dos uploads do painel (#1) — fundacional
+
+**Files:** `app/Filament/Resources/Posts/PostResource.php`; Test `tests/Feature/Filament/UploadDiscoTest.php`.
+
+**Causa-raiz (diagnosticada empiricamente):** o `SpatieMediaLibraryFileUpload` resolve o disco por `config('filament.default_filesystem_disk')` → `config('filesystems.default')` → **`local`** (`FILESYSTEM_DISK` ausente). `destacada`/`galeria`/`og` **não fixam disco** → gravam no `local` privado, mas o Spatie gera URL `/storage/...` (public) → **404 no front**. Comprovado: galeria do post 50 em `disk=local` (arquivos em `storage/app/private/`), enquanto migrados/corpo em `public`.
+
+- [ ] **Teste** (config-level, determinístico — espelha o de `responsiveImages`):
+
+```php
+public function test_uploads_de_imagem_usam_disco_public(): void
+{
+    Livewire::test(CreatePost::class)
+        ->assertFormFieldExists('destacada', fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $c): bool => $c->getDiskName() === 'public')
+        ->assertFormFieldExists('galeria',   fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $c): bool => $c->getDiskName() === 'public')
+        ->assertFormFieldExists('og',        fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $c): bool => $c->getDiskName() === 'public');
+}
+```
+
+- [ ] Rode o teste → deve FALHAR (hoje resolve `local`).
+- [ ] **Fix**: adicionar `->disk('public')` aos 3 `SpatieMediaLibraryFileUpload` (`destacada`, `galeria`, `og`) no `PostResource`. **NÃO** tocar no bloco de dimensionamento/ferramentas de imagem do RichEditor nem no clipe.
+- [ ] Teste verde + suíte completa verde.
+- [ ] **Dado existente**: mídia de teste já no `local` (ex.: galeria do post 50) **não** migra sozinha → re-upload após o fix (são dados de teste; migrados já estão em `public`). Sem migração de dados.
+- [ ] Verificação manual: subir capa + galeria num post → **renderiza no front**. `restart app`. Commit.
 
 ---
 

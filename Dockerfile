@@ -37,6 +37,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # testes de cap quanto na importação em lote dos 45 posts (cema:importar-blog).
 RUN echo "memory_limit=512M" > /usr/local/etc/php/conf.d/memory-limit.ini
 
+# OPcache — CRÍTICO para a performance. O app roda via `php artisan serve` (SAPI cli);
+# sem `opcache.enable_cli=1` o PHP recompila TODOS os arquivos a cada request (boot ~8s
+# no dev, agravado pelo bind mount do Windows). Com o cli ligado, o processo persistente
+# do servidor mantém o bytecode em memória → só o 1º request paga o boot.
+# Dev: validate_timestamps=1 + revalidate_freq=0 → edições são vistas na hora.
+# Produção: usar validate_timestamps=0 (sem stat por arquivo) e limpar o cache no deploy.
+RUN { \
+        echo "opcache.enable=1"; \
+        echo "opcache.enable_cli=1"; \
+        echo "opcache.memory_consumption=256"; \
+        echo "opcache.interned_strings_buffer=16"; \
+        echo "opcache.max_accelerated_files=20000"; \
+        echo "opcache.validate_timestamps=0"; \
+    } > /usr/local/etc/php/conf.d/opcache.ini
+
 # Composer (binário copiado da imagem oficial).
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 

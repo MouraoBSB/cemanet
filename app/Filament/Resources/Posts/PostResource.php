@@ -4,6 +4,7 @@
 
 namespace App\Filament\Resources\Posts;
 
+use App\Filament\RichContent\Plugins\BibliotecaMidiaPlugin;
 use App\Filament\RichContent\Plugins\ImagemPlugin;
 use App\Filament\RichContent\Plugins\TextoAlinhamentoPlugin;
 use App\Filament\Resources\Posts\Pages\CreatePost;
@@ -83,6 +84,7 @@ class PostResource extends Resource
                         ->plugins([
                             ImagemPlugin::make(),
                             TextoAlinhamentoPlugin::make(),
+                            BibliotecaMidiaPlugin::make(),
                         ])
                         ->textColors([
                             'roxo'     => '#4e4483',
@@ -93,6 +95,7 @@ class PostResource extends Resource
                         ])
                         ->toolbarButtons([
                             'attachFiles',
+                            'inserirDaBiblioteca',
                             'blockquote',
                             'bold',
                             'bulletList',

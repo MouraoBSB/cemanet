@@ -294,4 +294,11 @@ class PostResourceTest extends TestCase
             ->assertFormFieldExists('og', fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $campo): bool =>
                 $campo->getDiskName() === 'public');
     }
+
+    public function test_toolbar_inclui_inserir_da_biblioteca(): void
+    {
+        Livewire::test(CreatePost::class)
+            ->assertFormFieldExists('conteudo', fn (\Filament\Forms\Components\RichEditor $campo): bool =>
+                $campo->hasToolbarButton('inserirDaBiblioteca'));
+    }
 }

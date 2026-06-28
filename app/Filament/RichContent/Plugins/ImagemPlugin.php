@@ -42,42 +42,47 @@ class ImagemPlugin implements RichContentPlugin
      */
     public function getEditorTools(): array
     {
+        // IMPORTANTE: dentro de jsHandler/activeJsExpression use aspas SIMPLES para as
+        // strings JS. O Filament injeta essas expressões num atributo Alpine delimitado por
+        // aspas DUPLAS (x-on:click="..."); aspas duplas internas quebram o parse do Alpine
+        // ("Invalid or unexpected token") e o botão fica inerte. As tools nativas do Filament
+        // seguem o mesmo padrão (ex.: setTextAlign('start')).
         return [
             RichEditorTool::make('imagemAlinharEsquerda')
                 ->label('Imagem: alinhar à esquerda')
                 ->icon(Heroicon::Bars3BottomLeft)
-                ->jsHandler('$getEditor()?.chain().focus().definirAlinhamentoImagem("left").run()')
-                ->activeJsExpression('$getEditor()?.isActive("image", { align: "left" })'),
+                ->jsHandler('$getEditor()?.chain().focus().definirAlinhamentoImagem(\'left\').run()')
+                ->activeJsExpression('$getEditor()?.isActive(\'image\', { align: \'left\' })'),
 
             RichEditorTool::make('imagemAlinharCentro')
                 ->label('Imagem: alinhar ao centro')
                 ->icon(Heroicon::Bars3)
-                ->jsHandler('$getEditor()?.chain().focus().definirAlinhamentoImagem("center").run()')
-                ->activeJsExpression('$getEditor()?.isActive("image", { align: "center" })'),
+                ->jsHandler('$getEditor()?.chain().focus().definirAlinhamentoImagem(\'center\').run()')
+                ->activeJsExpression('$getEditor()?.isActive(\'image\', { align: \'center\' })'),
 
             RichEditorTool::make('imagemAlinharDireita')
                 ->label('Imagem: alinhar à direita')
                 ->icon(Heroicon::Bars3BottomRight)
-                ->jsHandler('$getEditor()?.chain().focus().definirAlinhamentoImagem("right").run()')
-                ->activeJsExpression('$getEditor()?.isActive("image", { align: "right" })'),
+                ->jsHandler('$getEditor()?.chain().focus().definirAlinhamentoImagem(\'right\').run()')
+                ->activeJsExpression('$getEditor()?.isActive(\'image\', { align: \'right\' })'),
 
             RichEditorTool::make('imagemTamanhoMedio')
                 ->label('Imagem: tamanho médio')
                 ->icon(Heroicon::Photo)
-                ->jsHandler('$getEditor()?.chain().focus().definirTamanhoImagem("medium").run()')
-                ->activeJsExpression('$getEditor()?.isActive("image", { size: "medium" })'),
+                ->jsHandler('$getEditor()?.chain().focus().definirTamanhoImagem(\'medium\').run()')
+                ->activeJsExpression('$getEditor()?.isActive(\'image\', { size: \'medium\' })'),
 
             RichEditorTool::make('imagemTamanhoGrande')
                 ->label('Imagem: tamanho grande')
                 ->icon(Heroicon::ArrowsPointingOut)
-                ->jsHandler('$getEditor()?.chain().focus().definirTamanhoImagem("large").run()')
-                ->activeJsExpression('$getEditor()?.isActive("image", { size: "large" })'),
+                ->jsHandler('$getEditor()?.chain().focus().definirTamanhoImagem(\'large\').run()')
+                ->activeJsExpression('$getEditor()?.isActive(\'image\', { size: \'large\' })'),
 
             RichEditorTool::make('imagemTamanhoTotal')
                 ->label('Imagem: tamanho real')
                 ->icon(Heroicon::ArrowsPointingIn)
-                ->jsHandler('$getEditor()?.chain().focus().definirTamanhoImagem("full").run()')
-                ->activeJsExpression('$getEditor()?.isActive("image", { size: "full" })'),
+                ->jsHandler('$getEditor()?.chain().focus().definirTamanhoImagem(\'full\').run()')
+                ->activeJsExpression('$getEditor()?.isActive(\'image\', { size: \'full\' })'),
         ];
     }
 

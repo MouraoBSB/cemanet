@@ -155,6 +155,19 @@ class PostResourceTest extends TestCase
             });
     }
 
+    public function test_handler_das_tools_de_imagem_e_alpine_valido(): void
+    {
+        // Regressão (BUG1 real): aspas DUPLAS no jsHandler/activeJsExpression quebravam o
+        // atributo Alpine x-on:click ("Invalid or unexpected token") e o botão ficava inerte.
+        // Devem ser aspas SIMPLES (como as tools nativas do Filament).
+        $html = Livewire::test(CreatePost::class)->html();
+
+        $this->assertStringContainsString("definirAlinhamentoImagem('left').run()", $html);
+        $this->assertStringContainsString("definirTamanhoImagem('medium').run()", $html);
+        $this->assertStringNotContainsString('definirAlinhamentoImagem(&quot;', $html);
+        $this->assertStringNotContainsString('definirTamanhoImagem(&quot;', $html);
+    }
+
     public function test_editor_tem_toolbar_flutuante_para_imagem(): void
     {
         // Affordance do BUG 1: ao selecionar a imagem, as ferramentas de imagem

@@ -280,4 +280,18 @@ class PostResourceTest extends TestCase
             ->assertFormFieldExists('galeria', fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $campo): bool =>
                 ! $campo->hasResponsiveImages());
     }
+
+    public function test_uploads_de_imagem_usam_disco_public(): void
+    {
+        // #1 (fundacional): o disco default do Filament é 'local' (privado) → a URL /storage
+        // gerada pelo Spatie aponta para o disco public (vazio) e a imagem 404 no front.
+        // Os uploads de mídia do post devem fixar 'public' para renderizar.
+        Livewire::test(CreatePost::class)
+            ->assertFormFieldExists('destacada', fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $campo): bool =>
+                $campo->getDiskName() === 'public')
+            ->assertFormFieldExists('galeria', fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $campo): bool =>
+                $campo->getDiskName() === 'public')
+            ->assertFormFieldExists('og', fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $campo): bool =>
+                $campo->getDiskName() === 'public');
+    }
 }

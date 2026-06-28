@@ -150,6 +150,7 @@ class PostResource extends Resource
                         SpatieMediaLibraryFileUpload::make('destacada')
                             ->label('Imagem destacada')
                             ->collection(Post::COLECAO_DESTACADA)
+                            ->disk('public') // grava no disco public — sem isto cai no 'local' (privado) e a URL /storage 404 no front
                             ->image()
                             ->imageEditor()
                             ->imageResizeMode('contain')
@@ -164,6 +165,7 @@ class PostResource extends Resource
                     SpatieMediaLibraryFileUpload::make('galeria')
                         ->label('Galeria de imagens')
                         ->collection(Post::COLECAO_GALERIA)
+                        ->disk('public') // grava no disco public (idem destacada)
                         ->image()
                         ->multiple()
                         ->reorderable()
@@ -275,6 +277,7 @@ class PostResource extends Resource
                         SpatieMediaLibraryFileUpload::make('og')
                             ->label('Imagem OG (Open Graph)')
                             ->collection(Post::COLECAO_OG)
+                            ->disk('public') // grava no disco public (idem destacada)
                             ->image()
                             ->imageResizeMode('contain')
                             ->imageResizeTargetWidth(1200)

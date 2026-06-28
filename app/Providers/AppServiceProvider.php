@@ -6,6 +6,7 @@ use App\Importacao\LeitorBlog;
 use App\Importacao\LeitorBlogMysql;
 use App\Importacao\LeitorLegado;
 use App\Importacao\LeitorLegadoMysql;
+use App\Listeners\CalcularHashMidia;
 use App\Listeners\CaparOriginalDaMidia;
 use App\Support\Blog\FonteReflexao;
 use App\Support\Blog\ReflexaoConfig;
@@ -34,5 +35,6 @@ class AppServiceProvider extends ServiceProvider
         Carbon::setLocale('pt_BR');
 
         Event::listen(MediaHasBeenAddedEvent::class, CaparOriginalDaMidia::class);
+        Event::listen(MediaHasBeenAddedEvent::class, CalcularHashMidia::class); // DEPOIS do cap → hash pós-cap
     }
 }

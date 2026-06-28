@@ -4,6 +4,7 @@
 // Carregada via RichContentPlugin::getTipTapJsExtensions().
 
 const { Extension } = window.FilamentRichEditor.tiptap.core
+const { NodeSelection } = window.FilamentRichEditor.tiptap.pmState
 
 const CLASSES_ALIGN = {
     left:   'alignleft',
@@ -57,33 +58,52 @@ export default Extension.create({
     },
 
     addCommands() {
-        // updateAttributes('image') só age sobre uma imagem DENTRO da seleção. Após
-        // inserir, o cursor vira seleção de TEXTO ao lado da imagem (inline) → seria
-        // no-op. Então, antes de aplicar, garantimos o nó 'image' selecionado:
-        //  - se já é uma NodeSelection de imagem (clique/toolbar flutuante), aplica direto;
-        //  - senão, localiza a imagem inline imediatamente antes/depois do cursor
-        //    (caso recém-inserida) e faz setNodeSelection antes do updateAttributes.
-        const aplicar = (attrs) => ({ state, chain }) => {
-            const { selection } = state
+        // Localiza a POSIÇÃO do nó 'image' alvo: a já selecionada (NodeSelection, via
+        // clique/toolbar flutuante) ou a imagem inline adjacente ao cursor (recém-inserida
+        // — o cursor vira seleção de TEXTO ao lado dela). Sem isso, atualizar atributos
+        // era no-op (o cursor não está "sobre" a imagem).
+        const localizarImagem = (state) => {
+            const sel = state.selection
 
-            if (selection.node && selection.node.type.name === 'image') {
-                return chain().updateAttributes('image', attrs).run()
+            if (sel.node && sel.node.type.name === 'image') {
+                return sel.from
             }
 
-            const { $from } = selection
-            let pos = null
+            const { $from } = sel
 
             if ($from.nodeBefore && $from.nodeBefore.type.name === 'image') {
-                pos = $from.pos - $from.nodeBefore.nodeSize
-            } else if ($from.nodeAfter && $from.nodeAfter.type.name === 'image') {
-                pos = $from.pos
+                return $from.pos - $from.nodeBefore.nodeSize
             }
+
+            if ($from.nodeAfter && $from.nodeAfter.type.name === 'image') {
+                return $from.pos
+            }
+
+            return null
+        }
+
+        // Aplica os atributos direto na transação via setNodeMarkup — robusto tanto na
+        // invocação standalone (editor.commands.x) quanto encadeada pelo botão
+        // (editor.chain().focus().x().run()). Mantém o nó selecionado para cliques seguidos.
+        const aplicar = (attrs) => ({ state, tr, dispatch }) => {
+            const pos = localizarImagem(state)
 
             if (pos === null) {
                 return false // nenhuma imagem por perto — nada a fazer
             }
 
-            return chain().setNodeSelection(pos).updateAttributes('image', attrs).run()
+            const node = state.doc.nodeAt(pos)
+
+            if (! node || node.type.name !== 'image') {
+                return false
+            }
+
+            if (dispatch) {
+                tr.setNodeMarkup(pos, undefined, { ...node.attrs, ...attrs })
+                tr.setSelection(NodeSelection.create(tr.doc, pos))
+            }
+
+            return true
         }
 
         return {

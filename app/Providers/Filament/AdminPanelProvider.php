@@ -9,6 +9,7 @@ use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
+use Filament\Support\Assets\Css;
 use Filament\Support\Assets\Js;
 use Filament\Support\Colors\Color;
 use Filament\Support\Facades\FilamentAsset;
@@ -30,6 +31,9 @@ class AdminPanelProvider extends PanelProvider
         FilamentAsset::register([
             Js::make('imagem-alinhada', resource_path('js/filament/imagem-alinhada.js'))
                 ->loadedOnRequest(),
+            Js::make('texto-alinhado', resource_path('js/filament/texto-alinhado.js'))
+                ->loadedOnRequest(),
+            Css::make('cema-editor', resource_path('css/filament/editor.css')),
         ], package: 'app');
     }
 

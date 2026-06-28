@@ -5,6 +5,7 @@
 namespace App\Filament\Resources\Posts;
 
 use App\Filament\RichContent\Plugins\ImagemPlugin;
+use App\Filament\RichContent\Plugins\TextoAlinhamentoPlugin;
 use App\Filament\Resources\Posts\Pages\CreatePost;
 use App\Filament\Resources\Posts\Pages\EditPost;
 use App\Filament\Resources\Posts\Pages\ListPosts;
@@ -78,21 +79,41 @@ class PostResource extends Resource
                         ->label('Conteúdo')
                         ->live(onBlur: true)
                         ->preventFileAttachmentPathTampering()
-                        ->plugins([ImagemPlugin::make()])
+                        ->plugins([
+                            ImagemPlugin::make(),
+                            TextoAlinhamentoPlugin::make(),
+                        ])
+                        ->textColors([
+                            'roxo'     => '#4e4483',
+                            'laranja'  => '#e79048',
+                            'verde'    => '#89ab98',
+                            'azul'     => '#6e9fcb',
+                            'vermelho' => '#c0392b',
+                        ])
                         ->toolbarButtons([
                             'attachFiles',
                             'blockquote',
                             'bold',
                             'bulletList',
                             'codeBlock',
-                            'h2',
-                            'h3',
+                            'clearFormatting',
+                            'grid',
+                            'horizontalRule',
                             'italic',
+                            'lead',
                             'link',
                             'orderedList',
+                            'paragraph',
+                            'h2',
+                            'h3',
                             'redo',
                             'strike',
+                            'textColor',
                             'underline',
+                            'alignStart',
+                            'alignCenter',
+                            'alignEnd',
+                            'alignJustify',
                             'undo',
                             'imagemAlinharEsquerda',
                             'imagemAlinharCentro',
@@ -101,6 +122,24 @@ class PostResource extends Resource
                             'imagemTamanhoGrande',
                             'imagemTamanhoTotal',
                         ])
+                        // Barra flutuante ao SELECIONAR uma imagem: as 6 ferramentas de
+                        // imagem aparecem junto do nó (affordance — sem isso o usuário não
+                        // sabe que precisa selecionar a imagem para alinhar/redimensionar).
+                        // 'table' preserva o padrão do Filament (caso tabelas sejam habilitadas).
+                        ->floatingToolbars([
+                            'image' => [
+                                'imagemAlinharEsquerda', 'imagemAlinharCentro', 'imagemAlinharDireita',
+                                'imagemTamanhoMedio', 'imagemTamanhoGrande', 'imagemTamanhoTotal',
+                            ],
+                            'table' => [
+                                'tableAddColumnBefore', 'tableAddColumnAfter', 'tableDeleteColumn',
+                                'tableAddRowBefore', 'tableAddRowAfter', 'tableDeleteRow',
+                                'tableMergeCells', 'tableSplitCell',
+                                'tableToggleHeaderRow', 'tableToggleHeaderCell',
+                                'tableDelete',
+                            ],
+                        ])
+                        ->extraAttributes(['class' => 'editor-conteudo-blog'])
                         ->columnSpanFull(),
                 ]),
 
@@ -176,6 +215,7 @@ class PostResource extends Resource
                         Select::make('status')
                             ->label('Status')
                             ->required()
+                            ->live()
                             ->options([
                                 Post::STATUS_RASCUNHO  => 'Rascunho',
                                 Post::STATUS_PUBLICADO => 'Publicado',
@@ -184,7 +224,13 @@ class PostResource extends Resource
                             ->default(Post::STATUS_RASCUNHO),
                         DateTimePicker::make('data_publicacao')
                             ->label('Data de publicação')
-                            ->seconds(false),
+                            ->seconds(false)
+                            // Pré-preenche para não dar atrito; rascunho pode ficar sem data,
+                            // mas publicar/agendar exige (senão o post não aparece no front).
+                            ->default(now())
+                            // Só Agendado exige data (é um agendamento futuro). Ao Publicar
+                            // sem data, as páginas preenchem now() → "publicar agora" sem atrito.
+                            ->required(fn ($get): bool => $get('status') === Post::STATUS_AGENDADO),
                     ]),
                 ]),
 

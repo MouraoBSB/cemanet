@@ -54,6 +54,57 @@ class PostResourceTest extends TestCase
         $this->assertDatabaseHas('posts', ['slug' => 'sementeira-de-luz']);
     }
 
+    public function test_cria_rascunho_sem_data_de_publicacao(): void
+    {
+        // Rascunho pode existir sem data (coluna nullable; data exigida só ao publicar).
+        Livewire::test(CreatePost::class)
+            ->fillForm([
+                'titulo'          => 'Rascunho sem data',
+                'slug'            => 'rascunho-sem-data',
+                'status'          => Post::STATUS_RASCUNHO,
+                'data_publicacao' => null,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('posts', ['slug' => 'rascunho-sem-data', 'data_publicacao' => null]);
+    }
+
+    public function test_publicar_sem_data_usa_o_instante_atual(): void
+    {
+        // "Publicar agora": publicar sem data não bloqueia — preenche o instante atual.
+        Livewire::test(CreatePost::class)
+            ->fillForm([
+                'titulo'          => 'Publicado sem data',
+                'slug'            => 'publicado-sem-data',
+                'status'          => Post::STATUS_PUBLICADO,
+                'data_publicacao' => null,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $post = Post::where('slug', 'publicado-sem-data')->first();
+        $this->assertNotNull($post);
+        $this->assertSame(Post::STATUS_PUBLICADO, $post->status);
+        $this->assertNotNull($post->data_publicacao);
+    }
+
+    public function test_agendar_exige_data_de_publicacao(): void
+    {
+        // Agendado é um agendamento futuro — exige data.
+        Livewire::test(CreatePost::class)
+            ->fillForm([
+                'titulo'          => 'Agendado sem data',
+                'slug'            => 'agendado-sem-data',
+                'status'          => Post::STATUS_AGENDADO,
+                'data_publicacao' => null,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['data_publicacao']);
+
+        $this->assertDatabaseMissing('posts', ['slug' => 'agendado-sem-data']);
+    }
+
     public function test_cria_post_com_categorias_e_faqs(): void
     {
         $categoria = Categoria::factory()->create();
@@ -127,6 +178,72 @@ class PostResourceTest extends TestCase
     public function test_configuracoes_blog_renderiza(): void
     {
         $this->get('/admin/configuracoes-blog')->assertOk();
+    }
+
+    public function test_paginas_de_post_tem_form_actions_sticky(): void
+    {
+        $this->assertTrue(\App\Filament\Resources\Posts\Pages\EditPost::$formActionsAreSticky);
+        $this->assertTrue(\App\Filament\Resources\Posts\Pages\CreatePost::$formActionsAreSticky);
+    }
+
+    public function test_toolbar_do_editor_inclui_botao_paragrafo(): void
+    {
+        Livewire::test(CreatePost::class)
+            ->assertFormFieldExists('conteudo', fn (\Filament\Forms\Components\RichEditor $campo): bool =>
+                $campo->hasToolbarButton('paragraph'));
+    }
+
+    public function test_toolbar_do_editor_inclui_alinhamento_de_texto(): void
+    {
+        Livewire::test(CreatePost::class)
+            ->assertFormFieldExists('conteudo', function (\Filament\Forms\Components\RichEditor $campo): bool {
+                foreach (['alignStart', 'alignCenter', 'alignEnd', 'alignJustify'] as $tool) {
+                    if (! $campo->hasToolbarButton($tool)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+    }
+
+    public function test_handler_das_tools_de_imagem_e_alpine_valido(): void
+    {
+        // Regressão (BUG1 real): aspas DUPLAS no jsHandler/activeJsExpression quebravam o
+        // atributo Alpine x-on:click ("Invalid or unexpected token") e o botão ficava inerte.
+        // Devem ser aspas SIMPLES (como as tools nativas do Filament).
+        $html = Livewire::test(CreatePost::class)->html();
+
+        $this->assertStringContainsString("definirAlinhamentoImagem('left').run()", $html);
+        $this->assertStringContainsString("definirTamanhoImagem('medium').run()", $html);
+        $this->assertStringNotContainsString('definirAlinhamentoImagem(&quot;', $html);
+        $this->assertStringNotContainsString('definirTamanhoImagem(&quot;', $html);
+    }
+
+    public function test_toolbar_inclui_ferramentas_nativas_extras(): void
+    {
+        Livewire::test(CreatePost::class)
+            ->assertFormFieldExists('conteudo', function (\Filament\Forms\Components\RichEditor $campo): bool {
+                foreach (['grid', 'clearFormatting', 'horizontalRule', 'lead', 'textColor'] as $tool) {
+                    if (! $campo->hasToolbarButton($tool)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+    }
+
+    public function test_editor_tem_toolbar_flutuante_para_imagem(): void
+    {
+        // Affordance do BUG 1: ao selecionar a imagem, as ferramentas de imagem
+        // aparecem numa barra flutuante junto do nó.
+        Livewire::test(CreatePost::class)
+            ->assertFormFieldExists('conteudo', function (\Filament\Forms\Components\RichEditor $campo): bool {
+                $flutuantes = $campo->getFloatingToolbars();
+
+                return isset($flutuantes['image'])
+                    && in_array('imagemAlinharEsquerda', $flutuantes['image'], true)
+                    && in_array('imagemTamanhoTotal', $flutuantes['image'], true);
+            });
     }
 
     public function test_cria_post_com_imagem_destacada_na_colecao_ml(): void

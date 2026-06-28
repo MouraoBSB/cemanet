@@ -5,9 +5,22 @@
 namespace App\Filament\Resources\Posts\Pages;
 
 use App\Filament\Resources\Posts\PostResource;
+use App\Models\Post;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreatePost extends CreateRecord
 {
     protected static string $resource = PostResource::class;
+
+    public static bool $formActionsAreSticky = true;
+
+    /** "Publicar agora": ao publicar sem data, usa o instante atual. */
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        if (($data['status'] ?? null) === Post::STATUS_PUBLICADO && blank($data['data_publicacao'] ?? null)) {
+            $data['data_publicacao'] = now();
+        }
+
+        return $data;
+    }
 }

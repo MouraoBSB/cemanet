@@ -60,6 +60,59 @@ class SanitizacaoBlogTest extends TestCase
         $this->assertStringNotContainsString('style=', $p->conteudo);
     }
 
+    public function test_conteudo_preserva_alinhamento_de_texto_por_classe(): void
+    {
+        $post = Post::factory()->make([
+            'conteudo' => '<p class="has-text-align-justify">Justificado.</p>'
+                . '<h2 class="has-text-align-center">Centro</h2>'
+                . '<p class="has-text-align-right">Direita</p>',
+        ]);
+
+        $html = $post->conteudo;
+
+        $this->assertStringContainsString('has-text-align-justify', $html);
+        $this->assertStringContainsString('has-text-align-center', $html);
+        $this->assertStringContainsString('has-text-align-right', $html);
+    }
+
+    public function test_conteudo_remove_classe_de_paragrafo_fora_da_allowlist(): void
+    {
+        $post = Post::factory()->make([
+            'conteudo' => '<p class="classe-maliciosa has-text-align-left">x</p>',
+        ]);
+
+        $html = $post->conteudo;
+
+        $this->assertStringNotContainsString('classe-maliciosa', $html);
+        $this->assertStringContainsString('has-text-align-left', $html);
+    }
+
+    public function test_conteudo_preserva_ferramentas_nativas_do_editor(): void
+    {
+        // hr (separador), lead (destaque), grid/colunas (data-cols) e cor (data-color)
+        // devem SOBREVIVER ao purifier — tudo por classe/data-attribute, sem style inline.
+        $post = Post::factory()->make([
+            'conteudo' => '<hr>'
+                . '<div class="lead">Abertura.</div>'
+                . '<div class="grid-layout" data-cols="2">'
+                . '<div class="grid-layout-col" data-col-span="1"><p>A</p></div>'
+                . '<div class="grid-layout-col"><p>B</p></div></div>'
+                . '<p>Texto <span class="color" data-color="roxo">colorido</span>.</p>',
+        ]);
+
+        $html = $post->conteudo;
+
+        $this->assertStringContainsString('<hr', $html);
+        $this->assertStringContainsString('class="lead"', $html);
+        $this->assertStringContainsString('grid-layout', $html);
+        $this->assertStringContainsString('data-cols="2"', $html);
+        $this->assertStringContainsString('grid-layout-col', $html);
+        $this->assertStringContainsString('data-color="roxo"', $html);
+        $this->assertStringContainsString('colorido', $html);
+        // política dura: nada de style inline sobrevive
+        $this->assertStringNotContainsString('style=', $html);
+    }
+
     /** perfil 'conteudo' (palestras) deve continuar sem data-id nem classes de imagem */
     public function test_perfil_conteudo_palestras_nao_permite_data_id_nem_classes(): void
     {

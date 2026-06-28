@@ -40,7 +40,7 @@ return [
         ],
         'custom_definition' => [
             'id' => 'html5-definitions',
-            'rev' => 2,
+            'rev' => 4,
             'debug' => false,
             'elements' => [
                 // http://developers.whatwg.org/sections.html
@@ -97,6 +97,14 @@ return [
                 // data-id necessário para o provider de mídia do blog não deletar
                 // imagens do corpo como "órfãs" (limpa só se data-id não aparece no HTML)
                 ['img', 'data-id', 'Text'],
+                // Cor de texto (tool textColor do Filament): a cor é mapeada por `data-color`
+                // via CSS (sem `style` inline, que o purifier remove).
+                ['span', 'data-color', 'Text'],
+                // Grid/colunas (tool grid do Filament): o layout é derivado de `data-cols`/
+                // `data-col-span` via CSS (sem `style` inline).
+                ['div', 'data-cols', 'Text'],
+                ['div', 'data-from-breakpoint', 'Text'],
+                ['div', 'data-col-span', 'Text'],
             ],
         ],
         'custom_attributes' => [
@@ -121,7 +129,7 @@ return [
         // 'Attr.AllowedClasses' é allow-list fechada — qualquer classe fora da lista é removida.
         //       'style' inline nunca é permitido; dimensões devem vir via classes CSS.
         'conteudo_blog' => [
-            'HTML.Allowed' => 'p,br,b,strong,i,em,u,s,h2,h3,h4,h5,ul,ol,li,blockquote,a[href|title|target|rel],img[src|alt|width|height|class|data-id],figure[class],figcaption,div[class],table,thead,tbody,tr,th,td,iframe[src|width|height|frameborder|allowfullscreen]',
+            'HTML.Allowed' => 'p[class],br,b,strong,i,em,u,s,h2[class],h3[class],h4[class],h5,ul,ol,li,blockquote,hr,a[href|title|target|rel],img[src|alt|width|height|class|data-id],span[class|data-color],figure[class],figcaption,div[class|data-cols|data-from-breakpoint|data-col-span],table,thead,tbody,tr,th,td,iframe[src|width|height|frameborder|allowfullscreen]',
             'HTML.SafeIframe' => true,
             'URI.SafeIframeRegexp' => '%^(https?:)?//(www\.youtube\.com/embed/|player\.vimeo\.com/video/)%',
             'HTML.TargetBlank' => true,
@@ -130,14 +138,17 @@ return [
             'Attr.AllowedClasses' => [
                 // Alinhamento clássico do WordPress
                 'alignleft', 'alignright', 'aligncenter', 'alignnone',
-                // Alinhamento Gutenberg
-                'has-text-align-left', 'has-text-align-center', 'has-text-align-right',
+                // Alinhamento Gutenberg (texto)
+                'has-text-align-left', 'has-text-align-center', 'has-text-align-right', 'has-text-align-justify',
                 // Tamanhos de imagem do WordPress
                 'size-thumbnail', 'size-medium', 'size-large', 'size-full',
                 // Blocos Gutenberg de imagem
                 'is-resized', 'wp-block-image', 'wp-block-media-text',
-                // Layout de colunas personalizado
+                // Layout de colunas personalizado (importação do legado)
                 'colunas', 'coluna',
+                // Ferramentas nativas do editor: parágrafo de destaque, cor de texto,
+                // e grid/colunas do Filament (layout derivado de data-* via CSS).
+                'lead', 'color', 'grid-layout', 'grid-layout-col',
             ],
         ],
     ],

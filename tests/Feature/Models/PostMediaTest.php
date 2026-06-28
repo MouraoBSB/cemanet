@@ -114,4 +114,46 @@ class PostMediaTest extends TestCase
         $this->assertTrue(Schema::hasColumn('posts', 'imagem_destacada_alt'));
         $this->assertFalse(Schema::hasTable('post_imagens'));
     }
+
+    public function test_conteudo_web_nao_gera_responsive_images(): void
+    {
+        Storage::fake('public');
+
+        $post = Post::factory()->create();
+
+        $img = UploadedFile::fake()->image('c.png', 1000, 700)->getContent();
+        $media = $post->addMediaFromString($img)
+            ->usingFileName('c.png')
+            ->toMediaCollection(Post::COLECAO_CONTEUDO);
+
+        $media->refresh();
+
+        // A conversão 'web' É gerada (síncrona)...
+        $this->assertTrue($media->hasGeneratedConversion('web'));
+        // ...mas SEM responsive images: o corpo usa <img src> simples (sem srcset),
+        // então gerar ~10 variantes só desperdiçava CPU e travava o attach.
+        $this->assertArrayNotHasKey('web', $media->responsive_images ?? []);
+    }
+
+    public function test_provider_do_corpo_serve_conversao_webp(): void
+    {
+        Storage::fake('public');
+
+        $post = Post::factory()->create();
+
+        $img = UploadedFile::fake()->image('c.png', 1000, 700)->getContent();
+        $media = $post->addMediaFromString($img)
+            ->usingFileName('c.png')
+            ->toMediaCollection(Post::COLECAO_CONTEUDO);
+
+        $provider = $post->getRichContentAttribute(Post::COLECAO_CONTEUDO)?->getFileAttachmentProvider();
+
+        $this->assertInstanceOf(\App\Filament\RichContent\ProviderImagemCorpo::class, $provider);
+
+        $url = $provider->getFileAttachmentUrl($media->uuid);
+
+        $this->assertNotNull($url);
+        // Serve a WebP otimizada (conversão 'web'), não o original .png.
+        $this->assertStringContainsString('.webp', $url);
+    }
 }

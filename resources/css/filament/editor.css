@@ -1,0 +1,129 @@
+/* CSS injetado SOMENTE no canvas do RichEditor do blog (escopo .editor-conteudo-blog)
+   para dar preview WYSIWYG e cursor visível. Espelha .conteudo-artigo do front.
+   Publicado via `php artisan filament:assets`. CSS puro (sem Tailwind/tokens do front).
+   Thiago Mourão — https://github.com/MouraoBSB — 2026-06-27 */
+
+/* Cursor (caret) sempre visível na cor da marca; gapcursor (entre blocos) visível. */
+.editor-conteudo-blog .tiptap.ProseMirror {
+    caret-color: #4e4483;
+}
+
+.editor-conteudo-blog .ProseMirror-gapcursor:after {
+    border-top: 2px solid #4e4483;
+    width: 1.25rem;
+}
+
+/* Regra-base: imagem nunca estoura o canvas (espelha .conteudo-artigo img do front).
+   Sem isto, uma imagem recém-inserida (ainda sem classe size-*) aparece em tamanho real. */
+.editor-conteudo-blog .tiptap img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Preview de alinhamento/tamanho de imagem dentro do editor (item 1). */
+.editor-conteudo-blog .tiptap {
+    overflow-wrap: anywhere;
+}
+
+.editor-conteudo-blog .tiptap::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+.editor-conteudo-blog .tiptap .alignleft {
+    float: left;
+    margin: 0.25rem 1.5rem 1rem 0;
+}
+
+.editor-conteudo-blog .tiptap .alignright {
+    float: right;
+    margin: 0.25rem 0 1rem 1.5rem;
+}
+
+.editor-conteudo-blog .tiptap .aligncenter {
+    display: block;
+    float: none;
+    clear: both;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.editor-conteudo-blog .tiptap .alignnone {
+    float: none;
+}
+
+.editor-conteudo-blog .tiptap .size-thumbnail { max-width: 25%; }
+.editor-conteudo-blog .tiptap .size-medium { max-width: 50%; }
+.editor-conteudo-blog .tiptap .size-large { max-width: 75%; }
+.editor-conteudo-blog .tiptap .size-full { max-width: 100%; }
+.editor-conteudo-blog .tiptap img.is-resized { max-width: 60%; }
+
+/* Preview de alinhamento de texto no editor (item 6). Espelha o front. */
+.editor-conteudo-blog .tiptap p {
+    text-align: justify;
+    hyphens: auto;
+}
+
+.editor-conteudo-blog .tiptap .has-text-align-left { text-align: left; hyphens: manual; }
+.editor-conteudo-blog .tiptap .has-text-align-center { text-align: center; hyphens: manual; }
+.editor-conteudo-blog .tiptap .has-text-align-right { text-align: right; hyphens: manual; }
+.editor-conteudo-blog .tiptap .has-text-align-justify { text-align: justify; hyphens: auto; }
+
+/* Toolbar fixa acompanhando a rolagem (item 2). top = altura do topbar (4rem),
+   z-index abaixo do topbar (z-30) e acima do conteúdo. Background opaco obrigatório
+   para a toolbar não ficar transparente sobre o texto que rola por baixo. */
+.editor-conteudo-blog .fi-fo-rich-editor-toolbar {
+    position: sticky;
+    top: 4rem;
+    z-index: 20;
+    background: var(--fi-color-white, #fff);
+}
+
+.dark .editor-conteudo-blog .fi-fo-rich-editor-toolbar {
+    background: #18181b;
+}
+
+/* Barra FLUTUANTE de imagem: fundo distinto (lilás) para NÃO confundir com a
+   barra de ferramentas do topo (branca). */
+.editor-conteudo-blog .fi-fo-rich-editor-floating-toolbar {
+    background: #ece8fb;
+    border-color: #b9aef0;
+}
+
+.dark .editor-conteudo-blog .fi-fo-rich-editor-floating-toolbar {
+    background: #2a2546;
+    border-color: #4e4483;
+}
+
+/* Preview no canvas das ferramentas nativas recém-ligadas (lead, hr, grid, cor). */
+.editor-conteudo-blog .tiptap .lead {
+    font-size: 1.15em;
+    line-height: 1.7;
+    font-weight: 500;
+    margin: 0 0 1.25rem;
+}
+
+.editor-conteudo-blog .tiptap hr {
+    border: 0;
+    border-top: 2px solid #c9c2e6;
+    width: 60%;
+    margin: 2rem auto;
+}
+
+.editor-conteudo-blog .tiptap .grid-layout {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+    margin: 1.5rem 0;
+}
+
+.editor-conteudo-blog .tiptap .grid-layout-col {
+    min-width: 0;
+}
+
+/* Cor de texto no editor: usa a variável --color que o TipTap injeta no span. */
+.editor-conteudo-blog .tiptap .color {
+    color: var(--color);
+}

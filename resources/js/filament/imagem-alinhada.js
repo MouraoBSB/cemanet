@@ -4,6 +4,7 @@
 // Carregada via RichContentPlugin::getTipTapJsExtensions().
 
 const { Extension } = window.FilamentRichEditor.tiptap.core
+const { NodeSelection } = window.FilamentRichEditor.tiptap.pmState
 
 const CLASSES_ALIGN = {
     left:   'alignleft',
@@ -57,12 +58,57 @@ export default Extension.create({
     },
 
     addCommands() {
-        return {
-            definirAlinhamentoImagem: (align) => ({ commands }) =>
-                commands.updateAttributes('image', { align }),
+        // Localiza a POSIÇÃO do nó 'image' alvo: a já selecionada (NodeSelection, via
+        // clique/toolbar flutuante) ou a imagem inline adjacente ao cursor (recém-inserida
+        // — o cursor vira seleção de TEXTO ao lado dela). Sem isso, atualizar atributos
+        // era no-op (o cursor não está "sobre" a imagem).
+        const localizarImagem = (state) => {
+            const sel = state.selection
 
-            definirTamanhoImagem: (size) => ({ commands }) =>
-                commands.updateAttributes('image', { size }),
+            if (sel.node && sel.node.type.name === 'image') {
+                return sel.from
+            }
+
+            const { $from } = sel
+
+            if ($from.nodeBefore && $from.nodeBefore.type.name === 'image') {
+                return $from.pos - $from.nodeBefore.nodeSize
+            }
+
+            if ($from.nodeAfter && $from.nodeAfter.type.name === 'image') {
+                return $from.pos
+            }
+
+            return null
+        }
+
+        // Aplica os atributos direto na transação via setNodeMarkup — robusto tanto na
+        // invocação standalone (editor.commands.x) quanto encadeada pelo botão
+        // (editor.chain().focus().x().run()). Mantém o nó selecionado para cliques seguidos.
+        const aplicar = (attrs) => ({ state, tr, dispatch }) => {
+            const pos = localizarImagem(state)
+
+            if (pos === null) {
+                return false // nenhuma imagem por perto — nada a fazer
+            }
+
+            const node = state.doc.nodeAt(pos)
+
+            if (! node || node.type.name !== 'image') {
+                return false
+            }
+
+            if (dispatch) {
+                tr.setNodeMarkup(pos, undefined, { ...node.attrs, ...attrs })
+                tr.setSelection(NodeSelection.create(tr.doc, pos))
+            }
+
+            return true
+        }
+
+        return {
+            definirAlinhamentoImagem: (align) => aplicar({ align }),
+            definirTamanhoImagem: (size) => aplicar({ size }),
         }
     },
 })

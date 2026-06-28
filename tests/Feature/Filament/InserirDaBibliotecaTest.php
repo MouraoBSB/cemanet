@@ -31,6 +31,14 @@ class InserirDaBibliotecaTest extends TestCase
             ->callFormComponentAction('conteudo', 'inserirDaBiblioteca',
                 data: ['midia_id' => $media->id],
                 arguments: ['editorSelection' => null])
-            ->assertDispatched('run-rich-editor-commands');
+            // Valida o PAYLOAD: o comando insertContent carrega a URL RELATIVA portável /midia/{id}/web
+            // (JSON_UNESCAPED_SLASHES porque o json_encode padrão escapa as barras → \/midia\/).
+            ->assertDispatched('run-rich-editor-commands', function (...$args) use ($media): bool {
+                $json = json_encode($args, JSON_UNESCAPED_SLASHES);
+
+                return str_contains($json, '/midia/' . $media->id . '/web')
+                    && ! str_contains($json, 'http://')   // garante que é relativa, sem domínio
+                    && ! str_contains($json, 'https://');
+            });
     }
 }

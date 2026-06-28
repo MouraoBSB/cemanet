@@ -79,6 +79,7 @@ class PostResource extends Resource
                         ->label('Conteúdo')
                         ->live(onBlur: true)
                         ->preventFileAttachmentPathTampering()
+                        ->fileAttachmentsMaxSize(20480) // 20 MB (KB) — alinhado ao PHP e ao Livewire
                         ->plugins([
                             ImagemPlugin::make(),
                             TextoAlinhamentoPlugin::make(),

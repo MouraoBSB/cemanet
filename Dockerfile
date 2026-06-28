@@ -52,6 +52,16 @@ RUN { \
         echo "opcache.validate_timestamps=0"; \
     } > /usr/local/etc/php/conf.d/opcache.ini
 
+# Limites de upload elevados para imagens do blog (corpo, destaque, galeria).
+# Defaults do PHP (2M/8M) rejeitavam fotos de ~8 MB e o upload travava em "100%".
+# Alinhados em ~20 MB com o teto do Livewire (config/livewire.php) e o do anexo do
+# RichEditor (->fileAttachmentsMaxSize). post_max_size > upload_max_filesize: folga
+# para o overhead do multipart.
+RUN { \
+        echo "upload_max_filesize=20M"; \
+        echo "post_max_size=22M"; \
+    } > /usr/local/etc/php/conf.d/uploads.ini
+
 # Composer (binário copiado da imagem oficial).
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 

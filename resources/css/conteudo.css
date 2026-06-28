@@ -144,6 +144,53 @@
     hyphens: auto;
 }
 
+/* Parágrafo de destaque (tool "lead" do Filament) */
+.conteudo-artigo .lead {
+    font-size: 1.15em;
+    line-height: 1.7;
+    font-weight: 500;
+    color: var(--color-text-ink, #2f2952);
+    margin: 0 0 1.25rem;
+}
+
+/* Separador (tool "horizontalRule") */
+.conteudo-artigo hr {
+    border: 0;
+    border-top: 2px solid var(--color-border-muted, #e6e1d8);
+    width: 60%;
+    margin: 2.5rem auto;
+}
+
+/* Grid/colunas do editor (tool "grid"). O layout vem do data-cols via CSS —
+   sem style inline (que o purifier remove). Padrão = 2 colunas. */
+.conteudo-artigo .grid-layout {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+    margin: 1.5rem 0;
+}
+
+.conteudo-artigo .grid-layout[data-cols="3"] { grid-template-columns: repeat(3, 1fr); }
+.conteudo-artigo .grid-layout[data-cols="4"] { grid-template-columns: repeat(4, 1fr); }
+
+.conteudo-artigo .grid-layout-col {
+    min-width: 0;
+}
+
+/* Cor de texto (tool "textColor") — mapeada por data-color, sem style inline.
+   Cobre tanto o nome (roxo) quanto o hex, caso o Filament grave o valor cru. */
+.conteudo-artigo .color[data-color="roxo"],
+.conteudo-artigo .color[data-color="#4e4483"]  { color: #4e4483; }
+.conteudo-artigo .color[data-color="laranja"],
+.conteudo-artigo .color[data-color="#e79048"]  { color: #e79048; }
+.conteudo-artigo .color[data-color="verde"],
+.conteudo-artigo .color[data-color="#89ab98"]  { color: #89ab98; }
+.conteudo-artigo .color[data-color="azul"],
+.conteudo-artigo .color[data-color="#6e9fcb"]  { color: #6e9fcb; }
+.conteudo-artigo .color[data-color="vermelho"],
+.conteudo-artigo .color[data-color="#c0392b"]  { color: #c0392b; }
+
 /* Responsivo: no mobile tudo empilha (sem float, largura cheia) */
 @media (max-width: 640px) {
     .conteudo-artigo .alignleft,
@@ -168,6 +215,13 @@
     }
 
     .conteudo-artigo .colunas {
+        grid-template-columns: 1fr;
+    }
+
+    /* Grid do editor empilha no mobile (independente de data-cols). */
+    .conteudo-artigo .grid-layout,
+    .conteudo-artigo .grid-layout[data-cols="3"],
+    .conteudo-artigo .grid-layout[data-cols="4"] {
         grid-template-columns: 1fr;
     }
 

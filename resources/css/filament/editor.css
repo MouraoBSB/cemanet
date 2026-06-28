@@ -83,3 +83,47 @@
 .dark .editor-conteudo-blog .fi-fo-rich-editor-toolbar {
     background: #18181b;
 }
+
+/* Barra FLUTUANTE de imagem: fundo distinto (lilás) para NÃO confundir com a
+   barra de ferramentas do topo (branca). */
+.editor-conteudo-blog .fi-fo-rich-editor-floating-toolbar {
+    background: #ece8fb;
+    border-color: #b9aef0;
+}
+
+.dark .editor-conteudo-blog .fi-fo-rich-editor-floating-toolbar {
+    background: #2a2546;
+    border-color: #4e4483;
+}
+
+/* Preview no canvas das ferramentas nativas recém-ligadas (lead, hr, grid, cor). */
+.editor-conteudo-blog .tiptap .lead {
+    font-size: 1.15em;
+    line-height: 1.7;
+    font-weight: 500;
+    margin: 0 0 1.25rem;
+}
+
+.editor-conteudo-blog .tiptap hr {
+    border: 0;
+    border-top: 2px solid #c9c2e6;
+    width: 60%;
+    margin: 2rem auto;
+}
+
+.editor-conteudo-blog .tiptap .grid-layout {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+    align-items: start;
+    margin: 1.5rem 0;
+}
+
+.editor-conteudo-blog .tiptap .grid-layout-col {
+    min-width: 0;
+}
+
+/* Cor de texto no editor: usa a variável --color que o TipTap injeta no span. */
+.editor-conteudo-blog .tiptap .color {
+    color: var(--color);
+}

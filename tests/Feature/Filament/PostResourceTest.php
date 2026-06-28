@@ -168,6 +168,19 @@ class PostResourceTest extends TestCase
         $this->assertStringNotContainsString('definirTamanhoImagem(&quot;', $html);
     }
 
+    public function test_toolbar_inclui_ferramentas_nativas_extras(): void
+    {
+        Livewire::test(CreatePost::class)
+            ->assertFormFieldExists('conteudo', function (\Filament\Forms\Components\RichEditor $campo): bool {
+                foreach (['grid', 'clearFormatting', 'horizontalRule', 'lead', 'textColor'] as $tool) {
+                    if (! $campo->hasToolbarButton($tool)) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+    }
+
     public function test_editor_tem_toolbar_flutuante_para_imagem(): void
     {
         // Affordance do BUG 1: ao selecionar a imagem, as ferramentas de imagem

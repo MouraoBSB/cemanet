@@ -18,7 +18,9 @@
 - **Dedup por SHA-256 do arquivo CAPADO** (listener após `CaparOriginalDaMidia`), em `custom_properties['sha256']`.
 - **Deleção autoritativa**: `Post::whereRaw('conteudo LIKE ?', ["%/midia/{id}/%"])` (com a **barra final** → `12` não casa `123`; teste de fronteira). Bloquear/avisar se em uso.
 - **#1 (disco) — fundacional, Task B0:** os 3 `SpatieMediaLibraryFileUpload` (destacada/galeria/og) precisam fixar `->disk('public')`. Causa-raiz: o disco default do Filament é `config('filesystems.default')`=`local` (FILESYSTEM_DISK ausente) → upload cai no `local` privado (`storage/app/private/`) e o Spatie gera URL `/storage` (public) → 404. Migrados e corpo vão a public via default do Spatie (por isso renderizam).
-- **#2 (corpo) — diagnóstico:** o clipe `attachFiles` salva o corpo **sem `<img>`** (a imagem inserida perde a referência no save → purifier remove; `conteudo` fica só com texto). A solução desta fatia é a tool **"Inserir da biblioteca"** (B5), que insere `<img src="/midia/{id}/web">` — caminho funcional e portável. **Durante a B, avaliar** se o botão `attachFiles` do corpo deve ser removido/ajustado para não recriar o bug (decisão a confirmar com o dono).
+- **#2 (corpo) — diagnóstico:** o clipe `attachFiles` salva o corpo **sem `<img>`** (a imagem inserida perde a referência no save → purifier remove; `conteudo` fica só com texto). A solução desta fatia é a tool **"Inserir da biblioteca"** (B5), que insere `<img src="/midia/{id}/web">` — caminho funcional e portável.
+- **Clipe do corpo — decisão do dono:** alvo é **remover** o `attachFiles`, MAS só depois que o modal "Inserir da biblioteca" (B5) também permitir **subir imagem nova** (resize nativo + dedup) → aí vira **superconjunto** do clipe. Se subir-no-modal for inviável no B5, **manter o clipe** até a biblioteca cobrir o upload novo. (Trazer o B5 ao dono antes de fechar.)
+- **Metadados de mídia (em `custom_properties`, SEM migração nova):** `alt` (ESSENCIAL — A11y/SEO; carimbado no `<img alt>` ao inserir, default = alt guardado na mídia), `legenda` (guardar), `titulo`/`descricao` (guardar; sem UI dedicada agora). Campos editáveis na BibliotecaResource (B4) e no modal de inserção/upload (B5). **Adiados:** render rico (figcaption + JSON-LD `ImageObject` por imagem) e "Gerar alt" por IA.
 - pt-BR; cabeçalho de autoria; commits com `Co-Authored-By: Claude Opus 4.8`. Testes/assets/migrations via Docker; `restart app` após PHP (opcache).
 
 ## Fora de escopo (adiado — confirmado pelo dono)
@@ -131,6 +133,7 @@ Event::listen(MediaHasBeenAddedEvent::class, CalcularHashMidia::class); // DEPOI
 ```
 
 - [ ] **Serviço** `RegistraMidiaBiblioteca::aPartirDoCaminho(...)`: checa hash de entrada na coleção (`whereJsonContains('custom_properties->sha256', $hash)`) → retorna existente; senão `addMediaFromString(...)->toMediaCollection('biblioteca')` e **reverifica** pelo hash canônico (pós-cap), descartando duplicata. (código no plano anterior, mantido.)
+- [ ] **Metadados opcionais**: o serviço aceita `array $meta = []` (`alt`/`legenda`/`titulo`/`descricao`) → `setCustomProperty` em cada, na mídia nova. Em **dedup-hit** (mídia já existe), **preenche só os campos vazios** (não sobrescreve metadados já curados). **Teste**: registrar com `['alt'=>'x']` → mídia guarda `alt`; registrar duplicata com alt diferente → mantém o alt original.
 - [ ] Testes verdes (incl. não-regressão do cap). Commit.
 
 ---
@@ -142,6 +145,7 @@ Event::listen(MediaHasBeenAddedEvent::class, CalcularHashMidia::class); // DEPOI
 - [ ] **Testes**: listagem renderiza; **deleção autoritativa** — mídia referenciada em `Post.conteudo` via `/midia/{id}/` é bloqueada/avisada; mídia livre deleta; **teste de fronteira do LIKE (#11)**: `/midia/12/` NÃO casa um post que só usa `/midia/123/`.
 - [ ] **Resource**: tabela com `ImageColumn` (preview `route('midia.serve',[id,'thumb'])`), nome/size/data, **busca por nome**, paginação. **Upload** (ação/modal) via `RegistraMidiaBiblioteca` (dedup). Padrão `PalestranteResource`/`PostResource`.
 - [ ] **Resize client-side nativo no upload** (absorve a Task A3 adiada, sem JS custom): o `FileUpload`/`SpatieMediaLibraryFileUpload` do modal de upload usa `->imageResizeTargetWidth('2000')->imageResizeMode('contain')->imageResizeUpscale(false)` → o navegador encolhe a imagem para ≤2000px de largura **antes** de subir, aliviando transferência e o save síncrono. (O cap server-side `Fit::Max 1920` continua como rede de segurança.) Confirmar os nomes exatos dos métodos no Filament 5 antes de aplicar.
+- [ ] **Campos de metadados editáveis** (form do registro/edição de mídia, ligados a `custom_properties`): `alt` (recomendado, com hint de A11y/SEO), `legenda` (textarea curta); `titulo`/`descricao` opcionais e secundários (seção colapsável). Persistir via `setCustomProperty` ao salvar; reler como default ao editar. **Teste**: salvar `alt`/`legenda` → reler da mídia.
 - [ ] **Deleção autoritativa** (varredura ANTES, com barra final):
 
 ```php
@@ -159,27 +163,32 @@ if ($usos > 0) { Notification::make()->danger()->title('Imagem em uso')
 **Files:** `app/Filament/RichContent/Actions/InserirDaBibliotecaAction.php`, `app/Filament/RichContent/Plugins/BibliotecaMidiaPlugin.php` (+ componente/Blade da grade); `app/Filament/Resources/Posts/PostResource.php`; Test `tests/Feature/Filament/PostResourceTest.php`.
 
 - [ ] **Teste**: toolbar inclui `inserirDaBiblioteca` (`hasToolbarButton`).
-- [ ] **Ação** (`#9` via `->action()`, NÃO jsHandler): modal com busca + grade de miniaturas; ao escolher, insere via `runCommands`:
+- [ ] **Modal com DOIS modos** (`#9` via `->action()`, NÃO jsHandler):
+  - **(A) Escolher da biblioteca:** busca + grade de miniaturas (componente reativo com `$set('midia_id', id)` — independe de índice de modal). Ao focar uma mídia, o campo **`alt`** pré-preenche com o alt guardado (editável).
+  - **(B) Subir nova:** `FileUpload` com `->imageResizeTargetWidth('2000')->imageResizeMode('contain')->imageResizeUpscale(false)` → ao confirmar, registra via `RegistraMidiaBiblioteca` (cap + dedup por hash) e usa a mídia resultante; campos **`alt`** (e opcional `legenda`) gravados nos metadados. **→ É este modo que torna a tool um superconjunto do clipe** (gatilho para remover o `attachFiles`).
+- [ ] **Inserção** (ambos os modos convergem aqui): `runCommands`, carimbando o `alt` editado:
 
 ```php
 ->action(function (array $arguments, array $data, RichEditor $component): void {
+    // modo (A): $data['midia_id']; modo (B): id retornado por RegistraMidiaBiblioteca
     $media = Media::query()->where('collection_name', Biblioteca::COLECAO)->findOrFail($data['midia_id']);
+    $alt = $data['alt'] ?? $media->getCustomProperty('alt') ?? $media->name; // alt do form > guardado > nome
     $component->runCommands(
         [EditorCommand::make('insertContent', arguments: [[
             'type'  => 'image',
             'attrs' => ['src' => route('midia.serve', [$media->id, 'web']),
-                        'alt' => $media->getCustomProperty('alt') ?? $media->name,
+                        'alt' => $alt,
                         'id'  => null], // tamper-check ok; cleanup é por coleção (não por isto)
         ]])],
         editorSelection: $arguments['editorSelection'],
     );
 });
 ```
-(Grade: componente reativo com `$set('midia_id', id)` — independe de índice de modal.)
 
 - [ ] **Plugin** `BibliotecaMidiaPlugin`: `getEditorTools()` → `RichEditorTool::make('inserirDaBiblioteca')->label('Inserir da biblioteca')->icon(...)->action()`; `getEditorActions()` → `[InserirDaBibliotecaAction::make()]`; demais `[]`.
 - [ ] **Registrar no `PostResource`** — **APENAS acrescentar** (`#4` INTOCÁVEL): `->plugins([ImagemPlugin::make(), TextoAlinhamentoPlugin::make(), BibliotecaMidiaPlugin::make()])` + `'inserirDaBiblioteca'` no `toolbarButtons`. **NÃO** alterar o bloco das ferramentas de imagem (alinhar/tamanho/floatingToolbars).
-- [ ] **Verificação manual (obrigatória):** inserir da biblioteca → busca/preview/insere → salva → **front renderiza** (`/midia/{id}/web`); reabrir o post → imagem permanece (não some). **UAT do dimensionamento (#4):** selecionar uma imagem → tamanho/alinhamento **ainda funcionam** (não regrediu); barra flutuante lilás ok.
+- [ ] **Clipe do corpo (decisão do dono):** se o modo (B) "subir nova" funcionar (resize + dedup) → **remover `'attachFiles'`** do `toolbarButtons` do `conteudo` (a biblioteca cobre o upload novo, sem a pegadinha do #2). Se (B) ficar inviável nesta fatia → **manter `'attachFiles'`** e registrar o motivo. **CHECKPOINT: antes de fechar o B5, trazer ao dono** (modo B viável? clipe removido ou mantido?).
+- [ ] **Verificação manual (obrigatória):** (1) inserir da biblioteca (modo A) → busca/preview/insere → salva → **front renderiza** (`/midia/{id}/web`); reabrir o post → imagem permanece. (2) subir nova (modo B) → dedup ok, `alt` carimbado no `<img alt>` do front. (3) **UAT do dimensionamento (#4):** selecionar uma imagem → tamanho/alinhamento **ainda funcionam**; barra flutuante lilás ok.
 - [ ] Teste verde. Commit.
 
 ---
@@ -187,6 +196,6 @@ if ($usos > 0) { Notification::make()->danger()->title('Imagem em uso')
 ## Verificação final (Fatia B)
 
 - [ ] Suíte verde; `filament:assets` + `restart app`.
-- [ ] **Aceite (do dono):** inserir da biblioteca sem re-upload ✔ · dedup por hash ✔ · deleção autoritativa (com fronteira do LIKE) ✔ · imagem nova do corpo por rota estável + WebP, renderiza no front e não some ao reabrir ✔ · dimensionamento de imagem intacto (UAT) ✔.
+- [ ] **Aceite (do dono):** inserir da biblioteca sem re-upload ✔ · **subir nova no modal (modo B) com resize + dedup** ✔ · dedup por hash ✔ · **`alt` editável carimbado no `<img alt>`** ✔ · deleção autoritativa (com fronteira do LIKE) ✔ · imagem nova do corpo por rota estável + WebP, renderiza no front e não some ao reabrir ✔ · **clipe removido (ou mantido com motivo, se modo B inviável)** ✔ · dimensionamento de imagem intacto (UAT) ✔.
 - [ ] **Merge próprio** da Fatia B.
-- [ ] **Backlog registrado:** re-migração dos 44 posts (portabilidade S3/CDN, com dry-run+backup) + polish do textColor.
+- [ ] **Backlog registrado:** re-migração dos 44 posts (portabilidade S3/CDN, com dry-run+backup) · polish do textColor · **render rico de metadados (figcaption + JSON-LD `ImageObject` por imagem)** · **"Gerar alt" por IA**.

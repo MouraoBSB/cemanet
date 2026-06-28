@@ -267,4 +267,17 @@ class PostResourceTest extends TestCase
 
         $this->assertDatabaseHas('posts', ['slug' => 'post-com-imagem-destacada']);
     }
+
+    public function test_uploads_de_imagem_nao_geram_responsive_images(): void
+    {
+        // Higiene de performance (Fatia A): capa e galeria são servidas por <img> simples
+        // no front (sem srcset), então o componente de upload do painel NÃO deve gerar
+        // responsive images do original (GenerateResponsiveImagesJob ocioso). As conversões
+        // do model são cobertas por PostMediaTest; aqui validamos o caminho do PAINEL.
+        Livewire::test(CreatePost::class)
+            ->assertFormFieldExists('destacada', fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $campo): bool =>
+                ! $campo->hasResponsiveImages())
+            ->assertFormFieldExists('galeria', fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $campo): bool =>
+                ! $campo->hasResponsiveImages());
+    }
 }

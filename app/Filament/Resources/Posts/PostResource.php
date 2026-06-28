@@ -155,8 +155,7 @@ class PostResource extends Resource
                             ->imageResizeMode('contain')
                             ->imageResizeTargetWidth(2000)
                             ->imageResizeTargetHeight(2000)
-                            ->conversion('thumb')
-                            ->responsiveImages(),
+                            ->conversion('thumb'),
                         TextInput::make('imagem_destacada_alt')
                             ->label('Alt da imagem destacada')
                             ->maxLength(255),
@@ -174,7 +173,6 @@ class PostResource extends Resource
                         ->imageResizeTargetWidth(2000)
                         ->imageResizeTargetHeight(2000)
                         ->conversion('thumb')
-                        ->responsiveImages()
                         ->columnSpanFull(),
                 ]),
 

@@ -84,12 +84,11 @@ class Post extends Model implements HasMedia, HasRichContent
         $this->addMediaCollection(self::COLECAO_DESTACADA)
             ->singleFile()
             ->registerMediaConversions(function (Media $media) {
-                // Versão web otimizada com srcset responsivo
+                // Versão web otimizada (sem srcset — o front usa <img> simples)
                 $this->addMediaConversion('web')
                     ->fit(Fit::Max, 1920, 1920)
                     ->format('webp')
                     ->quality(82)
-                    ->withResponsiveImages()
                     ->nonQueued();
                 // Miniatura para listagens
                 $this->addMediaConversion('thumb')
@@ -111,7 +110,6 @@ class Post extends Model implements HasMedia, HasRichContent
                     ->fit(Fit::Max, 1920, 1920)
                     ->format('webp')
                     ->quality(82)
-                    ->withResponsiveImages()
                     ->nonQueued();
                 $this->addMediaConversion('thumb')
                     ->fit(Fit::Crop, 400, 300)
@@ -154,7 +152,6 @@ class Post extends Model implements HasMedia, HasRichContent
                     ->fit(Fit::Max, 1920, 1920)
                     ->format('webp')
                     ->quality(82)
-                    ->withResponsiveImages()
                     ->nonQueued();
                 $this->addMediaConversion('thumb')
                     ->fit(Fit::Crop, 400, 300)

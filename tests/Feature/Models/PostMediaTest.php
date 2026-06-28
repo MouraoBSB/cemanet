@@ -156,4 +156,33 @@ class PostMediaTest extends TestCase
         // Serve a WebP otimizada (conversão 'web'), não o original .png.
         $this->assertStringContainsString('.webp', $url);
     }
+
+    public function test_web_das_colecoes_visuais_nao_gera_responsive_images(): void
+    {
+        Storage::fake('public');
+
+        $post = Post::factory()->create();
+
+        // destacada, galeria e corpo servem <img src> simples (sem srcset) no front,
+        // então a conversão 'web' NÃO deve gerar responsive images.
+        $colecoes = [
+            Post::COLECAO_DESTACADA,
+            Post::COLECAO_GALERIA,
+            Post::COLECAO_CORPO,
+        ];
+
+        foreach ($colecoes as $colecao) {
+            $img = UploadedFile::fake()->image("img-{$colecao}.png", 1000, 700)->getContent();
+            $media = $post->addMediaFromString($img)
+                ->usingFileName("img-{$colecao}.png")
+                ->toMediaCollection($colecao);
+
+            $media->refresh();
+
+            // A 'web' continua sendo gerada (síncrona)...
+            $this->assertTrue($media->hasGeneratedConversion('web'), "web não gerada em {$colecao}");
+            // ...mas SEM responsive images.
+            $this->assertArrayNotHasKey('web', $media->responsive_images ?? [], "responsive presente em {$colecao}");
+        }
+    }
 }

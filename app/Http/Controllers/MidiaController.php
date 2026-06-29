@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\Biblioteca;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -22,9 +23,18 @@ class MidiaController extends Controller
      */
     public function colar(Request $request): JsonResponse
     {
-        $request->validate([
+        // Validação explícita → SEMPRE 422 JSON (a extensão de colar consome JSON;
+        // não depende da negociação do header Accept).
+        $validator = Validator::make($request->all(), [
             'imagem' => ['required', 'file', 'image', 'max:20480'], // 20 MB (KB) — cabe no PHP (20M/22M)
         ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Arquivo inválido. Envie uma imagem de até 20 MB.',
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
 
         $arquivo = $request->file('imagem');
 

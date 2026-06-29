@@ -39,31 +39,31 @@ class ColarMidiaTest extends TestCase
         $this->assertCount(1, Biblioteca::instance()->getMedia(Biblioteca::COLECAO));
     }
 
-    public function test_nao_autenticado_nao_registra_midia(): void
+    public function test_nao_autenticado_e_redirecionado_e_nao_registra_midia(): void
     {
         Storage::fake('public');
 
+        // Sem auth: o middleware Authenticate do painel redireciona ao login (prova que a
+        // rota está protegida) e o controller nem roda → nada é registrado.
         $this->post($this->url(), [
             'imagem' => UploadedFile::fake()->image('paste.png', 400, 300),
-        ]);
+        ])->assertRedirect();
 
-        // Filament redireciona p/ login; o importante: NADA é registrado.
         $this->assertSame(0, Biblioteca::instance()->getMedia(Biblioteca::COLECAO)->count());
     }
 
-    public function test_rejeita_arquivo_que_nao_e_imagem(): void
+    public function test_rejeita_arquivo_que_nao_e_imagem_com_422_json(): void
     {
         Storage::fake('public');
         $this->actingAs(User::factory()->create());
 
-        // Envia com Accept JSON para forçar resposta 422 (em vez de redirect de sessão).
-        $resp = $this->withHeaders(['Accept' => 'application/json'])
-            ->post($this->url(), [
-                'imagem' => UploadedFile::fake()->create('doc.pdf', 100, 'application/pdf'),
-            ]);
+        $this->post($this->url(), [
+            'imagem' => UploadedFile::fake()->create('doc.pdf', 100, 'application/pdf'),
+        ])
+            ->assertStatus(422)
+            ->assertJsonStructure(['message', 'errors' => ['imagem']]);
 
-        $this->assertNotSame(200, $resp->getStatusCode());
-        $this->assertSame(0, \App\Models\Biblioteca::instance()->getMedia(\App\Models\Biblioteca::COLECAO)->count());
+        $this->assertSame(0, Biblioteca::instance()->getMedia(Biblioteca::COLECAO)->count());
     }
 
     public function test_dedup_mesma_imagem_retorna_mesma_url(): void

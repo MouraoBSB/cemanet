@@ -43,6 +43,10 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->authenticatedRoutes(fn () => \Illuminate\Support\Facades\Route::post(
+                '/midia/colar',
+                [\App\Http\Controllers\MidiaController::class, 'colar'],
+            )->name('midia.colar'))
             ->login()
             ->colors([
                 'primary' => Color::hex('#4e4483'),

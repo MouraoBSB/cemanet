@@ -57,6 +57,12 @@ Três insumos já existem; use-os, não recrie:
 ## Banco de dados
 
 - MySQL **somente** por **migrations + seeders**. NUNCA alterar schema na mão.
+- 🚫 **PROIBIDO destruir o banco de dev (conexão padrão):** nunca `migrate:fresh`,
+  `migrate:refresh`, `db:wipe`, `migrate:reset`, nem seed/factory destrutivo. Eles apagam
+  **TODOS** os dados — inclusive os importados do legado (123 palestras, 44 posts, mídia).
+  Só `php artisan migrate` **incremental**. **Todo brief de subagente que rode artisan no banco
+  DEVE proibir explicitamente esses comandos.** (Incidente 28/06/2026: um `migrate:fresh` de um
+  subagente zerou o dev; recuperável só por ser dev + importação idempotente.)
 - Antes de criar tabela/coluna, **conferir o que já existe** (evitar duplicar).
 - Chaves estrangeiras sempre. As relações do site atual viram pivôs:
   **107** (palestra→palestrante, 1–2, obrigatório) e **108** (palestra→diretor,

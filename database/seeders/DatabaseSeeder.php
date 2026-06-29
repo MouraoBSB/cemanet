@@ -15,12 +15,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Admin DURÁVEL e idempotente (sobrevive a db:seed; sem usuário aleatório).
+        // Credenciais via .env (não versionadas); o cast 'hashed' do model criptografa a senha.
+        User::updateOrCreate(
+            ['email' => env('ADMIN_EMAIL', 'admin@cema.local')],
+            [
+                'name' => env('ADMIN_NAME', 'Admin CEMA'),
+                'password' => env('ADMIN_PASSWORD', 'password'),
+                'email_verified_at' => now(),
+            ],
+        );
 
         $this->call(CategoriaSeeder::class);
     }

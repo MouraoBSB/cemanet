@@ -33,6 +33,8 @@ class AdminPanelProvider extends PanelProvider
                 ->loadedOnRequest(),
             Js::make('texto-alinhado', resource_path('js/filament/texto-alinhado.js'))
                 ->loadedOnRequest(),
+            Js::make('colar-na-biblioteca', resource_path('js/filament/colar-na-biblioteca.js'))
+                ->loadedOnRequest(),
             Css::make('cema-editor', resource_path('css/filament/editor.css')),
         ], package: 'app');
     }

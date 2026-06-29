@@ -7,6 +7,7 @@ namespace App\Filament\RichContent\Plugins;
 use App\Filament\RichContent\Actions\InserirDaBibliotecaAction;
 use Filament\Forms\Components\RichEditor\Plugins\Contracts\RichContentPlugin;
 use Filament\Forms\Components\RichEditor\RichEditorTool;
+use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Icons\Heroicon;
 
 /**
@@ -34,7 +35,9 @@ class BibliotecaMidiaPlugin implements RichContentPlugin
      */
     public function getTipTapJsExtensions(): array
     {
-        return [];
+        // Extensão que intercepta colar/arrastar de imagem no corpo, envia para a
+        // biblioteca (/admin/midia/colar) e insere a URL portável /midia/{id}/web.
+        return [FilamentAsset::getScriptSrc('colar-na-biblioteca', 'app')];
     }
 
     /**

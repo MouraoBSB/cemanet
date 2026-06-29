@@ -75,8 +75,7 @@ class ImportadorPalestras
         foreach ($dados as $p) {
             $foto = $this->baixador->baixar($p['foto_url'] ?? null, $p['slug']);
 
-            // campos sem foto para o updateOrCreate
-            $campos = [
+            $palestrante = Palestrante::updateOrCreate(['slug' => $p['slug']], [
                 'nome' => $p['nome'],
                 'bio' => $p['bio'] ?? null,
                 'email' => $p['email'] ?? null,
@@ -84,14 +83,13 @@ class ImportadorPalestras
                 'mostrar_email' => $p['mostrar_email'] ?? false,
                 'mostrar_telefone' => $p['mostrar_telefone'] ?? false,
                 'ativo' => $p['ativo'] ?? true,
-            ];
+            ]);
 
-            // preserva foto existente se o download não retornou nada
-            if ($foto !== null) {
-                $campos['foto'] = $foto;
+            // Foto vai para a Media Library (coleção 'foto'); singleFile substitui a anterior.
+            if ($foto !== null && \Illuminate\Support\Facades\Storage::disk('public')->exists($foto)) {
+                $palestrante->addMedia(\Illuminate\Support\Facades\Storage::disk('public')->path($foto))
+                    ->toMediaCollection(Palestrante::COLECAO_FOTO);
             }
-
-            Palestrante::updateOrCreate(['slug' => $p['slug']], $campos);
         }
 
         return count($dados);

@@ -9,8 +9,8 @@ use App\Models\Assunto;
 use App\Models\Palestra;
 use App\Models\Palestrante;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -52,11 +52,35 @@ class ImportadorPalestrasTest extends TestCase
         };
     }
 
+    /**
+     * Stub do BaixadorImagem que grava um JPEG mínimo válido no disco 'public' fake e
+     * retorna o caminho relativo, evitando HTTP real e bytes inválidos nas conversões do Spatie.
+     */
+    private function baixadorFake(): BaixadorImagem
+    {
+        return new class extends BaixadorImagem
+        {
+            public function baixar(?string $url, string $slug): ?string
+            {
+                if (empty($url)) {
+                    return null;
+                }
+                $caminho = "palestrantes/{$slug}.jpg";
+                // Grava um JPEG mínimo válido (1×1 px) para que o Spatie consiga processar.
+                Storage::disk('public')->put(
+                    $caminho,
+                    UploadedFile::fake()->image("{$slug}.jpg", 1, 1)->get(),
+                );
+
+                return $caminho;
+            }
+        };
+    }
+
     public function test_importa_e_e_idempotente(): void
     {
         Storage::fake('public');
-        Http::fake(['*' => Http::response('img', 200)]);
-        $importador = new ImportadorPalestras($this->leitorFake(), new BaixadorImagem);
+        $importador = new ImportadorPalestras($this->leitorFake(), $this->baixadorFake());
 
         // roda 2x
         $importador->importar();
@@ -77,5 +101,12 @@ class ImportadorPalestrasTest extends TestCase
         $this->assertSame('publicado', $palestra->status);
         $this->assertSame('2026-06-28 16:00:00', $palestra->data_da_palestra->format('Y-m-d H:i:s'));
         $this->assertSame(['assuntos' => 2, 'palestrantes' => 2, 'palestras' => 1, 'avisos' => []], $resumo);
+
+        // Ana tem foto_url → foto deve estar na Media Library; Bruno não tem foto_url → sem mídia.
+        $ana = Palestrante::where('slug', 'ana')->first();
+        $this->assertTrue($ana->fresh()->hasMedia(\App\Models\Palestrante::COLECAO_FOTO));
+
+        $bruno = Palestrante::where('slug', 'bruno')->first();
+        $this->assertFalse($bruno->fresh()->hasMedia(\App\Models\Palestrante::COLECAO_FOTO));
     }
 }

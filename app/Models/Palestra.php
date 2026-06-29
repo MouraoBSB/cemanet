@@ -25,8 +25,8 @@ class Palestra extends Model
 
     protected $fillable = [
         'titulo', 'slug', 'subtitulo', 'resumo', 'descricao', 'data_da_palestra',
-        'online', 'link_youtube', 'cor_fundo', 'publico_online', 'publico_presencial',
-        'publico_total', 'status',
+        'online', 'link_youtube', 'slide', 'duracao', 'referencias_evangelicas',
+        'cor_fundo', 'publico_online', 'publico_presencial', 'publico_total', 'curtidas', 'status',
     ];
 
     protected function casts(): array
@@ -74,6 +74,11 @@ class Palestra extends Model
     public function destaques(): HasMany
     {
         return $this->hasMany(PalestraDestaque::class)->orderBy('ordem');
+    }
+
+    public function referencias(): HasMany
+    {
+        return $this->hasMany(PalestraReferencia::class)->orderBy('ordem');
     }
 
     public function getYoutubeIdAttribute(): ?string

@@ -4,19 +4,18 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RegistraImagensPadrao;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Spatie\Image\Enums\Fit;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
-use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Palestrante extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia;
+    use HasFactory, InteractsWithMedia, RegistraImagensPadrao;
 
     public const COLECAO_FOTO = 'foto';
 
@@ -53,22 +52,9 @@ class Palestrante extends Model implements HasMedia
 
     public function registerMediaCollections(): void
     {
-        // Foto do palestrante no mesmo pipeline do blog: WebP otimizada + miniatura,
-        // disco public, conversões síncronas. Cap do original ≤2000px herda do CaparOriginalDaMidia.
-        $this->addMediaCollection(self::COLECAO_FOTO)
-            ->singleFile()
-            ->useDisk('public')
-            ->registerMediaConversions(function (Media $media) {
-                $this->addMediaConversion('web')
-                    ->fit(Fit::Max, 1200, 1200)
-                    ->format('webp')
-                    ->quality(82)
-                    ->nonQueued();
-                $this->addMediaConversion('thumb')
-                    ->fit(Fit::Crop, 400, 400)
-                    ->format('webp')
-                    ->nonQueued();
-            });
+        // Tratamento padrão de imagem do sistema (trait RegistraImagensPadrao):
+        // disco public, WebP web + miniatura, síncrono. Reutilizável por eventos etc.
+        $this->registrarColecaoImagem(self::COLECAO_FOTO);
     }
 
     /** URL da foto (WebP web) via Media Library, ou null. */

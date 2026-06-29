@@ -65,13 +65,22 @@ Ordem sugerida (cada um como nova fatia vertical):
 - [ ] Eventos
 - [ ] Agenda Reforma Íntima (com calendário)
 - [ ] Mensagens mediúnicas + Autores espirituais
-- [ ] Blog (Sementeira) / Posts + Páginas institucionais
-  - [ ] **Editor**: **RichEditor** (TipTap/HTML) nativo do Filament — a migração
-        **preserva o HTML** do Gutenberg. Habilitar **alinhamento/float de imagem**
-        (foto ao lado do texto, com contorno; empilha no mobile) e
-        **redimensionamento** (largura em %/max-width). Estilizar no CSS as classes
-        do Gutenberg (`alignleft`/`alignright`/`aligncenter`/`wp-block-media-text`/
-        `size-*`) p/ preservar o layout dos posts antigos. (Decisão em `PROJECT.md`.)
+- [ ] **Blog (Sementeira de Luz)** — módulo **Posts entregue** (admin + front + posts
+      importados + editor/mídia abaixo). Pendentes: **Comentários** e **Páginas institucionais**.
+  - [x] **Editor + mídia** (RichEditor TipTap): justificado padrão + alinhamento/tamanho de
+        imagem por classes (preserva as classes do Gutenberg no CSS); ferramentas nativas
+        (grid/lead/hr/clearFormatting/textColor); rodapé sticky; "publicar agora". **Performance**
+        do upload (3 tetos alinhados em ~20 MB, conversão síncrona). **Biblioteca de mídia**
+        reutilizável: rota portável `/midia/{id}/web` (escopo/allowlist/cache ramificado),
+        dedup SHA-256, metadados (alt/legenda/título/descrição), deleção autoritativa, tool
+        "Inserir da biblioteca" (escolher da grade / subir nova) que conserta a imagem do corpo
+        no front e substitui o clipe (anexos desativados no corpo). Fix de disco (uploads do
+        painel em `public`). *(merges: editor UX, Fatia A performance, Fatia B biblioteca;
+        252 testes PHP + 5 JS verdes)*
+        - **Backlog adiado:** re-migração dos posts (corpo → referências da biblioteca, p/
+          portabilidade S3/CDN, com dry-run+backup); render rico de metadados (figcaption +
+          JSON-LD `ImageObject`); "Gerar alt" por IA; colar/arrastar → biblioteca; polish do
+          textColor (retorno visual da cor).
   - [ ] **Comentários** (sistema próprio, Livewire): abertos **sem conta**
         (nome + e-mail; e-mail nunca público), **login/Google opcional** com
         vantagens (selo verificado, editar o próprio, notificação). Moderação

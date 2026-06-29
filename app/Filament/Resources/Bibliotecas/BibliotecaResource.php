@@ -43,8 +43,8 @@ class BibliotecaResource extends Resource
     }
 
     /**
-     * Conta os posts que referenciam a mídia pelo ID com barra final,
-     * evitando falsos positivos: /midia/12/ não casa /midia/123/.
+     * Conta os posts que referenciam a mídia pelo ID delimitado por barras nos dois
+     * lados (/midia/{id}/), evitando falsos positivos: /midia/12/ não casa /midia/123/.
      */
     public static function postsQueUsam(int $id): int
     {
@@ -115,13 +115,16 @@ class BibliotecaResource extends Resource
                     ->action(function (array $data): void {
                         $caminho = Storage::disk('local')->path($data['arquivo']);
 
-                        app(\App\Support\Biblioteca\RegistraMidiaBiblioteca::class)->aPartirDoCaminho(
-                            $caminho,
-                            basename($data['arquivo']),
-                            ['alt' => $data['alt'] ?? null, 'legenda' => $data['legenda'] ?? null],
-                        );
-
-                        Storage::disk('local')->delete($data['arquivo']);
+                        // finally: remove o temporário mesmo se o registro lançar (sem órfãos).
+                        try {
+                            app(\App\Support\Biblioteca\RegistraMidiaBiblioteca::class)->aPartirDoCaminho(
+                                $caminho,
+                                basename($data['arquivo']),
+                                ['alt' => $data['alt'] ?? null, 'legenda' => $data['legenda'] ?? null],
+                            );
+                        } finally {
+                            Storage::disk('local')->delete($data['arquivo']);
+                        }
 
                         Notification::make()
                             ->success()

@@ -56,12 +56,16 @@ class InserirDaBibliotecaAction
                 // Modo "subir nova": registra na biblioteca (cap + dedup) e usa a mídia resultante.
                 if (filled($data['arquivo'] ?? null)) {
                     $caminho = Storage::disk('local')->path($data['arquivo']);
-                    $media = app(RegistraMidiaBiblioteca::class)->aPartirDoCaminho(
-                        $caminho,
-                        basename($data['arquivo']),
-                        ['alt' => $data['alt'] ?? null, 'legenda' => $data['legenda'] ?? null],
-                    );
-                    Storage::disk('local')->delete($data['arquivo']);
+                    // finally: remove o temporário mesmo se o registro lançar (sem órfãos).
+                    try {
+                        $media = app(RegistraMidiaBiblioteca::class)->aPartirDoCaminho(
+                            $caminho,
+                            basename($data['arquivo']),
+                            ['alt' => $data['alt'] ?? null, 'legenda' => $data['legenda'] ?? null],
+                        );
+                    } finally {
+                        Storage::disk('local')->delete($data['arquivo']);
+                    }
                 } else {
                     // Modo "escolher": mídia já existente.
                     $media = Media::query()

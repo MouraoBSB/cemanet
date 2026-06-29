@@ -21,6 +21,7 @@ use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\RichEditor\TextColor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\Textarea;
@@ -90,12 +91,16 @@ class PostResource extends Resource
                             TextoAlinhamentoPlugin::make(),
                             BibliotecaMidiaPlugin::make(),
                         ])
+                        // TextColor::make(LABEL, COR): label = nome exibido no dropdown, cor = hex do
+                        // swatch. A CHAVE vira o data-color (mantém os nomes, casando com o CSS do front).
+                        // Antes a paleta era ['nome'=>'#hex'], que o Filament interpretava como
+                        // make(label='#hex', cor='nome') → swatch invisível e só o código no dropdown.
                         ->textColors([
-                            'roxo'     => '#4e4483',
-                            'laranja'  => '#e79048',
-                            'verde'    => '#89ab98',
-                            'azul'     => '#6e9fcb',
-                            'vermelho' => '#c0392b',
+                            'roxo'     => TextColor::make('Roxo', '#4e4483'),
+                            'laranja'  => TextColor::make('Laranja', '#e79048'),
+                            'verde'    => TextColor::make('Verde', '#89ab98'),
+                            'azul'     => TextColor::make('Azul', '#6e9fcb'),
+                            'vermelho' => TextColor::make('Vermelho', '#c0392b'),
                         ])
                         ->toolbarButtons([
                             // Clipe 'attachFiles' removido: salvava a imagem do corpo sem <img> (#2).

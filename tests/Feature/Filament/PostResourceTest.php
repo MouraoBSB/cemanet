@@ -319,4 +319,28 @@ class PostResourceTest extends TestCase
             ->assertFormFieldExists('conteudo', fn (\Filament\Forms\Components\RichEditor $campo): bool =>
                 ! $campo->hasFileAttachments());
     }
+
+    public function test_textcolors_tem_swatch_valido_e_nome_legivel(): void
+    {
+        // Regressão (#4): a paleta precisa ser TextColor(label=nome, cor=hex). Antes era
+        // ['nome' => '#hex'], que o Filament lia invertido (label=#hex, cor=nome) → swatch
+        // invisível e só o código no dropdown.
+        Livewire::test(CreatePost::class)
+            ->assertFormFieldExists('conteudo', function (\Filament\Forms\Components\RichEditor $campo): bool {
+                $cores = $campo->getTextColors();
+                if ($cores === []) {
+                    return false;
+                }
+                foreach ($cores as $cor) {
+                    if (! str_starts_with((string) $cor->getColor(), '#')) {  // cor do swatch = hex
+                        return false;
+                    }
+                    if (str_starts_with((string) $cor->getLabel(), '#')) {     // label = nome, não código
+                        return false;
+                    }
+                }
+
+                return true;
+            });
+    }
 }

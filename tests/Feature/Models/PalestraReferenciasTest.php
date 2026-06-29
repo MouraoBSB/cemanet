@@ -36,7 +36,7 @@ class PalestraReferenciasTest extends TestCase
 
     public function test_slide_download_url_deriva_do_link_cru(): void
     {
-        $palestra = \App\Models\Palestra::factory()->create([
+        $palestra = Palestra::factory()->create([
             'slide' => 'https://drive.google.com/file/d/1ABCdefg_hij/view?usp=sharing',
         ]);
 

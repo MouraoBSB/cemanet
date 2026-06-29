@@ -53,4 +53,12 @@ class LinkDriveTest extends TestCase
         $this->assertNull(LinkDrive::paraDownload(null));
         $this->assertNull(LinkDrive::paraDownload('   '));
     }
+
+    public function test_drive_nao_padrao_com_id_longo_no_path_vira_download(): void
+    {
+        $this->assertSame(
+            'https://drive.google.com/uc?export=download&id=1ABCDEFGHIJKLMNOPQRSTUVWXYZ12345',
+            LinkDrive::paraDownload('https://drive.google.com/file/1ABCDEFGHIJKLMNOPQRSTUVWXYZ12345/edit')
+        );
+    }
 }

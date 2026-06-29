@@ -41,7 +41,7 @@ class LinkDrive
         if (preg_match('#/file/d/([A-Za-z0-9_-]{10,})#', $link, $m)) {
             return $m[1];
         }
-        if (preg_match('/([A-Za-z0-9_-]{25,})/', $link, $m)) {
+        if (preg_match('#/([A-Za-z0-9_-]{25,})#', $link, $m)) {
             return $m[1];
         }
 

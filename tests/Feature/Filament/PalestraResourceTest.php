@@ -207,4 +207,31 @@ class PalestraResourceTest extends TestCase
             'cor_fundo' => '#4e4483',
         ]);
     }
+
+    public function test_cria_palestra_com_slide_duracao_e_referencias(): void
+    {
+        $p1 = \App\Models\Palestrante::factory()->ativo()->create();
+
+        \Livewire\Livewire::test(\App\Filament\Resources\Palestras\Pages\CreatePalestra::class)
+            ->fillForm([
+                'titulo' => 'Com Slide',
+                'slug' => 'com-slide',
+                'status' => \App\Models\Palestra::STATUS_PUBLICADO,
+                'ids_palestrantes' => [$p1->id],
+                'slide' => 'https://drive.google.com/file/d/1ABCdefg_hij/view',
+                'duracao' => '≈1h10',
+                'referencias_evangelicas' => 'João 14.',
+                'referencias' => [
+                    ['obra' => 'O Livro dos Espíritos', 'autor' => 'Allan Kardec', 'nota' => 'Conclusão.'],
+                ],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $palestra = \App\Models\Palestra::where('slug', 'com-slide')->first();
+        $this->assertSame('≈1h10', $palestra->duracao);
+        $this->assertSame('https://drive.google.com/uc?export=download&id=1ABCdefg_hij', $palestra->slide_download_url);
+        $this->assertCount(1, $palestra->referencias);
+        $this->assertSame('O Livro dos Espíritos', $palestra->referencias->first()->obra);
+    }
 }

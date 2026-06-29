@@ -310,4 +310,13 @@ class PostResourceTest extends TestCase
             ->assertFormFieldExists('conteudo', fn (\Filament\Forms\Components\RichEditor $campo): bool =>
                 ! $campo->hasToolbarButton('attachFiles'));
     }
+
+    public function test_corpo_nao_aceita_anexo_de_arquivo(): void
+    {
+        // #2 fechado por completo: anexos desativados no corpo (clipe + arrastar + colar).
+        // canAttachFiles=false → o JS não trata paste/drop. Imagem entra só pela biblioteca.
+        Livewire::test(CreatePost::class)
+            ->assertFormFieldExists('conteudo', fn (\Filament\Forms\Components\RichEditor $campo): bool =>
+                ! $campo->hasFileAttachments());
+    }
 }

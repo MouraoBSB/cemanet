@@ -80,7 +80,11 @@ class PostResource extends Resource
                         ->label('Conteúdo')
                         ->live(onBlur: true)
                         ->preventFileAttachmentPathTampering()
-                        ->fileAttachmentsMaxSize(20480) // 20 MB (KB) — alinhado ao PHP e ao Livewire
+                        ->fileAttachmentsMaxSize(20480) // 20 MB (KB) — vale se anexos forem reativados
+                        // Anexos de arquivo DESATIVADOS no corpo: fecha a porta dos fundos do #2
+                        // (clipe + arrastar + colar salvavam a imagem sem <img>). canAttachFiles=false
+                        // → o JS não trata paste/drop. O caminho de imagem é a tool "Inserir da biblioteca".
+                        ->fileAttachments(false)
                         ->plugins([
                             ImagemPlugin::make(),
                             TextoAlinhamentoPlugin::make(),

@@ -11,6 +11,9 @@ Route::get('/', fn () => view('pages.inicio'))->name('home');
 
 Route::get('/palestra_publica', [PalestraController::class, 'index'])->name('palestras.index');
 Route::get('/palestra_publica/{slug}', [PalestraController::class, 'show'])->name('palestras.show');
+Route::get('/palestra_publica/{slug}/calendario.ics', [PalestraController::class, 'calendario'])
+    ->name('palestras.calendario')
+    ->where('slug', '[a-z0-9-]+');
 
 // Compat: URLs antigas (WP/divulgação) → 301 para as novas, preservando o slug.
 Route::permanentRedirect('/palestras', '/palestra_publica');

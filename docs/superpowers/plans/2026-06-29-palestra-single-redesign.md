@@ -178,7 +178,7 @@ class PalestraReferencia extends Model
 
 - [ ] **Step 6: Wire `Palestra` ($fillable + relação)**
 
-Em `app/Models/Palestra.php`: adicionar ao `$fillable` os itens `'slide', 'duracao', 'referencias_evangelicas', 'curtidas'`; adicionar `use Illuminate\Database\Eloquent\Relations\HasMany;` (já importado) e o método:
+Em `app/Models/Palestra.php`: **inserir** no `$fillable` (sem remover nenhuma chave existente) os itens `'slide', 'duracao', 'referencias_evangelicas', 'curtidas'`; `use Illuminate\Database\Eloquent\Relations\HasMany;` já está importado; e adicionar o método:
 
 ```php
     public function referencias(): HasMany
@@ -752,7 +752,7 @@ class PalestraRelacionadasTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_relacionadas_compartilham_assunto(): void
+    public function test_controller_monta_relacionadas_por_assunto(): void
     {
         $assunto = Assunto::factory()->create();
         $atual = Palestra::factory()->create(['slug' => 'atual', 'status' => Palestra::STATUS_PUBLICADO]);
@@ -764,18 +764,19 @@ class PalestraRelacionadasTest extends TestCase
         $resp = $this->get(route('palestras.show', 'atual'));
 
         $resp->assertOk();
-        $resp->assertSee('Palestra Irmã');
+        // Testa o DADO passado à view (não o HTML — a partial nasce na Task 7).
+        $this->assertTrue($resp->viewData('relacionadas')->contains('id', $irma->id));
     }
 
     public function test_relacionadas_usam_fallback_quando_sem_assunto(): void
     {
         Palestra::factory()->create(['slug' => 'atual', 'status' => Palestra::STATUS_PUBLICADO]);
-        Palestra::factory()->create(['titulo' => 'Outra Recente', 'status' => Palestra::STATUS_PUBLICADO]);
+        $outra = Palestra::factory()->create(['titulo' => 'Outra Recente', 'status' => Palestra::STATUS_PUBLICADO]);
 
         $resp = $this->get(route('palestras.show', 'atual'));
 
         $resp->assertOk();
-        $resp->assertSee('Outra Recente');
+        $this->assertTrue($resp->viewData('relacionadas')->contains('id', $outra->id));
     }
 }
 ```
@@ -828,7 +829,7 @@ class CalendarioPalestraTest extends TestCase
 - [ ] **Step 2: Run tests to verify they fail**
 
 Run: `docker compose exec -T app php artisan test --filter=PalestraRelacionadasTest && docker compose exec -T app php artisan test --filter=CalendarioPalestraTest`
-Expected: FAIL (rota `palestras.calendario` inexistente; relacionadas não renderizadas).
+Expected: FAIL (rota `palestras.calendario` inexistente; `viewData('relacionadas')` indefinido).
 
 - [ ] **Step 3: Implement `DuracaoPalestra`**
 
@@ -947,15 +948,17 @@ Adicionar o método `calendario`:
 Em `routes/web.php`, após a linha `Route::get('/palestra_publica/{slug}', [PalestraController::class, 'show'])->name('palestras.show');`:
 
 ```php
-Route::get('/palestra_publica/{slug}/calendario.ics', [PalestraController::class, 'calendario'])->name('palestras.calendario');
+Route::get('/palestra_publica/{slug}/calendario.ics', [PalestraController::class, 'calendario'])
+    ->name('palestras.calendario')
+    ->where('slug', '[a-z0-9-]+');
 ```
 
-> A view ainda não renderiza relacionadas — `PalestraRelacionadasTest` só fica verde após a Task 7. Por isso o **commit desta task** roda só `CalendarioPalestraTest` (verde aqui); `PalestraRelacionadasTest` é fechado na Task 7.
+> Ambos fecham **verdes nesta task**: `PalestraRelacionadasTest` valida `viewData('relacionadas')` (independe do render da partial, que vem na Task 7); `CalendarioPalestraTest` valida o `.ics`. O teste de **render** das relacionadas no HTML fica na Task 7.
 
-- [ ] **Step 6: Run the calendar test**
+- [ ] **Step 6: Run both tests (green)**
 
-Run: `docker compose exec -T app php artisan test --filter=CalendarioPalestraTest`
-Expected: PASS.
+Run: `docker compose exec -T app php artisan test --filter=PalestraRelacionadasTest && docker compose exec -T app php artisan test --filter=CalendarioPalestraTest`
+Expected: PASS (ambos).
 
 - [ ] **Step 7: Commit**
 
@@ -1046,6 +1049,17 @@ class PalestraSingleSlideTest extends TestCase
         $resp->assertSee('Referências evangélicas');
         $resp->assertSee('A promessa do Consolador (João 14).');
     }
+
+    public function test_relacionadas_renderizam_no_html(): void
+    {
+        $assunto = \App\Models\Assunto::factory()->create();
+        $atual = Palestra::factory()->create(['slug' => 'atual-r', 'status' => Palestra::STATUS_PUBLICADO]);
+        $atual->assuntos()->attach($assunto);
+        $irma = Palestra::factory()->create(['titulo' => 'Palestra Irmã', 'status' => Palestra::STATUS_PUBLICADO]);
+        $irma->assuntos()->attach($assunto);
+
+        $this->get(route('palestras.show', 'atual-r'))->assertOk()->assertSee('Palestra Irmã');
+    }
 }
 ```
 
@@ -1104,7 +1118,7 @@ Expected: FAIL (sem botão de slides, sem "Vídeo em breve", sem referências).
             <div class="flex flex-col gap-3">
                 @foreach ($palestra->referencias as $ref)
                     <div class="flex gap-3 rounded-xl border border-[#ECE6D6] bg-[#FAF8F2] p-4">
-                        <span class="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-md bg-primary text-white shadow-[inset_3px_0_0_0_theme(colors.gold)]" aria-hidden="true">📖</span>
+                        <span class="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-md bg-primary text-white shadow-[inset_3px_0_0_0_var(--color-gold)]" aria-hidden="true">📖</span>
                         <div>
                             <p class="font-display text-[15px] font-semibold text-primary">{{ $ref->obra }}@if ($ref->autor)<span class="font-normal text-text-muted"> · {{ $ref->autor }}</span>@endif</p>
                             @if ($ref->nota)
@@ -1387,11 +1401,11 @@ Substituir `resources/views/palestras/show.blade.php` pelo conteúdo abaixo (man
 </x-layout.app>
 ```
 
-- [ ] **Step 7: Build assets + run the new and regression suites**
+- [ ] **Step 7: Build assets + run the FULL suite (regressões)**
 
 Run (host): `npm run build`
-Run: `docker compose exec -T app php artisan test --filter=PalestraSingleSlideTest && docker compose exec -T app php artisan test --filter=PalestraSingleTest && docker compose exec -T app php artisan test --filter=PalestraInteracoesTest && docker compose exec -T app php artisan test --filter=PalestraRelacionadasTest`
-Expected: PASS em todos (novos + regressões do single/interações/relacionadas).
+Run: `docker compose exec -T app php artisan test`
+Expected: PASS na **suíte inteira** (não só `--filter`). A reescrita do `show.blade.php` está coberta por testes de regressão fora destes filtros; rodar tudo é obrigatório. Devem continuar verdes, em especial: `PalestraSingleTest` (`from-primary to-footer-bg`, `cema-hero-deco`, `"@type":"Event"`, `application/ld+json`, `assertDontSee('background:#abcdef')`, `assertDontSee('</script> XSS')`, link `route('palestrantes.show','joao-ativo')`) e `PalestraInteracoesTest` (`wa.me`, `facebook.com/sharer`, `Copiar link`, `x-data`). Conferir no markup que a sidebar mantém **"Ver perfil completo →"** (`route('palestrantes.show', $p->slug)`) e a barra mantém `wa.me`/`facebook.com/sharer`/`Copiar link`/`x-data`.
 
 - [ ] **Step 8: Commit**
 

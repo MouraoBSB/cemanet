@@ -22,7 +22,7 @@ class PalestraSingleSlideTest extends TestCase
 
         $resp->assertOk();
         $resp->assertSee('Baixar slides');
-        $resp->assertSee('https://drive.google.com/uc?export=download&id=1ABCdefg_hij', false);
+        $resp->assertSee('https://drive.google.com/uc?export=download&id=1ABCdefg_hij');
     }
 
     public function test_botao_baixar_slides_oculto_sem_slide(): void

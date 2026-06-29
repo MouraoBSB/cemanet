@@ -45,7 +45,7 @@
 
     {{-- Barra de progresso de leitura --}}
     <div class="fixed inset-x-0 top-0 z-50 h-[3px] bg-gold/90 origin-left motion-reduce:hidden"
-         x-data="{ p: 0 }" x-init="const f = () => { const h = document.documentElement; p = (h.scrollTop) / (h.scrollHeight - h.clientHeight) || 0; requestAnimationFrame(() => {}); }; window.addEventListener('scroll', f, { passive: true }); f();"
+         x-data="{ p: 0 }" x-init="const f = () => { const h = document.documentElement; p = (h.scrollTop) / (h.scrollHeight - h.clientHeight) || 0; }; window.addEventListener('scroll', f, { passive: true }); f();"
          :style="`transform: scaleX(${p})`" aria-hidden="true"></div>
 
     {{-- S1: Hero (sempre roxo; partículas) --}}
@@ -165,7 +165,7 @@
                            class="flex items-center justify-center gap-2 rounded-pill bg-[#FF0000] px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90">▶ Assistir no YouTube</a>
                     @endif
                     @if (filled($palestra->slide))
-                        <a href="{!! $palestra->slide_download_url !!}" target="_blank" rel="noopener"
+                        <a href="{{ $palestra->slide_download_url }}" target="_blank" rel="noopener"
                            class="flex items-center justify-center gap-2 rounded-pill border border-primary px-4 py-2.5 text-sm font-semibold text-primary hover:bg-cream">⬇ Baixar slides</a>
                     @endif
                     @if ($googleAgenda)

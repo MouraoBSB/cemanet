@@ -3,6 +3,8 @@
     $org = ['@type' => 'Organization', 'name' => 'Centro Espírita Maria Madalena'];
     $urlArtigo = $post->canonical ?? route('blog.show', $post->slug);
 
+    $conteudo = app(\App\Support\Blog\EnriquecedorImagensConteudo::class)->enriquecer($post->conteudo);
+
     $graph = [
         // array_filter omite chaves nulas — "image":null é inválido para Article (schema.org).
         array_filter([
@@ -35,6 +37,10 @@
                 'acceptedAnswer' => ['@type' => 'Answer', 'text' => $f->resposta],
             ])->all(),
         ];
+    }
+
+    foreach ($conteudo['imagens'] as $imagemObj) {
+        $graph[] = $imagemObj;
     }
 
     $jsonLd = json_encode(
@@ -238,7 +244,7 @@
             [&_a]:text-secondary [&_a]:underline [&_a]:hover:text-primary
             [&_strong]:font-semibold [&_strong]:text-text-ink
             [&_img]:mx-auto [&_img]:rounded-xl [&_img]:shadow-card">
-            {!! $post->conteudo !!}
+            {!! $conteudo['html'] !!}
         </div>
 
         {{-- Galeria de imagens com lightbox --}}

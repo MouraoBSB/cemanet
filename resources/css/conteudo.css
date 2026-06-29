@@ -69,6 +69,67 @@
     text-align: center;
 }
 
+/* --- figura-conteudo (gerada pelo EnriquecedorImagensConteudo) ---
+   O <figure> agora carrega as classes de alinhamento/tamanho (movidas da <img>);
+   a <img> dentro do figure preenche toda a largura do figure. */
+
+/* Encolhe até a largura do conteúdo sem estourar; centraliza por padrão. */
+.conteudo-artigo .figura-conteudo {
+    display: table;          /* "shrink-wrap": largura se adapta à img */
+    margin: 1.5rem auto;
+}
+
+/* A img preenche o figure (tamanho controlado pelo figure, não pela img). */
+.conteudo-artigo .figura-conteudo img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Legenda — mesma cor de var(--color-text-muted) já usada no figcaption padrão. */
+.conteudo-artigo .figura-conteudo figcaption {
+    text-align: center;
+    font-size: 0.875rem;
+    font-style: italic;
+    color: var(--color-text-muted, #7a8a8a);
+    margin-top: 0.5rem;
+}
+
+/* Alinhamento NO FIGURE — espelha os floats/margens das regras de .alignleft/.alignright */
+.conteudo-artigo .figura-conteudo.alignleft {
+    float: left;
+    margin: 0.25rem 1.5rem 1rem 0;
+}
+
+.conteudo-artigo .figura-conteudo.alignright {
+    float: right;
+    margin: 0.25rem 0 1rem 1.5rem;
+}
+
+.conteudo-artigo .figura-conteudo.aligncenter {
+    float: none;
+    clear: both;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.conteudo-artigo .figura-conteudo.alignnone {
+    float: none;
+}
+
+/* Tamanho NO FIGURE — espelha as larguras de .size-* das imgs */
+.conteudo-artigo .figura-conteudo.size-medium {
+    max-width: 50%;
+}
+
+.conteudo-artigo .figura-conteudo.size-large {
+    max-width: 75%;
+}
+
+.conteudo-artigo .figura-conteudo.size-full {
+    max-width: 100%;
+}
+
 /* Tamanhos do Gutenberg — largura em %, nunca px fixo */
 .conteudo-artigo .size-thumbnail {
     max-width: 25%;
@@ -202,7 +263,12 @@
     .conteudo-artigo img.is-resized,
     .conteudo-artigo .size-thumbnail,
     .conteudo-artigo .size-medium,
-    .conteudo-artigo .size-large {
+    .conteudo-artigo .size-large,
+    .conteudo-artigo .figura-conteudo.alignleft,
+    .conteudo-artigo .figura-conteudo.alignright,
+    .conteudo-artigo .figura-conteudo.size-medium,
+    .conteudo-artigo .figura-conteudo.size-large,
+    .conteudo-artigo .figura-conteudo.size-full {
         float: none;
         max-width: 100% !important;
         width: 100% !important;

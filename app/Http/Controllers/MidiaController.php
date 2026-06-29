@@ -5,6 +5,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Biblioteca;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -14,6 +17,38 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
  */
 class MidiaController extends Controller
 {
+    /**
+     * Recebe UMA imagem (POST multipart direto), registra na biblioteca (cap + dedup)
+     * e devolve a URL relativa portável /midia/{id}/web para a extensão de colar/arrastar.
+     */
+    public function colar(Request $request): JsonResponse
+    {
+        // Validação explícita → SEMPRE 422 JSON (a extensão de colar consome JSON;
+        // não depende da negociação do header Accept).
+        $validator = Validator::make($request->all(), [
+            'imagem' => ['required', 'file', 'image', 'max:20480'], // 20 MB (KB) — cabe no PHP (20M/22M)
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => 'Arquivo inválido. Envie uma imagem de até 20 MB.',
+                'errors'  => $validator->errors(),
+            ], 422);
+        }
+
+        $arquivo = $request->file('imagem');
+
+        $media = app(\App\Support\Biblioteca\RegistraMidiaBiblioteca::class)->aPartirDoCaminho(
+            $arquivo->getRealPath(),
+            $arquivo->getClientOriginalName(),
+        );
+
+        return response()->json([
+            'id'  => $media->id,
+            'url' => route('midia.serve', [$media->id, 'web'], false),
+        ]);
+    }
+
     public function serve(int $media, string $conversao = 'web'): BinaryFileResponse
     {
         // #5: só mídia da biblioteca é servível por esta rota.

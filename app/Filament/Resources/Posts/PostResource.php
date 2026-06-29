@@ -94,7 +94,8 @@ class PostResource extends Resource
                             'vermelho' => '#c0392b',
                         ])
                         ->toolbarButtons([
-                            'attachFiles',
+                            // Clipe 'attachFiles' removido: salvava a imagem do corpo sem <img> (#2).
+                            // Substituído pela tool 'inserirDaBiblioteca' (URL portável /midia/{id}/web).
                             'inserirDaBiblioteca',
                             'blockquote',
                             'bold',

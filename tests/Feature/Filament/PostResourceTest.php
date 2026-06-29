@@ -301,4 +301,13 @@ class PostResourceTest extends TestCase
             ->assertFormFieldExists('conteudo', fn (\Filament\Forms\Components\RichEditor $campo): bool =>
                 $campo->hasToolbarButton('inserirDaBiblioteca'));
     }
+
+    public function test_toolbar_nao_inclui_mais_o_clipe_attachfiles(): void
+    {
+        // #2: o clipe attachFiles salvava a imagem do corpo sem <img>. Foi removido e
+        // substituído pela tool 'inserirDaBiblioteca' (caminho portável /midia/{id}/web).
+        Livewire::test(CreatePost::class)
+            ->assertFormFieldExists('conteudo', fn (\Filament\Forms\Components\RichEditor $campo): bool =>
+                ! $campo->hasToolbarButton('attachFiles'));
+    }
 }

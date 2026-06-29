@@ -101,7 +101,11 @@ class PalestraController extends Controller
         $fim = $inicio->copy()->addMinutes(DuracaoPalestra::minutos($palestra->duracao));
         $fmt = fn ($d) => $d->format('Ymd\THis\Z');
 
-        $escapar = fn (string $v) => str_replace(["\\", ';', ',', "\n"], ['\\\\', '\\;', '\\,', '\\n'], $v);
+        $escapar = fn (string $v) => str_replace(
+            ["\\", ';', ',', "\r\n", "\r", "\n"],
+            ['\\\\', '\\;', '\\,', '\\n', '\\n', '\\n'],
+            $v
+        );
         $local = 'Centro Espírita Maria Madalena — Quadra 02, Lote 16, Vila Vicentina, Planaltina, DF';
 
         $linhas = [

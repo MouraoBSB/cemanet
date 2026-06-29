@@ -31,6 +31,22 @@ class CalendarioPalestraTest extends TestCase
         $resp->assertSee('SUMMARY:CEMA 65 Anos', false);
     }
 
+    public function test_ics_escapa_quebras_de_linha_no_summary(): void
+    {
+        \App\Models\Palestra::factory()->create([
+            'slug' => 'titulo-com-quebra',
+            'titulo' => "Linha1\r\nLinha2",
+            'status' => \App\Models\Palestra::STATUS_PUBLICADO,
+            'data_da_palestra' => \Illuminate\Support\Carbon::create(2026, 6, 21, 19, 0, 0, 'America/Sao_Paulo'),
+        ]);
+
+        $resp = $this->get(route('palestras.calendario', 'titulo-com-quebra'));
+
+        $resp->assertOk();
+        $resp->assertSee('SUMMARY:Linha1\nLinha2', false); // \n literal (backslash-n), não quebra real
+        $this->assertStringNotContainsString("SUMMARY:Linha1\r\nLinha2", $resp->getContent()); // sem CRLF cru no valor
+    }
+
     public function test_ics_404_sem_data(): void
     {
         Palestra::factory()->create(['slug' => 'sem-data', 'status' => Palestra::STATUS_PUBLICADO, 'data_da_palestra' => null]);

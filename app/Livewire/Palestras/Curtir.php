@@ -5,6 +5,7 @@
 namespace App\Livewire\Palestras;
 
 use App\Models\Palestra;
+use Illuminate\Contracts\View\View;
 use Illuminate\Support\Facades\RateLimiter;
 use Livewire\Attributes\Locked;
 use Livewire\Component;
@@ -40,17 +41,17 @@ class Curtir extends Component
         }
         RateLimiter::hit($chave, 60);
 
-        $palestra = Palestra::findOrFail($this->palestraId);
         if ($delta > 0) {
-            $palestra->increment('curtidas');
-        } elseif ($palestra->curtidas > 0) {
-            $palestra->decrement('curtidas');
+            Palestra::whereKey($this->palestraId)->increment('curtidas');
+        } else {
+            // decremento atômico condicionado: nunca abaixo de zero, mesmo sob concorrência
+            Palestra::whereKey($this->palestraId)->where('curtidas', '>', 0)->decrement('curtidas');
         }
 
-        $this->curtidas = $palestra->refresh()->curtidas;
+        $this->curtidas = (int) (Palestra::whereKey($this->palestraId)->value('curtidas') ?? 0);
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.palestras.curtir');
     }

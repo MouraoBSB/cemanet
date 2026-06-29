@@ -138,25 +138,50 @@
 
             {{-- Sidebar sticky --}}
             <aside class="space-y-5 desktop-sm:sticky desktop-sm:top-24">
-                @forelse ($palestrantes as $p)
-                    <div class="overflow-hidden rounded-xl border border-border-muted bg-cream">
-                        @if ($p->foto_thumb_url)
-                            <img src="{{ $p->foto_thumb_url }}" alt="{{ $p->nome }}" loading="lazy" width="320" height="200" class="h-[200px] w-full object-cover">
-                        @endif
-                        <div class="p-5">
-                            <p class="font-mono text-[11px] uppercase tracking-[0.1em] text-accent">Palestrante</p>
-                            <h2 class="mt-1 font-display text-xl font-semibold text-primary">
-                                <a href="{{ route('palestrantes.show', $p->slug) }}" class="hover:underline">{{ $p->nome }}</a>
-                            </h2>
-                            @if ($p->bio)
-                                <div class="mt-2 line-clamp-4 text-sm text-text-secondary">{!! \Illuminate\Support\Str::limit(strip_tags($p->bio), 200) !!}</div>
-                            @endif
-                            <a href="{{ route('palestrantes.show', $p->slug) }}" class="mt-3 inline-block text-sm font-semibold text-secondary hover:underline">Ver perfil completo →</a>
-                        </div>
+                @if ($palestrantes->count() > 1)
+                    {{-- 2+ palestrantes: bloco compacto (avatar + nome + perfil), sem inflar a sidebar --}}
+                    <div class="rounded-xl border border-border-muted bg-cream p-5">
+                        <p class="font-mono text-[11px] uppercase tracking-[0.1em] text-accent">Palestrantes</p>
+                        <ul class="mt-3 space-y-3.5">
+                            @foreach ($palestrantes as $p)
+                                @php($iniciais = \Illuminate\Support\Str::upper(collect(explode(' ', $p->nome))->filter()->take(2)->map(fn ($w) => mb_substr($w, 0, 1))->implode('')))
+                                <li>
+                                    <a href="{{ route('palestrantes.show', $p->slug) }}" class="group flex items-center gap-3">
+                                        @if ($p->foto_thumb_url)
+                                            <img src="{{ $p->foto_thumb_url }}" alt="{{ $p->nome }}" loading="lazy" width="44" height="44" class="size-11 shrink-0 rounded-full object-cover">
+                                        @else
+                                            <span aria-hidden="true" class="flex size-11 shrink-0 items-center justify-center rounded-full bg-primary font-display text-sm font-semibold text-white">{{ $iniciais }}</span>
+                                        @endif
+                                        <span class="min-w-0">
+                                            <span class="block truncate font-display font-semibold text-primary group-hover:underline">{{ $p->nome }}</span>
+                                            <span class="text-xs text-secondary">Ver perfil completo →</span>
+                                        </span>
+                                    </a>
+                                </li>
+                            @endforeach
+                        </ul>
                     </div>
-                @empty
-                    <p class="text-sm text-text-muted">Palestrante a confirmar.</p>
-                @endforelse
+                @else
+                    @forelse ($palestrantes as $p)
+                        <div class="overflow-hidden rounded-xl border border-border-muted bg-cream">
+                            @if ($p->foto_thumb_url)
+                                <img src="{{ $p->foto_thumb_url }}" alt="{{ $p->nome }}" loading="lazy" width="320" height="200" class="h-[200px] w-full object-cover">
+                            @endif
+                            <div class="p-5">
+                                <p class="font-mono text-[11px] uppercase tracking-[0.1em] text-accent">Palestrante</p>
+                                <h2 class="mt-1 font-display text-xl font-semibold text-primary">
+                                    <a href="{{ route('palestrantes.show', $p->slug) }}" class="hover:underline">{{ $p->nome }}</a>
+                                </h2>
+                                @if ($p->bio)
+                                    <div class="mt-2 line-clamp-4 text-sm text-text-secondary">{!! \Illuminate\Support\Str::limit(strip_tags($p->bio), 200) !!}</div>
+                                @endif
+                                <a href="{{ route('palestrantes.show', $p->slug) }}" class="mt-3 inline-block text-sm font-semibold text-secondary hover:underline">Ver perfil completo →</a>
+                            </div>
+                        </div>
+                    @empty
+                        <p class="text-sm text-text-muted">Palestrante a confirmar.</p>
+                    @endforelse
+                @endif
 
                 {{-- Ações --}}
                 <div class="space-y-2.5 rounded-xl border border-border-muted bg-white p-5">

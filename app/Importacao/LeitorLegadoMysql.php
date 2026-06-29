@@ -80,6 +80,7 @@ class LeitorLegadoMysql implements LeitorLegado
                 'data_da_palestra' => TransformadorLegado::unixParaData($meta['data_da_palestra'] ?? null),
                 'online' => TransformadorLegado::statusParaAtivo($meta['palestra_online'] ?? null),
                 'link_youtube' => $meta['link_do_youtube'] ?? null,
+                'slide' => html_entity_decode((string) ($meta['_slides'] ?? ''), ENT_QUOTES | ENT_HTML5) ?: null,
                 'cor_fundo' => $meta['escolher_cor_do_fundo'] ?? null,
                 'publico_online' => isset($meta['publico_online']) && $meta['publico_online'] !== '' ? (int) $meta['publico_online'] : null,
                 'publico_presencial' => isset($meta['publico_presencial']) && $meta['publico_presencial'] !== '' ? (int) $meta['publico_presencial'] : null,

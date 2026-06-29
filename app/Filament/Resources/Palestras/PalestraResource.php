@@ -122,6 +122,17 @@ class PalestraResource extends Resource
                             ->url()
                             ->maxLength(500),
                     ]),
+                    Grid::make(2)->schema([
+                        TextInput::make('slide')
+                            ->label('Link dos slides (Google Drive)')
+                            ->url()
+                            ->maxLength(500)
+                            ->helperText('Cole o link normal do Google Drive; o sistema gera o download direto automaticamente.'),
+                        TextInput::make('duracao')
+                            ->label('Duração')
+                            ->placeholder('≈1h10')
+                            ->maxLength(40),
+                    ]),
                     Grid::make(3)->schema([
                         TextInput::make('publico_presencial')
                             ->label('Público presencial')
@@ -160,6 +171,25 @@ class PalestraResource extends Resource
                         ->collapsible()
                         ->defaultItems(0)
                         ->addActionLabel('Adicionar destaque')
+                        ->columnSpanFull(),
+                ]),
+                Tabs\Tab::make('Referências')->schema([
+                    Textarea::make('referencias_evangelicas')
+                        ->label('Referências evangélicas')
+                        ->rows(3)
+                        ->columnSpanFull(),
+                    Repeater::make('referencias')
+                        ->label('Referências doutrinárias')
+                        ->relationship('referencias')
+                        ->schema([
+                            TextInput::make('obra')->label('Obra')->required()->maxLength(255),
+                            TextInput::make('autor')->label('Autor')->maxLength(255),
+                            Textarea::make('nota')->label('Nota')->rows(2),
+                        ])
+                        ->orderColumn('ordem')
+                        ->collapsible()
+                        ->defaultItems(0)
+                        ->addActionLabel('Adicionar referência')
                         ->columnSpanFull(),
                 ]),
             ]),

@@ -4,6 +4,7 @@
 
 namespace App\Models;
 
+use App\Support\Palestras\LinkDrive;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -25,8 +26,8 @@ class Palestra extends Model
 
     protected $fillable = [
         'titulo', 'slug', 'subtitulo', 'resumo', 'descricao', 'data_da_palestra',
-        'online', 'link_youtube', 'cor_fundo', 'publico_online', 'publico_presencial',
-        'publico_total', 'status',
+        'online', 'link_youtube', 'slide', 'duracao', 'referencias_evangelicas',
+        'cor_fundo', 'publico_online', 'publico_presencial', 'publico_total', 'curtidas', 'status',
     ];
 
     protected function casts(): array
@@ -76,6 +77,11 @@ class Palestra extends Model
         return $this->hasMany(PalestraDestaque::class)->orderBy('ordem');
     }
 
+    public function referencias(): HasMany
+    {
+        return $this->hasMany(PalestraReferencia::class)->orderBy('ordem');
+    }
+
     public function getYoutubeIdAttribute(): ?string
     {
         if ($this->link_youtube && preg_match('~(?:v=|youtu\.be/|live/|embed/|shorts/)([A-Za-z0-9_-]{6,})~', $this->link_youtube, $m)) {
@@ -88,6 +94,12 @@ class Palestra extends Model
     public function getYoutubeThumbAttribute(): ?string
     {
         return $this->youtube_id ? "https://i.ytimg.com/vi/{$this->youtube_id}/mqdefault.jpg" : null;
+    }
+
+    /** Link de download direto do slide (derivado do link cru), ou null. */
+    protected function slideDownloadUrl(): Attribute
+    {
+        return Attribute::get(fn (): ?string => LinkDrive::paraDownload($this->slide));
     }
 
     protected function descricao(): Attribute

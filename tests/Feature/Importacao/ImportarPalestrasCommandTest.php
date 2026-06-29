@@ -31,7 +31,7 @@ class ImportarPalestrasCommandTest extends TestCase
 
             public function palestras(): array
             {
-                return [['titulo' => 'T', 'slug' => 't', 'subtitulo' => null, 'resumo' => null, 'descricao' => null, 'data_da_palestra' => Carbon::parse('2026-06-28 16:00:00'), 'online' => false, 'link_youtube' => null, 'cor_fundo' => null, 'publico_online' => null, 'publico_presencial' => null, 'publico_total' => null, 'status' => 'publicado', 'palestrantes_slugs' => ['ana'], 'diretor_slug' => null, 'assuntos_slugs' => ['fe'], 'destaques' => []]];
+                return [['titulo' => 'T', 'slug' => 't', 'subtitulo' => null, 'resumo' => null, 'descricao' => null, 'data_da_palestra' => Carbon::parse('2026-06-28 16:00:00'), 'online' => false, 'link_youtube' => null, 'slide' => 'https://drive.google.com/file/d/1ABCdefg_hij/view?usp=sharing', 'cor_fundo' => null, 'publico_online' => null, 'publico_presencial' => null, 'publico_total' => null, 'status' => 'publicado', 'palestrantes_slugs' => ['ana'], 'diretor_slug' => null, 'assuntos_slugs' => ['fe'], 'destaques' => []]];
             }
         });
 
@@ -40,5 +40,9 @@ class ImportarPalestrasCommandTest extends TestCase
             ->assertExitCode(0);
 
         $this->assertSame(1, Palestra::count());
+
+        $palestra = Palestra::first();
+        $this->assertSame('https://drive.google.com/file/d/1ABCdefg_hij/view?usp=sharing', $palestra->slide);
+        $this->assertSame('https://drive.google.com/uc?export=download&id=1ABCdefg_hij', $palestra->slide_download_url);
     }
 }

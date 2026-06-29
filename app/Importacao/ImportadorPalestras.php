@@ -111,6 +111,7 @@ class ImportadorPalestras
                         'data_da_palestra' => $d['data_da_palestra'],
                         'online' => $d['online'] ?? false,
                         'link_youtube' => $d['link_youtube'] ?? null,
+                        'slide' => $d['slide'] ?? null,
                         'cor_fundo' => $d['cor_fundo'] ?? null,
                         'publico_online' => $d['publico_online'] ?? null,
                         'publico_presencial' => $d['publico_presencial'] ?? null,

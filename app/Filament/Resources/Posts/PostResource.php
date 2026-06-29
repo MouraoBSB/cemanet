@@ -164,7 +164,9 @@ class PostResource extends Resource
                             ->label('Alt da imagem destacada')
                             ->maxLength(255),
                     ]),
-                    // Galeria de fotos: múltiplas, reordenáveis via drag-and-drop, cap ≤2000px
+                    // Galeria de fotos: múltiplas, reordenáveis via drag-and-drop, cap ≤2000px.
+                    // panelLayout('grid') → miniaturas quadradas numa grade (estilo WordPress),
+                    // arrastáveis para ordenar — em vez de imagens grandes empilhadas.
                     SpatieMediaLibraryFileUpload::make('galeria')
                         ->label('Galeria de imagens')
                         ->collection(Post::COLECAO_GALERIA)
@@ -174,6 +176,7 @@ class PostResource extends Resource
                         ->reorderable()
                         ->appendFiles()
                         ->maxFiles(50)
+                        ->panelLayout('grid')
                         ->imageResizeMode('contain')
                         ->imageResizeTargetWidth(2000)
                         ->imageResizeTargetHeight(2000)

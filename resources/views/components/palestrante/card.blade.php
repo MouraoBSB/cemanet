@@ -1,7 +1,7 @@
 @props(['palestrante'])
 
 @php
-    $foto = $palestrante->foto ? asset('storage/'.$palestrante->foto) : null;
+    $foto = $palestrante->foto_thumb_url;
     $resumoBio = $palestrante->bio ? \Illuminate\Support\Str::limit(strip_tags($palestrante->bio), 120) : null;
 @endphp
 <article {{ $attributes->class(['group flex flex-col overflow-hidden rounded-lg border border-border-muted bg-white shadow-card transition hover:shadow-elevated']) }}>

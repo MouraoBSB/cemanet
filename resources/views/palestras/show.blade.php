@@ -95,8 +95,8 @@
             <aside class="space-y-5">
                 @forelse ($palestrantes as $p)
                     <div class="overflow-hidden rounded-xl border border-border-muted bg-cream">
-                        @if ($p->foto)
-                            <img src="{{ asset('storage/'.$p->foto) }}" alt="{{ $p->nome }}"
+                        @if ($p->foto_thumb_url)
+                            <img src="{{ $p->foto_thumb_url }}" alt="{{ $p->nome }}"
                                  loading="lazy" width="300" height="230" class="h-[230px] w-full object-cover">
                         @endif
                         <div class="p-5">

@@ -12,8 +12,8 @@
         <section class="mx-auto max-w-[1240px] px-6 pt-12" aria-label="Próxima palestra">
             <p class="mb-3 font-display text-2xl font-semibold text-primary"><span class="text-gold">Próximas</span> Palestras</p>
             <div class="flex flex-col items-center gap-5 rounded-2xl bg-accent p-6 text-white sm:flex-row sm:gap-7">
-                @if ($pp?->foto)
-                    <img src="{{ asset('storage/'.$pp->foto) }}" alt="{{ $pp->nome }}" width="112" height="112"
+                @if ($pp?->foto_thumb_url)
+                    <img src="{{ $pp->foto_thumb_url }}" alt="{{ $pp->nome }}" width="112" height="112"
                          class="size-28 shrink-0 rounded-full object-cover ring-4 ring-white/40">
                 @endif
                 <div class="flex-1 text-center sm:text-left">

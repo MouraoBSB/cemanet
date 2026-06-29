@@ -1,5 +1,6 @@
 @php
-    $foto = $palestrante->foto ? asset('storage/'.$palestrante->foto) : null;
+    $fotoSeo = $palestrante->foto_url;
+    $foto    = $palestrante->foto_thumb_url;
 @endphp
 
 <x-layout.app :title="$palestrante->nome" :description="\Illuminate\Support\Str::limit(strip_tags($palestrante->bio ?? ''), 150) ?: 'Palestrante do CEMA'">
@@ -11,7 +12,7 @@
                 '@type' => 'Person',
                 'name' => $palestrante->nome,
                 // omite 'image' quando não há foto (null vira chave inválida no schema)
-                'image' => $foto,
+                'image' => $fotoSeo,
                 'description' => \Illuminate\Support\Str::limit(strip_tags($palestrante->bio ?? ''), 200),
                 'url' => route('palestrantes.show', $palestrante->slug),
                 'worksFor' => ['@type' => 'Organization', 'name' => 'Centro Espírita Maria Madalena'],

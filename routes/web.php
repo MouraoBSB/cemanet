@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\MidiaController;
 use App\Http\Controllers\PalestraController;
 use App\Http\Controllers\PalestranteController;
 use App\Http\Controllers\SitemapController;
@@ -27,6 +28,12 @@ Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap')
 
 // Compat: URL antiga de categoria → listagem filtrada (301).
 Route::get('/categoria/{slug}', fn (string $slug) => redirect()->to('/sementeira?categoria='.$slug, 301));
+
+// Mídia da biblioteca por rota estável/portável (antes do catch-all).
+Route::get('/midia/{media}/{conversao?}', [MidiaController::class, 'serve'])
+    ->name('midia.serve')
+    ->where('media', '[0-9]+')
+    ->where('conversao', '[a-z]+');
 
 // Catch-all raiz: redireciona slugs de posts existentes → /sementeira/{slug} (301).
 // DEVE ser a última rota do arquivo.

@@ -4,6 +4,7 @@
 
 namespace App\Filament\Resources\Posts;
 
+use App\Filament\RichContent\Plugins\BibliotecaMidiaPlugin;
 use App\Filament\RichContent\Plugins\ImagemPlugin;
 use App\Filament\RichContent\Plugins\TextoAlinhamentoPlugin;
 use App\Filament\Resources\Posts\Pages\CreatePost;
@@ -83,6 +84,7 @@ class PostResource extends Resource
                         ->plugins([
                             ImagemPlugin::make(),
                             TextoAlinhamentoPlugin::make(),
+                            BibliotecaMidiaPlugin::make(),
                         ])
                         ->textColors([
                             'roxo'     => '#4e4483',
@@ -92,7 +94,9 @@ class PostResource extends Resource
                             'vermelho' => '#c0392b',
                         ])
                         ->toolbarButtons([
-                            'attachFiles',
+                            // Clipe 'attachFiles' removido: salvava a imagem do corpo sem <img> (#2).
+                            // Substituído pela tool 'inserirDaBiblioteca' (URL portável /midia/{id}/web).
+                            'inserirDaBiblioteca',
                             'blockquote',
                             'bold',
                             'bulletList',
@@ -150,6 +154,7 @@ class PostResource extends Resource
                         SpatieMediaLibraryFileUpload::make('destacada')
                             ->label('Imagem destacada')
                             ->collection(Post::COLECAO_DESTACADA)
+                            ->disk('public') // grava no disco public — sem isto cai no 'local' (privado) e a URL /storage 404 no front
                             ->image()
                             ->imageEditor()
                             ->imageResizeMode('contain')
@@ -160,15 +165,19 @@ class PostResource extends Resource
                             ->label('Alt da imagem destacada')
                             ->maxLength(255),
                     ]),
-                    // Galeria de fotos: múltiplas, reordenáveis via drag-and-drop, cap ≤2000px
+                    // Galeria de fotos: múltiplas, reordenáveis via drag-and-drop, cap ≤2000px.
+                    // panelLayout('grid') → miniaturas quadradas numa grade (estilo WordPress),
+                    // arrastáveis para ordenar — em vez de imagens grandes empilhadas.
                     SpatieMediaLibraryFileUpload::make('galeria')
                         ->label('Galeria de imagens')
                         ->collection(Post::COLECAO_GALERIA)
+                        ->disk('public') // grava no disco public (idem destacada)
                         ->image()
                         ->multiple()
                         ->reorderable()
                         ->appendFiles()
                         ->maxFiles(50)
+                        ->panelLayout('grid')
                         ->imageResizeMode('contain')
                         ->imageResizeTargetWidth(2000)
                         ->imageResizeTargetHeight(2000)
@@ -275,6 +284,7 @@ class PostResource extends Resource
                         SpatieMediaLibraryFileUpload::make('og')
                             ->label('Imagem OG (Open Graph)')
                             ->collection(Post::COLECAO_OG)
+                            ->disk('public') // grava no disco public (idem destacada)
                             ->image()
                             ->imageResizeMode('contain')
                             ->imageResizeTargetWidth(1200)

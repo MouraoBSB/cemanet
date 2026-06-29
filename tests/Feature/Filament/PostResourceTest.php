@@ -280,4 +280,34 @@ class PostResourceTest extends TestCase
             ->assertFormFieldExists('galeria', fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $campo): bool =>
                 ! $campo->hasResponsiveImages());
     }
+
+    public function test_uploads_de_imagem_usam_disco_public(): void
+    {
+        // #1 (fundacional): o disco default do Filament é 'local' (privado) → a URL /storage
+        // gerada pelo Spatie aponta para o disco public (vazio) e a imagem 404 no front.
+        // Os uploads de mídia do post devem fixar 'public' para renderizar.
+        Livewire::test(CreatePost::class)
+            ->assertFormFieldExists('destacada', fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $campo): bool =>
+                $campo->getDiskName() === 'public')
+            ->assertFormFieldExists('galeria', fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $campo): bool =>
+                $campo->getDiskName() === 'public')
+            ->assertFormFieldExists('og', fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $campo): bool =>
+                $campo->getDiskName() === 'public');
+    }
+
+    public function test_toolbar_inclui_inserir_da_biblioteca(): void
+    {
+        Livewire::test(CreatePost::class)
+            ->assertFormFieldExists('conteudo', fn (\Filament\Forms\Components\RichEditor $campo): bool =>
+                $campo->hasToolbarButton('inserirDaBiblioteca'));
+    }
+
+    public function test_toolbar_nao_inclui_mais_o_clipe_attachfiles(): void
+    {
+        // #2: o clipe attachFiles salvava a imagem do corpo sem <img>. Foi removido e
+        // substituído pela tool 'inserirDaBiblioteca' (caminho portável /midia/{id}/web).
+        Livewire::test(CreatePost::class)
+            ->assertFormFieldExists('conteudo', fn (\Filament\Forms\Components\RichEditor $campo): bool =>
+                ! $campo->hasToolbarButton('attachFiles'));
+    }
 }

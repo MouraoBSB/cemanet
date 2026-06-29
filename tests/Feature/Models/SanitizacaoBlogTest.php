@@ -126,4 +126,15 @@ class SanitizacaoBlogTest extends TestCase
         $this->assertStringNotContainsString('alignleft', $limpo);
         $this->assertStringNotContainsString('wp-block-image', $limpo);
     }
+
+    public function test_sanitizacao_mantem_url_de_midia_da_biblioteca(): void
+    {
+        // A URL relativa /midia/{id}/web (sem esquema) deve sobreviver ao purifier,
+        // mesmo sem data-id (a inserção da biblioteca usa id=null no nó).
+        $post = \App\Models\Post::factory()->make([
+            'conteudo' => '<p>texto</p><img src="/midia/12/web" alt="legenda">',
+        ]);
+
+        $this->assertStringContainsString('/midia/12/web', (string) $post->conteudo);
+    }
 }

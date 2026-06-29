@@ -11,6 +11,12 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class EnriquecedorImagensConteudo
 {
+    /** Classes de alinhamento/tamanho que migram da <img> para o <figure> (layout correto). */
+    private const CLASSES_FIGURA = [
+        'alignleft', 'alignright', 'aligncenter', 'alignnone',
+        'size-medium', 'size-large', 'size-full',
+    ];
+
     /**
      * @return array{html: string, imagens: array<int, array<string, mixed>>}
      */
@@ -65,12 +71,20 @@ class EnriquecedorImagensConteudo
             $titulo    = $midia?->getCustomProperty('titulo');
             $descricao = $midia?->getCustomProperty('descricao');
 
-            // <figure>…<img>…[<figcaption>legenda</figcaption>]</figure>
-            $figure = $dom->createElement('figure');
-            $figure->setAttribute('class', 'figura-conteudo');
-            $img->parentNode?->replaceChild($figure, $img);
-            $figure->appendChild($img);
+            // Só envolve em <figure> quando há legenda a exibir (mínima intervenção no layout).
             if (filled($legenda)) {
+                // Move alinhamento/tamanho da <img> para o <figure> (float/center/width corretos).
+                $classes = preg_split('/\s+/', trim($img->getAttribute('class')), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+                $mover = array_values(array_intersect($classes, self::CLASSES_FIGURA));
+                $restantes = array_values(array_diff($classes, $mover));
+
+                $restantes === [] ? $img->removeAttribute('class') : $img->setAttribute('class', implode(' ', $restantes));
+
+                $figure = $dom->createElement('figure');
+                $figure->setAttribute('class', trim('figura-conteudo ' . implode(' ', $mover)));
+                $img->parentNode?->replaceChild($figure, $img);
+                $figure->appendChild($img);
+
                 $cap = $dom->createElement('figcaption');
                 $cap->appendChild($dom->createTextNode($legenda)); // createTextNode ESCAPA (anti-XSS)
                 $figure->appendChild($cap);

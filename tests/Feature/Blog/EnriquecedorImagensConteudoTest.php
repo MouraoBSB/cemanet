@@ -65,20 +65,35 @@ class EnriquecedorImagensConteudoTest extends TestCase
         $this->assertStringContainsString('/midia/' . $midia->id . '/web', $out['imagens'][0]['contentUrl']);
     }
 
-    /** 2) img /midia/{id}/web sem legenda → figure SEM figcaption, mas gera ImageObject com contentUrl. */
-    public function test_imagem_sem_legenda_vira_figure_sem_figcaption_mas_gera_image_object(): void
+    /** 2) img /midia/{id}/web SEM legenda → NÃO vira figure (img simples), mas gera ImageObject. */
+    public function test_imagem_sem_legenda_nao_vira_figure_mas_gera_image_object(): void
     {
         $midia = $this->criarMidia([]);
 
         $html = '<img src="/midia/' . $midia->id . '/web" alt="sem legenda">';
         $out  = $this->servico->enriquecer($html);
 
-        $this->assertStringContainsString('<figure', $out['html']);
-        $this->assertStringNotContainsString('<figcaption', $out['html']);
+        $this->assertStringNotContainsString('<figure', $out['html']);
+        $this->assertStringContainsString('/midia/' . $midia->id . '/web', $out['html']);
         $this->assertCount(1, $out['imagens']);
         $this->assertSame('ImageObject', $out['imagens'][0]['@type']);
         $this->assertStringContainsString('/midia/' . $midia->id . '/web', $out['imagens'][0]['contentUrl']);
         $this->assertArrayNotHasKey('caption', $out['imagens'][0]);
+    }
+
+    /** 6) imagem COM legenda e classe de alinhamento/tamanho → a classe migra da img para o figure. */
+    public function test_classe_de_alinhamento_migra_para_o_figure(): void
+    {
+        $midia = $this->criarMidia(['legenda' => 'Cap']);
+
+        $html = '<img src="/midia/' . $midia->id . '/web" class="aligncenter size-large" alt="x">';
+        $out  = $this->servico->enriquecer($html);
+
+        // a classe de alinhamento/tamanho vai para o <figure>
+        $this->assertMatchesRegularExpression('/<figure class="figura-conteudo[^"]*aligncenter[^"]*"/', $out['html']);
+        $this->assertMatchesRegularExpression('/<figure class="figura-conteudo[^"]*size-large[^"]*"/', $out['html']);
+        // e sai da <img>
+        $this->assertDoesNotMatchRegularExpression('/<img[^>]*\baligncenter\b/', $out['html']);
     }
 
     /** 3) img /storage/... (migrada) fica intacta, sem figure e sem ImageObject. */

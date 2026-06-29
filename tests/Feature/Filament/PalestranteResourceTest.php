@@ -9,8 +9,8 @@ use App\Filament\Resources\Palestrantes\Pages\EditPalestrante;
 use App\Filament\Resources\Palestrantes\Pages\ListPalestrantes;
 use App\Models\Palestrante;
 use App\Models\User;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -56,10 +56,11 @@ class PalestranteResourceTest extends TestCase
             ->assertFormFieldExists('bio', fn (RichEditor $field) => true);
     }
 
-    public function test_formulario_create_tem_file_upload_foto(): void
+    public function test_form_usa_upload_de_media_library_para_foto(): void
     {
         Livewire::test(CreatePalestrante::class)
-            ->assertFormFieldExists('foto', fn (FileUpload $field) => true);
+            ->assertFormFieldExists('foto', fn (SpatieMediaLibraryFileUpload $campo): bool =>
+                $campo->getCollection() === Palestrante::COLECAO_FOTO);
     }
 
     public function test_pode_criar_palestrante_via_formulario(): void

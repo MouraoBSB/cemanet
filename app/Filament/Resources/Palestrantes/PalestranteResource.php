@@ -7,13 +7,13 @@ namespace App\Filament\Resources\Palestrantes;
 use App\Filament\Resources\Palestrantes\Pages\CreatePalestrante;
 use App\Filament\Resources\Palestrantes\Pages\EditPalestrante;
 use App\Filament\Resources\Palestrantes\Pages\ListPalestrantes;
+use App\Filament\Support\ComponentesImagem;
 use App\Models\Palestrante;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -22,7 +22,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
@@ -74,13 +74,8 @@ class PalestranteResource extends Resource
 
                 Section::make('Foto')
                     ->schema([
-                        FileUpload::make('foto')
-                            ->label('Foto do palestrante')
-                            ->image()
-                            ->imageEditor()
-                            ->disk('public')
-                            ->directory('palestrantes')
-                            ->maxSize(2048),
+                        ComponentesImagem::upload('foto', Palestrante::COLECAO_FOTO)
+                            ->label('Foto do palestrante'),
                     ]),
 
                 Section::make('Biografia')
@@ -127,10 +122,11 @@ class PalestranteResource extends Resource
     {
         return $table
             ->columns([
-                ImageColumn::make('foto')
+                SpatieMediaLibraryImageColumn::make('foto')
                     ->label('Foto')
-                    ->circular()
-                    ->disk('public'),
+                    ->collection(Palestrante::COLECAO_FOTO)
+                    ->conversion('thumb')
+                    ->circular(),
 
                 TextColumn::make('nome')
                     ->label('Nome')

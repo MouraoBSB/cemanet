@@ -4,6 +4,7 @@
 
 namespace App\Models;
 
+use App\Support\Palestras\LinkDrive;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -93,6 +94,12 @@ class Palestra extends Model
     public function getYoutubeThumbAttribute(): ?string
     {
         return $this->youtube_id ? "https://i.ytimg.com/vi/{$this->youtube_id}/mqdefault.jpg" : null;
+    }
+
+    /** Link de download direto do slide (derivado do link cru), ou null. */
+    protected function slideDownloadUrl(): Attribute
+    {
+        return Attribute::get(fn (): ?string => LinkDrive::paraDownload($this->slide));
     }
 
     protected function descricao(): Attribute

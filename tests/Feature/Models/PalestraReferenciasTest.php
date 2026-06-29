@@ -33,4 +33,16 @@ class PalestraReferenciasTest extends TestCase
 
         $this->assertDatabaseHas('palestras', ['id' => $palestra->id, 'duracao' => '≈1h10', 'curtidas' => 5]);
     }
+
+    public function test_slide_download_url_deriva_do_link_cru(): void
+    {
+        $palestra = \App\Models\Palestra::factory()->create([
+            'slide' => 'https://drive.google.com/file/d/1ABCdefg_hij/view?usp=sharing',
+        ]);
+
+        $this->assertSame(
+            'https://drive.google.com/uc?export=download&id=1ABCdefg_hij',
+            $palestra->slide_download_url
+        );
+    }
 }

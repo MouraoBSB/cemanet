@@ -99,7 +99,7 @@
                 </div>
 
                 @if ($palestra->descricao)
-                    <div class="max-w-none font-serif text-[16px] leading-[1.82] text-[#3a3553] [&_p]:mb-[18px] [&_a]:text-secondary [&_a]:underline">
+                    <div class="max-w-none text-justify hyphens-auto font-serif text-[16px] leading-[1.82] text-[#3a3553] [&_p]:mb-[18px] [&_a]:text-secondary [&_a]:underline">
                         {!! $palestra->descricao !!}
                     </div>
                 @endif
@@ -196,8 +196,6 @@
                     @if ($googleAgenda)
                         <a href="{{ $googleAgenda }}" target="_blank" rel="noopener"
                            class="flex items-center justify-center gap-2 rounded-pill border border-border px-4 py-2.5 text-sm font-semibold text-text-secondary hover:border-primary hover:text-primary">📅 Adicionar ao calendário</a>
-                        <a href="{{ route('palestras.calendario', $palestra->slug) }}"
-                           class="block text-center text-xs text-text-muted hover:text-primary">Baixar .ics</a>
                     @endif
                 </div>
 

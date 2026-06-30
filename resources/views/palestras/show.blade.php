@@ -31,12 +31,12 @@
     <x-slot:head>
         <script type="application/ld+json">{!! $jsonLd !!}</script>
         @if ($ytId)
-            <meta property="og:image" content="{{ $palestra->youtube_thumb }}">
+            <meta property="og:image" content="{{ $palestra->youtube_thumb_hq }}">
             <script type="application/ld+json">{!! json_encode([
                 '@context' => 'https://schema.org',
                 '@type' => 'VideoObject',
                 'name' => $palestra->titulo,
-                'thumbnailUrl' => $palestra->youtube_thumb,
+                'thumbnailUrl' => $palestra->youtube_thumb_hq,
                 'embedUrl' => 'https://www.youtube.com/embed/'.$ytId,
                 'uploadDate' => optional($data)->toIso8601String(),
             ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG) !!}</script>

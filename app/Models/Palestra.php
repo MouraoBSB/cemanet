@@ -96,6 +96,12 @@ class Palestra extends Model
         return $this->youtube_id ? "https://i.ytimg.com/vi/{$this->youtube_id}/mqdefault.jpg" : null;
     }
 
+    /** Thumb maior (hqdefault) para Open Graph / social cards. */
+    public function getYoutubeThumbHqAttribute(): ?string
+    {
+        return $this->youtube_id ? "https://i.ytimg.com/vi/{$this->youtube_id}/hqdefault.jpg" : null;
+    }
+
     /** Link de download direto do slide (derivado do link cru), ou null. */
     protected function slideDownloadUrl(): Attribute
     {

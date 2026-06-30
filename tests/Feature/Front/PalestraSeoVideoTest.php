@@ -29,6 +29,9 @@ class PalestraSeoVideoTest extends TestCase
     {
         Palestra::factory()->create(['slug' => 'sem-video', 'status' => Palestra::STATUS_PUBLICADO, 'link_youtube' => null]);
 
-        $this->get(route('palestras.show', 'sem-video'))->assertOk()->assertDontSee('"@type":"VideoObject"', false);
+        $this->get(route('palestras.show', 'sem-video'))
+            ->assertOk()
+            ->assertDontSee('"@type":"VideoObject"', false)
+            ->assertDontSee('og:image', false); // og:image só é emitido quando há vídeo
     }
 }

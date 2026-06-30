@@ -4,14 +4,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PalestraReferencia extends Model
 {
-    use HasFactory;
-
     protected $fillable = ['obra', 'autor', 'nota', 'ordem'];
 
     public function palestra(): BelongsTo

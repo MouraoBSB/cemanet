@@ -6,7 +6,12 @@
                 @forelse ($relacionadas as $rel)
                     <a href="{{ route('palestras.show', $rel->slug) }}"
                        class="block overflow-hidden rounded-2xl border border-border-muted bg-white shadow-card transition hover:-translate-y-1">
-                        <div class="aspect-video bg-gradient-to-br from-primary to-footer-bg"></div>
+                        @php($thumb = $rel->youtube_thumb ?: optional($rel->palestrantesAtivos->first())->foto_thumb_url)
+                        @if ($thumb)
+                            <img src="{{ $thumb }}" alt="{{ $rel->titulo }}" loading="lazy" class="aspect-video w-full bg-surface object-cover">
+                        @else
+                            <div class="aspect-video bg-gradient-to-br from-primary to-footer-bg"></div>
+                        @endif
                         <div class="p-4">
                             <p class="font-display font-semibold text-text-ink">{{ \Illuminate\Support\Str::limit($rel->titulo, 50) }}</p>
                             <p class="mt-1 text-xs text-text-muted">

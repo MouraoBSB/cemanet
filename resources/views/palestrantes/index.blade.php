@@ -82,7 +82,7 @@
                             <span class="inline-block size-2 animate-pulse rounded-full bg-gold motion-reduce:animate-none" aria-hidden="true"></span> Em destaque
                         </p>
                         <div class="flex items-center gap-3">
-                            <span class="cema-spk-avatar cema-grad-{{ $proxima->id % 8 }} grid size-12 shrink-0 place-items-center overflow-hidden rounded-full ring-2 ring-white/25">
+                            <span class="cema-spk-avatar cema-grad-{{ ($dpp?->id ?? $proxima->id) % 8 }} grid size-12 shrink-0 place-items-center overflow-hidden rounded-full ring-2 ring-white/25">
                                 @if ($dpp?->foto_thumb_url)
                                     <img src="{{ $dpp->foto_thumb_url }}" alt="" width="48" height="48" class="size-full object-cover">
                                 @else

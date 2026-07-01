@@ -18,23 +18,53 @@ class Lista extends Component
     #[Url(as: 'q', except: '')]
     public string $q = '';
 
-    public function updatedQ(): void
+    #[Url(as: 'ordenar', except: 'az')]
+    public string $ordenar = 'az';
+
+    public function updated(string $name): void
     {
+        if (in_array($name, ['q', 'ordenar'], true)) {
+            $this->resetPage();
+        }
+    }
+
+    public function limparFiltros(): void
+    {
+        $this->reset(['q', 'ordenar']);
         $this->resetPage();
+    }
+
+    /** @return list<array{chave:string, rotulo:string}> */
+    public function filtrosAtivos(): array
+    {
+        $chips = [];
+        if ($this->q !== '') {
+            $chips[] = ['chave' => 'q', 'rotulo' => 'Nome: “'.$this->q.'”'];
+        }
+
+        return $chips;
     }
 
     public function render()
     {
-        $palestrantes = Palestrante::query()
+        $query = Palestrante::query()
             ->ativo()
-            ->when($this->q !== '', fn (Builder $query) => $query->where('nome', 'like', '%'.$this->q.'%'))
-            ->withCount(['palestras as palestras_ministradas_count' => function (Builder $query) {
-                $query->where('palestra_pessoa.papel', Palestra::PAPEL_PALESTRANTE)
+            ->when($this->q !== '', fn (Builder $q) => $q->where('nome', 'like', '%'.$this->q.'%'))
+            ->withCount(['palestras as palestras_ministradas_count' => function (Builder $q) {
+                $q->where('palestra_pessoa.papel', Palestra::PAPEL_PALESTRANTE)
                     ->where('palestras.status', Palestra::STATUS_PUBLICADO);
-            }])
-            ->orderBy('nome')
-            ->paginate(12);
+            }]);
 
-        return view('livewire.palestrantes.lista', ['palestrantes' => $palestrantes]);
+        match ($this->ordenar) {
+            'za' => $query->orderBy('nome', 'desc'),
+            'mais' => $query->orderByDesc('palestras_ministradas_count')->orderBy('nome'),
+            'menos' => $query->orderBy('palestras_ministradas_count')->orderBy('nome'),
+            default => $query->orderBy('nome'), // az + qualquer valor inválido via URL
+        };
+
+        return view('livewire.palestrantes.lista', [
+            'palestrantes' => $query->paginate(12),
+            'filtrosAtivos' => $this->filtrosAtivos(),
+        ]);
     }
 }

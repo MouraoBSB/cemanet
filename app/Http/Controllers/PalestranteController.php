@@ -4,6 +4,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Palestra;
 use App\Models\Palestrante;
 use Illuminate\Contracts\View\View;
 
@@ -11,7 +12,17 @@ class PalestranteController extends Controller
 {
     public function index(): View
     {
-        return view('palestrantes.index');
+        $proxima = Palestra::query()->publicado()->whereNotNull('data_da_palestra')
+            ->where('data_da_palestra', '>=', now())
+            ->with(['palestrantesAtivos', 'assuntos'])
+            ->orderBy('data_da_palestra')
+            ->first(); // sem fallback (pode ser null)
+
+        return view('palestrantes.index', [
+            'totalColaboradores' => Palestrante::ativo()->count(),
+            'totalAcervo' => Palestra::publicado()->count(),
+            'proxima' => $proxima,
+        ]);
     }
 
     public function show(string $slug): View

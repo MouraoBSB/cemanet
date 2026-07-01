@@ -157,7 +157,16 @@
                                 </div>
                                 <h3 class="mt-1 truncate font-display font-semibold text-text-ink group-hover:text-primary">{{ $p->titulo }}</h3>
                                 @if ($pa)
-                                    <p class="mt-0.5 truncate text-sm text-text-secondary">com {{ $p->palestrantesAtivos->pluck('nome')->join(', ', ' e ') }}</p>
+                                    <div class="mt-1 flex items-center gap-2 text-sm text-text-secondary">
+                                        <span class="cema-cal-avatar cema-cal-avatar-{{ $p->id % 4 }} grid size-6 shrink-0 place-items-center overflow-hidden rounded-full ring-1 ring-black/5">
+                                            @if ($pa->foto_thumb_url)
+                                                <img src="{{ $pa->foto_thumb_url }}" alt="" width="24" height="24" class="size-full object-cover">
+                                            @else
+                                                <span class="text-[9px] font-semibold text-[#3a2f00]">{{ collect(explode(' ', $pa->nome))->take(2)->map(fn ($n) => mb_substr($n, 0, 1))->implode('') }}</span>
+                                            @endif
+                                        </span>
+                                        <span class="truncate">com {{ $p->palestrantesAtivos->pluck('nome')->join(', ', ' e ') }}</span>
+                                    </div>
                                 @endif
                             </div>
                             <span class="cema-row-cta hidden shrink-0 items-center self-center rounded-pill border border-border-muted px-4 py-2 text-sm font-semibold text-primary transition sm:inline-flex">Ver palestra</span>

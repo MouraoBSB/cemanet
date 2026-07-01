@@ -13,19 +13,21 @@ use Illuminate\Http\Response;
 class CalendarioController extends Controller
 {
     /**
-     * Stub da página de Calendário: lista as próximas palestras publicadas.
-     * A fatia do módulo Calendário substitui o corpo por <livewire:palestras.calendario />.
+     * Página do Calendário de Palestras: casca (hero + breadcrumb + Livewire) e SEO.
+     * `$proximasParaSeo` alimenta o JSON-LD ItemList/Event da view.
      */
     public function index(): View
     {
-        $proximas = Palestra::query()
+        $proximasParaSeo = Palestra::query()
             ->publicado()
             ->whereNotNull('data_da_palestra')
             ->where('data_da_palestra', '>=', now())
+            ->with(['palestrantesAtivos', 'assuntos'])
             ->orderBy('data_da_palestra')
+            ->take(16)
             ->get();
 
-        return view('pages.calendario', ['proximas' => $proximas]);
+        return view('palestras.calendario', compact('proximasParaSeo'));
     }
 
     /**

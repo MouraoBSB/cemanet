@@ -12,19 +12,14 @@ class PalestraController extends Controller
 {
     public function index()
     {
+        // Só destaca uma palestra realmente FUTURA; sem futura, $proxima é null e o banner some (sem fallback).
         $proxima = Palestra::query()
             ->publicado()
             ->whereNotNull('data_da_palestra')
             ->where('data_da_palestra', '>=', now())
-            ->with('palestrantesAtivos')
+            ->with(['palestrantesAtivos', 'assuntos'])
             ->orderBy('data_da_palestra')
-            ->first()
-            ?? Palestra::query()
-                ->publicado()
-                ->whereNotNull('data_da_palestra')
-                ->with('palestrantesAtivos')
-                ->orderByDesc('data_da_palestra')
-                ->first();
+            ->first();
 
         return view('palestras.index', compact('proxima'));
     }

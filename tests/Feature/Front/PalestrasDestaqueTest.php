@@ -40,6 +40,7 @@ class PalestrasDestaqueTest extends TestCase
         $resp = $this->get(route('palestras.index'));
 
         $resp->assertOk();
+        $resp->assertDontSeeText('Próxima palestra'); // sem futura → banner some (sem fallback)
         $resp->assertDontSee('Contagem regressiva para a palestra', false); // sem futura → sem timer
     }
 }

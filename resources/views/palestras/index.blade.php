@@ -24,7 +24,7 @@
                 <p class="font-mono text-xs uppercase tracking-[0.14em] text-[#9db8e0]">Centro Espírita Maria Madalena</p>
                 <h1 class="mt-3 font-display text-4xl font-semibold sm:text-5xl">Palestras Públicas</h1>
                 <div class="mt-4 h-1 w-16 rounded-full bg-gold"></div>
-                <p class="mt-4 max-w-xl font-light text-[#d7def0]">Reflexões à luz do Espiritismo, abertas a todos.</p>
+                <p class="mt-4 max-w-xl font-light text-[#d7def0]">Reflexões à luz do Espiritismo, abertas a todos — todos os domingos, às 19h, presencialmente e ao vivo pelo nosso canal.</p>
             </div>
             <a href="{{ route('palestras.calendario') }}"
                class="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-5 py-4 transition hover:bg-white/15">
@@ -67,7 +67,7 @@
                     <div class="flex-1 text-center sm:text-left">
                         @if ($proxima->data_da_palestra)
                             <span class="inline-flex items-center gap-1.5 rounded-pill bg-gold px-3 py-1 font-mono text-xs font-semibold text-[#3a2f00]">
-                                {{ $proxima->data_da_palestra->translatedFormat('d \d\e M') }} · {{ $proxima->data_da_palestra->format('H\hi') }}
+                                {{ $proxima->data_da_palestra->translatedFormat('d \d\e F \d\e Y') }} · {{ $proxima->data_da_palestra->format('H\hi') }}
                             </span>
                         @endif
                         <h2 class="mt-3 font-display text-2xl font-semibold">{{ $proxima->titulo }}</h2>

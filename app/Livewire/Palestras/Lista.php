@@ -42,6 +42,9 @@ class Lista extends Component
     #[Url(as: 'video', except: '')]
     public string $video = '';
 
+    #[Url(as: 'visao', except: 'grid')]
+    public string $visao = 'grid';
+
     public function updated(string $name): void
     {
         if (in_array($name, ['q', 'assunto', 'palestrante', 'dataDe', 'dataAte', 'ordenar', 'ano', 'video'], true)) {
@@ -51,8 +54,57 @@ class Lista extends Component
 
     public function limparFiltros(): void
     {
-        $this->reset(['q', 'assunto', 'palestrante', 'dataDe', 'dataAte', 'ordenar']);
+        // 'visao' preservada de propósito (preferência de exibição, não filtro).
+        $this->reset(['q', 'assunto', 'palestrante', 'dataDe', 'dataAte', 'ordenar', 'ano', 'video']);
         $this->resetPage();
+    }
+
+    public function removerFiltro(string $chave): void
+    {
+        $mapa = [
+            'q' => 'q', 'assunto' => 'assunto', 'palestrante' => 'palestrante',
+            'de' => 'dataDe', 'ate' => 'dataAte', 'ano' => 'ano', 'video' => 'video',
+        ];
+
+        if (isset($mapa[$chave])) {
+            $this->{$mapa[$chave]} = '';
+            $this->resetPage();
+        }
+    }
+
+    public function alternarVisao(string $visao): void
+    {
+        // NÃO chama resetPage(): trocar a visão não deve voltar para a página 1.
+        $this->visao = in_array($visao, ['grid', 'list'], true) ? $visao : 'grid';
+    }
+
+    public function filtrosAtivos(): array
+    {
+        $chips = [];
+
+        if ($this->q !== '') {
+            $chips[] = ['chave' => 'q', 'rotulo' => 'Título: “'.$this->q.'”'];
+        }
+        if ($this->assunto !== '') {
+            $chips[] = ['chave' => 'assunto', 'rotulo' => 'Tema: '.(Assunto::where('slug', $this->assunto)->value('nome') ?? $this->assunto)];
+        }
+        if ($this->palestrante !== '') {
+            $chips[] = ['chave' => 'palestrante', 'rotulo' => 'Palestrante: '.(Palestrante::where('slug', $this->palestrante)->value('nome') ?? $this->palestrante)];
+        }
+        if ($this->dataDe !== '') {
+            $chips[] = ['chave' => 'de', 'rotulo' => 'De: '.$this->dataDe];
+        }
+        if ($this->dataAte !== '') {
+            $chips[] = ['chave' => 'ate', 'rotulo' => 'Até: '.$this->dataAte];
+        }
+        if ($this->ano !== '') {
+            $chips[] = ['chave' => 'ano', 'rotulo' => 'Ano: '.$this->ano];
+        }
+        if ($this->video !== '') {
+            $chips[] = ['chave' => 'video', 'rotulo' => $this->video === 'com' ? 'Com vídeo' : 'Sem vídeo'];
+        }
+
+        return $chips;
     }
 
     /** Anos distintos (desc) das palestras publicadas, para o filtro. Distinct em PHP (portável). */
@@ -97,6 +149,7 @@ class Lista extends Component
             'palestrantes' => Palestrante::ativo()->orderBy('nome')->get(['nome', 'slug']),
             'assuntos' => Assunto::whereHas('palestras', fn (Builder $q) => $q->publicado())->orderBy('nome')->get(['nome', 'slug']),
             'anos' => $this->anosDisponiveis(),
+            'filtrosAtivos' => $this->filtrosAtivos(),
         ]);
     }
 }

@@ -6,7 +6,7 @@
                 @forelse ($relacionadas as $rel)
                     <a href="{{ route('palestras.show', $rel->slug) }}"
                        class="block overflow-hidden rounded-2xl border border-border-muted bg-white shadow-card transition hover:-translate-y-1">
-                        @php($thumb = $rel->youtube_thumb ?: optional($rel->palestrantesAtivos->first())->foto_thumb_url)
+                        @php($thumb = $rel->youtube_thumb_hq ?: optional($rel->palestrantesAtivos->first())->foto_thumb_url)
                         @if ($thumb)
                             <img src="{{ $thumb }}" alt="{{ $rel->titulo }}" loading="lazy" class="aspect-video w-full bg-surface object-cover">
                         @else

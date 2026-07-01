@@ -54,6 +54,28 @@ Objetivo: o módulo Palestras completo, do banco ao público, com dados migrados
 Pronto quando: as 123 palestras aparecem corretas no público e no admin, com
 testes verdes e página leve.
 
+## Redesign incremental do front público  🔄 em andamento
+
+Refinamentos hi-fi do front (design-system), fatia a fatia, sobre os módulos já
+entregues. Cada fatia: spec + plano (`docs/superpowers/`) → subagent-driven-development
+→ revisão → PR (CI verde) → merge.
+
+- [x] **Palestras — listagem/archive** `/palestra_publica`: card-pôster 16:10, barra de
+      filtros redesenhada (chips de filtros ativos, limpar/remover), visões grade/lista,
+      banner "Próxima palestra" + "Veja também" + JSON-LD. *(PR #1, merge `d446e18`)*
+- [x] **Calendário de Palestras** `/palestra_publica/calendario`: página Livewire
+      (destaque da próxima + tabs Próximas/Realizadas + navegação mês/ano + mini-calendário
+      indexador + agenda), **feed `.ics`/webcal** agregado + modal "Assinar", `FeedIcs`
+      compartilhado (dobra RFC 5545), JSON-LD `ItemList`/`Event`. *(PR #2, merge `1cd5c4c`;
+      suíte completa 352 verdes)*
+- [ ] **Palestrantes — redesign da listagem** `/palestrantes`: hero na nova identidade,
+      grade de cards (avatar da foto ou **iniciais** em gradiente + badge de contagem de
+      palestras), busca reativa + ordenação (A–Z / Z–A / mais / menos), sidebar (intro +
+      stats reais + card "Em destaque" da próxima palestra), estado vazio, paginação 12.
+      **Sem filtro de área nesta fase** (o handoff presume uma taxonomia de área fictícia;
+      `Palestrante` não tem campo `area` — feature adiada para quando houver taxonomia real).
+      *(spec/plano em revisão)*
+
 ## Fase 2+ — Expansão  🔄 em andamento
 
 Ordem sugerida (cada um como nova fatia vertical):

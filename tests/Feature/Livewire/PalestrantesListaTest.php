@@ -120,4 +120,30 @@ class PalestrantesListaTest extends TestCase
         $this->assertCount(1, $ativos);
         $this->assertSame('q', $ativos[0]['chave']);
     }
+
+    public function test_view_tem_toolbar_grade_e_wire_key(): void
+    {
+        Palestrante::factory()->create(['nome' => 'Ana Souza']);
+
+        Livewire::test(Lista::class)
+            ->assertSee('Buscar palestrante')                 // label/placeholder da busca
+            ->assertSee('Ordenar')                            // rótulo do select
+            ->assertSee('Ana Souza')                          // card na grade
+            ->assertSeeHtml('wire:key="palestrante-');        // wire:key no @foreach
+    }
+
+    public function test_view_conta_resultados(): void
+    {
+        Palestrante::factory()->count(3)->create();
+
+        Livewire::test(Lista::class)->assertSee('3 palestrantes');
+    }
+
+    public function test_view_estado_vazio_com_limpar(): void
+    {
+        Livewire::test(Lista::class)
+            ->set('q', 'zzznaoexistequalquercoisa')
+            ->assertSee('Nenhum palestrante encontrado')
+            ->assertSee('Limpar filtros');
+    }
 }

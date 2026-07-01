@@ -1,7 +1,7 @@
 @props(['palestrante'])
 
 @php($contagem = $palestrante->palestras_ministradas_count ?? 0)
-<a href="{{ route('palestrantes.show', $palestrante->slug) }}" aria-label="{{ $palestrante->nome }}"
+<a {{ $attributes->except(['palestrante']) }} href="{{ route('palestrantes.show', $palestrante->slug) }}" aria-label="{{ $palestrante->nome }}"
    class="cema-spk-card group flex flex-col overflow-hidden rounded-2xl border border-border-muted bg-white shadow-card">
     {{-- Topo: foto ou gradiente + iniciais --}}
     <div class="cema-spk-avatar cema-grad-{{ $palestrante->id % 8 }} relative h-[188px] w-full overflow-hidden">

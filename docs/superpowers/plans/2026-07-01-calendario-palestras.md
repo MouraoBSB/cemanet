@@ -645,26 +645,27 @@ class CalendarioComponentTest extends TestCase
         parent::tearDown();
     }
 
-    // NOTA (Livewire v4.3.2): o Testable NÃO tem assertViewHas/viewData. Asserimos ESTADO
-    // via assertSet (props públicas modo/mes) e COMPORTAMENTO via assertSee/assertSeeHtml/assertSeeText
-    // sobre o HTML renderizado. `$this->mes` reflete o mês em foco após mount/navegação.
+    // NOTA (Livewire v4.3.2): o Testable NÃO tem `assertViewHas`, mas TEM `viewData($key)`
+    // (retorna getView()->getData()[$key]) — mesma API já usada na archive mergeada. Aferimos os
+    // dados de render DIRETAMENTE pelo dado (proxima, mesFoco, palestrasDoMes com eh_*, matriz,
+    // temAnterior/temProximo) e usamos `assertSet` para estado público (modo/mes) onde couber.
 
-    public function test_destaque_mostra_proxima_futura(): void
+    public function test_destaque_usa_proxima_futura_sem_fallback(): void
     {
-        Palestra::factory()->create(['titulo' => 'Palestra Passada', 'status' => Palestra::STATUS_PUBLICADO, 'data_da_palestra' => Carbon::create(2026, 6, 15, 19, 0)]);
-        Palestra::factory()->create(['titulo' => 'Bem Vinda Futura', 'status' => Palestra::STATUS_PUBLICADO, 'data_da_palestra' => Carbon::create(2026, 7, 5, 19, 0)]);
+        Palestra::factory()->create(['titulo' => 'Passada', 'status' => Palestra::STATUS_PUBLICADO, 'data_da_palestra' => Carbon::create(2026, 6, 15, 19, 0)]);
+        Palestra::factory()->create(['titulo' => 'Futura', 'status' => Palestra::STATUS_PUBLICADO, 'data_da_palestra' => Carbon::create(2026, 7, 5, 19, 0)]);
 
-        Livewire::test(Calendario::class)
-            ->assertSee('Próxima palestra')   // rótulo do destaque presente
-            ->assertSee('Bem Vinda Futura');  // título da próxima no destaque
+        $proxima = Livewire::test(Calendario::class)->viewData('proxima');
+
+        $this->assertNotNull($proxima);
+        $this->assertSame('Futura', $proxima->titulo);
     }
 
-    public function test_sem_futura_destaque_some_sem_fallback(): void
+    public function test_sem_futura_destaque_e_nulo(): void
     {
         Palestra::factory()->create(['titulo' => 'Só Passada', 'status' => Palestra::STATUS_PUBLICADO, 'data_da_palestra' => Carbon::create(2026, 6, 15, 19, 0)]);
 
-        Livewire::test(Calendario::class)
-            ->assertDontSee('Próxima palestra'); // destaque ausente (sem fallback); "Próximas" (tab) não casa
+        $this->assertNull(Livewire::test(Calendario::class)->viewData('proxima')); // sem fallback
     }
 
     public function test_modo_realizadas_alterna_conjunto_e_reseta_mes(): void
@@ -672,11 +673,12 @@ class CalendarioComponentTest extends TestCase
         Palestra::factory()->create(['status' => Palestra::STATUS_PUBLICADO, 'data_da_palestra' => Carbon::create(2026, 8, 2, 19, 0)]);  // futura
         Palestra::factory()->create(['status' => Palestra::STATUS_PUBLICADO, 'data_da_palestra' => Carbon::create(2026, 5, 10, 19, 0)]); // passada
 
-        Livewire::test(Calendario::class)
-            ->assertSet('mes', '2026-08')          // proximas: mês da futura
-            ->set('modo', 'realizadas')            // dispara updatedModo → reseta $mes
-            ->assertSet('modo', 'realizadas')
-            ->assertSet('mes', '2026-05');         // realizadas: mês mais recente do passado
+        $c = Livewire::test(Calendario::class);
+        $this->assertSame('2026-08', $c->viewData('mesFoco'));   // proximas: mês da futura
+
+        $c->set('modo', 'realizadas');                            // dispara updatedModo → reseta $mes
+        $c->assertSet('modo', 'realizadas');
+        $this->assertSame('2026-05', $c->viewData('mesFoco'));   // realizadas: mês mais recente do passado
     }
 
     public function test_navegacao_de_mes_respeita_limites(): void
@@ -685,19 +687,29 @@ class CalendarioComponentTest extends TestCase
         Palestra::factory()->create(['status' => Palestra::STATUS_PUBLICADO, 'data_da_palestra' => Carbon::create(2026, 8, 9, 19, 0)]);
         Palestra::factory()->create(['status' => Palestra::STATUS_PUBLICADO, 'data_da_palestra' => Carbon::create(2026, 9, 6, 19, 0)]);
 
-        Livewire::test(Calendario::class)
-            ->assertSet('mes', '2026-07')
-            ->call('mesProximo')->assertSet('mes', '2026-08')
-            ->call('mesProximo')->assertSet('mes', '2026-09')
-            ->call('mesProximo')->assertSet('mes', '2026-09')   // topo: não avança além do limite
-            ->call('mesAnterior')->assertSet('mes', '2026-08');
+        $c = Livewire::test(Calendario::class);
+        $this->assertSame('2026-07', $c->viewData('mesFoco'));
+        $this->assertFalse($c->viewData('temAnterior'));
+        $this->assertTrue($c->viewData('temProximo'));
+
+        $c->call('mesProximo');
+        $this->assertSame('2026-08', $c->viewData('mesFoco'));
+
+        $c->call('mesProximo');
+        $this->assertSame('2026-09', $c->viewData('mesFoco'));
+        $this->assertFalse($c->viewData('temProximo'));
+
+        $c->call('mesProximo'); // topo: não avança além do limite
+        $this->assertSame('2026-09', $c->viewData('mesFoco'));
+
+        $c->call('mesAnterior');
+        $this->assertSame('2026-08', $c->viewData('mesFoco'));
     }
 
     public function test_palestra_realizada_mais_cedo_hoje_e_marcada_sem_orfa(): void
     {
         // Fronteira now() consistente: palestra de hoje 09h (já passou às 12h) → Realizada+gravada, não órfã.
-        // A marca "▶ gravada" só aparece se eh_realizada && link_youtube; sob a fronteira antiga (startOfDay)
-        // esta palestra ficaria sem marca (órfã) e "gravada" NÃO apareceria → este teste trava a regressão.
+        // Sob a fronteira antiga (startOfDay) eh_realizada seria FALSE → sem marca (órfã). Aferimos PELO DADO.
         Palestra::factory()->create([
             'titulo' => 'Hoje Cedo',
             'status' => Palestra::STATUS_PUBLICADO,
@@ -710,12 +722,22 @@ class CalendarioComponentTest extends TestCase
             'data_da_palestra' => Carbon::create(2026, 7, 5, 19, 0),
         ]);
 
-        // Em Próximas, o mês em foco (julho) lista ambas; a de hoje cedo aparece marcada como gravada.
-        Livewire::test(Calendario::class)
-            ->assertSee('Próxima palestra')  // destaque presente (há futura)
-            ->assertSee('Ainda Vem')
-            ->assertSee('Hoje Cedo')
-            ->assertSeeText('gravada');       // ▶ gravada — exclusivo da realizada de hoje cedo
+        $c = Livewire::test(Calendario::class);
+
+        // não é a próxima
+        $this->assertSame('Ainda Vem', $c->viewData('proxima')->titulo);
+
+        // em Próximas, o mês em foco (julho) lista AMBAS; marcas aferidas pelo dado
+        $col = $c->viewData('palestrasDoMes');
+        $hoje = $col->firstWhere('titulo', 'Hoje Cedo');
+        $futura = $col->firstWhere('titulo', 'Ainda Vem');
+
+        $this->assertNotNull($hoje);
+        $this->assertTrue((bool) $hoje->eh_realizada);   // realizada mais cedo hoje (fronteira now())
+        $this->assertTrue((bool) $hoje->tem_gravacao);   // realizada + youtube
+        $this->assertFalse((bool) $hoje->eh_proxima);    // não é a próxima (não órfã)
+        $this->assertTrue((bool) $futura->eh_proxima);
+        $this->assertFalse((bool) $futura->eh_realizada);
     }
 
     public function test_mini_calendario_marca_dia_nao_domingo(): void
@@ -723,10 +745,14 @@ class CalendarioComponentTest extends TestCase
         // 2026-06-22 é uma SEGUNDA-feira (20h) → dia com palestra no mini-calendário (não assume domingo).
         Palestra::factory()->create(['titulo' => 'Segunda 20h', 'status' => Palestra::STATUS_PUBLICADO, 'data_da_palestra' => Carbon::create(2026, 6, 22, 20, 0)]);
 
-        Livewire::test(Calendario::class)
-            ->set('modo', 'realizadas')       // 22/jun é passado (now fixado em 01/jul)
-            ->assertSet('mes', '2026-06')
-            ->assertSeeHtml('aria-label="22: Segunda 20h"'); // botão do dia 22 (segunda) marcado
+        $c = Livewire::test(Calendario::class)->set('modo', 'realizadas'); // 22/jun é passado (now = 01/jul)
+        $this->assertSame('2026-06', $c->viewData('mesFoco'));
+
+        $matriz = $c->viewData('matriz');
+        $dia22 = collect($matriz['dias'])->firstWhere('dia', 22); // 22/jun/2026 = segunda-feira
+        $this->assertNotNull($dia22);
+        $this->assertNotNull($dia22['palestra']);
+        $this->assertSame('Segunda 20h', $dia22['palestra']['titulo']);
     }
 }
 ```
@@ -1019,14 +1045,15 @@ class Calendario extends Component
                     <p class="mb-3 font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">Dias com palestra</p>
                     <div class="grid grid-cols-7 gap-1 text-center">
                         @foreach (['D', 'S', 'T', 'Q', 'Q', 'S', 'S'] as $inicial)
-                            <span class="py-1 font-mono text-[11px] font-semibold text-text-muted" aria-hidden="true">{{ $inicial }}</span>
+                            <span wire:key="dow-{{ $loop->index }}" class="py-1 font-mono text-[11px] font-semibold text-text-muted" aria-hidden="true">{{ $inicial }}</span>
                         @endforeach
                         @for ($v = 0; $v < $matriz['diasVazios']; $v++)
-                            <span aria-hidden="true"></span>
+                            <span wire:key="vazio-{{ $v }}" aria-hidden="true"></span>
                         @endfor
                         @foreach ($matriz['dias'] as $celula)
                             @if ($celula['palestra'])
                                 <button type="button"
+                                        wire:key="dia-{{ $celula['dia'] }}"
                                         class="cema-cal-day cema-cal-day--com-palestra @if ($celula['hoje']) cema-cal-day--hoje @endif"
                                         title="{{ $celula['palestra']['titulo'] }}"
                                         aria-label="{{ $celula['dia'] }}: {{ $celula['palestra']['titulo'] }}"
@@ -1040,7 +1067,7 @@ class Calendario extends Component
                                             }
                                         ">{{ $celula['dia'] }}</button>
                             @else
-                                <span class="cema-cal-day @if ($celula['hoje']) cema-cal-day--hoje @endif">{{ $celula['dia'] }}</span>
+                                <span wire:key="dia-{{ $celula['dia'] }}" class="cema-cal-day @if ($celula['hoje']) cema-cal-day--hoje @endif">{{ $celula['dia'] }}</span>
                             @endif
                         @endforeach
                     </div>
@@ -1064,7 +1091,7 @@ class Calendario extends Component
                     @forelse ($palestrasDoMes as $p)
                         @php($pa = $p->palestrantesAtivos->first())
                         @php($ptag = $p->assuntos->first())
-                        <a id="linha-{{ $p->slug }}" href="{{ route('palestras.show', $p->slug) }}"
+                        <a wire:key="linha-{{ $p->id }}" id="linha-{{ $p->slug }}" href="{{ route('palestras.show', $p->slug) }}"
                            class="cema-row group flex items-stretch gap-4 rounded-2xl border border-border-muted bg-white p-3 shadow-card sm:p-4">
                             <span @class(['flex w-[72px] shrink-0 flex-col items-center justify-center rounded-xl py-2 text-center', 'cema-chip-data--proxima' => $p->eh_proxima, 'cema-chip-data--realizada' => ! $p->eh_proxima])>
                                 <span class="font-mono text-[10px] uppercase">{{ $p->data_da_palestra->translatedFormat('D') }}</span>
@@ -1496,9 +1523,10 @@ EOF
 
 **3. Consistência de tipos/nomes:**
 - `FeedIcs::escapar/vevento/documento/PRODID` — mesma assinatura da Task 1 usada nas Tasks 2 e 5. ✅
-- Atributos dinâmicos `eh_proxima`/`eh_realizada`/`tem_gravacao` — setados no `render()` (Task 4) e lidos na view (Task 4); o `CalendarioComponentTest` os verifica indiretamente pelo HTML renderizado (badges "Próxima"/"▶ gravada"). ✅
-- **API de teste do Livewire v4.3.2:** o `Testable` NÃO expõe `assertViewHas`/`viewData`; os testes usam `assertSet` (props públicas `modo`/`mes`) + `assertSee`/`assertSeeHtml`/`assertSeeText` (HTML). O `mes` público espelha o mês em foco após mount/navegação. ✅
+- Atributos dinâmicos `eh_proxima`/`eh_realizada`/`tem_gravacao` — setados no `render()` (Task 4), lidos na view (Task 4) e aferidos **pelo dado** no `CalendarioComponentTest` via `viewData('palestrasDoMes')`. ✅
+- **API de teste do Livewire v4.3.2:** o `Testable` TEM `viewData($key)` (usado na archive mergeada) mas NÃO tem `assertViewHas`; os testes usam `viewData('proxima'|'mesFoco'|'palestrasDoMes'|'matriz'|'temAnterior'|'temProximo')` + `assertSet` (props públicas `modo`/`mes`). ✅
 - `createFromFormat('!Y-m', $mesFoco)` (com `!`) evita overflow de dia (29-31) ao formatar o rótulo do mês. ✅
+- **`wire:key` nos loops do render** (convenção da archive): `linha-{id}` no `<a>` da agenda; `dia-{n}`/`vazio-{n}`/`dow-{n}` nas células do mini-calendário → morphdom não reaproveita nó errado ao trocar de mês (id de scroll correto, sem vazamento de estado Alpine). ✅
 - `matriz` (`diasVazios`/`dias[dia,palestra,hoje]`) — produzida no componente, consumida na view e no teste. ✅
 - Classes CSS referenciadas nas views (Tasks 4-5) definidas na Task 6. ✅
 - `palestras.calendario-ics` — nome usado na rota (Task 2), no modal (Task 3 via prop) e na casca (Task 5). ✅

@@ -5,7 +5,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Palestra;
-use App\Support\Palestras\DuracaoPalestra;
+use App\Support\Palestras\FeedIcs;
 use Illuminate\Database\Eloquent\Builder;
 
 class PalestraController extends Controller
@@ -89,36 +89,14 @@ class PalestraController extends Controller
 
     public function calendario(string $slug)
     {
-        $palestra = Palestra::query()->publicado()->where('slug', $slug)->firstOrFail();
+        $palestra = Palestra::query()
+            ->publicado()
+            ->with(['palestrantesAtivos', 'assuntos'])
+            ->where('slug', $slug)
+            ->firstOrFail();
         abort_if($palestra->data_da_palestra === null, 404);
 
-        $inicio = $palestra->data_da_palestra->copy()->utc();
-        $fim = $inicio->copy()->addMinutes(DuracaoPalestra::minutos($palestra->duracao));
-        $fmt = fn ($d) => $d->format('Ymd\THis\Z');
-
-        $escapar = fn (string $v) => str_replace(
-            ['\\', ';', ',', "\r\n", "\r", "\n"],
-            ['\\\\', '\\;', '\\,', '\\n', '\\n', '\\n'],
-            $v
-        );
-        $local = 'Centro Espírita Maria Madalena — Quadra 02, Lote 16, Vila Vicentina, Planaltina, DF';
-
-        $linhas = [
-            'BEGIN:VCALENDAR',
-            'VERSION:2.0',
-            'PRODID:-//CEMA//Palestras//PT-BR',
-            'BEGIN:VEVENT',
-            'UID:palestra-'.$palestra->id.'@cemanet.org.br',
-            'DTSTART:'.$fmt($inicio),
-            'DTEND:'.$fmt($fim),
-            'SUMMARY:'.$escapar($palestra->titulo),
-            'DESCRIPTION:'.$escapar(route('palestras.show', $palestra->slug)),
-            'LOCATION:'.$escapar($local),
-            'END:VEVENT',
-            'END:VCALENDAR',
-        ];
-
-        return response(implode("\r\n", $linhas)."\r\n", 200, [
+        return response(FeedIcs::documento([$palestra]), 200, [
             'Content-Type' => 'text/calendar; charset=utf-8',
             'Content-Disposition' => 'attachment; filename="palestra-'.$palestra->slug.'.ics"',
         ]);

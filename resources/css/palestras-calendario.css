@@ -1,0 +1,72 @@
+/* Palestras — Calendário. Thiago Mourão — https://github.com/MouraoBSB — 2026-07-01 */
+
+/* Dia do mini-calendário */
+.cema-cal-day {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    margin: 0 auto;
+    border-radius: 9999px;
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+.cema-cal-day--com-palestra {
+    color: #3a2f00;
+    font-weight: 700;
+    background: radial-gradient(circle at 30% 30%, #f7c24e, var(--color-gold));
+    box-shadow: 0 2px 8px rgba(242, 168, 30, .4);
+    cursor: pointer;
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+.cema-cal-day--com-palestra:hover {
+    transform: scale(1.12);
+    box-shadow: 0 4px 12px rgba(242, 168, 30, .55);
+}
+.cema-cal-day--hoje {
+    box-shadow: inset 0 0 0 2px var(--color-secondary);
+}
+
+/* Linha da agenda */
+.cema-row {
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+.cema-row:hover {
+    transform: translateX(3px);
+    box-shadow: 0 12px 28px rgba(46, 41, 82, .14);
+    border-color: var(--color-gold);
+}
+.cema-row:hover .cema-row-cta {
+    background-color: var(--color-primary);
+    color: #fff;
+    border-color: var(--color-primary);
+}
+.cema-row.is-destaque {
+    animation: cema-row-pulse 1.9s ease;
+}
+@keyframes cema-row-pulse {
+    0%, 100% { box-shadow: 0 2px 8px rgba(0, 0, 0, .08); }
+    30% { box-shadow: 0 0 0 3px var(--color-gold), 0 12px 28px rgba(242, 168, 30, .35); }
+}
+
+/* Chip de data (72px) */
+.cema-chip-data--proxima { background: #fbf1da; color: #8a6a1e; }
+.cema-chip-data--realizada { background: #f2f1f6; color: #9a93b4; }
+
+/* Avatar do destaque — gradientes dourados rotacionados por índice */
+.cema-cal-avatar { background: linear-gradient(140deg, #f7c24e, #e79048); }
+.cema-cal-avatar-0 { background: linear-gradient(140deg, #f7c24e, #e79048); }
+.cema-cal-avatar-1 { background: linear-gradient(140deg, #f2a81e, #d9772e); }
+.cema-cal-avatar-2 { background: linear-gradient(140deg, #f9d976, #e79048); }
+.cema-cal-avatar-3 { background: linear-gradient(140deg, #e6a53a, #c86a2f); }
+
+/* Modal */
+.cema-modal { box-shadow: 0 24px 64px rgba(0, 0, 0, .28); }
+
+@media (prefers-reduced-motion: reduce) {
+    .cema-cal-day--com-palestra,
+    .cema-row { transition: none; }
+    .cema-cal-day--com-palestra:hover,
+    .cema-row:hover { transform: none; }
+    .cema-row.is-destaque { animation: none; }
+}

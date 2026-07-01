@@ -17,6 +17,9 @@ Route::get('/palestra_publica', [PalestraController::class, 'index'])->name('pal
 // DEVE vir ANTES de palestras.show para não ser capturada por {slug}.
 Route::get('/palestra_publica/calendario', [CalendarioController::class, 'index'])->name('palestras.calendario');
 
+// Feed .ics agregado das próximas palestras. DEVE vir ANTES de palestras.show.
+Route::get('/palestra_publica/calendario.ics', [CalendarioController::class, 'feed'])->name('palestras.calendario-ics');
+
 Route::get('/palestra_publica/{slug}', [PalestraController::class, 'show'])
     ->name('palestras.show')
     ->where('slug', '[a-z0-9-]+');

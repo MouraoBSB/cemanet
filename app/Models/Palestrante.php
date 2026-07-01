@@ -73,6 +73,17 @@ class Palestrante extends Model implements HasMedia
         );
     }
 
+    /** Iniciais (1ª letra das 2 primeiras palavras do nome), maiúsculas — fallback do avatar. */
+    protected function iniciais(): Attribute
+    {
+        return Attribute::get(function (): string {
+            $palavras = preg_split('/\s+/', trim((string) $this->nome), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+            $letras = array_map(fn ($p) => mb_strtoupper(mb_substr($p, 0, 1)), array_slice($palavras, 0, 2));
+
+            return $letras === [] ? '?' : implode('', $letras);
+        });
+    }
+
     protected function bio(): Attribute
     {
         return Attribute::make(

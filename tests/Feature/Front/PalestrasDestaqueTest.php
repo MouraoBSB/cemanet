@@ -19,7 +19,7 @@ class PalestrasDestaqueTest extends TestCase
         $resp = $this->get(route('palestras.index'));
 
         $resp->assertOk();
-        $resp->assertSeeText('Próximas Palestras');
+        $resp->assertSeeText('Próxima palestra');
         $resp->assertSeeText('Vem Aí');
     }
 

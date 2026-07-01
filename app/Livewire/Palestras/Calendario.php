@@ -73,7 +73,7 @@ class Calendario extends Component
             ->orderBy('data_da_palestra')
             ->first();
 
-        $mesesAsc = $this->mesesModoAsc();
+        $mesesAsc = $this->mesesModoAsc($agora);
         $mesesExib = $this->modo === 'realizadas' ? array_reverse($mesesAsc) : $mesesAsc;
         $anos = collect($mesesExib)->map(fn ($m) => substr($m, 0, 4))->unique()->values()->all();
 
@@ -127,9 +127,9 @@ class Calendario extends Component
     }
 
     /** Meses ('Y-m') com palestra no modo atual, em ordem CRONOLÓGICA ASCENDENTE. */
-    private function mesesModoAsc(): array
+    private function mesesModoAsc(?Carbon $agora = null): array
     {
-        $agora = now();
+        $agora ??= now();
         $q = Palestra::query()->publicado()->whereNotNull('data_da_palestra');
         $q = $this->modo === 'realizadas'
             ? $q->where('data_da_palestra', '<', $agora)

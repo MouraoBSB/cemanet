@@ -76,4 +76,42 @@ class FeedIcsTest extends TestCase
         $this->assertSame(1, substr_count($doc, 'BEGIN:VEVENT'));
         $this->assertStringEndsWith("END:VCALENDAR\r\n", $doc);
     }
+
+    public function test_dobrar_quebra_por_octetos_sem_partir_multibyte(): void
+    {
+        // 'é' = 2 octetos; "X:" + 60×'é' = 122 octetos → precisa dobrar.
+        $linha = 'X:'.str_repeat('é', 60);
+
+        $dobrada = FeedIcs::dobrar($linha);
+
+        foreach (explode("\r\n", $dobrada) as $fisica) {
+            $this->assertLessThanOrEqual(75, strlen($fisica), "Linha física excede 75 octetos: {$fisica}");
+        }
+        // desdobrar (remover CRLF+espaço) reconstrói o original — nenhum 'é' foi partido ao meio.
+        $this->assertSame($linha, str_replace("\r\n ", '', $dobrada));
+    }
+
+    public function test_documento_dobra_location_longo_preservando_utf8(): void
+    {
+        // Presencial → LOCATION ~94 octetos (com em-dash "—" e acentos) que excede 75 e precisa dobrar.
+        $p = Palestra::factory()->create([
+            'titulo' => 'Palestra Presencial',
+            'online' => false,
+            'status' => Palestra::STATUS_PUBLICADO,
+            'data_da_palestra' => Carbon::create(2026, 6, 21, 19, 0, 0, 'America/Sao_Paulo'),
+        ])->load(['palestrantesAtivos', 'assuntos']);
+
+        $doc = FeedIcs::documento([$p]);
+
+        // (0) houve dobra de fato (continuação CRLF+espaço presente).
+        $this->assertStringContainsString("\r\n ", $doc);
+        // (1) nenhuma linha física excede 75 octetos.
+        foreach (explode("\r\n", $doc) as $fisica) {
+            $this->assertLessThanOrEqual(75, strlen($fisica), "Linha física excede 75 octetos: {$fisica}");
+        }
+        // (2) desdobrar reconstrói o LOCATION original intacto (em-dash/acentos não partidos).
+        $desdobrado = str_replace("\r\n ", '', $doc);
+        $localEscapado = FeedIcs::escapar('Centro Espírita Maria Madalena — Quadra 02, Lote 16, Vila Vicentina, Planaltina, DF');
+        $this->assertStringContainsString('LOCATION:'.$localEscapado, $desdobrado);
+    }
 }

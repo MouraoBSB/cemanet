@@ -23,6 +23,33 @@ final class FeedIcs
     }
 
     /**
+     * Dobra uma linha lógica em linhas físicas de no máximo 75 OCTETOS (RFC 5545 §3.1).
+     * A continuação começa com um espaço (que conta no limite). A quebra é por octetos,
+     * mas nunca parte uma sequência multibyte UTF-8 (o em-dash e acentos ficam intactos).
+     */
+    public static function dobrar(string $linha): string
+    {
+        if (strlen($linha) <= 75) {
+            return $linha;
+        }
+
+        $saida = '';
+        $atual = 0; // octetos já escritos na linha física corrente
+
+        foreach (mb_str_split($linha) as $ch) {
+            $octetos = strlen($ch);
+            if ($atual + $octetos > 75) {
+                $saida .= "\r\n "; // continuação: CRLF + espaço (o espaço já ocupa 1 octeto)
+                $atual = 1;
+            }
+            $saida .= $ch;
+            $atual += $octetos;
+        }
+
+        return $saida;
+    }
+
+    /**
      * Linhas de UM VEVENT a partir da palestra (usa a hora REAL de data_da_palestra).
      *
      * @return list<string>
@@ -78,6 +105,7 @@ final class FeedIcs
 
         $linhas[] = 'END:VCALENDAR';
 
-        return implode("\r\n", $linhas)."\r\n";
+        // Dobra cada linha lógica em linhas físicas ≤75 octetos antes de unir com CRLF.
+        return implode("\r\n", array_map([self::class, 'dobrar'], $linhas))."\r\n";
     }
 }

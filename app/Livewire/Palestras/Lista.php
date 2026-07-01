@@ -9,6 +9,7 @@ use App\Models\Palestra;
 use App\Models\Palestrante;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -35,9 +36,15 @@ class Lista extends Component
     #[Url(as: 'ordenar', except: 'recente')]
     public string $ordenar = 'recente';
 
+    #[Url(as: 'ano', except: '')]
+    public string $ano = '';
+
+    #[Url(as: 'video', except: '')]
+    public string $video = '';
+
     public function updated(string $name): void
     {
-        if (in_array($name, ['q', 'assunto', 'palestrante', 'dataDe', 'dataAte', 'ordenar'], true)) {
+        if (in_array($name, ['q', 'assunto', 'palestrante', 'dataDe', 'dataAte', 'ordenar', 'ano', 'video'], true)) {
             $this->resetPage();
         }
     }
@@ -46,6 +53,18 @@ class Lista extends Component
     {
         $this->reset(['q', 'assunto', 'palestrante', 'dataDe', 'dataAte', 'ordenar']);
         $this->resetPage();
+    }
+
+    /** Anos distintos (desc) das palestras publicadas, para o filtro. Distinct em PHP (portável). */
+    public function anosDisponiveis(): Collection
+    {
+        return Palestra::publicado()
+            ->whereNotNull('data_da_palestra')
+            ->pluck('data_da_palestra')
+            ->map(fn ($d) => $d->year)
+            ->unique()
+            ->sortDesc()
+            ->values();
     }
 
     public function render()
@@ -65,13 +84,19 @@ class Lista extends Component
             ->when($this->palestrante !== '', fn (Builder $query) => $query->whereHas('palestrantesAtivos', fn (Builder $p) => $p->where('palestrantes.slug', $this->palestrante)))
             ->when($this->dataDe !== '' && Carbon::hasFormat($this->dataDe, 'Y-m-d'), fn (Builder $query) => $query->whereDate('data_da_palestra', '>=', $this->dataDe))
             ->when($this->dataAte !== '' && Carbon::hasFormat($this->dataAte, 'Y-m-d'), fn (Builder $query) => $query->whereDate('data_da_palestra', '<=', $this->dataAte))
-            ->orderByRaw('data_da_palestra IS NULL, data_da_palestra '.($this->ordenar === 'antiga' ? 'asc' : 'desc'))
-            ->paginate(12);
+            ->when($this->ano !== '' && ctype_digit($this->ano), fn (Builder $query) => $query->whereYear('data_da_palestra', (int) $this->ano))
+            ->when($this->video === 'com', fn (Builder $query) => $query->whereNotNull('link_youtube'))
+            ->when($this->video === 'sem', fn (Builder $query) => $query->whereNull('link_youtube'))
+            ->when($this->ordenar === 'az',
+                fn (Builder $query) => $query->orderBy('titulo'),
+                fn (Builder $query) => $query->orderByRaw('data_da_palestra IS NULL, data_da_palestra '.($this->ordenar === 'antiga' ? 'asc' : 'desc')))
+            ->paginate(9);
 
         return view('livewire.palestras.lista', [
             'palestras' => $palestras,
             'palestrantes' => Palestrante::ativo()->orderBy('nome')->get(['nome', 'slug']),
             'assuntos' => Assunto::whereHas('palestras', fn (Builder $q) => $q->publicado())->orderBy('nome')->get(['nome', 'slug']),
+            'anos' => $this->anosDisponiveis(),
         ]);
     }
 }

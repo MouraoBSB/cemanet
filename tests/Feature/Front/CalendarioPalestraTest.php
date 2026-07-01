@@ -22,7 +22,7 @@ class CalendarioPalestraTest extends TestCase
             'data_da_palestra' => Carbon::create(2026, 6, 21, 19, 0, 0, 'America/Sao_Paulo'),
         ]);
 
-        $resp = $this->get(route('palestras.calendario', 'cema-65'));
+        $resp = $this->get(route('palestras.evento-ics', 'cema-65'));
 
         $resp->assertOk();
         $this->assertStringContainsString('text/calendar', $resp->headers->get('content-type'));
@@ -40,7 +40,7 @@ class CalendarioPalestraTest extends TestCase
             'data_da_palestra' => Carbon::create(2026, 6, 21, 19, 0, 0, 'America/Sao_Paulo'),
         ]);
 
-        $resp = $this->get(route('palestras.calendario', 'titulo-com-quebra'));
+        $resp = $this->get(route('palestras.evento-ics', 'titulo-com-quebra'));
 
         $resp->assertOk();
         $resp->assertSee('SUMMARY:Linha1\nLinha2', false); // \n literal (backslash-n), não quebra real
@@ -51,6 +51,6 @@ class CalendarioPalestraTest extends TestCase
     {
         Palestra::factory()->create(['slug' => 'sem-data', 'status' => Palestra::STATUS_PUBLICADO, 'data_da_palestra' => null]);
 
-        $this->get(route('palestras.calendario', 'sem-data'))->assertNotFound();
+        $this->get(route('palestras.evento-ics', 'sem-data'))->assertNotFound();
     }
 }

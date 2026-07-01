@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\BlogController;
+use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\MidiaController;
 use App\Http\Controllers\PalestraController;
 use App\Http\Controllers\PalestranteController;
@@ -11,9 +12,16 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', fn () => view('pages.inicio'))->name('home');
 
 Route::get('/palestra_publica', [PalestraController::class, 'index'])->name('palestras.index');
-Route::get('/palestra_publica/{slug}', [PalestraController::class, 'show'])->name('palestras.show');
+
+// Stub da página Calendário (nome canônico; a fatia do Calendário preenche o corpo depois).
+// DEVE vir ANTES de palestras.show para não ser capturada por {slug}.
+Route::get('/palestra_publica/calendario', [CalendarioController::class, 'index'])->name('palestras.calendario');
+
+Route::get('/palestra_publica/{slug}', [PalestraController::class, 'show'])
+    ->name('palestras.show')
+    ->where('slug', '[a-z0-9-]+');
 Route::get('/palestra_publica/{slug}/calendario.ics', [PalestraController::class, 'calendario'])
-    ->name('palestras.calendario')
+    ->name('palestras.evento-ics')
     ->where('slug', '[a-z0-9-]+');
 
 // Compat: URLs antigas (WP/divulgação) → 301 para as novas, preservando o slug.

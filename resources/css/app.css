@@ -6,6 +6,7 @@
    Thiago Mourão — https://github.com/MouraoBSB — 2026-06-24 */
 @import 'tailwindcss';
 @import './conteudo.css';
+@import './palestras-archive.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';

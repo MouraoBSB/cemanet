@@ -24,14 +24,14 @@
                     <h3 class="cema-poster__titulo font-display text-lg font-bold leading-tight text-white">{{ $palestra->titulo }}</h3>
                     @if ($palestrante)
                         <span class="mt-2 inline-flex items-center gap-2 rounded-pill bg-black/25 py-1 pl-1 pr-3 backdrop-blur-sm">
-                            <span class="flex size-6 items-center justify-center overflow-hidden rounded-full bg-white/90">
+                            <span class="flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/90">
                                 @if ($palestrante->foto_thumb_url)
                                     <img src="{{ $palestrante->foto_thumb_url }}" alt="" class="size-full object-cover">
                                 @else
                                     <span class="font-display text-[10px] font-semibold text-primary">{{ collect(explode(' ', $palestrante->nome))->take(2)->map(fn ($n) => mb_substr($n, 0, 1))->implode('') }}</span>
                                 @endif
                             </span>
-                            <span class="text-[11.5px] font-medium text-white">{{ $palestrante->nome }}</span>
+                            <span class="min-w-0 truncate text-[11.5px] font-medium text-white">{{ $palestra->palestrantesAtivos->pluck('nome')->join(', ', ' e ') }}</span>
                         </span>
                     @endif
                 </div>

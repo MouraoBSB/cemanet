@@ -25,7 +25,7 @@
                     @if ($tema)<span class="rounded-pill bg-[#EFEBF7] px-2 py-0.5 text-[11px] text-[#6a6390]">{{ $tema->nome }}</span>@endif
                 </div>
                 <h3 class="mt-1 font-display text-[16.5px] font-semibold leading-snug text-text-ink group-hover:text-primary">{{ $palestra->titulo }}</h3>
-                @if ($palestrante)<p class="mt-0.5 text-[13px] text-text-muted">com {{ $palestrante->nome }}</p>@endif
+                @if ($palestrante)<p class="mt-0.5 text-[13px] text-text-muted">com {{ $palestra->palestrantesAtivos->pluck('nome')->join(', ', ' e ') }}</p>@endif
             </div>
             <span class="cema-talk-cta inline-flex shrink-0 items-center gap-1.5 rounded-pill bg-cream px-4 py-2 text-[13px] font-medium text-primary transition">Ver palestra</span>
         </div>

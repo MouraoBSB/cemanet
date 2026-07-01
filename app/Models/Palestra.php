@@ -108,6 +108,14 @@ class Palestra extends Model
         return Attribute::get(fn (): ?string => LinkDrive::paraDownload($this->slide));
     }
 
+    /** Formato de exibição derivado do booleano `online` (sem coluna nova). */
+    protected function formato(): Attribute
+    {
+        return Attribute::get(fn (): array => $this->online
+            ? ['slug' => 'online', 'rotulo' => 'Online', 'cor' => 'secondary']
+            : ['slug' => 'presencial', 'rotulo' => 'Presencial', 'cor' => 'accent']);
+    }
+
     protected function descricao(): Attribute
     {
         return Attribute::make(

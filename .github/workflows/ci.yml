@@ -41,6 +41,8 @@ jobs:
         with:
           php-version: '8.3'
           extensions: pdo_mysql, mbstring, zip, gd, bcmath, exif, intl
+          # Espelha os limites de upload do Docker/produção (Dockerfile: uploads.ini).
+          ini-values: upload_max_filesize=20M, post_max_size=22M
           coverage: none
 
       - name: Configurar Node 20

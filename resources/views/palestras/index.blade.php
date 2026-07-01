@@ -54,6 +54,8 @@
                 <span class="inline-block size-2.5 animate-pulse rounded-full bg-gold" aria-hidden="true"></span> Próxima palestra
             </p>
             <div class="relative overflow-hidden rounded-[18px] bg-gradient-to-r from-[#3a3266] via-primary to-[#5b4f92] p-6 text-white sm:p-8">
+                <span aria-hidden="true" class="pointer-events-none absolute -right-10 -top-16 size-48 rounded-full bg-white/10"></span>
+                <span aria-hidden="true" class="pointer-events-none absolute -bottom-20 -right-2 size-64 rounded-full bg-white/[0.07]"></span>
                 <div class="relative flex flex-col items-center gap-6 sm:flex-row sm:gap-7">
                     <span class="flex size-24 shrink-0 items-center justify-center overflow-hidden rounded-full bg-white/15 ring-4 ring-white/20">
                         @if ($pp?->foto_thumb_url)

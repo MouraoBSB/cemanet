@@ -109,7 +109,7 @@
         </div>
         <div class="mt-9">{{ $palestras->onEachSide(1)->links() }}</div>
     @else
-        <div class="grid gap-[22px] sm:grid-cols-2 desktop-sm:grid-cols-3">
+        <div class="grid gap-[22px] grid-cols-[repeat(auto-fill,minmax(280px,1fr))]">
             @foreach ($palestras as $palestra)
                 <x-palestra.card :palestra="$palestra" wire:key="card-{{ $palestra->id }}" />
             @endforeach

@@ -125,6 +125,8 @@ Expected: migração aplica só a nova; testes PASS. (🚫 nunca `migrate:fresh`
 
 - [ ] **Step 6: Escrever o teste do Filament (falha)**
 
+> O arquivo real **já importa** `use Filament\Forms\Components\TextInput;` e `use Livewire\Livewire;` — não duplicar. E `TextInput::make('email')` está na `Section::make('Dados pessoais')` do `PalestranteResource` (é lá que o Step 8 insere o `chamada`).
+
 Adicionar em `tests/Feature/Filament/PalestranteResourceTest.php`:
 ```php
     public function test_formulario_tem_campo_chamada_opcional(): void
@@ -703,7 +705,7 @@ class PalestrantePerfilRedesignTest extends TestCase
         $resp = $this->get(route('palestrantes.show', 'fulano'));
 
         $resp->assertOk();
-        $resp->assertSee('PALESTRANTE');
+        $resp->assertSee('Palestrante'); // eyebrow "Palestrante · CEMA" (maiúsculo é só CSS); assertSee é case-sensitive
         $resp->assertSee('Fulano de Tal');
         $resp->assertSee(route('palestras.calendario'), false);
         $resp->assertSee('palestranteDetalhe(', false); // wiring do Alpine
@@ -758,7 +760,14 @@ class PalestrantePerfilRedesignTest extends TestCase
     public function test_sidebar_proxima_e_compartilhar(): void
     {
         $pessoa = $this->palestrante();
-        $this->comPalestra($pessoa, ['titulo' => 'Palestra Futura', 'slug' => 'palestra-futura', 'data_da_palestra' => now()->addMonth()]);
+        // A palestra futura precisa de um assunto: o bloco "Áreas de atuação"
+        // só renderiza quando $areas não está vazio (big-bang — @if isNotEmpty).
+        $evangelho = Assunto::factory()->create(['nome' => 'Evangelho', 'slug' => 'evangelho']);
+        $this->comPalestra(
+            $pessoa,
+            ['titulo' => 'Palestra Futura', 'slug' => 'palestra-futura', 'data_da_palestra' => now()->addMonth()],
+            $evangelho,
+        );
 
         $resp = $this->get(route('palestrantes.show', 'fulano'));
         $resp->assertSee('Em destaque');
@@ -836,7 +845,7 @@ Expected: FAIL (view antiga).
                 @if ($areasHero->isNotEmpty())
                     <div class="flex flex-wrap gap-2.5">
                         @foreach ($areasHero as $areaItem)
-                            <button type="button" wire:key="hero-chip-{{ $areaItem['slug'] }}"
+                            <button type="button"
                                     @click="selecionar('{{ $areaItem['slug'] }}')"
                                     :aria-pressed="area === '{{ $areaItem['slug'] }}'"
                                     :class="area === '{{ $areaItem['slug'] }}' ? 'ring-2 ring-gold' : ''"
@@ -879,7 +888,7 @@ Expected: FAIL (view antiga).
 @endphp
 <div class="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(130px,1fr))]">
     @foreach ($tiles as $tile)
-        <div wire:key="stat-{{ $loop->index }}" class="{{ $tile['bg'] }} rounded-[14px] border border-border-muted px-4 py-[18px] text-center">
+        <div class="{{ $tile['bg'] }} rounded-[14px] border border-border-muted px-4 py-[18px] text-center">
             <p class="font-display text-[26px] font-bold leading-none text-primary">{{ $tile['valor'] }}</p>
             <p class="mt-[7px] text-[11.5px] text-[#6a6685]">{{ $tile['rotulo'] }}</p>
         </div>
@@ -924,7 +933,7 @@ Expected: FAIL (view antiga).
                         :class="area === 'todos' ? 'bg-primary text-white' : 'bg-surface text-text-secondary'"
                         class="rounded-pill px-3.5 py-1.5 text-[12.5px] font-medium transition">Todas</button>
                 @foreach ($areas as $areaItem)
-                    <button type="button" wire:key="filtro-chip-{{ $areaItem['slug'] }}"
+                    <button type="button"
                             @click="selecionar('{{ $areaItem['slug'] }}')"
                             :aria-pressed="area === '{{ $areaItem['slug'] }}'"
                             :class="area === '{{ $areaItem['slug'] }}' ? 'bg-primary text-white' : 'bg-surface text-text-secondary'"
@@ -947,7 +956,6 @@ Expected: FAIL (view antiga).
         <div class="grid gap-5 [grid-template-columns:repeat(auto-fill,minmax(258px,1fr))]" x-show="!vazio">
             @foreach ($palestras as $palestra)
                 <x-palestra.card
-                    wire:key="palestra-{{ $palestra->id }}"
                     :palestra="$palestra"
                     x-show="visivel({{ $palestra->id }})"
                     x-bind:style="{ order: ordem({{ $palestra->id }}) }" />
@@ -1004,7 +1012,7 @@ Expected: FAIL (view antiga).
             <h2 class="mb-3.5 font-display text-base font-semibold text-primary">Áreas de atuação</h2>
             <div class="flex flex-col gap-0.5">
                 @foreach ($areas as $areaItem)
-                    <button type="button" wire:key="area-lat-{{ $areaItem['slug'] }}"
+                    <button type="button"
                             @click="selecionar('{{ $areaItem['slug'] }}')"
                             :aria-pressed="area === '{{ $areaItem['slug'] }}'"
                             :class="area === '{{ $areaItem['slug'] }}' ? 'bg-surface' : ''"
@@ -1110,7 +1118,7 @@ docker compose exec -T app php artisan test --filter='PalestrantePerfilRedesignT
 ```
 Expected: PASS (novos verdes; os 5 de `PalestrantePerfilTest` — bio, palestras, contato por flags, JSON-LD, 404 — seguem verdes). Pint: `docker compose exec -T app ./vendor/bin/pint app resources tests`.
 
-> Se `PalestrantePerfilTest::test_contato_respeita_flags` ou `test_email_oculto_quando_flag_desligada` falharem, revisar o card "Contato" do parcial `sidebar` (gating por flag). Se o wire:key não chegar ao DOM do card, confirmar que `<x-palestra.card>` faz merge de `{{ $attributes }}` (a listagem já corrigiu isso — o `<article>` usa `$attributes->class([...])`).
+> Se `PalestrantePerfilTest::test_contato_respeita_flags` ou `test_email_oculto_quando_flag_desligada` falharem, revisar o card "Contato" do parcial `sidebar` (gating por flag). As diretivas `x-show`/`x-bind:style` passadas ao `<x-palestra.card>` chegam ao `<article>` porque o componente renderiza `$attributes->class([...])` (que emite os demais atributos além do class). Nenhum `wire:key` é usado nesta página — o filtro/ordenação é Alpine, não Livewire.
 
 - [ ] **Step 12: Commit**
 

@@ -390,7 +390,7 @@ Expected: FAIL (o card atual usa fallback "CEMA"/bio, não "DG"/`cema-grad-*`; s
 @props(['palestrante'])
 
 @php($contagem = $palestrante->palestras_ministradas_count ?? 0)
-<a href="{{ route('palestrantes.show', $palestrante->slug) }}"
+<a href="{{ route('palestrantes.show', $palestrante->slug) }}" aria-label="{{ $palestrante->nome }}"
    class="cema-spk-card group flex flex-col overflow-hidden rounded-2xl border border-border-muted bg-white shadow-card">
     {{-- Topo: foto ou gradiente + iniciais --}}
     <div class="cema-spk-avatar cema-grad-{{ $palestrante->id % 8 }} relative h-[188px] w-full overflow-hidden">
@@ -495,7 +495,7 @@ Expected: FAIL (a view antiga tem "Buscar palestrante…" mas não "Ordenar", ne
                 <svg class="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5" stroke-linecap="round"/></svg>
                 <input id="busca-palestrantes" type="search" wire:model.live.debounce.300ms="q"
                        placeholder="Buscar palestrante pelo nome…"
-                       class="w-full rounded-pill border border-border bg-surface py-2.5 pl-11 pr-10 font-sans text-sm text-text outline-none focus:border-primary">
+                       class="w-full rounded-pill border border-border bg-surface py-2.5 pl-11 pr-10 font-sans text-sm text-text-ink outline-none focus:border-primary">
                 @if ($q !== '')
                     <button type="button" wire:click="$set('q', '')" aria-label="Limpar busca"
                             class="absolute right-3 top-1/2 grid size-6 -translate-y-1/2 place-items-center rounded-full text-text-muted transition hover:bg-surface hover:text-text-ink">
@@ -728,7 +728,7 @@ Adicionar `use App\Models\Palestra;` no topo e substituir `index()`:
                     @php($dpp = $proxima->palestrantesAtivos->first())
                     <div class="relative mt-6 overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-[#3a3266] p-6 text-white shadow-card">
                         <p class="mb-3 inline-flex items-center gap-2 font-display text-sm font-semibold">
-                            <span class="inline-block size-2 animate-pulse rounded-full bg-gold" aria-hidden="true"></span> Em destaque
+                            <span class="inline-block size-2 animate-pulse rounded-full bg-gold motion-reduce:animate-none" aria-hidden="true"></span> Em destaque
                         </p>
                         <div class="flex items-center gap-3">
                             <span class="cema-spk-avatar cema-grad-{{ $proxima->id % 8 }} grid size-12 shrink-0 place-items-center overflow-hidden rounded-full ring-2 ring-white/25">
@@ -862,7 +862,7 @@ Abrir `http://localhost:8000/palestrantes` e conferir:
 2. Grade de cards com avatar de **iniciais** em gradiente (fotos ausentes no lançamento) + badge de contagem; hover eleva o card e o botão vira roxo.
 3. Busca reativa (debounce), "×" limpa; `<select>` de ordenação (A–Z / Z–A / mais / menos) reordena; contagem "N palestrantes"; "Limpar filtros" aparece com busca e reseta.
 4. Estado vazio (busca sem resultado) com botão "Limpar filtros".
-5. Sidebar: stats reais (Colaboradores / Palestras no acervo); "Em destaque" com a próxima palestra (some se não houver futura).
+5. Sidebar: stats reais (Colaboradores / Palestras no acervo); "Em destaque" com a próxima palestra (some se não houver futura) — conferir que a **data sai com o mês em português** (`translatedFormat`, locale pt-BR).
 6. Paginação (12/pág) funciona; card navegável por teclado (Tab/Enter); `prefers-reduced-motion` desativa animações; responsivo (sidebar empilha < desktop-sm).
 
 - [ ] **Step 6: Commit**

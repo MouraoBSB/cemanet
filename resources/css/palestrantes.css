@@ -37,3 +37,28 @@
     .cema-spk-card:hover .cema-spk-avatar img,
     .cema-spk-avatar img { transform: none; transition: none; }
 }
+
+/* ===== Perfil (single) do palestrante ===== */
+@layer components {
+    /* Bolinhas das áreas — rotação por assunto->id % 8 (consistente hero/sidebar/filtro). */
+    .cema-dot-0 { background: #4e4483; }
+    .cema-dot-1 { background: #6e9fcb; }
+    .cema-dot-2 { background: #89ab98; }
+    .cema-dot-3 { background: #f2a81e; }
+    .cema-dot-4 { background: #c87fb0; }
+    .cema-dot-5 { background: #e79048; }
+    .cema-dot-6 { background: #5aa9a0; }
+    .cema-dot-7 { background: #7a6fbe; }
+
+    /* Prosa de leitura do "Sobre". */
+    .cema-prosa-perfil p { margin-bottom: 16px; font-size: 15.5px; line-height: 1.85; color: #3a3553; }
+    .cema-prosa-perfil p:last-child { margin-bottom: 0; }
+    .cema-prosa-perfil a { color: var(--color-secondary); text-decoration: underline; }
+    .cema-prosa-perfil h2,
+    .cema-prosa-perfil h3 { margin: 20px 0 10px; font-family: var(--font-display); font-weight: 600; color: var(--color-primary); }
+    .cema-prosa-perfil ul { margin-bottom: 16px; padding-left: 1.25rem; list-style: disc; }
+
+    /* Botões redondos de compartilhar. */
+    .cema-share-btn { display: flex; width: 42px; height: 42px; align-items: center; justify-content: center; border-radius: 9999px; transition: filter .2s ease, transform .2s ease; }
+    .cema-share-btn:hover { filter: brightness(1.06); transform: translateY(-1px); }
+}

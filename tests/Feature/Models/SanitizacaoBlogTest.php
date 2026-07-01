@@ -46,7 +46,7 @@ class SanitizacaoBlogTest extends TestCase
     public function test_sanitiza_mantem_data_id_e_classes_de_imagem(): void
     {
         $html = '<figure class="wp-block-image size-large alignleft x">'
-            . '<img src="/s/1/a.webp" data-id="42" alt="" class="alignright evil" style="width:9px"></figure>';
+            .'<img src="/s/1/a.webp" data-id="42" alt="" class="alignright evil" style="width:9px"></figure>';
 
         $p = Post::factory()->create(['conteudo' => $html]);
 
@@ -64,8 +64,8 @@ class SanitizacaoBlogTest extends TestCase
     {
         $post = Post::factory()->make([
             'conteudo' => '<p class="has-text-align-justify">Justificado.</p>'
-                . '<h2 class="has-text-align-center">Centro</h2>'
-                . '<p class="has-text-align-right">Direita</p>',
+                .'<h2 class="has-text-align-center">Centro</h2>'
+                .'<p class="has-text-align-right">Direita</p>',
         ]);
 
         $html = $post->conteudo;
@@ -93,11 +93,11 @@ class SanitizacaoBlogTest extends TestCase
         // devem SOBREVIVER ao purifier — tudo por classe/data-attribute, sem style inline.
         $post = Post::factory()->make([
             'conteudo' => '<hr>'
-                . '<div class="lead">Abertura.</div>'
-                . '<div class="grid-layout" data-cols="2">'
-                . '<div class="grid-layout-col" data-col-span="1"><p>A</p></div>'
-                . '<div class="grid-layout-col"><p>B</p></div></div>'
-                . '<p>Texto <span class="color" data-color="roxo">colorido</span>.</p>',
+                .'<div class="lead">Abertura.</div>'
+                .'<div class="grid-layout" data-cols="2">'
+                .'<div class="grid-layout-col" data-col-span="1"><p>A</p></div>'
+                .'<div class="grid-layout-col"><p>B</p></div></div>'
+                .'<p>Texto <span class="color" data-color="roxo">colorido</span>.</p>',
         ]);
 
         $html = $post->conteudo;
@@ -117,7 +117,7 @@ class SanitizacaoBlogTest extends TestCase
     public function test_perfil_conteudo_palestras_nao_permite_data_id_nem_classes(): void
     {
         $html = '<figure class="wp-block-image alignleft">'
-            . '<img src="/s/1/a.webp" data-id="42" alt="" class="alignright"></figure>';
+            .'<img src="/s/1/a.webp" data-id="42" alt="" class="alignright"></figure>';
 
         $limpo = clean($html, 'conteudo');
 
@@ -131,7 +131,7 @@ class SanitizacaoBlogTest extends TestCase
     {
         // A URL relativa /midia/{id}/web (sem esquema) deve sobreviver ao purifier,
         // mesmo sem data-id (a inserção da biblioteca usa id=null no nó).
-        $post = \App\Models\Post::factory()->make([
+        $post = Post::factory()->make([
             'conteudo' => '<p>texto</p><img src="/midia/12/web" alt="legenda">',
         ]);
 

@@ -15,9 +15,9 @@ use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 class ComponentesImagem
 {
     /**
-     * @param  string  $nome       nome do campo
-     * @param  string  $colecao    coleção de mídia do model (ex.: Palestrante::COLECAO_FOTO)
-     * @param  bool    $multiplas  true = galeria (múltiplas, reordenáveis, grade)
+     * @param  string  $nome  nome do campo
+     * @param  string  $colecao  coleção de mídia do model (ex.: Palestrante::COLECAO_FOTO)
+     * @param  bool  $multiplas  true = galeria (múltiplas, reordenáveis, grade)
      */
     public static function upload(string $nome, string $colecao, bool $multiplas = false): SpatieMediaLibraryFileUpload
     {

@@ -4,9 +4,7 @@
 
 namespace Tests\Feature\Front;
 
-use App\Models\Categoria;
 use App\Models\Post;
-use App\Models\PostFaq;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
@@ -18,10 +16,10 @@ class BlogSeoTest extends TestCase
     private function postPublicado(array $attrs = []): Post
     {
         return Post::factory()->create(array_merge([
-            'titulo'          => 'A Luz da Caridade',
-            'slug'            => 'a-luz-da-caridade',
-            'resumo'          => 'Um artigo sobre caridade espírita.',
-            'status'          => Post::STATUS_PUBLICADO,
+            'titulo' => 'A Luz da Caridade',
+            'slug' => 'a-luz-da-caridade',
+            'resumo' => 'Um artigo sobre caridade espírita.',
+            'status' => Post::STATUS_PUBLICADO,
             'data_publicacao' => now()->subDay(),
         ], $attrs));
     }
@@ -142,7 +140,7 @@ class BlogSeoTest extends TestCase
         // Título com vetor XSS: sem JSON_HEX_TAG o </script> fecha o bloco cedo.
         $this->postPublicado([
             'titulo' => 'Ataque </script> XSS',
-            'slug'   => 'ataque-xss-jsonld',
+            'slug' => 'ataque-xss-jsonld',
         ]);
 
         $resp = $this->get(route('blog.show', 'ataque-xss-jsonld'));
@@ -176,9 +174,9 @@ class BlogSeoTest extends TestCase
     public function test_sitemap_nao_contem_slug_de_rascunho(): void
     {
         Post::factory()->create([
-            'titulo'          => 'Rascunho Oculto',
-            'slug'            => 'rascunho-oculto',
-            'status'          => Post::STATUS_RASCUNHO,
+            'titulo' => 'Rascunho Oculto',
+            'slug' => 'rascunho-oculto',
+            'status' => Post::STATUS_RASCUNHO,
             'data_publicacao' => now()->subDay(),
         ]);
 

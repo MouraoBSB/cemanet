@@ -22,6 +22,7 @@ class RegistraMidiaBiblioteca
         $hashEntrada = hash_file('sha256', $caminho);
         if ($existente = $this->buscarPorHash($hashEntrada)) {
             $this->preencherMetadadosVazios($existente, $meta);
+
             return $existente;
         }
 
@@ -38,10 +39,12 @@ class RegistraMidiaBiblioteca
         if ($hashCanonico && $duplicata = $this->buscarPorHash($hashCanonico, $media->id)) {
             $media->delete();
             $this->preencherMetadadosVazios($duplicata, $meta);
+
             return $duplicata;
         }
 
         $this->preencherMetadadosVazios($media, $meta);
+
         return $media;
     }
 

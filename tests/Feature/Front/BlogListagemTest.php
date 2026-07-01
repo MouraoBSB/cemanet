@@ -3,10 +3,10 @@
 namespace Tests\Feature\Front;
 
 use App\Livewire\Blog\Lista;
-use App\Models\Categoria;
 use App\Models\Configuracao;
 use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -25,8 +25,8 @@ class BlogListagemTest extends TestCase
     public function test_listagem_mostra_post_publicado(): void
     {
         Post::factory()->create([
-            'titulo'  => 'Artigo Publicado',
-            'status'  => Post::STATUS_PUBLICADO,
+            'titulo' => 'Artigo Publicado',
+            'status' => Post::STATUS_PUBLICADO,
             'data_publicacao' => now()->subDay(),
         ]);
 
@@ -52,8 +52,8 @@ class BlogListagemTest extends TestCase
     public function test_listagem_nao_mostra_post_com_data_futura(): void
     {
         Post::factory()->create([
-            'titulo'          => 'Post Futuro',
-            'status'          => Post::STATUS_PUBLICADO,
+            'titulo' => 'Post Futuro',
+            'status' => Post::STATUS_PUBLICADO,
             'data_publicacao' => now()->addDays(3),
         ]);
 
@@ -66,21 +66,21 @@ class BlogListagemTest extends TestCase
     public function test_mais_lidas_ordena_por_visualizacoes(): void
     {
         Post::factory()->create([
-            'titulo'        => 'Post Pouco Lido',
+            'titulo' => 'Post Pouco Lido',
             'visualizacoes' => 10,
-            'status'        => Post::STATUS_PUBLICADO,
+            'status' => Post::STATUS_PUBLICADO,
             'data_publicacao' => now()->subDays(2),
         ]);
         Post::factory()->create([
-            'titulo'        => 'Post Muito Lido',
+            'titulo' => 'Post Muito Lido',
             'visualizacoes' => 999,
-            'status'        => Post::STATUS_PUBLICADO,
+            'status' => Post::STATUS_PUBLICADO,
             'data_publicacao' => now()->subDays(3),
         ]);
         Post::factory()->create([
-            'titulo'        => 'Post Medianamente Lido',
+            'titulo' => 'Post Medianamente Lido',
             'visualizacoes' => 250,
-            'status'        => Post::STATUS_PUBLICADO,
+            'status' => Post::STATUS_PUBLICADO,
             'data_publicacao' => now()->subDays(4),
         ]);
 
@@ -109,22 +109,22 @@ class BlogListagemTest extends TestCase
         // Sem nenhum post com destaque=true, o mais recente vira herói via fallback.
         // O $posts do grid NÃO deve conter o id do $destaque.
         $maisRecente = Post::factory()->create([
-            'titulo'          => 'Post Mais Recente',
-            'status'          => Post::STATUS_PUBLICADO,
+            'titulo' => 'Post Mais Recente',
+            'status' => Post::STATUS_PUBLICADO,
             'data_publicacao' => now()->subHour(),
-            'destaque'        => false,
+            'destaque' => false,
         ]);
         Post::factory()->create([
-            'titulo'          => 'Post Mais Antigo',
-            'status'          => Post::STATUS_PUBLICADO,
+            'titulo' => 'Post Mais Antigo',
+            'status' => Post::STATUS_PUBLICADO,
             'data_publicacao' => now()->subDays(2),
-            'destaque'        => false,
+            'destaque' => false,
         ]);
 
         $component = Livewire::test(Lista::class);
         $component->assertOk();
 
-        /** @var \Illuminate\Pagination\LengthAwarePaginator $posts */
+        /** @var LengthAwarePaginator $posts */
         $posts = $component->viewData('posts');
         $ids = $posts->pluck('id')->all();
 
@@ -140,8 +140,8 @@ class BlogListagemTest extends TestCase
         Storage::fake('public');
 
         $post = Post::factory()->comImagemDestacada()->create([
-            'titulo'   => 'Destaque Com Capa',
-            'status'   => Post::STATUS_PUBLICADO,
+            'titulo' => 'Destaque Com Capa',
+            'status' => Post::STATUS_PUBLICADO,
             'destaque' => true,
         ]);
 

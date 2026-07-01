@@ -5,6 +5,7 @@ use App\Http\Controllers\MidiaController;
 use App\Http\Controllers\PalestraController;
 use App\Http\Controllers\PalestranteController;
 use App\Http\Controllers\SitemapController;
+use App\Models\Post;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => view('pages.inicio'))->name('home');
@@ -41,7 +42,7 @@ Route::get('/midia/{media}/{conversao?}', [MidiaController::class, 'serve'])
 // Catch-all raiz: redireciona slugs de posts existentes → /sementeira/{slug} (301).
 // DEVE ser a última rota do arquivo.
 Route::get('/{slug}', function (string $slug) {
-    abort_unless(\App\Models\Post::where('slug', $slug)->exists(), 404);
+    abort_unless(Post::where('slug', $slug)->exists(), 404);
 
     return redirect()->route('blog.show', ['slug' => $slug], 301);
 })->where('slug', '[a-z0-9-]+');

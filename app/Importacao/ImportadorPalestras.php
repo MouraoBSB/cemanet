@@ -9,6 +9,7 @@ use App\Models\Palestra;
 use App\Models\Palestrante;
 use App\Support\Palestras\CardinalidadePalestra;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class ImportadorPalestras
 {
@@ -86,8 +87,8 @@ class ImportadorPalestras
             ]);
 
             // Foto vai para a Media Library (coleção 'foto'); singleFile substitui a anterior.
-            if ($foto !== null && \Illuminate\Support\Facades\Storage::disk('public')->exists($foto)) {
-                $palestrante->addMedia(\Illuminate\Support\Facades\Storage::disk('public')->path($foto))
+            if ($foto !== null && Storage::disk('public')->exists($foto)) {
+                $palestrante->addMedia(Storage::disk('public')->path($foto))
                     ->toMediaCollection(Palestrante::COLECAO_FOTO);
             }
         }

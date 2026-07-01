@@ -59,8 +59,7 @@ class PalestranteResourceTest extends TestCase
     public function test_form_usa_upload_de_media_library_para_foto(): void
     {
         Livewire::test(CreatePalestrante::class)
-            ->assertFormFieldExists('foto', fn (SpatieMediaLibraryFileUpload $campo): bool =>
-                $campo->getCollection() === Palestrante::COLECAO_FOTO);
+            ->assertFormFieldExists('foto', fn (SpatieMediaLibraryFileUpload $campo): bool => $campo->getCollection() === Palestrante::COLECAO_FOTO);
     }
 
     public function test_pode_criar_palestrante_via_formulario(): void

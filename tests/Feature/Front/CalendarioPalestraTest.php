@@ -33,11 +33,11 @@ class CalendarioPalestraTest extends TestCase
 
     public function test_ics_escapa_quebras_de_linha_no_summary(): void
     {
-        \App\Models\Palestra::factory()->create([
+        Palestra::factory()->create([
             'slug' => 'titulo-com-quebra',
             'titulo' => "Linha1\r\nLinha2",
-            'status' => \App\Models\Palestra::STATUS_PUBLICADO,
-            'data_da_palestra' => \Illuminate\Support\Carbon::create(2026, 6, 21, 19, 0, 0, 'America/Sao_Paulo'),
+            'status' => Palestra::STATUS_PUBLICADO,
+            'data_da_palestra' => Carbon::create(2026, 6, 21, 19, 0, 0, 'America/Sao_Paulo'),
         ]);
 
         $resp = $this->get(route('palestras.calendario', 'titulo-com-quebra'));

@@ -79,12 +79,12 @@ class InserirDaBibliotecaAction
 
                 $component->runCommands(
                     [EditorCommand::make('insertContent', [[
-                        'type'  => 'image',
+                        'type' => 'image',
                         'attrs' => [
                             // URL RELATIVA (sem domínio) → portável p/ troca de domínio/CDN (constraint #13).
                             'src' => route('midia.serve', [$media->id, 'web'], false),
                             'alt' => $alt,
-                            'id'  => null,
+                            'id' => null,
                         ],
                     ]])],
                     editorSelection: $arguments['editorSelection'] ?? null,

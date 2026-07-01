@@ -54,7 +54,7 @@ class BlogSingleTest extends TestCase
         Storage::fake('public');
 
         $post = Post::factory()->comImagemDestacada()->create([
-            'slug'   => 'com-capa',
+            'slug' => 'com-capa',
             'status' => 'publicado',
         ]);
 
@@ -70,7 +70,7 @@ class BlogSingleTest extends TestCase
         Storage::fake('public');
 
         $post = Post::factory()->comImagemDestacada()->create([
-            'slug'   => 'capa-dupla',
+            'slug' => 'capa-dupla',
             'status' => 'publicado',
         ]);
 

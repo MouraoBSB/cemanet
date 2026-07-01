@@ -7,7 +7,9 @@ use App\Models\Post;
 use App\Models\PostFaq;
 use App\Models\Tag;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PostTest extends TestCase
@@ -91,12 +93,12 @@ class PostTest extends TestCase
 
     public function test_galeria_media_ordenada(): void
     {
-        \Illuminate\Support\Facades\Storage::fake('public');
+        Storage::fake('public');
 
         $post = Post::factory()->create();
 
-        $img1 = \Illuminate\Http\UploadedFile::fake()->image('primeira.jpg', 100, 100)->getContent();
-        $img2 = \Illuminate\Http\UploadedFile::fake()->image('segunda.jpg', 100, 100)->getContent();
+        $img1 = UploadedFile::fake()->image('primeira.jpg', 100, 100)->getContent();
+        $img2 = UploadedFile::fake()->image('segunda.jpg', 100, 100)->getContent();
 
         $post->addMediaFromString($img1)->usingFileName('primeira.jpg')->toMediaCollection(Post::COLECAO_GALERIA);
         $post->addMediaFromString($img2)->usingFileName('segunda.jpg')->toMediaCollection(Post::COLECAO_GALERIA);

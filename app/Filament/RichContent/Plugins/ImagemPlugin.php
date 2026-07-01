@@ -5,10 +5,12 @@
 namespace App\Filament\RichContent\Plugins;
 
 use App\Filament\RichContent\TipTap\ImagemAtributosExtension;
+use Filament\Actions\Action;
 use Filament\Forms\Components\RichEditor\Plugins\Contracts\RichContentPlugin;
 use Filament\Forms\Components\RichEditor\RichEditorTool;
 use Filament\Support\Facades\FilamentAsset;
 use Filament\Support\Icons\Heroicon;
+use Tiptap\Core\Extension;
 
 /**
  * Plugin RichContent: adiciona alinhamento e tamanho de imagem via classes WP.
@@ -22,7 +24,7 @@ class ImagemPlugin implements RichContentPlugin
     }
 
     /**
-     * @return array<\Tiptap\Core\Extension>
+     * @return array<Extension>
      */
     public function getTipTapPhpExtensions(): array
     {
@@ -87,7 +89,7 @@ class ImagemPlugin implements RichContentPlugin
     }
 
     /**
-     * @return array<\Filament\Actions\Action>
+     * @return array<Action>
      */
     public function getEditorActions(): array
     {

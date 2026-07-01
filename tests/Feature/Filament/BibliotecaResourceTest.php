@@ -13,6 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Tests\TestCase;
 
 class BibliotecaResourceTest extends TestCase
@@ -29,7 +30,7 @@ class BibliotecaResourceTest extends TestCase
     }
 
     /** Cria uma mídia na biblioteca para uso nos testes. */
-    private function criarMidia(): \Spatie\MediaLibrary\MediaCollections\Models\Media
+    private function criarMidia(): Media
     {
         return Biblioteca::instance()
             ->addMediaFromString(UploadedFile::fake()->image('x.png', 800, 600)->getContent())
@@ -47,7 +48,7 @@ class BibliotecaResourceTest extends TestCase
         $m = $this->criarMidia();
 
         Post::factory()->create([
-            'conteudo' => '<p>x</p><img src="/midia/' . $m->id . '/web" alt="">',
+            'conteudo' => '<p>x</p><img src="/midia/'.$m->id.'/web" alt="">',
         ]);
 
         Livewire::test(ListBibliotecas::class)
@@ -72,7 +73,7 @@ class BibliotecaResourceTest extends TestCase
 
         // Referência a um ID com sufixo (ex: 129 quando o id é 12) — não deve bloquear
         Post::factory()->create([
-            'conteudo' => '<img src="/midia/' . $m->id . '9/web" alt="">',
+            'conteudo' => '<img src="/midia/'.$m->id.'9/web" alt="">',
         ]);
 
         Livewire::test(ListBibliotecas::class)

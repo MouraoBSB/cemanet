@@ -18,16 +18,16 @@ class ImagemAtributosExtension extends Extension
     public static $name = 'imagemAtributos';
 
     private const CLASSES_ALIGN = [
-        'left'   => 'alignleft',
-        'right'  => 'alignright',
+        'left' => 'alignleft',
+        'right' => 'alignright',
         'center' => 'aligncenter',
-        'none'   => 'alignnone',
+        'none' => 'alignnone',
     ];
 
     private const CLASSES_SIZE = [
         'medium' => 'size-medium',
-        'large'  => 'size-large',
-        'full'   => 'size-full',
+        'large' => 'size-large',
+        'full' => 'size-full',
     ];
 
     /**
@@ -41,11 +41,11 @@ class ImagemAtributosExtension extends Extension
     {
         return [
             [
-                'types'      => ['image'],
+                'types' => ['image'],
                 'attributes' => [
                     'align' => [
-                        'default'    => null,
-                        'parseHTML'  => function ($DOMNode) {
+                        'default' => null,
+                        'parseHTML' => function ($DOMNode) {
                             $classes = array_filter(
                                 explode(' ', (string) $DOMNode->getAttribute('class'))
                             );
@@ -63,8 +63,8 @@ class ImagemAtributosExtension extends Extension
                             : [],
                     ],
                     'size' => [
-                        'default'    => null,
-                        'parseHTML'  => function ($DOMNode) {
+                        'default' => null,
+                        'parseHTML' => function ($DOMNode) {
                             $classes = array_filter(
                                 explode(' ', (string) $DOMNode->getAttribute('class'))
                             );

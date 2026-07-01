@@ -4,12 +4,12 @@
 
 namespace App\Filament\Resources\Posts;
 
-use App\Filament\RichContent\Plugins\BibliotecaMidiaPlugin;
-use App\Filament\RichContent\Plugins\ImagemPlugin;
-use App\Filament\RichContent\Plugins\TextoAlinhamentoPlugin;
 use App\Filament\Resources\Posts\Pages\CreatePost;
 use App\Filament\Resources\Posts\Pages\EditPost;
 use App\Filament\Resources\Posts\Pages\ListPosts;
+use App\Filament\RichContent\Plugins\BibliotecaMidiaPlugin;
+use App\Filament\RichContent\Plugins\ImagemPlugin;
+use App\Filament\RichContent\Plugins\TextoAlinhamentoPlugin;
 use App\Models\Post;
 use App\Support\Blog\PlacarSeo;
 use BackedEnum;
@@ -96,10 +96,10 @@ class PostResource extends Resource
                         // Antes a paleta era ['nome'=>'#hex'], que o Filament interpretava como
                         // make(label='#hex', cor='nome') → swatch invisível e só o código no dropdown.
                         ->textColors([
-                            'roxo'     => TextColor::make('Roxo', '#4e4483'),
-                            'laranja'  => TextColor::make('Laranja', '#e79048'),
-                            'verde'    => TextColor::make('Verde', '#89ab98'),
-                            'azul'     => TextColor::make('Azul', '#6e9fcb'),
+                            'roxo' => TextColor::make('Roxo', '#4e4483'),
+                            'laranja' => TextColor::make('Laranja', '#e79048'),
+                            'verde' => TextColor::make('Verde', '#89ab98'),
+                            'azul' => TextColor::make('Azul', '#6e9fcb'),
                             'vermelho' => TextColor::make('Vermelho', '#c0392b'),
                         ])
                         ->toolbarButtons([
@@ -234,9 +234,9 @@ class PostResource extends Resource
                             ->required()
                             ->live()
                             ->options([
-                                Post::STATUS_RASCUNHO  => 'Rascunho',
+                                Post::STATUS_RASCUNHO => 'Rascunho',
                                 Post::STATUS_PUBLICADO => 'Publicado',
-                                Post::STATUS_AGENDADO  => 'Agendado',
+                                Post::STATUS_AGENDADO => 'Agendado',
                             ])
                             ->default(Post::STATUS_RASCUNHO),
                         DateTimePicker::make('data_publicacao')
@@ -340,8 +340,8 @@ class PostResource extends Resource
                     ->badge()
                     ->color(fn (string $state) => match ($state) {
                         Post::STATUS_PUBLICADO => 'success',
-                        Post::STATUS_AGENDADO  => 'warning',
-                        default                => 'gray',
+                        Post::STATUS_AGENDADO => 'warning',
+                        default => 'gray',
                     }),
                 TextColumn::make('data_publicacao')
                     ->label('Publicação')
@@ -356,9 +356,9 @@ class PostResource extends Resource
                 SelectFilter::make('status')
                     ->label('Status')
                     ->options([
-                        Post::STATUS_RASCUNHO  => 'Rascunho',
+                        Post::STATUS_RASCUNHO => 'Rascunho',
                         Post::STATUS_PUBLICADO => 'Publicado',
-                        Post::STATUS_AGENDADO  => 'Agendado',
+                        Post::STATUS_AGENDADO => 'Agendado',
                     ]),
                 SelectFilter::make('categorias')
                     ->label('Categoria')
@@ -384,9 +384,9 @@ class PostResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index'  => ListPosts::route('/'),
+            'index' => ListPosts::route('/'),
             'create' => CreatePost::route('/create'),
-            'edit'   => EditPost::route('/{record}/edit'),
+            'edit' => EditPost::route('/{record}/edit'),
         ];
     }
 }

@@ -32,21 +32,21 @@ class ImportarBlogCommandTest extends TestCase
             public function posts(): array
             {
                 return [[
-                    'wp_id'                    => 1,
-                    'titulo'                   => 'Post de teste',
-                    'slug'                     => 'post-de-teste',
-                    'resumo'                   => null,
-                    'conteudo'                 => '<p>Conteúdo simples.</p>',
-                    'data_publicacao'          => Carbon::parse('2026-01-15 10:00:00'),
-                    'status'                   => 'publicado',
-                    'imagem_url'               => null,
-                    'imagem_alt'               => null,
-                    'categorias_slugs'         => ['reflexoes-e-espiritualidade'],
+                    'wp_id' => 1,
+                    'titulo' => 'Post de teste',
+                    'slug' => 'post-de-teste',
+                    'resumo' => null,
+                    'conteudo' => '<p>Conteúdo simples.</p>',
+                    'data_publicacao' => Carbon::parse('2026-01-15 10:00:00'),
+                    'status' => 'publicado',
+                    'imagem_url' => null,
+                    'imagem_alt' => null,
+                    'categorias_slugs' => ['reflexoes-e-espiritualidade'],
                     'categoria_principal_slug' => 'reflexoes-e-espiritualidade',
-                    'tags'                     => [],
-                    'faqs'                     => [],
-                    'galeria'                  => [],
-                    'seo'                      => ['titulo' => null, 'descricao' => null, 'keyword' => null, 'og_imagem' => null],
+                    'tags' => [],
+                    'faqs' => [],
+                    'galeria' => [],
+                    'seo' => ['titulo' => null, 'descricao' => null, 'keyword' => null, 'og_imagem' => null],
                 ]];
             }
         });

@@ -102,7 +102,7 @@ class PalestraController extends Controller
         $fmt = fn ($d) => $d->format('Ymd\THis\Z');
 
         $escapar = fn (string $v) => str_replace(
-            ["\\", ';', ',', "\r\n", "\r", "\n"],
+            ['\\', ';', ',', "\r\n", "\r", "\n"],
             ['\\\\', '\\;', '\\,', '\\n', '\\n', '\\n'],
             $v
         );

@@ -5,6 +5,7 @@
 namespace App\Importacao;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Image\Enums\Fit;
 use Spatie\Image\Image;
@@ -60,7 +61,7 @@ class BaixadorImagem
         // e passar isso ao Http::get faz o Guzzle interpretar o esquema como "a" e lançar,
         // derrubando a importação inteira. Aqui vira aviso e segue.
         if (! preg_match('~^https?://~i', $url)) {
-            \Illuminate\Support\Facades\Log::warning('BaixadorImagem: URL inválida ignorada', [
+            Log::warning('BaixadorImagem: URL inválida ignorada', [
                 'url' => mb_strimwidth($url, 0, 80, '…'),
             ]);
 
@@ -86,13 +87,13 @@ class BaixadorImagem
         @unlink($tmpSemExt);
 
         $ext = match ($mime) {
-            'image/png'  => 'png',
-            'image/gif'  => 'gif',
+            'image/png' => 'png',
+            'image/gif' => 'gif',
             'image/webp' => 'webp',
-            default      => 'jpg',
+            default => 'jpg',
         };
 
-        $tmp = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'cema_mid_' . uniqid() . '.' . $ext;
+        $tmp = sys_get_temp_dir().DIRECTORY_SEPARATOR.'cema_mid_'.uniqid().'.'.$ext;
         file_put_contents($tmp, $bytes);
 
         // try/finally garante a limpeza do temp mesmo se o GD falhar ao redimensionar

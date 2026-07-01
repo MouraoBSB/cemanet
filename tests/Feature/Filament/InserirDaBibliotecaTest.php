@@ -36,7 +36,7 @@ class InserirDaBibliotecaTest extends TestCase
             ->assertDispatched('run-rich-editor-commands', function (...$args) use ($media): bool {
                 $json = json_encode($args, JSON_UNESCAPED_SLASHES);
 
-                return str_contains($json, '/midia/' . $media->id . '/web')
+                return str_contains($json, '/midia/'.$media->id.'/web')
                     && ! str_contains($json, 'http://')   // garante que é relativa, sem domínio
                     && ! str_contains($json, 'https://');
             });

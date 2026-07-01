@@ -24,8 +24,7 @@ class UploadLimitesTest extends TestCase
     public function test_campo_conteudo_aceita_anexo_de_ate_20mb(): void
     {
         Livewire::test(CreatePost::class)
-            ->assertFormFieldExists('conteudo', fn (RichEditor $campo): bool =>
-                $campo->getFileAttachmentsMaxSize() >= 20480);
+            ->assertFormFieldExists('conteudo', fn (RichEditor $campo): bool => $campo->getFileAttachmentsMaxSize() >= 20480);
     }
 
     public function test_livewire_aceita_upload_temporario_de_20mb(): void

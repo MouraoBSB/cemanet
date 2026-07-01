@@ -6,12 +6,15 @@ namespace Tests\Feature\Filament;
 
 use App\Filament\Pages\ConfiguracoesBlog;
 use App\Filament\Resources\Posts\Pages\CreatePost;
+use App\Filament\Resources\Posts\Pages\EditPost;
 use App\Filament\Resources\Posts\Pages\ListPosts;
 use App\Models\Categoria;
 use App\Models\Configuracao;
 use App\Models\Post;
 use App\Models\Tag;
 use App\Models\User;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Livewire;
@@ -43,9 +46,9 @@ class PostResourceTest extends TestCase
     {
         Livewire::test(CreatePost::class)
             ->fillForm([
-                'titulo'          => 'Sementeira de Luz',
-                'slug'            => 'sementeira-de-luz',
-                'status'          => Post::STATUS_PUBLICADO,
+                'titulo' => 'Sementeira de Luz',
+                'slug' => 'sementeira-de-luz',
+                'status' => Post::STATUS_PUBLICADO,
                 'data_publicacao' => now()->format('Y-m-d H:i'),
             ])
             ->call('create')
@@ -59,9 +62,9 @@ class PostResourceTest extends TestCase
         // Rascunho pode existir sem data (coluna nullable; data exigida só ao publicar).
         Livewire::test(CreatePost::class)
             ->fillForm([
-                'titulo'          => 'Rascunho sem data',
-                'slug'            => 'rascunho-sem-data',
-                'status'          => Post::STATUS_RASCUNHO,
+                'titulo' => 'Rascunho sem data',
+                'slug' => 'rascunho-sem-data',
+                'status' => Post::STATUS_RASCUNHO,
                 'data_publicacao' => null,
             ])
             ->call('create')
@@ -75,9 +78,9 @@ class PostResourceTest extends TestCase
         // "Publicar agora": publicar sem data não bloqueia — preenche o instante atual.
         Livewire::test(CreatePost::class)
             ->fillForm([
-                'titulo'          => 'Publicado sem data',
-                'slug'            => 'publicado-sem-data',
-                'status'          => Post::STATUS_PUBLICADO,
+                'titulo' => 'Publicado sem data',
+                'slug' => 'publicado-sem-data',
+                'status' => Post::STATUS_PUBLICADO,
                 'data_publicacao' => null,
             ])
             ->call('create')
@@ -94,9 +97,9 @@ class PostResourceTest extends TestCase
         // Agendado é um agendamento futuro — exige data.
         Livewire::test(CreatePost::class)
             ->fillForm([
-                'titulo'          => 'Agendado sem data',
-                'slug'            => 'agendado-sem-data',
-                'status'          => Post::STATUS_AGENDADO,
+                'titulo' => 'Agendado sem data',
+                'slug' => 'agendado-sem-data',
+                'status' => Post::STATUS_AGENDADO,
                 'data_publicacao' => null,
             ])
             ->call('create')
@@ -111,13 +114,13 @@ class PostResourceTest extends TestCase
 
         Livewire::test(CreatePost::class)
             ->fillForm([
-                'titulo'               => 'Post com Categorias',
-                'slug'                 => 'post-com-categorias',
-                'status'               => Post::STATUS_PUBLICADO,
-                'data_publicacao'      => now()->format('Y-m-d H:i'),
-                'categorias'           => [$categoria->id],
+                'titulo' => 'Post com Categorias',
+                'slug' => 'post-com-categorias',
+                'status' => Post::STATUS_PUBLICADO,
+                'data_publicacao' => now()->format('Y-m-d H:i'),
+                'categorias' => [$categoria->id],
                 'categoria_principal_id' => $categoria->id,
-                'faqs'                 => [
+                'faqs' => [
                     ['pergunta' => 'O que é a Sementeira?', 'resposta' => 'É um blog espírita.'],
                 ],
             ])
@@ -137,11 +140,11 @@ class PostResourceTest extends TestCase
 
         Livewire::test(CreatePost::class)
             ->fillForm([
-                'titulo'         => 'Post com Tags',
-                'slug'           => 'post-com-tags',
-                'status'         => Post::STATUS_RASCUNHO,
+                'titulo' => 'Post com Tags',
+                'slug' => 'post-com-tags',
+                'status' => Post::STATUS_RASCUNHO,
                 'data_publicacao' => now()->format('Y-m-d H:i'),
-                'tags'           => [$tag->id],
+                'tags' => [$tag->id],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -156,7 +159,7 @@ class PostResourceTest extends TestCase
         Livewire::test(CreatePost::class)
             ->fillForm([
                 'titulo' => 'Sem Slug',
-                'slug'   => '',
+                'slug' => '',
                 'status' => Post::STATUS_RASCUNHO,
             ])
             ->call('create')
@@ -182,26 +185,26 @@ class PostResourceTest extends TestCase
 
     public function test_paginas_de_post_tem_form_actions_sticky(): void
     {
-        $this->assertTrue(\App\Filament\Resources\Posts\Pages\EditPost::$formActionsAreSticky);
-        $this->assertTrue(\App\Filament\Resources\Posts\Pages\CreatePost::$formActionsAreSticky);
+        $this->assertTrue(EditPost::$formActionsAreSticky);
+        $this->assertTrue(CreatePost::$formActionsAreSticky);
     }
 
     public function test_toolbar_do_editor_inclui_botao_paragrafo(): void
     {
         Livewire::test(CreatePost::class)
-            ->assertFormFieldExists('conteudo', fn (\Filament\Forms\Components\RichEditor $campo): bool =>
-                $campo->hasToolbarButton('paragraph'));
+            ->assertFormFieldExists('conteudo', fn (RichEditor $campo): bool => $campo->hasToolbarButton('paragraph'));
     }
 
     public function test_toolbar_do_editor_inclui_alinhamento_de_texto(): void
     {
         Livewire::test(CreatePost::class)
-            ->assertFormFieldExists('conteudo', function (\Filament\Forms\Components\RichEditor $campo): bool {
+            ->assertFormFieldExists('conteudo', function (RichEditor $campo): bool {
                 foreach (['alignStart', 'alignCenter', 'alignEnd', 'alignJustify'] as $tool) {
                     if (! $campo->hasToolbarButton($tool)) {
                         return false;
                     }
                 }
+
                 return true;
             });
     }
@@ -222,12 +225,13 @@ class PostResourceTest extends TestCase
     public function test_toolbar_inclui_ferramentas_nativas_extras(): void
     {
         Livewire::test(CreatePost::class)
-            ->assertFormFieldExists('conteudo', function (\Filament\Forms\Components\RichEditor $campo): bool {
+            ->assertFormFieldExists('conteudo', function (RichEditor $campo): bool {
                 foreach (['grid', 'clearFormatting', 'horizontalRule', 'lead', 'textColor'] as $tool) {
                     if (! $campo->hasToolbarButton($tool)) {
                         return false;
                     }
                 }
+
                 return true;
             });
     }
@@ -237,7 +241,7 @@ class PostResourceTest extends TestCase
         // Affordance do BUG 1: ao selecionar a imagem, as ferramentas de imagem
         // aparecem numa barra flutuante junto do nó.
         Livewire::test(CreatePost::class)
-            ->assertFormFieldExists('conteudo', function (\Filament\Forms\Components\RichEditor $campo): bool {
+            ->assertFormFieldExists('conteudo', function (RichEditor $campo): bool {
                 $flutuantes = $campo->getFloatingToolbars();
 
                 return isset($flutuantes['image'])
@@ -257,9 +261,9 @@ class PostResourceTest extends TestCase
         // na coleção é coberta por PostMediaTest/PostFactoryMediaTest e verificação manual.
         Livewire::test(CreatePost::class)
             ->fillForm([
-                'titulo'          => 'Post com Imagem Destacada',
-                'slug'            => 'post-com-imagem-destacada',
-                'status'          => Post::STATUS_RASCUNHO,
+                'titulo' => 'Post com Imagem Destacada',
+                'slug' => 'post-com-imagem-destacada',
+                'status' => Post::STATUS_RASCUNHO,
                 'data_publicacao' => now()->format('Y-m-d H:i'),
             ])
             ->call('create')
@@ -275,10 +279,8 @@ class PostResourceTest extends TestCase
         // responsive images do original (GenerateResponsiveImagesJob ocioso). As conversões
         // do model são cobertas por PostMediaTest; aqui validamos o caminho do PAINEL.
         Livewire::test(CreatePost::class)
-            ->assertFormFieldExists('destacada', fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $campo): bool =>
-                ! $campo->hasResponsiveImages())
-            ->assertFormFieldExists('galeria', fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $campo): bool =>
-                ! $campo->hasResponsiveImages());
+            ->assertFormFieldExists('destacada', fn (SpatieMediaLibraryFileUpload $campo): bool => ! $campo->hasResponsiveImages())
+            ->assertFormFieldExists('galeria', fn (SpatieMediaLibraryFileUpload $campo): bool => ! $campo->hasResponsiveImages());
     }
 
     public function test_uploads_de_imagem_usam_disco_public(): void
@@ -287,19 +289,15 @@ class PostResourceTest extends TestCase
         // gerada pelo Spatie aponta para o disco public (vazio) e a imagem 404 no front.
         // Os uploads de mídia do post devem fixar 'public' para renderizar.
         Livewire::test(CreatePost::class)
-            ->assertFormFieldExists('destacada', fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $campo): bool =>
-                $campo->getDiskName() === 'public')
-            ->assertFormFieldExists('galeria', fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $campo): bool =>
-                $campo->getDiskName() === 'public')
-            ->assertFormFieldExists('og', fn (\Filament\Forms\Components\SpatieMediaLibraryFileUpload $campo): bool =>
-                $campo->getDiskName() === 'public');
+            ->assertFormFieldExists('destacada', fn (SpatieMediaLibraryFileUpload $campo): bool => $campo->getDiskName() === 'public')
+            ->assertFormFieldExists('galeria', fn (SpatieMediaLibraryFileUpload $campo): bool => $campo->getDiskName() === 'public')
+            ->assertFormFieldExists('og', fn (SpatieMediaLibraryFileUpload $campo): bool => $campo->getDiskName() === 'public');
     }
 
     public function test_toolbar_inclui_inserir_da_biblioteca(): void
     {
         Livewire::test(CreatePost::class)
-            ->assertFormFieldExists('conteudo', fn (\Filament\Forms\Components\RichEditor $campo): bool =>
-                $campo->hasToolbarButton('inserirDaBiblioteca'));
+            ->assertFormFieldExists('conteudo', fn (RichEditor $campo): bool => $campo->hasToolbarButton('inserirDaBiblioteca'));
     }
 
     public function test_toolbar_nao_inclui_mais_o_clipe_attachfiles(): void
@@ -307,8 +305,7 @@ class PostResourceTest extends TestCase
         // #2: o clipe attachFiles salvava a imagem do corpo sem <img>. Foi removido e
         // substituído pela tool 'inserirDaBiblioteca' (caminho portável /midia/{id}/web).
         Livewire::test(CreatePost::class)
-            ->assertFormFieldExists('conteudo', fn (\Filament\Forms\Components\RichEditor $campo): bool =>
-                ! $campo->hasToolbarButton('attachFiles'));
+            ->assertFormFieldExists('conteudo', fn (RichEditor $campo): bool => ! $campo->hasToolbarButton('attachFiles'));
     }
 
     public function test_corpo_nao_aceita_anexo_de_arquivo(): void
@@ -316,8 +313,7 @@ class PostResourceTest extends TestCase
         // #2 fechado por completo: anexos desativados no corpo (clipe + arrastar + colar).
         // canAttachFiles=false → o JS não trata paste/drop. Imagem entra só pela biblioteca.
         Livewire::test(CreatePost::class)
-            ->assertFormFieldExists('conteudo', fn (\Filament\Forms\Components\RichEditor $campo): bool =>
-                ! $campo->hasFileAttachments());
+            ->assertFormFieldExists('conteudo', fn (RichEditor $campo): bool => ! $campo->hasFileAttachments());
     }
 
     public function test_textcolors_tem_swatch_valido_e_nome_legivel(): void
@@ -326,7 +322,7 @@ class PostResourceTest extends TestCase
         // ['nome' => '#hex'], que o Filament lia invertido (label=#hex, cor=nome) → swatch
         // invisível e só o código no dropdown.
         Livewire::test(CreatePost::class)
-            ->assertFormFieldExists('conteudo', function (\Filament\Forms\Components\RichEditor $campo): bool {
+            ->assertFormFieldExists('conteudo', function (RichEditor $campo): bool {
                 $cores = $campo->getTextColors();
                 if ($cores === []) {
                     return false;

@@ -50,7 +50,7 @@ class ReescritorImagensConteudoTest extends TestCase
         // O src reescrito é o caminho RELATIVO da conversão 'web' (sem host/porta),
         // para não quebrar se o APP_URL/domínio mudar.
         $caminhoWeb = parse_url($media->getUrl('web'), PHP_URL_PATH);
-        $this->assertStringContainsString('src="' . $caminhoWeb . '"', $out);
+        $this->assertStringContainsString('src="'.$caminhoWeb.'"', $out);
         $this->assertStringNotContainsString('http://localhost', $out);
     }
 

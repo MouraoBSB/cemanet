@@ -5,6 +5,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Biblioteca;
+use App\Support\Biblioteca\RegistraMidiaBiblioteca;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -32,19 +33,19 @@ class MidiaController extends Controller
         if ($validator->fails()) {
             return response()->json([
                 'message' => 'Arquivo inválido. Envie uma imagem de até 20 MB.',
-                'errors'  => $validator->errors(),
+                'errors' => $validator->errors(),
             ], 422);
         }
 
         $arquivo = $request->file('imagem');
 
-        $media = app(\App\Support\Biblioteca\RegistraMidiaBiblioteca::class)->aPartirDoCaminho(
+        $media = app(RegistraMidiaBiblioteca::class)->aPartirDoCaminho(
             $arquivo->getRealPath(),
             $arquivo->getClientOriginalName(),
         );
 
         return response()->json([
-            'id'  => $media->id,
+            'id' => $media->id,
             'url' => route('midia.serve', [$media->id, 'web'], false),
         ]);
     }
@@ -59,7 +60,7 @@ class MidiaController extends Controller
         // #11: conversão fora da allowlist cai para 'web' (nunca serve original arbitrário por nome).
         $conversao = in_array($conversao, ['web', 'thumb'], true) ? $conversao : 'web';
 
-        $gerada  = $m->hasGeneratedConversion($conversao);
+        $gerada = $m->hasGeneratedConversion($conversao);
         $caminho = $gerada ? $m->getPath($conversao) : $m->getPath();
         abort_unless(is_file($caminho), 404);
 
@@ -71,7 +72,7 @@ class MidiaController extends Controller
 
         return response()->file($caminho, [
             'Cache-Control' => $cache,
-            'Content-Type'  => $gerada ? 'image/webp' : $m->mime_type,
+            'Content-Type' => $gerada ? 'image/webp' : $m->mime_type,
         ]);
     }
 }

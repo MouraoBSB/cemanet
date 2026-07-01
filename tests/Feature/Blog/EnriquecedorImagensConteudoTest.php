@@ -53,8 +53,8 @@ class EnriquecedorImagensConteudoTest extends TestCase
     {
         $midia = $this->criarMidia(['legenda' => 'Minha legenda']);
 
-        $html = '<p><img src="/midia/' . $midia->id . '/web" alt="foto"></p>';
-        $out  = $this->servico->enriquecer($html);
+        $html = '<p><img src="/midia/'.$midia->id.'/web" alt="foto"></p>';
+        $out = $this->servico->enriquecer($html);
 
         $this->assertStringContainsString('<figure', $out['html']);
         $this->assertStringContainsString('<figcaption>Minha legenda</figcaption>', $out['html']);
@@ -62,7 +62,7 @@ class EnriquecedorImagensConteudoTest extends TestCase
         $this->assertSame('ImageObject', $out['imagens'][0]['@type']);
         $this->assertArrayHasKey('caption', $out['imagens'][0]);
         $this->assertSame('Minha legenda', $out['imagens'][0]['caption']);
-        $this->assertStringContainsString('/midia/' . $midia->id . '/web', $out['imagens'][0]['contentUrl']);
+        $this->assertStringContainsString('/midia/'.$midia->id.'/web', $out['imagens'][0]['contentUrl']);
     }
 
     /** 2) img /midia/{id}/web SEM legenda → NÃO vira figure (img simples), mas gera ImageObject. */
@@ -70,14 +70,14 @@ class EnriquecedorImagensConteudoTest extends TestCase
     {
         $midia = $this->criarMidia([]);
 
-        $html = '<img src="/midia/' . $midia->id . '/web" alt="sem legenda">';
-        $out  = $this->servico->enriquecer($html);
+        $html = '<img src="/midia/'.$midia->id.'/web" alt="sem legenda">';
+        $out = $this->servico->enriquecer($html);
 
         $this->assertStringNotContainsString('<figure', $out['html']);
-        $this->assertStringContainsString('/midia/' . $midia->id . '/web', $out['html']);
+        $this->assertStringContainsString('/midia/'.$midia->id.'/web', $out['html']);
         $this->assertCount(1, $out['imagens']);
         $this->assertSame('ImageObject', $out['imagens'][0]['@type']);
-        $this->assertStringContainsString('/midia/' . $midia->id . '/web', $out['imagens'][0]['contentUrl']);
+        $this->assertStringContainsString('/midia/'.$midia->id.'/web', $out['imagens'][0]['contentUrl']);
         $this->assertArrayNotHasKey('caption', $out['imagens'][0]);
     }
 
@@ -86,8 +86,8 @@ class EnriquecedorImagensConteudoTest extends TestCase
     {
         $midia = $this->criarMidia(['legenda' => 'Cap']);
 
-        $html = '<img src="/midia/' . $midia->id . '/web" class="aligncenter size-large" alt="x">';
-        $out  = $this->servico->enriquecer($html);
+        $html = '<img src="/midia/'.$midia->id.'/web" class="aligncenter size-large" alt="x">';
+        $out = $this->servico->enriquecer($html);
 
         // a classe de alinhamento/tamanho vai para o <figure>
         $this->assertMatchesRegularExpression('/<figure class="figura-conteudo[^"]*aligncenter[^"]*"/', $out['html']);
@@ -100,7 +100,7 @@ class EnriquecedorImagensConteudoTest extends TestCase
     public function test_imagem_storage_fica_intacta_sem_figure_e_sem_image_object(): void
     {
         $html = '<img src="/storage/posts/foto-migrada.jpg" alt="migrada">';
-        $out  = $this->servico->enriquecer($html);
+        $out = $this->servico->enriquecer($html);
 
         $this->assertStringNotContainsString('<figure', $out['html']);
         $this->assertStringContainsString('/storage/posts/foto-migrada.jpg', $out['html']);
@@ -130,8 +130,8 @@ class EnriquecedorImagensConteudoTest extends TestCase
     {
         $midia = $this->criarMidia(['legenda' => '<b>texto</b> & "aspas"']);
 
-        $html = '<img src="/midia/' . $midia->id . '/web" alt="escape">';
-        $out  = $this->servico->enriquecer($html);
+        $html = '<img src="/midia/'.$midia->id.'/web" alt="escape">';
+        $out = $this->servico->enriquecer($html);
 
         // Deve aparecer escapado, não como HTML renderizado
         $this->assertStringContainsString('&lt;b&gt;texto&lt;/b&gt;', $out['html']);

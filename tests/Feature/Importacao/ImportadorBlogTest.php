@@ -5,7 +5,6 @@ namespace Tests\Feature\Importacao;
 use App\Importacao\BaixadorImagem;
 use App\Importacao\ImportadorBlog;
 use App\Importacao\LeitorBlog;
-use App\Importacao\ReescritorImagensConteudo;
 use App\Models\Post;
 use Database\Seeders\CategoriaSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -33,7 +32,7 @@ class ImportadorBlogTest extends TestCase
             ? "<p>Texto.</p><img src=\"{$urlConteudo}\" alt=\"img\">"
             : '<p>Texto longo o suficiente para calculo.</p>';
 
-        return new class ($conteudo, $urlGaleria) implements LeitorBlog
+        return new class($conteudo, $urlGaleria) implements LeitorBlog
         {
             public function __construct(
                 private string $conteudo,
@@ -43,18 +42,18 @@ class ImportadorBlogTest extends TestCase
             public function posts(): array
             {
                 return [[
-                    'titulo'                   => 'Luz e Amor',
-                    'slug'                     => 'luz-e-amor',
-                    'resumo'                   => 'Um belo post',
-                    'conteudo'                 => $this->conteudo,
-                    'data_publicacao'          => Carbon::parse('2026-01-15'),
-                    'status'                   => 'publicado',
-                    'wp_id'                    => 123,
-                    'imagem_url'               => 'https://example.com/foto.jpg',
-                    'imagem_alt'               => 'Foto de luz',
-                    'categorias_slugs'         => ['reflexoes-e-espiritualidade', 'categoria-inexistente'],
+                    'titulo' => 'Luz e Amor',
+                    'slug' => 'luz-e-amor',
+                    'resumo' => 'Um belo post',
+                    'conteudo' => $this->conteudo,
+                    'data_publicacao' => Carbon::parse('2026-01-15'),
+                    'status' => 'publicado',
+                    'wp_id' => 123,
+                    'imagem_url' => 'https://example.com/foto.jpg',
+                    'imagem_alt' => 'Foto de luz',
+                    'categorias_slugs' => ['reflexoes-e-espiritualidade', 'categoria-inexistente'],
                     'categoria_principal_slug' => 'reflexoes-e-espiritualidade',
-                    'tags'                     => [
+                    'tags' => [
                         ['nome' => 'Amor', 'slug' => 'amor'],
                         ['nome' => 'Luz', 'slug' => 'luz'],
                     ],
@@ -65,9 +64,9 @@ class ImportadorBlogTest extends TestCase
                         ['url' => $this->urlGaleria, 'wp_id' => 456, 'ordem' => 0],
                     ],
                     'seo' => [
-                        'titulo'    => 'SEO Luz',
+                        'titulo' => 'SEO Luz',
                         'descricao' => 'desc seo',
-                        'keyword'   => 'luz amor',
+                        'keyword' => 'luz amor',
                         'og_imagem' => 'https://example.com/og.jpg',
                     ],
                 ]];
@@ -238,20 +237,20 @@ class ImportadorBlogTest extends TestCase
             public function posts(): array
             {
                 return [[
-                    'titulo'                   => 'Galeria Ordenada',
-                    'slug'                     => 'galeria-ordenada',
-                    'resumo'                   => null,
-                    'conteudo'                 => '<p>Texto longo o suficiente para calculo.</p>',
-                    'data_publicacao'          => Carbon::parse('2026-01-15'),
-                    'status'                   => 'publicado',
-                    'wp_id'                    => 999,
-                    'imagem_url'               => null,
-                    'imagem_alt'               => null,
-                    'categorias_slugs'         => [],
+                    'titulo' => 'Galeria Ordenada',
+                    'slug' => 'galeria-ordenada',
+                    'resumo' => null,
+                    'conteudo' => '<p>Texto longo o suficiente para calculo.</p>',
+                    'data_publicacao' => Carbon::parse('2026-01-15'),
+                    'status' => 'publicado',
+                    'wp_id' => 999,
+                    'imagem_url' => null,
+                    'imagem_alt' => null,
+                    'categorias_slugs' => [],
                     'categoria_principal_slug' => null,
-                    'tags'                     => [],
-                    'faqs'                     => [],
-                    'galeria'                  => [
+                    'tags' => [],
+                    'faqs' => [],
+                    'galeria' => [
                         ['url' => 'https://example.com/primeira.jpg', 'wp_id' => 1, 'ordem' => 0],
                         ['url' => 'https://example.com/segunda.jpg', 'wp_id' => 2, 'ordem' => 1],
                     ],
@@ -274,7 +273,7 @@ class ImportadorBlogTest extends TestCase
         // Passar isso ao Http::get fazia o Guzzle lançar ("scheme a"), derrubando o import.
         Http::fake();
 
-        $r = app(\App\Importacao\BaixadorImagem::class)->baixarCapado('a:2:{s:5:"check";b:1;}', 1200);
+        $r = app(BaixadorImagem::class)->baixarCapado('a:2:{s:5:"check";b:1;}', 1200);
 
         $this->assertNull($r);
         Http::assertNothingSent(); // nem tentou baixar — rejeitado antes do request

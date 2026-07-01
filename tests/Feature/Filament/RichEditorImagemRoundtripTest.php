@@ -7,6 +7,7 @@ namespace Tests\Feature\Filament;
 use App\Filament\RichContent\Plugins\ImagemPlugin;
 use Filament\Forms\Components\RichEditor\RichContentRenderer;
 use Tests\TestCase;
+use Tiptap\Editor;
 
 /**
  * Testa o round-trip dos atributos `align` e `size` da extensão ImagemPlugin.
@@ -24,7 +25,7 @@ use Tests\TestCase;
  */
 class RichEditorImagemRoundtripTest extends TestCase
 {
-    private function editor(): \Tiptap\Editor
+    private function editor(): Editor
     {
         return RichContentRenderer::make()
             ->plugins([ImagemPlugin::make()])
@@ -33,14 +34,14 @@ class RichEditorImagemRoundtripTest extends TestCase
 
     // --- Testes de align ---
 
-    public function test_atributo_align_sobrevive_ao_getHTML(): void
+    public function test_atributo_align_sobrevive_ao_get_html(): void
     {
         $doc = [
-            'type'    => 'doc',
+            'type' => 'doc',
             'content' => [[
-                'type'    => 'paragraph',
+                'type' => 'paragraph',
                 'content' => [[
-                    'type'  => 'image',
+                    'type' => 'image',
                     'attrs' => ['src' => 'https://x/a.jpg', 'align' => 'left'],
                 ]],
             ]],
@@ -54,11 +55,11 @@ class RichEditorImagemRoundtripTest extends TestCase
     public function test_align_right_gera_classe_alignright(): void
     {
         $doc = [
-            'type'    => 'doc',
+            'type' => 'doc',
             'content' => [[
-                'type'    => 'paragraph',
+                'type' => 'paragraph',
                 'content' => [[
-                    'type'  => 'image',
+                    'type' => 'image',
                     'attrs' => ['src' => 'https://x/b.jpg', 'align' => 'right'],
                 ]],
             ]],
@@ -72,11 +73,11 @@ class RichEditorImagemRoundtripTest extends TestCase
     public function test_imagem_sem_align_nao_emite_classe_wp(): void
     {
         $doc = [
-            'type'    => 'doc',
+            'type' => 'doc',
             'content' => [[
-                'type'    => 'paragraph',
+                'type' => 'paragraph',
                 'content' => [[
-                    'type'  => 'image',
+                    'type' => 'image',
                     'attrs' => ['src' => 'https://x/c.jpg'],
                 ]],
             ]],
@@ -95,11 +96,11 @@ class RichEditorImagemRoundtripTest extends TestCase
     public function test_atributo_size_large_gera_classe_size_large(): void
     {
         $doc = [
-            'type'    => 'doc',
+            'type' => 'doc',
             'content' => [[
-                'type'    => 'paragraph',
+                'type' => 'paragraph',
                 'content' => [[
-                    'type'  => 'image',
+                    'type' => 'image',
                     'attrs' => ['src' => 'https://x/d.jpg', 'size' => 'large'],
                 ]],
             ]],
@@ -113,11 +114,11 @@ class RichEditorImagemRoundtripTest extends TestCase
     public function test_atributo_size_medium_gera_classe_size_medium(): void
     {
         $doc = [
-            'type'    => 'doc',
+            'type' => 'doc',
             'content' => [[
-                'type'    => 'paragraph',
+                'type' => 'paragraph',
                 'content' => [[
-                    'type'  => 'image',
+                    'type' => 'image',
                     'attrs' => ['src' => 'https://x/e.jpg', 'size' => 'medium'],
                 ]],
             ]],
@@ -131,11 +132,11 @@ class RichEditorImagemRoundtripTest extends TestCase
     public function test_atributo_size_full_gera_classe_size_full(): void
     {
         $doc = [
-            'type'    => 'doc',
+            'type' => 'doc',
             'content' => [[
-                'type'    => 'paragraph',
+                'type' => 'paragraph',
                 'content' => [[
-                    'type'  => 'image',
+                    'type' => 'image',
                     'attrs' => ['src' => 'https://x/f.jpg', 'size' => 'full'],
                 ]],
             ]],
@@ -151,11 +152,11 @@ class RichEditorImagemRoundtripTest extends TestCase
     public function test_align_e_size_coexistem_na_mesma_classe(): void
     {
         $doc = [
-            'type'    => 'doc',
+            'type' => 'doc',
             'content' => [[
-                'type'    => 'paragraph',
+                'type' => 'paragraph',
                 'content' => [[
-                    'type'  => 'image',
+                    'type' => 'image',
                     'attrs' => ['src' => 'https://x/g.jpg', 'align' => 'left', 'size' => 'large'],
                 ]],
             ]],

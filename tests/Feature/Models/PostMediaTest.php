@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Models;
 
+use App\Filament\RichContent\ProviderImagemCorpo;
 use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
+use Spatie\MediaLibrary\HasMedia;
 use Tests\TestCase;
 
 class PostMediaTest extends TestCase
@@ -104,7 +106,7 @@ class PostMediaTest extends TestCase
     {
         $post = new Post;
 
-        $this->assertInstanceOf(\Spatie\MediaLibrary\HasMedia::class, $post);
+        $this->assertInstanceOf(HasMedia::class, $post);
     }
 
     public function test_colunas_imagem_antigas_removidas_do_schema(): void
@@ -148,7 +150,7 @@ class PostMediaTest extends TestCase
 
         $provider = $post->getRichContentAttribute(Post::COLECAO_CONTEUDO)?->getFileAttachmentProvider();
 
-        $this->assertInstanceOf(\App\Filament\RichContent\ProviderImagemCorpo::class, $provider);
+        $this->assertInstanceOf(ProviderImagemCorpo::class, $provider);
 
         $url = $provider->getFileAttachmentUrl($media->uuid);
 

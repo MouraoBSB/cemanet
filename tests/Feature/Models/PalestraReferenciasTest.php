@@ -3,7 +3,6 @@
 namespace Tests\Feature\Models;
 
 use App\Models\Palestra;
-use App\Models\PalestraReferencia;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

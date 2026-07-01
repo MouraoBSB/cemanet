@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Front;
 
+use App\Models\Assunto;
 use App\Models\Palestra;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -64,7 +65,7 @@ class PalestraSingleSlideTest extends TestCase
 
     public function test_relacionadas_renderizam_no_html(): void
     {
-        $assunto = \App\Models\Assunto::factory()->create();
+        $assunto = Assunto::factory()->create();
         $atual = Palestra::factory()->create(['slug' => 'atual-r', 'status' => Palestra::STATUS_PUBLICADO]);
         $atual->assuntos()->attach($assunto);
         $irma = Palestra::factory()->create(['titulo' => 'Palestra Irmã', 'status' => Palestra::STATUS_PUBLICADO]);

@@ -22,7 +22,7 @@ class BlogMediaRenderTest extends TestCase
         Storage::fake('public');
 
         $post = Post::factory()->comImagemDestacada()->create([
-            'slug'   => 'post-com-media',
+            'slug' => 'post-com-media',
             'status' => Post::STATUS_PUBLICADO,
         ]);
 
@@ -41,7 +41,7 @@ class BlogMediaRenderTest extends TestCase
         Storage::fake('public');
 
         $post = Post::factory()->comImagemDestacada()->create([
-            'status'   => Post::STATUS_PUBLICADO,
+            'status' => Post::STATUS_PUBLICADO,
             'destaque' => true,
         ]);
 
@@ -61,7 +61,7 @@ class BlogMediaRenderTest extends TestCase
         Storage::fake('public');
 
         Post::factory()->create([
-            'slug'   => 'post-sem-media',
+            'slug' => 'post-sem-media',
             'status' => Post::STATUS_PUBLICADO,
         ]);
 

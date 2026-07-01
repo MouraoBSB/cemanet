@@ -28,9 +28,9 @@ class BlogConteudoRicoTest extends TestCase
         $midia->setCustomProperty('legenda', 'Legenda de teste')->save();
 
         $post = Post::factory()->create([
-            'status'          => Post::STATUS_PUBLICADO,
+            'status' => Post::STATUS_PUBLICADO,
             'data_publicacao' => now()->subDay(),
-            'conteudo'        => '<p>texto</p><img src="/midia/' . $midia->id . '/web" alt="x">',
+            'conteudo' => '<p>texto</p><img src="/midia/'.$midia->id.'/web" alt="x">',
         ]);
 
         $resp = $this->get(route('blog.show', $post->slug));

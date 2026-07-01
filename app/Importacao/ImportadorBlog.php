@@ -34,18 +34,18 @@ class ImportadorBlog
 
                 // 2. Montar campos SEM imagem_destacada e og_imagem (vão para a ML)
                 $campos = [
-                    'titulo'               => $d['titulo'],
-                    'resumo'               => $d['resumo'] ?? null,
-                    'conteudo'             => $conteudoLimpo,
-                    'data_publicacao'      => $d['data_publicacao'],
-                    'status'               => $d['status'],
-                    'wp_id'                => $d['wp_id'],
+                    'titulo' => $d['titulo'],
+                    'resumo' => $d['resumo'] ?? null,
+                    'conteudo' => $conteudoLimpo,
+                    'data_publicacao' => $d['data_publicacao'],
+                    'status' => $d['status'],
+                    'wp_id' => $d['wp_id'],
                     'imagem_destacada_alt' => $d['imagem_alt'] ?? null,
-                    'criado_por_id'        => null,
-                    'tempo_leitura_min'    => TransformadorBlog::tempoLeitura($conteudoLimpo),
-                    'seo_titulo'           => $d['seo']['titulo'] ?? null,
-                    'seo_descricao'        => $d['seo']['descricao'] ?? null,
-                    'seo_keyword'          => $d['seo']['keyword'] ?? null,
+                    'criado_por_id' => null,
+                    'tempo_leitura_min' => TransformadorBlog::tempoLeitura($conteudoLimpo),
+                    'seo_titulo' => $d['seo']['titulo'] ?? null,
+                    'seo_descricao' => $d['seo']['descricao'] ?? null,
+                    'seo_keyword' => $d['seo']['keyword'] ?? null,
                 ];
 
                 // 3. Persistir / atualizar o post
@@ -64,7 +64,7 @@ class ImportadorBlog
                         $post->addMediaFromString($bytes)
                             ->usingFileName(basename(parse_url($urlDestacada, PHP_URL_PATH) ?? 'capa.jpg'))
                             ->withCustomProperties([
-                                'alt'        => $d['imagem_alt'] ?? null,
+                                'alt' => $d['imagem_alt'] ?? null,
                                 'url_legado' => $urlDestacada,
                             ])
                             ->toMediaCollection(Post::COLECAO_DESTACADA);
@@ -98,7 +98,7 @@ class ImportadorBlog
                     $post->addMediaFromString($bytes)
                         ->usingFileName(basename(parse_url($item['url'], PHP_URL_PATH) ?? 'galeria.jpg'))
                         ->withCustomProperties([
-                            'alt'        => $item['alt'] ?? null,
+                            'alt' => $item['alt'] ?? null,
                             'url_legado' => $item['url'],
                         ])
                         ->toMediaCollection(Post::COLECAO_GALERIA);
@@ -152,7 +152,7 @@ class ImportadorBlog
         }
 
         return [
-            'posts'  => $processados,
+            'posts' => $processados,
             'avisos' => $this->avisos,
         ];
     }

@@ -30,7 +30,7 @@ class EnriquecedorImagensConteudo
         libxml_use_internal_errors(true);
         // meta charset evita mangle de UTF-8; NOIMPLIED/NODEFDTD evita <html><body>.
         $dom->loadHTML(
-            '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><div id="cema-raiz">' . $html . '</div>',
+            '<meta http-equiv="Content-Type" content="text/html; charset=utf-8"><div id="cema-raiz">'.$html.'</div>',
             LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD,
         );
         libxml_clear_errors();
@@ -67,8 +67,8 @@ class EnriquecedorImagensConteudo
         foreach ($imgs as [$img, $id]) {
             $midia = $midias->get($id);
 
-            $legenda   = $midia?->getCustomProperty('legenda');
-            $titulo    = $midia?->getCustomProperty('titulo');
+            $legenda = $midia?->getCustomProperty('legenda');
+            $titulo = $midia?->getCustomProperty('titulo');
             $descricao = $midia?->getCustomProperty('descricao');
 
             // Só envolve em <figure> quando há legenda a exibir (mínima intervenção no layout).
@@ -81,7 +81,7 @@ class EnriquecedorImagensConteudo
                 $restantes === [] ? $img->removeAttribute('class') : $img->setAttribute('class', implode(' ', $restantes));
 
                 $figure = $dom->createElement('figure');
-                $figure->setAttribute('class', trim('figura-conteudo ' . implode(' ', $mover)));
+                $figure->setAttribute('class', trim('figura-conteudo '.implode(' ', $mover)));
                 $img->parentNode?->replaceChild($figure, $img);
                 $figure->appendChild($img);
 
@@ -92,10 +92,10 @@ class EnriquecedorImagensConteudo
 
             // ImageObject (omitindo chaves vazias)
             $obj = array_filter([
-                '@type'       => 'ImageObject',
-                'contentUrl'  => url('/midia/' . $id . '/web'),
-                'caption'     => $legenda,
-                'name'        => $titulo,
+                '@type' => 'ImageObject',
+                'contentUrl' => url('/midia/'.$id.'/web'),
+                'caption' => $legenda,
+                'name' => $titulo,
                 'description' => $descricao,
             ], fn ($v) => filled($v));
             $imagens[] = $obj;

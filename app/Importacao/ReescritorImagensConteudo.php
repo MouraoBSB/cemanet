@@ -31,7 +31,7 @@ class ReescritorImagensConteudo
 
             if ($bytes === null) {
                 Log::warning('ReescritorImagensConteudo: falha ao baixar imagem', [
-                    'url'       => $url,
+                    'url' => $url,
                     'slug_post' => $slugPost,
                 ]);
 

@@ -4,8 +4,11 @@
 
 namespace App\Filament\RichContent\Plugins;
 
+use Filament\Actions\Action;
 use Filament\Forms\Components\RichEditor\Plugins\Contracts\RichContentPlugin;
+use Filament\Forms\Components\RichEditor\RichEditorTool;
 use Filament\Support\Facades\FilamentAsset;
+use Tiptap\Core\Extension;
 
 /**
  * Plugin RichContent: substitui a extensão `textAlign` padrão do Filament por uma
@@ -20,7 +23,7 @@ class TextoAlinhamentoPlugin implements RichContentPlugin
         return app(static::class);
     }
 
-    /** @return array<\Tiptap\Core\Extension> */
+    /** @return array<Extension> */
     public function getTipTapPhpExtensions(): array
     {
         // Não é necessário espelho PHP: o conteúdo do blog é salvo como o HTML do
@@ -34,13 +37,13 @@ class TextoAlinhamentoPlugin implements RichContentPlugin
         return [FilamentAsset::getScriptSrc('texto-alinhado', 'app')];
     }
 
-    /** @return array<\Filament\Forms\Components\RichEditor\RichEditorTool> */
+    /** @return array<RichEditorTool> */
     public function getEditorTools(): array
     {
         return [];
     }
 
-    /** @return array<\Filament\Actions\Action> */
+    /** @return array<Action> */
     public function getEditorActions(): array
     {
         return [];

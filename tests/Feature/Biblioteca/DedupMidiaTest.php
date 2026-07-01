@@ -22,7 +22,7 @@ class DedupMidiaTest extends TestCase
         parent::setUp();
         Storage::fake('public');
         // Arquivo ≤ teto (não capa → hash de entrada == hash canônico).
-        $this->arquivo = sys_get_temp_dir() . '/dedup-' . uniqid() . '.png';
+        $this->arquivo = sys_get_temp_dir().'/dedup-'.uniqid().'.png';
         file_put_contents($this->arquivo, UploadedFile::fake()->image('x.png', 800, 600)->getContent());
     }
 
@@ -34,7 +34,7 @@ class DedupMidiaTest extends TestCase
 
     public function test_mesmo_arquivo_registra_uma_unica_midia(): void
     {
-        $svc = new RegistraMidiaBiblioteca();
+        $svc = new RegistraMidiaBiblioteca;
 
         $a = $svc->aPartirDoCaminho($this->arquivo, 'x.png');
         $b = $svc->aPartirDoCaminho($this->arquivo, 'x.png');
@@ -46,7 +46,7 @@ class DedupMidiaTest extends TestCase
 
     public function test_guarda_e_preserva_metadados(): void
     {
-        $svc = new RegistraMidiaBiblioteca();
+        $svc = new RegistraMidiaBiblioteca;
 
         $a = $svc->aPartirDoCaminho($this->arquivo, 'x.png', ['alt' => 'Descrição A', 'legenda' => 'Leg']);
         $this->assertSame('Descrição A', $a->getCustomProperty('alt'));

@@ -17,9 +17,9 @@ class PlacarSeo
         ?string $keyword,
         ?string $descricao,
     ): array {
-        $conteudo  = $conteudo  ?? '';
-        $titulo    = $titulo    ?? '';
-        $keyword   = $keyword   ?? '';
+        $conteudo = $conteudo ?? '';
+        $titulo = $titulo ?? '';
+        $keyword = $keyword ?? '';
         $descricao = $descricao ?? '';
 
         // Texto limpo (sem tags HTML) para análise de palavras e parágrafo inicial
@@ -43,7 +43,7 @@ class PlacarSeo
             if ($totalPalavras > 0) {
                 // Conta ocorrências da keyword (case-insensitive, Unicode)
                 $ocorrencias = preg_match_all(
-                    '/' . preg_quote($keyword, '/') . '/iu',
+                    '/'.preg_quote($keyword, '/').'/iu',
                     $textoLimpo,
                 );
                 // Palavras da keyword via regex Unicode (suporte a acentos)
@@ -61,11 +61,11 @@ class PlacarSeo
 
         // Sinal 7: todas as <img> têm atributo alt não vazio
         $imgsComAlt = true;
-        $totalImgs  = preg_match_all('/<img\b[^>]*>/i', $conteudo, $matchesImg);
+        $totalImgs = preg_match_all('/<img\b[^>]*>/i', $conteudo, $matchesImg);
         if ($totalImgs > 0) {
             foreach ($matchesImg[0] as $tag) {
                 // Verifica se a tag possui alt="algo não vazio"
-                if (!preg_match('/\balt\s*=\s*(?:"([^"]+)"|\'([^\']+)\'|(\S+))/i', $tag)) {
+                if (! preg_match('/\balt\s*=\s*(?:"([^"]+)"|\'([^\']+)\'|(\S+))/i', $tag)) {
                     $imgsComAlt = false;
                     break;
                 }
@@ -84,7 +84,7 @@ class PlacarSeo
             ['ok' => $keywordNoTitulo,    'rotulo' => 'Keyword no título'],
             ['ok' => $keywordNoParagrafo, 'rotulo' => 'Keyword no 1º parágrafo'],
             ['ok' => $densidadeOk,        'rotulo' => 'Densidade da keyword (0,5%–2,5%)'],
-            ['ok' => $palavrasSuficientes,'rotulo' => 'Conteúdo com ≥ 300 palavras'],
+            ['ok' => $palavrasSuficientes, 'rotulo' => 'Conteúdo com ≥ 300 palavras'],
             ['ok' => $temSubtitulo,       'rotulo' => 'Subtítulo (h2 ou h3)'],
             ['ok' => $imgsComAlt,         'rotulo' => 'Imagens com atributo alt'],
             ['ok' => $descricaoOk,        'rotulo' => 'Meta description (50–160 caracteres)'],
@@ -92,7 +92,7 @@ class PlacarSeo
         ];
 
         $aprovados = count(array_filter($itens, fn ($i) => $i['ok']));
-        $nota      = (int) round($aprovados / count($itens) * 100);
+        $nota = (int) round($aprovados / count($itens) * 100);
 
         return ['nota' => $nota, 'itens' => $itens];
     }

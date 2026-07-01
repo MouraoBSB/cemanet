@@ -25,8 +25,8 @@ class BlogConteudoResponsivoTest extends TestCase
 HTML;
 
         $post = Post::factory()->create([
-            'slug'     => 'post-responsivo',
-            'status'   => Post::STATUS_PUBLICADO,
+            'slug' => 'post-responsivo',
+            'status' => Post::STATUS_PUBLICADO,
             'conteudo' => $conteudo,
         ]);
 
@@ -52,8 +52,8 @@ HTML;
 HTML;
 
         $post = Post::factory()->create([
-            'slug'     => 'post-sem-px',
-            'status'   => Post::STATUS_PUBLICADO,
+            'slug' => 'post-sem-px',
+            'status' => Post::STATUS_PUBLICADO,
             'conteudo' => $conteudo,
         ]);
 

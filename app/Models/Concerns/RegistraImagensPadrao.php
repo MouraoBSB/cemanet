@@ -24,10 +24,10 @@ use Spatie\MediaLibrary\MediaCollections\Models\Media;
 trait RegistraImagensPadrao
 {
     /**
-     * @param  string  $colecao     nome da coleção de mídia
-     * @param  bool    $unica       true = singleFile (1 imagem); false = múltiplas (galeria)
-     * @param  int     $larguraWeb  largura máxima da conversão `web` (px)
-     * @param  int     $ladoThumb   lado da miniatura quadrada `thumb` (px)
+     * @param  string  $colecao  nome da coleção de mídia
+     * @param  bool  $unica  true = singleFile (1 imagem); false = múltiplas (galeria)
+     * @param  int  $larguraWeb  largura máxima da conversão `web` (px)
+     * @param  int  $ladoThumb  lado da miniatura quadrada `thumb` (px)
      */
     protected function registrarColecaoImagem(
         string $colecao,

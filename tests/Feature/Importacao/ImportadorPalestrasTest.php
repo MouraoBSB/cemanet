@@ -104,9 +104,9 @@ class ImportadorPalestrasTest extends TestCase
 
         // Ana tem foto_url → foto deve estar na Media Library; Bruno não tem foto_url → sem mídia.
         $ana = Palestrante::where('slug', 'ana')->first();
-        $this->assertTrue($ana->fresh()->hasMedia(\App\Models\Palestrante::COLECAO_FOTO));
+        $this->assertTrue($ana->fresh()->hasMedia(Palestrante::COLECAO_FOTO));
 
         $bruno = Palestrante::where('slug', 'bruno')->first();
-        $this->assertFalse($bruno->fresh()->hasMedia(\App\Models\Palestrante::COLECAO_FOTO));
+        $this->assertFalse($bruno->fresh()->hasMedia(Palestrante::COLECAO_FOTO));
     }
 }

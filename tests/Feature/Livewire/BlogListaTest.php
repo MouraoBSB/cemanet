@@ -20,8 +20,8 @@ class BlogListaTest extends TestCase
     private function criarPostsPopularesParaSidebar(): void
     {
         Post::factory()->count(5)->create([
-            'status'          => Post::STATUS_PUBLICADO,
-            'visualizacoes'   => 9999,
+            'status' => Post::STATUS_PUBLICADO,
+            'visualizacoes' => 9999,
             'data_publicacao' => now()->subYear(),
         ]);
     }
@@ -35,18 +35,18 @@ class BlogListaTest extends TestCase
 
         // postCat1 é o mais recente → será o $destaque global
         $postCat1 = Post::factory()->create([
-            'titulo'          => 'Artigo Reflexoes XZ Unico',
-            'status'          => Post::STATUS_PUBLICADO,
-            'visualizacoes'   => 0,
+            'titulo' => 'Artigo Reflexoes XZ Unico',
+            'status' => Post::STATUS_PUBLICADO,
+            'visualizacoes' => 0,
             'data_publicacao' => now()->subDays(1),
         ]);
         $postCat1->categorias()->attach($cat1);
 
         // postCat2 mais antigo, views=0 → não entra no destaque nem nas mais lidas
         $postCat2 = Post::factory()->create([
-            'titulo'          => 'Artigo Pratica XZ Unico',
-            'status'          => Post::STATUS_PUBLICADO,
-            'visualizacoes'   => 0,
+            'titulo' => 'Artigo Pratica XZ Unico',
+            'status' => Post::STATUS_PUBLICADO,
+            'visualizacoes' => 0,
             'data_publicacao' => now()->subDays(5),
         ]);
         $postCat2->categorias()->attach($cat2);
@@ -68,18 +68,18 @@ class BlogListaTest extends TestCase
         $cat = Categoria::factory()->create(['slug' => 'espiritualidade-xz']);
 
         $postA = Post::factory()->create([
-            'titulo'          => 'Artigo Espiritualidade XZ Unico',
-            'status'          => Post::STATUS_PUBLICADO,
-            'visualizacoes'   => 0,
+            'titulo' => 'Artigo Espiritualidade XZ Unico',
+            'status' => Post::STATUS_PUBLICADO,
+            'visualizacoes' => 0,
             'data_publicacao' => now()->subDays(1),
         ]);
         $postA->categorias()->attach($cat);
 
         // postB sem categoria, views=0, mais antigo → não aparece em destaque nem sidebar
         $postB = Post::factory()->create([
-            'titulo'          => 'Artigo Sem Categoria XZ Unico',
-            'status'          => Post::STATUS_PUBLICADO,
-            'visualizacoes'   => 0,
+            'titulo' => 'Artigo Sem Categoria XZ Unico',
+            'status' => Post::STATUS_PUBLICADO,
+            'visualizacoes' => 0,
             'data_publicacao' => now()->subDays(6),
         ]);
 
@@ -97,15 +97,15 @@ class BlogListaTest extends TestCase
         $this->criarPostsPopularesParaSidebar();
 
         Post::factory()->create([
-            'titulo'          => 'Fe Raciocinada XZ Unico',
-            'status'          => Post::STATUS_PUBLICADO,
-            'visualizacoes'   => 0,
+            'titulo' => 'Fe Raciocinada XZ Unico',
+            'status' => Post::STATUS_PUBLICADO,
+            'visualizacoes' => 0,
             'data_publicacao' => now()->subDays(1),
         ]);
         Post::factory()->create([
-            'titulo'          => 'Mediunidade Servico XZ Unico',
-            'status'          => Post::STATUS_PUBLICADO,
-            'visualizacoes'   => 0,
+            'titulo' => 'Mediunidade Servico XZ Unico',
+            'status' => Post::STATUS_PUBLICADO,
+            'visualizacoes' => 0,
             'data_publicacao' => now()->subDays(6),
         ]);
 
@@ -119,25 +119,25 @@ class BlogListaTest extends TestCase
     {
         // Post em destaque ocupa o herói (fora do grid), isolando a asserção ao grid.
         Post::factory()->create([
-            'titulo'          => 'Post Destaque Heroi XZ',
-            'status'          => Post::STATUS_PUBLICADO,
-            'destaque'        => true,
-            'visualizacoes'   => 0,
+            'titulo' => 'Post Destaque Heroi XZ',
+            'status' => Post::STATUS_PUBLICADO,
+            'destaque' => true,
+            'visualizacoes' => 0,
             'data_publicacao' => now(),
         ]);
 
         Post::factory()->create([
-            'titulo'          => 'Post Antigo XZ',
-            'status'          => Post::STATUS_PUBLICADO,
-            'destaque'        => false,
-            'visualizacoes'   => 0,
+            'titulo' => 'Post Antigo XZ',
+            'status' => Post::STATUS_PUBLICADO,
+            'destaque' => false,
+            'visualizacoes' => 0,
             'data_publicacao' => now()->subDays(10),
         ]);
         Post::factory()->create([
-            'titulo'          => 'Post Recente XZ',
-            'status'          => Post::STATUS_PUBLICADO,
-            'destaque'        => false,
-            'visualizacoes'   => 0,
+            'titulo' => 'Post Recente XZ',
+            'status' => Post::STATUS_PUBLICADO,
+            'destaque' => false,
+            'visualizacoes' => 0,
             'data_publicacao' => now()->subDays(1),
         ]);
 

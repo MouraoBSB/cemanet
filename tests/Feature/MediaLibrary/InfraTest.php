@@ -1,4 +1,5 @@
 <?php
+
 // Thiago Mourão — https://github.com/MouraoBSB — 2026-06-26
 
 namespace Tests\Feature\MediaLibrary;
@@ -71,5 +72,6 @@ class ItemDeTesteMedia extends Model implements HasMedia
     use InteractsWithMedia;
 
     protected $table = 'itens_de_teste_media';
+
     protected $guarded = [];
 }

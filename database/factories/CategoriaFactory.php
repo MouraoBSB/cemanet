@@ -17,9 +17,9 @@ class CategoriaFactory extends Factory
         $nome = fake()->unique()->words(3, true);
 
         return [
-            'nome'  => ucfirst($nome),
-            'slug'  => Str::slug($nome).'-'.fake()->unique()->numberBetween(1, 99999),
-            'cor'   => fake()->hexColor(),
+            'nome' => ucfirst($nome),
+            'slug' => Str::slug($nome).'-'.fake()->unique()->numberBetween(1, 99999),
+            'cor' => fake()->hexColor(),
             'ordem' => fake()->numberBetween(1, 99),
         ];
     }

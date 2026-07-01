@@ -7,6 +7,7 @@ namespace App\Filament\Resources\Bibliotecas;
 use App\Filament\Resources\Bibliotecas\Pages\ListBibliotecas;
 use App\Models\Biblioteca;
 use App\Models\Post;
+use App\Support\Biblioteca\RegistraMidiaBiblioteca;
 use BackedEnum;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
@@ -72,7 +73,7 @@ class BibliotecaResource extends Resource
 
                 TextColumn::make('size')
                     ->label('Tamanho')
-                    ->formatStateUsing(fn (int $state): string => number_format($state / 1024, 0, ',', '.') . ' KB')
+                    ->formatStateUsing(fn (int $state): string => number_format($state / 1024, 0, ',', '.').' KB')
                     ->sortable(),
 
                 TextColumn::make('custom_properties.alt')
@@ -117,7 +118,7 @@ class BibliotecaResource extends Resource
 
                         // finally: remove o temporário mesmo se o registro lançar (sem órfãos).
                         try {
-                            app(\App\Support\Biblioteca\RegistraMidiaBiblioteca::class)->aPartirDoCaminho(
+                            app(RegistraMidiaBiblioteca::class)->aPartirDoCaminho(
                                 $caminho,
                                 basename($data['arquivo']),
                                 ['alt' => $data['alt'] ?? null, 'legenda' => $data['legenda'] ?? null],
@@ -137,9 +138,9 @@ class BibliotecaResource extends Resource
                     ->label('Editar')
                     ->icon(Heroicon::OutlinedPencilSquare)
                     ->fillForm(fn (Media $record): array => [
-                        'alt'       => $record->getCustomProperty('alt'),
-                        'legenda'   => $record->getCustomProperty('legenda'),
-                        'titulo'    => $record->getCustomProperty('titulo'),
+                        'alt' => $record->getCustomProperty('alt'),
+                        'legenda' => $record->getCustomProperty('legenda'),
+                        'titulo' => $record->getCustomProperty('titulo'),
                         'descricao' => $record->getCustomProperty('descricao'),
                     ])
                     ->form([

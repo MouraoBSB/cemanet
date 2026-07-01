@@ -129,10 +129,10 @@ class LeitorBlogMysql implements LeitorBlog
     private function termosDoPost(int $postId, string $taxonomy): array
     {
         $rows = $this->db->select(
-            "SELECT t.slug FROM wp_term_relationships tr
+            'SELECT t.slug FROM wp_term_relationships tr
              JOIN wp_term_taxonomy tt ON tt.term_taxonomy_id = tr.term_taxonomy_id
              JOIN wp_terms t ON t.term_id = tt.term_id
-             WHERE tr.object_id = ? AND tt.taxonomy = ?",
+             WHERE tr.object_id = ? AND tt.taxonomy = ?',
             [$postId, $taxonomy]
         );
 
@@ -161,7 +161,7 @@ class LeitorBlogMysql implements LeitorBlog
      * Resolve o slug da categoria principal.
      * Usa rank_math_primary_category (term_id) → slug do banco; fallback: 1ª categoria.
      *
-     * @param array<int,string> $categoriasSlugs
+     * @param  array<int,string>  $categoriasSlugs
      */
     private function categoriaPrincipalSlug(?string $rankMathTermId, array $categoriasSlugs): ?string
     {

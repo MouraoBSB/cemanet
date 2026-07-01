@@ -41,7 +41,7 @@ class TransformadorBlogTest extends TestCase
         // 250 palavras acentuadas → ceil(250/200) = 2 minutos.
         // Com str_word_count, "coração" poderia ser quebrado em múltiplos tokens
         // inflando a contagem e produzindo resultado incorreto.
-        $html = '<p>' . str_repeat('coração ', 250) . '</p>';
+        $html = '<p>'.str_repeat('coração ', 250).'</p>';
         $this->assertSame(2, TransformadorBlog::tempoLeitura($html));
 
         // 4 palavras acentuadas → 1 minuto (ceil(4/200)=1).
@@ -85,8 +85,8 @@ class TransformadorBlogTest extends TestCase
         // Um regex ganancioso (\S+) engolia jet-sm-gb-GUID"><img e destruía a imagem,
         // cascateando perda de conteúdo no purifier. [\w-]+ para no aspas/colchete.
         $guid = '847308d4-0582-4cdf-b0ad-e24241d9f636';
-        $html = '<figure class="wp-block-image size-large jet-sm-gb-wrapper jet-sm-gb-' . $guid . '">'
-            . '<img src="https://x/uploads/foto.png" alt="" class="wp-image-27418"/></figure>';
+        $html = '<figure class="wp-block-image size-large jet-sm-gb-wrapper jet-sm-gb-'.$guid.'">'
+            .'<img src="https://x/uploads/foto.png" alt="" class="wp-image-27418"/></figure>';
 
         $out = TransformadorBlog::limparGutenberg($html);
 

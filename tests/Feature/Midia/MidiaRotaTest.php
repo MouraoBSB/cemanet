@@ -9,13 +9,14 @@ use App\Models\Post;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 use Tests\TestCase;
 
 class MidiaRotaTest extends TestCase
 {
     use RefreshDatabase;
 
-    private function midiaBiblioteca(): \Spatie\MediaLibrary\MediaCollections\Models\Media
+    private function midiaBiblioteca(): Media
     {
         Storage::fake('public');
         $bytes = UploadedFile::fake()->image('x.png', 800, 600)->getContent();

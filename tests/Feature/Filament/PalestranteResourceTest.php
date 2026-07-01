@@ -115,4 +115,27 @@ class PalestranteResourceTest extends TestCase
 
         $this->get('/admin/palestrantes')->assertOk();
     }
+
+    public function test_formulario_tem_campo_chamada_opcional(): void
+    {
+        Livewire::test(CreatePalestrante::class)
+            ->assertFormFieldExists('chamada', fn (TextInput $field): bool => ! $field->isRequired());
+    }
+
+    public function test_cria_palestrante_com_chamada(): void
+    {
+        Livewire::test(CreatePalestrante::class)
+            ->fillForm([
+                'nome' => 'Com Chamada',
+                'slug' => 'com-chamada',
+                'chamada' => 'Servindo desde a infância.',
+                'ativo' => true,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('palestrantes', [
+            'slug' => 'com-chamada', 'chamada' => 'Servindo desde a infância.',
+        ]);
+    }
 }

@@ -19,7 +19,6 @@ class CalendarioController extends Controller
             ->publicado()
             ->whereNotNull('data_da_palestra')
             ->where('data_da_palestra', '>=', now())
-            ->with('palestrantesAtivos')
             ->orderBy('data_da_palestra')
             ->get();
 

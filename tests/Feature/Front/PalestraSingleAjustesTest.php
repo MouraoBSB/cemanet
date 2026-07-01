@@ -53,7 +53,7 @@ class PalestraSingleAjustesTest extends TestCase
         $resp = $this->get(route('palestras.show', 'atual-thumb'));
 
         $resp->assertOk();
-        // o mini-card da relacionada renderiza a thumb do YouTube (não só o gradiente)
-        $resp->assertSee('i.ytimg.com/vi/ABCdefg/mqdefault.jpg', false);
+        // o mini-card da relacionada renderiza a thumb do YouTube (hqdefault, decisão da archive) — não só o gradiente
+        $resp->assertSee('i.ytimg.com/vi/ABCdefg/hqdefault.jpg', false);
     }
 }

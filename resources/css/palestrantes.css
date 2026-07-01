@@ -1,0 +1,39 @@
+/* Palestrantes — listagem. Thiago Mourão — https://github.com/MouraoBSB — 2026-07-01 */
+
+.cema-spk-card {
+    cursor: pointer;
+    animation: cemaSpkFade .4s both;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.cema-spk-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(46, 41, 82, .18);
+    border-color: #E2D9C2;
+}
+.cema-spk-card:hover .cema-spk-cta {
+    background-color: var(--color-primary);
+    color: #fff;
+}
+.cema-spk-card:hover .cema-spk-avatar img {
+    transform: scale(1.04);
+}
+
+/* Avatar (topo do card / destaque): consome o gradiente de cema-grad-{n}. */
+.cema-spk-avatar {
+    background: var(--grad, linear-gradient(140deg, var(--color-primary), var(--color-footer-bg)));
+}
+.cema-spk-avatar img {
+    transition: transform .3s ease;
+}
+
+@keyframes cemaSpkFade {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cema-spk-card { animation: none; transition: none; }
+    .cema-spk-card:hover { transform: none; }
+    .cema-spk-card:hover .cema-spk-avatar img,
+    .cema-spk-avatar img { transform: none; transition: none; }
+}

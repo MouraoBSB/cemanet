@@ -8,6 +8,7 @@
 @import './conteudo.css';
 @import './palestras-archive.css';
 @import './palestras-calendario.css';
+@import './palestrantes.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';

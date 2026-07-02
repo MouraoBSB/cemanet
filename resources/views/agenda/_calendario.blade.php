@@ -4,24 +4,24 @@
     <div class="mb-3 flex items-center justify-between gap-2 rounded-md bg-cream p-2">
         @if ($mesAnterior)
             <a href="{{ route('agenda.show', $mesAnterior) }}" wire:navigate aria-label="Mês anterior"
-               class="agenda-cal-seta grid size-8 place-items-center rounded-full text-text-secondary transition hover:text-primary">‹</a>
+               class="agenda-cal-seta grid size-[34px] place-items-center rounded-[8px] text-primary transition hover:bg-primary/10">‹</a>
         @else
-            <span class="grid size-8 place-items-center rounded-full text-text-muted opacity-40" aria-hidden="true">‹</span>
+            <span class="grid size-[34px] place-items-center rounded-[8px] text-primary/40" aria-hidden="true">‹</span>
         @endif
 
         <h2 class="font-display font-semibold capitalize text-primary">{{ $tituloMes }}</h2>
 
         @if ($mesProximo)
             <a href="{{ route('agenda.show', $mesProximo) }}" wire:navigate aria-label="Próximo mês"
-               class="agenda-cal-seta grid size-8 place-items-center rounded-full text-text-secondary transition hover:text-primary">›</a>
+               class="agenda-cal-seta grid size-[34px] place-items-center rounded-[8px] text-primary transition hover:bg-primary/10">›</a>
         @else
-            <span class="grid size-8 place-items-center rounded-full text-text-muted opacity-40" aria-hidden="true">›</span>
+            <span class="grid size-[34px] place-items-center rounded-[8px] text-primary/40" aria-hidden="true">›</span>
         @endif
     </div>
 
     <div class="grid grid-cols-7 gap-1.5 text-center">
         @foreach (['dom', 'seg', 'ter', 'qua', 'qui', 'sex', 'sáb'] as $inicial)
-            <span class="font-display text-[11px] uppercase tracking-wide text-[#9a93b4]" aria-hidden="true">{{ $inicial }}</span>
+            <span class="font-display text-[11px] font-semibold uppercase tracking-wide text-[#9a93b4]" aria-hidden="true">{{ $inicial }}</span>
         @endforeach
     </div>
 
@@ -34,7 +34,7 @@
             @if ($celula['temConteudo'])
                 <a href="{{ route('agenda.show', $celula['ymd']) }}" wire:navigate
                    @class([
-                       'agenda-dia agenda-dia--conteudo',
+                       'agenda-dia',
                        'agenda-dia--sel' => $celula['selecionado'],
                        'agenda-dia--hoje' => $celula['hoje'],
                    ])

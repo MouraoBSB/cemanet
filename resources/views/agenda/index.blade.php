@@ -60,7 +60,7 @@
             @if ($capaAgenda)
                 <div class="relative mx-auto shrink-0">
                     <div class="absolute inset-0 rounded-full" style="background:radial-gradient(circle, rgba(122,170,225,0.55), transparent 68%); filter:blur(14px);" aria-hidden="true"></div>
-                    <img src="{{ $capaAgenda }}" alt="Agenda Reforma Íntima" class="agenda-capa relative block w-[230px] max-w-[54vw] rounded-lg" style="box-shadow:0 34px 64px rgba(0,0,0,0.55);">
+                    <img src="{{ $capaAgenda }}" alt="Agenda Reforma Íntima" class="agenda-capa relative block w-[230px] max-w-[54vw] rounded-[8px]" style="box-shadow:0 34px 64px rgba(0,0,0,0.55);">
                 </div>
             @endif
         </div>
@@ -99,7 +99,7 @@
     {{-- Sobre o projeto --}}
     <section class="bg-cream">
         <div class="mx-auto max-w-[980px] px-6 py-14">
-            <p class="font-mono text-xs uppercase tracking-[0.16em] text-[#a2825b]">Sobre o projeto</p>
+            <p class="font-mono text-xs uppercase tracking-[0.16em] text-[#9a8c5e]">Sobre o projeto</p>
             <h2 class="mt-2 font-display text-2xl font-semibold text-primary">Um caminho diário de renovação interior</h2>
             <p class="mt-4 text-[15px] leading-[1.8] text-text-secondary">A <strong>Agenda Reforma Íntima</strong> é um projeto desenvolvido pela <strong>Editora Auta de Sousa</strong>, com o propósito de incentivar o hábito da transformação moral e espiritual no dia a dia. Inspirada nos ensinamentos do Evangelho e nas orientações de obras espíritas como <em>O Evangelho Segundo o Espiritismo</em>, <em>O Livro dos Espíritos</em> e autores como Emmanuel e André Luiz, a Agenda oferece uma abordagem prática para o progresso íntimo.</p>
             <p class="mt-3 text-[15px] leading-[1.8] text-text-secondary">A proposta é simples, mas transformadora: estimular reflexões diárias e práticas constantes que conduzam à reforma íntima, ajudando na construção de virtudes como justiça, amor, caridade, gratidão e responsabilidade.</p>
@@ -109,7 +109,7 @@
                     ['Meta do Mês e do Dia', 'Uma diretriz ou exercício prático baseado em orientações de Benfeitores Espirituais, auxiliando no desenvolvimento de hábitos virtuosos.'],
                     ['Prece Diária', 'Uma oração para promover sintonia com as forças do bem, fortalecendo a conexão com as Esferas Superiores e a busca pela edificação espiritual.'],
                 ] as [$ct, $cd])
-                    <div class="rounded-xl border border-border-muted bg-white p-5 shadow-card">
+                    <div class="rounded-[14px] border border-[#E8E2D0] bg-white p-5">
                         <h3 class="font-display text-[15px] font-semibold text-primary">{{ $ct }}</h3>
                         <p class="mt-2 text-[13.5px] leading-relaxed text-text-secondary">{{ $cd }}</p>
                     </div>

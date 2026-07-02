@@ -43,9 +43,8 @@
         transition: all 0.14s ease;
     }
     a.agenda-dia:hover {
-        border-color: var(--color-primary);
-        transform: translateY(-1px);
-        box-shadow: 0 6px 14px rgba(78, 68, 131, 0.16);
+        background: var(--color-cream);
+        border-color: #E2D9C2;
     }
     .agenda-dia--vazio {
         background: #FAFAFB;
@@ -59,11 +58,14 @@
         color: #fff;
         box-shadow: 0 8px 18px rgba(78, 68, 131, 0.28);
     }
-    .agenda-dia--sel .agenda-bookmark {
-        color: #fff;
-    }
     .agenda-bookmark {
         color: #c6bee6;
+    }
+    .agenda-dia--hoje .agenda-bookmark {
+        color: var(--color-primary);
+    }
+    .agenda-dia--sel .agenda-bookmark {
+        color: #fff;
     }
 
     @media (prefers-reduced-motion: reduce) {

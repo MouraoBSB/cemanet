@@ -43,4 +43,16 @@ class AgendaSlugLegadoTest extends TestCase
 
         $this->assertSame(2, AgendaSlugLegado::where('data', '2026-08-05')->count());
     }
+
+    public function test_data_atribuida_como_carbon_e_gravada_sem_hora(): void
+    {
+        // Duas URLs antigas do mesmo dia (05/08) — data passada como objeto Carbon.
+        AgendaSlugLegado::create(['slug' => '05-de-agosto-de-2026', 'data' => Carbon::create(2026, 8, 5)]);
+        AgendaSlugLegado::create(['slug' => '27313', 'data' => Carbon::create(2026, 8, 5)]);
+
+        // Consulta por string Y-m-d deve casar as duas (gravadas sem hora).
+        $this->assertSame(2, AgendaSlugLegado::where('data', '2026-08-05')->count());
+        // Leitura devolve Carbon.
+        $this->assertInstanceOf(Carbon::class, AgendaSlugLegado::first()->data);
+    }
 }

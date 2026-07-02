@@ -4,8 +4,10 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class AgendaSlugLegado extends Model
 {
@@ -18,15 +20,18 @@ class AgendaSlugLegado extends Model
 
     protected $fillable = ['slug', 'data'];
 
-    protected function casts(): array
+    /**
+     * Normaliza `data` para string Y-m-d na escrita (robusto a string ou
+     * Carbon) e devolve Carbon na leitura. O cast nativo 'date:Y-m-d' só
+     * corrige a escrita de strings: se o atributo for atribuído como Carbon,
+     * o valor grava como Y-m-d H:i:s no SQLite (testes) mas trunca no MySQL
+     * (prod), divergindo entre ambientes e quebrando comparações por string.
+     */
+    protected function data(): Attribute
     {
-        return [
-            // Formato explícito: cast 'date' puro serializa no INSERT com o
-            // formato de datetime da grammar (Y-m-d H:i:s). No SQLite (usado
-            // nos testes) a coluna não trunca a hora como o MySQL faz numa
-            // coluna DATE nativa, quebrando comparações por string. Fixando
-            // o formato aqui, a gravação já sai como Y-m-d nos dois motores.
-            'data' => 'date:Y-m-d',
-        ];
+        return Attribute::make(
+            get: fn (?string $value) => $value !== null ? Carbon::parse($value) : null,
+            set: fn ($value) => $value !== null ? Carbon::parse($value)->format('Y-m-d') : null,
+        );
     }
 }

@@ -30,7 +30,7 @@
 ## Notas de integração entre tasks (ler antes de executar)
 
 - **Ordem:** as tasks estão em ordem de dependência (1→14): dados (1-3) → importação (4-6) → admin (7-8) → front (9-12) → SEO (13-14).
-- **Dono do `<x-slot:head>` de SEO:** o slot de SEO (`<link rel="canonical">`, `<meta robots noindex>` condicional e o `<script application/ld+json>` com `Article` + `BreadcrumbList`) é **de responsabilidade da Task 13**. Ao executar a **Task 11**, criar a casca `resources/views/agenda/index.blade.php` **sem** esse slot (apenas hero, breadcrumb, `@include _dia`, `@include _calendario`, "Sobre o projeto", "Veja também" e o **script de fuso**). **Ignore** o `<x-slot:head>` de SEO que aparece embutido no exemplo de código da Task 11 — ele é reimplementado de forma canônica na Task 13 (que usa a variável `$urlCanonica`). Isso evita slot duplicado e divergência de nomes de variável (`$canonical` vs `$urlCanonica`).
+- **Dono do `<x-slot:head>` de SEO (consolidado):** a casca `resources/views/agenda/index.blade.php` (**Task 11**) é a **DONA ÚNICA** do slot de SEO — `<link rel="canonical">` (variável **`$urlCanonica`**), `<meta name="robots" content="noindex">` condicional e o `<script application/ld+json>` com `Article` (quando há dia) + `BreadcrumbList` (sempre, nome null-safe). A **Task 13** **NÃO reescreve** a view: adiciona apenas o `AgendaSeoTest` como **trava de regressão** (verde assim que a Task 11 estiver feita). A **Task 12** (A11y/`noindex`) passa porque o slot **já existe desde a Task 11**. Nunca emitir `og:type`/`og:url` na Agenda (o layout já os emite).
 - **Variáveis da view** (fornecidas pelo `AgendaController`, Task 9): `$dia, $metaMes, $matriz, $diaAnterior, $diaProximo, $mesAnterior, $mesProximo, $ehUrlNua, $hojeBrasilia, $dataAtual, $temConteudo`.
 - **Preâmbulos dos agentes:** cada fase pode começar com uma frase de contexto do rascunho ("Tenho tudo o que preciso…", "Mapeamento completo…") — é ruído inofensivo; siga direto para as tasks.
 
@@ -2680,49 +2680,51 @@ class AgendaCrawlavelTest extends TestCase
 ```blade
 {{-- Agenda Reforma Íntima — casca SSR (card do dia + calendário navegável). --}}
 @php
+    // Esta casca é a DONA ÚNICA do <x-slot:head> de SEO da Agenda (canonical + noindex + JSON-LD).
+    // A Task 13 apenas adiciona um teste de regressão (AgendaSeoTest); NÃO reescreve este bloco.
     $tituloPagina = 'Agenda Reforma Íntima — '.$dataAtual->format('d/m/Y');
-    $canonical = $ehUrlNua ? route('agenda.index') : route('agenda.show', $dataAtual->format('Y-m-d'));
+    $urlCanonica = $ehUrlNua ? route('agenda.index') : route('agenda.show', $dataAtual->format('Y-m-d'));
 
+    $org = ['@type' => 'Organization', 'name' => 'Centro Espírita Maria Madalena'];
+    $graph = [];
     if ($temConteudo) {
-        $org = ['@type' => 'Organization', 'name' => 'Centro Espírita Maria Madalena'];
-        $graph = [
-            array_filter([
-                '@type' => 'Article',
-                'headline' => $tituloPagina,
-                'datePublished' => $dia->data->toIso8601String(),
-                'dateModified' => $dia->updated_at?->toIso8601String(),
-                'articleBody' => trim(strip_tags((string) $dia->reflexao)) ?: null,
-                'inLanguage' => 'pt-BR',
-                'author' => $org,
-                'publisher' => $org,
-                'mainEntityOfPage' => $canonical,
-                'description' => $dia->descricaoSeo() ?: null,
-            ], fn ($v) => $v !== null),
-            [
-                '@type' => 'BreadcrumbList',
-                'itemListElement' => [
-                    ['@type' => 'ListItem', 'position' => 1, 'name' => 'Início', 'item' => route('home')],
-                    ['@type' => 'ListItem', 'position' => 2, 'name' => 'Agenda Reforma Íntima', 'item' => route('agenda.index')],
-                    ['@type' => 'ListItem', 'position' => 3, 'name' => $dia->tituloExtenso(), 'item' => $canonical],
-                ],
-            ],
-        ];
-        $jsonLd = json_encode(
-            ['@context' => 'https://schema.org', '@graph' => $graph],
-            JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG
-        );
+        $graph[] = array_filter([
+            '@type' => 'Article',
+            'headline' => $tituloPagina,
+            'datePublished' => $dia->data->toIso8601String(),
+            'dateModified' => $dia->updated_at?->toIso8601String(),
+            'articleBody' => trim(strip_tags((string) $dia->reflexao)) ?: null,
+            'inLanguage' => 'pt-BR',
+            'author' => $org,
+            'publisher' => $org,
+            'mainEntityOfPage' => $urlCanonica,
+            'description' => $dia->descricaoSeo() ?: null,
+        ], fn ($v) => $v !== null);
     }
+    // BreadcrumbList SEMPRE (inclusive no dia vazio — nome null-safe).
+    $graph[] = [
+        '@type' => 'BreadcrumbList',
+        'itemListElement' => [
+            ['@type' => 'ListItem', 'position' => 1, 'name' => 'Início', 'item' => route('home')],
+            ['@type' => 'ListItem', 'position' => 2, 'name' => 'Agenda Reforma Íntima', 'item' => route('agenda.index')],
+            ['@type' => 'ListItem', 'position' => 3, 'name' => $dia?->tituloExtenso() ?? $dataAtual->format('d/m/Y'), 'item' => $urlCanonica],
+        ],
+    ];
+    $jsonLd = json_encode(
+        ['@context' => 'https://schema.org', '@graph' => $graph],
+        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG
+    );
 @endphp
 
 <x-layout.app :title="$tituloPagina" :description="$dia?->descricaoSeo()">
     <x-slot:head>
-        <link rel="canonical" href="{{ $canonical }}">
+        {{-- DONO ÚNICO do <head> de SEO da Agenda. --}}
+        <link rel="canonical" href="{{ $urlCanonica }}">
         @unless ($temConteudo)
             <meta name="robots" content="noindex">
         @endunless
-        @if ($temConteudo)
-            <script type="application/ld+json">{!! $jsonLd !!}</script>
-        @endif
+        {{-- Sem og:type/og:url aqui: o layout já emite og:type=website + og:url. --}}
+        <script type="application/ld+json">{!! $jsonLd !!}</script>
     </x-slot:head>
 
     {{-- Hero --}}
@@ -3021,19 +3023,20 @@ Now I have all the molds I need. Here are the two tasks for Fase E (SEO).
 
 ---
 
-### Task 13: SEO on-page da Agenda — canonical + JSON-LD (Article + BreadcrumbList) + noindex condicional no `<x-slot:head>`
+### Task 13: Trava de regressão de SEO da Agenda (`AgendaSeoTest`)
+
+> O `<x-slot:head>` de SEO (canonical + `noindex` condicional + JSON-LD `Article`+`BreadcrumbList`) é implementado e é **de responsabilidade da Task 11** (dona única da casca `resources/views/agenda/index.blade.php`). Esta task **NÃO reescreve** a view — apenas adiciona um teste que **trava** esse comportamento contra regressões. Ele deve **passar** assim que a Task 11 estiver concluída.
 
 **Files:**
-- Modify: `resources/views/agenda/index.blade.php` (casca criada na Fase D — adicionar o bloco `@php` do JSON-LD e o `<x-slot:head>`; fixar `:title`/`:description`).
 - Create (test): `tests/Feature/Front/AgendaSeoTest.php`
 
 **Interfaces:**
-- **Consumes:** variáveis da view vindas do `AgendaController` — `$dia` (`?App\Models\AgendaDia`), `$ehUrlNua` (bool), `$dataAtual` (`Carbon\Carbon`), `$temConteudo` (bool). Métodos do model: `AgendaDia::tituloExtenso(): string`, `descricaoSeo(): string`, propriedades `->data` (Carbon), `->reflexao` (?string), `->updated_at`. Rotas `route('agenda.index')` e `route('agenda.show', string $data)`. Componente `<x-layout.app :title :description>` com slot nomeado `head` (o layout injeta `{{ $head ?? '' }}` no `<head>`; já emite `og:type=website` e `og:url=url()->current()`).
-- **Produces:** dentro da casca, um `<x-slot:head>` com `<link rel="canonical">` (data ou URL nua), um `<script type="application/ld+json">` (`@graph` = `Article` quando há dia + `BreadcrumbList` sempre) e `<meta name="robots" content="noindex">` quando `!$temConteudo`. **Não** emite `og:type`/`og:url` (evita duplicar o layout).
+- **Consumes:** a rota `agenda.show` e a casca da Task 11, que já emite `<link rel="canonical">`, `<meta name="robots" content="noindex">` no dia vazio, e `<script type="application/ld+json">` com `Article` (quando há dia) + `BreadcrumbList` (sempre), **sem** `og:type`/`og:url` próprios. `AgendaDia::factory()` (Task 3).
+- **Produces:** nada de produção — apenas a trava de regressão.
 
 Passos:
 
-- [ ] **Step 1: Escrever o teste de SEO que falha.** Criar `tests/Feature/Front/AgendaSeoTest.php`:
+- [ ] **Step 1: Escrever o `AgendaSeoTest`.** Criar `tests/Feature/Front/AgendaSeoTest.php`:
 
 ```php
 <?php
@@ -3084,7 +3087,7 @@ class AgendaSeoTest extends TestCase
 
     public function test_dia_sem_conteudo_tem_noindex(): void
     {
-        // Data válida (futuro) sem AgendaDia publicado → 200 + noindex.
+        // Data válida (futuro) sem AgendaDia publicado → 200 + noindex (a casca da Task 11 já trata isso).
         $resp = $this->get(route('agenda.show', '2026-12-25'));
 
         $resp->assertOk();
@@ -3105,92 +3108,17 @@ class AgendaSeoTest extends TestCase
 }
 ```
 
-- [ ] **Step 2: Rodar o teste e ver falhar.**
+- [ ] **Step 2: Rodar o teste — deve PASSAR (a casca da Task 11 já implementa o slot de SEO).**
   Run: `docker exec cema-app php artisan test --filter=AgendaSeoTest`
-  Expected: FAIL — `test_show_tem_jsonld_article_breadcrumb_e_canonical` falha em `assertSee('"@type":"Article"')` (a casca ainda não possui `<x-slot:head>`); `test_dia_sem_conteudo_tem_noindex` falha por não encontrar `noindex`.
+  Expected: OK — 4 passed. Este é um teste de **regressão** (verde imediato, não RED→GREEN). Se falhar, é sinal de que a casca da Task 11 divergiu do especificado — **corrija a Task 11** (a dona do slot), **não** adicione um segundo `<x-slot:head>` aqui. (Se editar Blade não refletir no dev: `docker exec cema-app php artisan queue:restart` / restart app worker — OPcache `validate_timestamps=0`.)
 
-- [ ] **Step 3: Adicionar o bloco `@php` do JSON-LD no topo da casca.** Em `resources/views/agenda/index.blade.php`, **imediatamente antes** da tag `<x-layout.app ...>` (após o comentário de autoria, no padrão de `blog/show.blade.php:2-53`), inserir:
-
-```blade
-@php
-    $org = ['@type' => 'Organization', 'name' => 'Centro Espírita Maria Madalena'];
-
-    // A URL nua é canônica de si mesma ("hoje" evergreen); cada data é canônica de si.
-    $urlCanonica = $ehUrlNua
-        ? route('agenda.index')
-        : route('agenda.show', $dataAtual->format('Y-m-d'));
-
-    $graph = [];
-
-    // Article só existe quando há conteúdo publicado para a data.
-    if ($dia !== null) {
-        // array_filter descarta chaves nulas (ex.: articleBody vazio) — inválidas no schema.org.
-        $graph[] = array_filter([
-            '@type'            => 'Article',
-            'headline'         => 'Agenda Reforma Íntima — '.$dia->tituloExtenso(),
-            'datePublished'    => $dia->data->toIso8601String(),
-            'dateModified'     => $dia->updated_at?->toIso8601String(),
-            'articleBody'      => trim(strip_tags((string) $dia->reflexao)) ?: null,
-            'inLanguage'       => 'pt-BR',
-            'author'           => $org,
-            'publisher'        => $org,
-            'mainEntityOfPage' => $urlCanonica,
-        ], fn ($v) => $v !== null);
-    }
-
-    $graph[] = [
-        '@type'           => 'BreadcrumbList',
-        'itemListElement' => [
-            ['@type' => 'ListItem', 'position' => 1, 'name' => 'Início', 'item' => url('/')],
-            ['@type' => 'ListItem', 'position' => 2, 'name' => 'Agenda Reforma Íntima', 'item' => route('agenda.index')],
-            ['@type' => 'ListItem', 'position' => 3, 'name' => $dataAtual->format('d/m/Y'), 'item' => $urlCanonica],
-        ],
-    ];
-
-    // JSON_HEX_TAG neutraliza </script> injetado em conteúdo (mesmo vetor de blog/show).
-    $jsonLd = json_encode(
-        ['@context' => 'https://schema.org', '@graph' => $graph],
-        JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG
-    );
-@endphp
-```
-
-- [ ] **Step 4: Fixar `:title`/`:description` e adicionar o `<x-slot:head>` como primeiro filho da casca.** Garantir que a tag de abertura da casca esteja assim (ajustando as props que a Fase D deixou):
-
-```blade
-<x-layout.app
-    :title="'Agenda Reforma Íntima — '.$dataAtual->format('d/m/Y')"
-    :description="$dia?->descricaoSeo()">
-
-    <x-slot:head>
-        {{-- Canonical: data própria, ou a URL nua quando "hoje" evergreen. --}}
-        <link rel="canonical" href="{{ $urlCanonica }}">
-
-        {{-- Dias sem conteúdo publicado não devem ser indexados (estado vazio). --}}
-        @unless ($temConteudo)
-            <meta name="robots" content="noindex">
-        @endunless
-
-        {{-- Sem og:type/og:url aqui: o layout já emite og:type=website + og:url. --}}
-
-        {{-- JSON-LD: Article (quando há dia) + BreadcrumbList. --}}
-        <script type="application/ld+json">{!! $jsonLd !!}</script>
-    </x-slot:head>
-```
-
-  (Manter o restante do corpo da casca — hero, `agenda/_dia`, `agenda/_calendario`, "Sobre o projeto", "Veja também" e o script de fuso — intacto após o slot.)
-
-- [ ] **Step 5: Recarregar o worker e rodar o teste até passar.**
-  Run: `docker exec cema-app php artisan test --filter=AgendaSeoTest`
-  Expected: OK — 4 passed (se editar Blade não refletir, `docker exec cema-app php artisan queue:restart` / restart app worker antes de reexecutar; OPcache `validate_timestamps=0` no dev).
-
-- [ ] **Step 6: Pint e commit.**
-  Run: `docker exec cema-app ./vendor/bin/pint resources/views/agenda/index.blade.php tests/Feature/Front/AgendaSeoTest.php`
+- [ ] **Step 3: Pint e commit.**
+  Run: `docker exec cema-app ./vendor/bin/pint tests/Feature/Front/AgendaSeoTest.php`
   Then:
 
 ```bash
-git add resources/views/agenda/index.blade.php tests/Feature/Front/AgendaSeoTest.php
-git commit -m "feat(agenda/seo): canonical, JSON-LD (Article+BreadcrumbList) e noindex condicional no <x-slot:head>"
+git add tests/Feature/Front/AgendaSeoTest.php
+git commit -m "test(agenda/seo): trava de regressao do <x-slot:head> (canonical, JSON-LD, noindex)"
 ```
 
 ---

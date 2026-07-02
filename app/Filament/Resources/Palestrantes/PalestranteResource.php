@@ -70,6 +70,12 @@ class PalestranteResource extends Resource
                             ->label('E-mail')
                             ->email()
                             ->maxLength(255),
+
+                        TextInput::make('chamada')
+                            ->label('Chamada (frase do hero)')
+                            ->helperText('Frase curta exibida no topo do perfil. Opcional.')
+                            ->maxLength(180)
+                            ->columnSpan(2),
                     ]),
 
                 Section::make('Foto')

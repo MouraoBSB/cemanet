@@ -68,12 +68,21 @@ entregues. Cada fatia: spec + plano (`docs/superpowers/`) → subagent-driven-de
       indexador + agenda), **feed `.ics`/webcal** agregado + modal "Assinar", `FeedIcs`
       compartilhado (dobra RFC 5545), JSON-LD `ItemList`/`Event`. *(PR #2, merge `1cd5c4c`;
       suíte completa 352 verdes)*
-- [ ] **Palestrantes — redesign da listagem** `/palestrantes`: hero na nova identidade,
+- [x] **Palestrantes — redesign da listagem** `/palestrantes`: hero na nova identidade,
       grade de cards (avatar da foto ou **iniciais** em gradiente + badge de contagem de
       palestras), busca reativa + ordenação (A–Z / Z–A / mais / menos), sidebar (intro +
       stats reais + card "Em destaque" da próxima palestra), estado vazio, paginação 12.
       **Sem filtro de área nesta fase** (o handoff presume uma taxonomia de área fictícia;
       `Palestrante` não tem campo `area` — feature adiada para quando houver taxonomia real).
+      *(PR #3, merge `9d556cd`; suíte completa 370 verdes)*
+- [ ] **Palestrante — detalhe (single)** `/palestrantes/{slug}`: hero roxo (foto 3:4 em
+      moldura ou **iniciais** em gradiente, eyebrow, H1, **frase de chamada** — coluna nova
+      `chamada`, opcional — chips das áreas + CTA calendário), bloco de estatísticas reais
+      (palestras · temas · ativo desde · % online), "Sobre" com prosa, grade de palestras
+      reaproveitando `<x-palestra.card>` com **filtro por tema + ordenação client-side
+      (Alpine)**, e sidebar sticky (próxima palestra em destaque · áreas de atuação clicáveis
+      · compartilhar). Áreas = `assuntos` distintos (**sem** taxonomia de "área" fictícia);
+      cor rotacionada `id % 8`. Migração **aditiva** `chamada` (nunca `migrate:fresh`).
       *(spec/plano em revisão)*
 
 ## Fase 2+ — Expansão  🔄 em andamento

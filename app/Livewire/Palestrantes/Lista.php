@@ -18,8 +18,8 @@ class Lista extends Component
     #[Url(as: 'q', except: '')]
     public string $q = '';
 
-    #[Url(as: 'ordenar', except: 'az')]
-    public string $ordenar = 'az';
+    #[Url(as: 'ordenar', except: 'mais')]
+    public string $ordenar = 'mais';
 
     public function updated(string $name): void
     {

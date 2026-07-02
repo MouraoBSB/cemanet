@@ -20,7 +20,7 @@ class Palestrante extends Model implements HasMedia
     public const COLECAO_FOTO = 'foto';
 
     protected $fillable = [
-        'nome', 'slug', 'bio', 'email', 'telefone',
+        'nome', 'slug', 'chamada', 'bio', 'email', 'telefone',
         'mostrar_email', 'mostrar_telefone', 'ativo',
     ];
 

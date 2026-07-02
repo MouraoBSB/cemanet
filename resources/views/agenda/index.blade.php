@@ -48,13 +48,21 @@
     </x-slot:head>
 
     {{-- Hero --}}
-    <section class="relative overflow-hidden bg-gradient-to-br from-primary to-footer-bg text-white">
+    <section class="agenda-hero relative overflow-hidden text-white">
         <x-ui.particulas />
-        <div class="relative mx-auto max-w-[1240px] px-6 py-16">
-            <p class="font-mono text-xs uppercase tracking-[0.14em] text-gold">Devocional diário</p>
-            <h1 class="mt-3 font-display text-4xl font-semibold sm:text-5xl">Agenda Reforma Íntima</h1>
-            <div class="mt-4 h-1 w-16 rounded-full bg-gold"></div>
-            <p class="mt-4 max-w-xl font-light text-[#d7def0]">Uma reflexão à luz do Evangelho para cada dia — com meta do mês, meta do dia e sugestão de prece.</p>
+        <div class="relative mx-auto flex max-w-[1240px] flex-wrap items-center gap-12 px-6 py-16">
+            <div class="min-w-[280px] flex-1">
+                <p class="font-mono text-xs uppercase tracking-[0.18em] text-[#9db8e0]">Editora Auta de Sousa · Projeto CEMA</p>
+                <h1 class="mt-3 font-display text-4xl font-semibold sm:text-5xl">Agenda Reforma Íntima</h1>
+                <div class="mt-4 h-1 w-16 rounded-full bg-gold"></div>
+                <p class="mt-4 max-w-xl font-sans font-light text-white/85">Transforme-se a cada dia: reflexões do Evangelho, metas espirituais e uma sugestão de prece para a sua jornada de renovação interior.</p>
+            </div>
+            @if ($capaAgenda)
+                <div class="relative mx-auto shrink-0">
+                    <div class="absolute inset-0 rounded-full" style="background:radial-gradient(circle, rgba(122,170,225,0.55), transparent 68%); filter:blur(14px);" aria-hidden="true"></div>
+                    <img src="{{ $capaAgenda }}" alt="Agenda Reforma Íntima" class="agenda-capa relative block w-[230px] max-w-[54vw] rounded-lg" style="box-shadow:0 34px 64px rgba(0,0,0,0.55);">
+                </div>
+            @endif
         </div>
     </section>
 
@@ -90,9 +98,27 @@
 
     {{-- Sobre o projeto --}}
     <section class="bg-cream">
-        <div class="mx-auto max-w-[1240px] px-6 py-12">
-            <h2 class="font-display text-lg font-semibold text-primary">Sobre a Agenda Reforma Íntima</h2>
-            <p class="mt-3 max-w-3xl font-serif text-[15px] leading-[1.8] text-[#3a3553]">A Agenda Reforma Íntima é um devocional diário editado pela Editora Auta de Sousa. A cada data, uma reflexão à luz do Evangelho, uma meta do mês, uma meta do dia e uma sugestão de prece — um roteiro simples para o trabalho de autotransformação moral.</p>
+        <div class="mx-auto max-w-[980px] px-6 py-14">
+            <p class="font-mono text-xs uppercase tracking-[0.16em] text-[#a2825b]">Sobre o projeto</p>
+            <h2 class="mt-2 font-display text-2xl font-semibold text-primary">Um caminho diário de renovação interior</h2>
+            <p class="mt-4 text-[15px] leading-[1.8] text-text-secondary">A <strong>Agenda Reforma Íntima</strong> é um projeto desenvolvido pela <strong>Editora Auta de Sousa</strong>, com o propósito de incentivar o hábito da transformação moral e espiritual no dia a dia. Inspirada nos ensinamentos do Evangelho e nas orientações de obras espíritas como <em>O Evangelho Segundo o Espiritismo</em>, <em>O Livro dos Espíritos</em> e autores como Emmanuel e André Luiz, a Agenda oferece uma abordagem prática para o progresso íntimo.</p>
+            <p class="mt-3 text-[15px] leading-[1.8] text-text-secondary">A proposta é simples, mas transformadora: estimular reflexões diárias e práticas constantes que conduzam à reforma íntima, ajudando na construção de virtudes como justiça, amor, caridade, gratidão e responsabilidade.</p>
+            <div class="mt-8 grid gap-4" style="grid-template-columns:repeat(auto-fit,minmax(220px,1fr));">
+                @foreach ([
+                    ['Tema para Reflexão e Vivência', 'Um pequeno trecho do Evangelho de Jesus, retirado do Novo Testamento, para ser meditado e vivenciado ao longo do dia.'],
+                    ['Meta do Mês e do Dia', 'Uma diretriz ou exercício prático baseado em orientações de Benfeitores Espirituais, auxiliando no desenvolvimento de hábitos virtuosos.'],
+                    ['Prece Diária', 'Uma oração para promover sintonia com as forças do bem, fortalecendo a conexão com as Esferas Superiores e a busca pela edificação espiritual.'],
+                ] as [$ct, $cd])
+                    <div class="rounded-xl border border-border-muted bg-white p-5 shadow-card">
+                        <h3 class="font-display text-[15px] font-semibold text-primary">{{ $ct }}</h3>
+                        <p class="mt-2 text-[13.5px] leading-relaxed text-text-secondary">{{ $cd }}</p>
+                    </div>
+                @endforeach
+            </div>
+            <blockquote class="mt-8 border-l-4 border-gold pl-4">
+                <p class="font-serif text-[15px] italic text-[#3a3553]">"Todas as conquistas do espírito se efetuam na base de lições recapituladas."</p>
+                <cite class="mt-1 block text-[13px] not-italic text-text-muted">— Emmanuel</cite>
+            </blockquote>
         </div>
     </section>
 

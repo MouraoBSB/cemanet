@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AgendaDia;
 use App\Support\Agenda\CalendarioAgenda;
+use App\Support\Agenda\CapaAgenda;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 
@@ -84,6 +85,7 @@ class AgendaController extends Controller
             'hojeBrasilia' => $hojeBrasilia,
             'dataAtual' => $dataAtual,
             'temConteudo' => $temConteudo,
+            'capaAgenda' => CapaAgenda::url(),
         ]);
     }
 }

@@ -40,4 +40,26 @@ class PalestranteMediaTest extends TestCase
         $this->assertNotNull($p->foto_url);
         $this->assertStringContainsString('.webp', $p->foto_url);
     }
+
+    public function test_original_armazenado_e_webp_e_gera_conversoes(): void
+    {
+        Storage::fake('public');
+        $p = Palestrante::factory()->create();
+
+        $p->addMediaFromString(UploadedFile::fake()->image('f.png', 1000, 800)->getContent())
+            ->usingFileName('f.png')
+            ->toMediaCollection(Palestrante::COLECAO_FOTO);
+
+        $media = $p->getFirstMedia(Palestrante::COLECAO_FOTO);
+
+        // O original guardado é WebP (nada de PNG/JPEG "gordo" no disco).
+        $this->assertSame('image/webp', $media->mime_type);
+        $this->assertStringEndsWith('.webp', $media->file_name);
+        $this->assertFileExists($media->getPath());
+
+        // As conversões continuam sendo geradas a partir do original (WebP).
+        $this->assertStringContainsString('.webp', $p->foto_url);
+        $this->assertStringContainsString('.webp', $p->foto_thumb_url);
+        $this->assertFileExists($media->getPath('web'));
+    }
 }

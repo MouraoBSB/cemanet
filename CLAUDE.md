@@ -3,6 +3,7 @@
 Leia antes de agir. Visão e escopo: ver [PROJECT.md](PROJECT.md).
 Fases e estado atual: ver [ROADMAP.md](ROADMAP.md).
 Modelo de dados e regras de negócio: ver [DATA-MODEL.md](DATA-MODEL.md).
+**Imagens (padrão único WebP): ver [IMAGENS.md](IMAGENS.md).**
 Referência visual: pasta [design-system/](design-system/).
 
 ## O que é este projeto
@@ -72,6 +73,23 @@ Três insumos já existem; use-os, não recrie:
   e taxonomia por slug, **a partir do banco `legado`** (fonte preferida — conteúdo
   mais rico). Ver mapeamento em [DATA-MODEL.md](DATA-MODEL.md) e [DB-LEGADO.md](DB-LEGADO.md).
 
+## Imagens (padrão ÚNICO — WebP)
+
+Qualquer imagem do site é servida em **WebP** e o disco guarda **só WebP** (o original é
+capado ≤2000px — ≤1200 na coleção `og` — e reencodado para WebP no upload). **Não** reinvente
+upload/otimização por módulo. **Receita copy-paste: [IMAGENS.md](IMAGENS.md).** Referência: `Palestrante`.
+
+- **Imagem de entidade** (palestrante, evento, página institucional…): model
+  `implements HasMedia` + `use InteractsWithMedia, RegistraImagensPadrao;` e
+  `registrarColecaoImagem('capa'|'galeria', ...)`; Filament usa
+  `App\Filament\Support\ComponentesImagem::upload($campo, $colecao, $multiplas)`.
+- **Servir**: sempre a conversão, via accessor `getFirstMediaUrl($colecao, 'web'|'thumb')` —
+  **nunca** o original. Fallback (iniciais/gradiente) quando não há foto.
+- **Imagem no corpo de rich text** (blog): pool central `Biblioteca`, servida por
+  `/midia/{id}/web` (`MidiaController`) — não este pipeline.
+- O pipeline WebP é **global** (listener `App\Listeners\CaparOriginalDaMidia`); não crie
+  disco/otimização/observer próprios para imagem.
+
 ## Como trabalhar (workflow)
 
 1. **Planejar antes de codar** — roadmap curto por tarefa (correções triviais
@@ -97,6 +115,7 @@ Três insumos já existem; use-os, não recrie:
 - `ROADMAP.md` — fases e estado atual (atualizar ao concluir etapas).
 - `DATA-MODEL.md` — tabelas, relações, regras de negócio e mapeamento WP→MySQL.
 - `DB-LEGADO.md` — acesso somente leitura ao banco do WordPress atual (estrutura real).
+- `IMAGENS.md` — padrão único de imagens (WebP): receita de model/Filament/serviço.
 - `design-system/` — tokens, componentes e mapa de páginas (referência de UI).
 
 ## Conflitos e dúvidas

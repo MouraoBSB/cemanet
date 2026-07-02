@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\MidiaController;
 use App\Http\Controllers\PalestraController;
 use App\Http\Controllers\PalestranteController;
 use App\Http\Controllers\SitemapController;
+use App\Models\AgendaSlugLegado;
 use App\Models\Post;
 use Illuminate\Support\Facades\Route;
 
@@ -37,6 +39,21 @@ Route::get('/palestrantes/{slug}', [PalestranteController::class, 'show'])->name
 // Blog "Sementeira de Luz"
 Route::get('/sementeira', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/sementeira/{slug}', [BlogController::class, 'show'])->name('blog.show');
+
+// Agenda Reforma Íntima (devocional diário). Estáticas antes de {data}.
+Route::get('/agenda-reforma-intima', [AgendaController::class, 'index'])->name('agenda.index');
+Route::get('/agenda-reforma-intima/{data}', [AgendaController::class, 'show'])
+    ->name('agenda.show')
+    ->where('data', '\d{4}-\d{2}-\d{2}');
+
+// Compat: URLs antigas do WP → 301 para as URLs datadas novas.
+Route::permanentRedirect('/agenda-reforma', '/agenda-reforma-intima');
+Route::get('/agenda-reforma/{slug}', function (string $slug) {
+    $data = AgendaSlugLegado::where('slug', $slug)->value('data');
+    abort_if($data === null, 404);
+
+    return redirect()->route('agenda.show', $data->format('Y-m-d'), 301);
+})->where('slug', '[a-z0-9-]+'); // slug numérico (maio) OU de data (jun-ago)
 
 // Sitemap (antes do catch-all)
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');

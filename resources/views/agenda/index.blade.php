@@ -60,7 +60,8 @@
             @if ($capaAgenda)
                 <div class="relative mx-auto shrink-0">
                     <div class="absolute inset-0 rounded-full" style="background:radial-gradient(circle, rgba(122,170,225,0.55), transparent 68%); filter:blur(14px);" aria-hidden="true"></div>
-                    <img src="{{ $capaAgenda }}" alt="Agenda Reforma Íntima" class="agenda-capa relative block w-[230px] max-w-[54vw] rounded-[8px]" style="box-shadow:0 34px 64px rgba(0,0,0,0.55);">
+                    {{-- drop-shadow (não box-shadow) segue o canal alfa do PNG: sombra na silhueta do livro, sem borda retangular. --}}
+                    <img src="{{ $capaAgenda }}" alt="Agenda Reforma Íntima" class="agenda-capa relative block w-[230px] max-w-[54vw]" style="filter: drop-shadow(0 22px 30px rgba(0,0,0,0.45));">
                 </div>
             @endif
         </div>

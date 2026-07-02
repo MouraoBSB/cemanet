@@ -5,7 +5,7 @@
 namespace Tests\Feature\Filament;
 
 use App\Filament\Pages\ConfiguracoesAgenda;
-use App\Models\Configuracao;
+use App\Models\ConfiguracaoAgenda;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -28,7 +28,7 @@ class ConfiguracoesAgendaTest extends TestCase
         $this->get('/admin/configuracoes-agenda')->assertOk();
     }
 
-    public function test_configuracoes_agenda_grava_capa(): void
+    public function test_configuracoes_agenda_grava_capa_otimizada_em_webp(): void
     {
         Storage::fake('public');
 
@@ -39,9 +39,14 @@ class ConfiguracoesAgendaTest extends TestCase
             ->call('salvar')
             ->assertHasNoFormErrors();
 
-        $caminho = Configuracao::valor('agenda_capa');
+        $configuracao = ConfiguracaoAgenda::instance();
+        $media = $configuracao->getFirstMedia(ConfiguracaoAgenda::COLECAO_CAPA);
 
-        $this->assertNotNull($caminho);
-        Storage::disk('public')->assertExists($caminho);
+        $this->assertNotNull($media);
+
+        $urlWeb = $configuracao->getFirstMediaUrl(ConfiguracaoAgenda::COLECAO_CAPA, 'web');
+
+        $this->assertNotEmpty($urlWeb);
+        $this->assertTrue(str_ends_with($urlWeb, '.webp'));
     }
 }

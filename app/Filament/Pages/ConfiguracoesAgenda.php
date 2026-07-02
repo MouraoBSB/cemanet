@@ -4,9 +4,9 @@
 
 namespace App\Filament\Pages;
 
-use App\Models\Configuracao;
+use App\Filament\Support\ComponentesImagem;
+use App\Models\ConfiguracaoAgenda as ConfiguracaoAgendaModel;
 use Filament\Actions\Action;
-use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
 use Filament\Pages\Page;
 use Filament\Schemas\Components\Actions;
@@ -30,23 +30,25 @@ class ConfiguracoesAgenda extends Page
     /** @var array<string, mixed> */
     public ?array $data = [];
 
+    public ?ConfiguracaoAgendaModel $record = null;
+
     public function mount(): void
     {
-        $this->form->fill([
-            'agenda_capa' => Configuracao::valor('agenda_capa'),
-        ]);
+        $this->record = ConfiguracaoAgendaModel::instance();
+
+        // Array não-nulo (mesmo vazio) força o hidratador a carregar o estado
+        // do componente de mídia a partir das relações (mídia já existente).
+        $this->form->fill([]);
     }
 
     public function form(Schema $schema): Schema
     {
         return $schema
+            ->model($this->record)
             ->statePath('data')
             ->components([
-                FileUpload::make('agenda_capa')
+                ComponentesImagem::upload('agenda_capa', ConfiguracaoAgendaModel::COLECAO_CAPA)
                     ->label('Capa da Agenda (livro)')
-                    ->image()
-                    ->disk('public')
-                    ->directory('agenda')
                     ->columnSpanFull(),
             ]);
     }
@@ -69,9 +71,9 @@ class ConfiguracoesAgenda extends Page
 
     public function salvar(): void
     {
-        $dados = $this->form->getState();
-
-        Configuracao::definir('agenda_capa', $dados['agenda_capa'] ?? null);
+        // getState() já dispara saveRelationships() do componente de mídia
+        // (grava/otimiza a capa na Media Library do registro vinculado).
+        $this->form->getState();
 
         Notification::make()
             ->title('Configurações salvas com sucesso.')

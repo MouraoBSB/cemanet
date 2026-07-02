@@ -4,16 +4,13 @@
 
 namespace App\Support\Agenda;
 
-use App\Models\Configuracao;
-use Illuminate\Support\Facades\Storage;
+use App\Models\ConfiguracaoAgenda;
 
 class CapaAgenda
 {
-    /** Resolve a capa da Agenda (configurada no admin) para uma URL pública, ou null se não houver. */
+    /** Resolve a capa da Agenda (configurada no admin) para uma URL pública WebP, ou null se não houver. */
     public static function url(): ?string
     {
-        $caminho = Configuracao::valor('agenda_capa');
-
-        return filled($caminho) ? Storage::disk('public')->url($caminho) : null;
+        return ConfiguracaoAgenda::instance()->capaUrl;
     }
 }

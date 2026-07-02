@@ -49,7 +49,7 @@ class PalestrantePerfilRedesignTest extends TestCase
         $this->get(route('palestrantes.show', 'fulano'))->assertDontSee('Servindo desde a infância.');
     }
 
-    public function test_chips_de_area_e_barra_de_filtro(): void
+    public function test_temas_linkam_para_archive_filtrada_e_ordenacao(): void
     {
         $pessoa = $this->palestrante();
         $evangelho = Assunto::factory()->create(['nome' => 'Evangelho', 'slug' => 'evangelho']);
@@ -57,9 +57,10 @@ class PalestrantePerfilRedesignTest extends TestCase
 
         $resp = $this->get(route('palestrantes.show', 'fulano'));
         $resp->assertSee('Evangelho');
-        $resp->assertSee("selecionar('evangelho')", false); // chip clicável
-        $resp->assertSee('Título (A–Z)');                    // opção de ordenação
-        $resp->assertSee('Palestra A');                      // card via <x-palestra.card>
+        // Chip de tema navega para a archive já filtrada por aquele assunto.
+        $resp->assertSee(route('palestras.index', ['assunto' => 'evangelho']), false);
+        $resp->assertSee('Título (A–Z)'); // opção de ordenação (client-side) permanece
+        $resp->assertSee('Palestra A');   // card via <x-palestra.card>
     }
 
     public function test_stats_reais_e_null_safe(): void
@@ -68,11 +69,11 @@ class PalestrantePerfilRedesignTest extends TestCase
         $this->comPalestra($pessoa, ['data_da_palestra' => '2023-05-01 19:30', 'online' => true]);
 
         $resp = $this->get(route('palestrantes.show', 'fulano'));
-        $resp->assertSee('Ativo no CEMA desde');
-        $resp->assertSee('2023');
-        $resp->assertSee('100%'); // 1 de 1 online
+        $resp->assertSee('Última palestra');
+        $resp->assertSee('2023');   // mês/ano da mais recente
+        $resp->assertSee('100%');   // 1 de 1 online
 
-        // Sem palestras → ano/percentual viram "—" (null-safe).
+        // Sem palestras → última/percentual viram "—" (null-safe).
         $vazio = $this->palestrante(['slug' => 'sem-palestras', 'nome' => 'Sem Palestras']);
         $this->get(route('palestrantes.show', 'sem-palestras'))->assertSee('—');
     }

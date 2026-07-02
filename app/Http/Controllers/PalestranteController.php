@@ -50,12 +50,11 @@ class PalestranteController extends Controller
             ->orderBy('data_da_palestra')
             ->first(); // sem fallback (big-bang)
 
-        // Payload do filtro/ordenação client-side (Alpine): ordenação feita no cliente.
+        // Payload da ordenação client-side (Alpine): reordena a grade no cliente.
         $itensFiltro = $palestras->map(fn (Palestra $p) => [
             'id' => $p->id,
             'titulo' => $p->titulo,
             'ts' => $p->data_da_palestra?->getTimestamp(),
-            'assuntos' => $p->assuntos->pluck('slug')->values()->all(),
         ])->values();
 
         return view('palestrantes.show', [

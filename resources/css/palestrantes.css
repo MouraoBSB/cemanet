@@ -50,8 +50,8 @@
     .cema-dot-6 { background: #5aa9a0; }
     .cema-dot-7 { background: #7a6fbe; }
 
-    /* Prosa de leitura do "Sobre". */
-    .cema-prosa-perfil p { margin-bottom: 16px; font-size: 15.5px; line-height: 1.85; color: #3a3553; }
+    /* Prosa de leitura do "Sobre" (texto justificado). */
+    .cema-prosa-perfil p { margin-bottom: 16px; font-size: 15.5px; line-height: 1.85; color: #3a3553; text-align: justify; }
     .cema-prosa-perfil p:last-child { margin-bottom: 0; }
     .cema-prosa-perfil a { color: var(--color-secondary); text-decoration: underline; }
     .cema-prosa-perfil h2,

@@ -1,20 +1,10 @@
-// Componente Alpine do perfil do palestrante: filtro por tema + ordenação (client-side).
+// Componente Alpine do perfil do palestrante: ordenação client-side da grade.
+// (O filtro por tema virou navegação para a archive; aqui fica só a ordenação.)
 // Alpine vem do bundle do Livewire; registramos no evento alpine:init.
 document.addEventListener('alpine:init', () => {
     window.Alpine.data('palestranteDetalhe', (config) => ({
-        area: 'todos',
         sort: 'recent',
         itens: config.itens ?? [],
-        areas: config.areas ?? [],
-
-        visivel(id) {
-            if (this.area === 'todos') {
-                return true;
-            }
-            const item = this.itens.find((i) => i.id === id);
-
-            return !!item && item.assuntos.includes(this.area);
-        },
 
         get ordemPorId() {
             const arr = [...this.itens];
@@ -35,29 +25,6 @@ document.addEventListener('alpine:init', () => {
 
         ordem(id) {
             return this.ordemPorId[id] ?? 0;
-        },
-
-        selecionar(slug) {
-            this.area = this.area === slug ? 'todos' : slug;
-        },
-
-        get filtradas() {
-            return this.itens.filter((i) => this.visivel(i.id));
-        },
-
-        get vazio() {
-            return this.filtradas.length === 0;
-        },
-
-        get rotulo() {
-            const n = this.filtradas.length;
-            const base = n === 1 ? '1 palestra' : `${n} palestras`;
-            if (this.area === 'todos') {
-                return base;
-            }
-            const a = this.areas.find((x) => x.slug === this.area);
-
-            return a ? `${base} em ${a.nome}` : base;
         },
     }));
 });

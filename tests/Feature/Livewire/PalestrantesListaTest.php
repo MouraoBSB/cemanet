@@ -35,15 +35,25 @@ class PalestrantesListaTest extends TestCase
             ->assertDontSee('Abadio Inativo'); // o escopo ->ativo() barra inativos na busca
     }
 
-    public function test_default_ordena_az_e_paginacao_12(): void
+    public function test_default_ordena_por_mais_palestras_e_paginacao_12(): void
     {
-        Palestrante::factory()->create(['nome' => 'Bruno']);
-        Palestrante::factory()->create(['nome' => 'Ana']);
-        Palestrante::factory()->create(['nome' => 'Carlos']);
+        $ana = Palestrante::factory()->create(['nome' => 'Ana']);       // 0 palestras
+        $bruno = Palestrante::factory()->create(['nome' => 'Bruno']);   // 2 palestras
+        $carlos = Palestrante::factory()->create(['nome' => 'Carlos']); // 1 palestra
 
+        $bruno->palestras()->attach([
+            Palestra::factory()->create(['status' => Palestra::STATUS_PUBLICADO])->id,
+            Palestra::factory()->create(['status' => Palestra::STATUS_PUBLICADO])->id,
+        ], ['papel' => Palestra::PAPEL_PALESTRANTE]);
+        $carlos->palestras()->attach(
+            Palestra::factory()->create(['status' => Palestra::STATUS_PUBLICADO])->id,
+            ['papel' => Palestra::PAPEL_PALESTRANTE],
+        );
+
+        // Sem set('ordenar'): o default agora é 'mais' (mais palestras primeiro; empate por nome).
         $pag = Livewire::test(Lista::class)->viewData('palestrantes');
 
-        $this->assertSame(['Ana', 'Bruno', 'Carlos'], collect($pag->items())->pluck('nome')->all());
+        $this->assertSame(['Bruno', 'Carlos', 'Ana'], collect($pag->items())->pluck('nome')->all());
         $this->assertSame(12, $pag->perPage());
     }
 
@@ -107,7 +117,7 @@ class PalestrantesListaTest extends TestCase
             ->set('ordenar', 'za')
             ->call('limparFiltros')
             ->assertSet('q', '')
-            ->assertSet('ordenar', 'az');
+            ->assertSet('ordenar', 'mais');
     }
 
     public function test_filtros_ativos_reflete_a_busca(): void

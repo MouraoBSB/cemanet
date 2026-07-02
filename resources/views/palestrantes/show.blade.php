@@ -21,7 +21,7 @@
         @endif
     </x-slot:head>
 
-    <div x-data="palestranteDetalhe({ itens: @js($itensFiltro), areas: @js($areas) })">
+    <div x-data="palestranteDetalhe({ itens: @js($itensFiltro) })">
         @include('palestrantes.perfil.hero')
 
         <section class="bg-surface">

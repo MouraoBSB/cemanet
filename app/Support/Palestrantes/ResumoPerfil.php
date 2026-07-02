@@ -5,6 +5,7 @@
 namespace App\Support\Palestrantes;
 
 use App\Models\Palestra;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 
 /**
@@ -15,7 +16,7 @@ use Illuminate\Support\Collection;
 class ResumoPerfil
 {
     /** Nº máximo de chips de área exibidos no hero. */
-    public const CHIPS_HERO = 8;
+    public const CHIPS_HERO = 6;
 
     /** @param Collection<int, Palestra> $palestras */
     public function __construct(private Collection $palestras) {}
@@ -30,14 +31,13 @@ class ResumoPerfil
         return $this->areas()->count();
     }
 
-    /** Menor ano de `data_da_palestra`; null quando não há data. */
-    public function anoAtivoDesde(): ?int
+    /** Data da palestra mais recente; null quando não há data. */
+    public function ultimaPalestra(): ?Carbon
     {
         return $this->palestras
             ->pluck('data_da_palestra')
             ->filter()
-            ->map(fn ($d) => (int) $d->year)
-            ->min();
+            ->max();
     }
 
     /** Percentual de palestras online (0–100); null quando não há palestras. */

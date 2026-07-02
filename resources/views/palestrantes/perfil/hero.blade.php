@@ -34,15 +34,13 @@
                     <p class="mb-5 max-w-[560px] font-serif italic text-white/85 [font-size:clamp(1.05rem,1rem+0.35vw,1.25rem)]">{{ $palestrante->chamada }}</p>
                 @endif
                 @if ($areasHero->isNotEmpty())
+                    {{-- Máx. ~6 temas (top por frequência); cada um leva à archive filtrada por aquele assunto. --}}
                     <div class="flex flex-wrap gap-2.5">
                         @foreach ($areasHero as $areaItem)
-                            <button type="button"
-                                    @click="selecionar('{{ $areaItem['slug'] }}')"
-                                    :aria-pressed="area === '{{ $areaItem['slug'] }}'"
-                                    :class="area === '{{ $areaItem['slug'] }}' ? 'ring-2 ring-gold' : ''"
-                                    class="inline-flex items-center gap-2 rounded-pill border border-white/20 bg-white/10 px-3.5 py-1.5 text-[12.5px] text-[#e7e9f4] transition hover:bg-white/15">
+                            <a href="{{ route('palestras.index', ['assunto' => $areaItem['slug']]) }}"
+                               class="inline-flex items-center gap-2 rounded-pill border border-white/20 bg-white/10 px-3.5 py-1.5 text-[12.5px] text-[#e7e9f4] transition hover:bg-white/15">
                                 <span class="cema-dot-{{ $areaItem['cor'] }} inline-block size-2 rounded-full"></span>{{ $areaItem['nome'] }}
-                            </button>
+                            </a>
                         @endforeach
                     </div>
                 @endif

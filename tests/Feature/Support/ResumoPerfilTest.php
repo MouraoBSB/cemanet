@@ -23,7 +23,7 @@ class ResumoPerfilTest extends TestCase
         return $p->load('assuntos');
     }
 
-    public function test_totais_temas_ano_e_percentual(): void
+    public function test_totais_temas_ultima_e_percentual(): void
     {
         $evangelho = Assunto::factory()->create(['nome' => 'Evangelho', 'slug' => 'evangelho']);
         $perdao = Assunto::factory()->create(['nome' => 'Perdão', 'slug' => 'perdao']);
@@ -38,7 +38,7 @@ class ResumoPerfilTest extends TestCase
 
         $this->assertSame(3, $r->totalPalestras());
         $this->assertSame(2, $r->totalTemas());
-        $this->assertSame(2022, $r->anoAtivoDesde());
+        $this->assertSame('2024-03-10', $r->ultimaPalestra()?->format('Y-m-d')); // mais recente (ignora null)
         $this->assertSame(67, $r->percentualOnline()); // 2 de 3 → 66.67 → 67
     }
 
@@ -66,12 +66,12 @@ class ResumoPerfilTest extends TestCase
 
         $this->assertSame(0, $r->totalPalestras());
         $this->assertSame(0, $r->totalTemas());
-        $this->assertNull($r->anoAtivoDesde());
+        $this->assertNull($r->ultimaPalestra());
         $this->assertNull($r->percentualOnline()); // guarda de divisão por zero
         $this->assertTrue($r->areas()->isEmpty());
     }
 
-    public function test_areas_hero_limita_top_8(): void
+    public function test_areas_hero_limita_top_6(): void
     {
         $palestras = new Collection;
         for ($i = 0; $i < 10; $i++) {
@@ -79,6 +79,6 @@ class ResumoPerfilTest extends TestCase
             $palestras->push($this->palestra(['data_da_palestra' => '2024-01-0'.(($i % 9) + 1)], [$a]));
         }
 
-        $this->assertSame(8, (new ResumoPerfil($palestras))->areasHero()->count());
+        $this->assertSame(6, (new ResumoPerfil($palestras))->areasHero()->count());
     }
 }

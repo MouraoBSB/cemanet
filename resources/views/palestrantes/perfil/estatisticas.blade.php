@@ -1,10 +1,10 @@
 @php
-    $ano = $resumo->anoAtivoDesde();
+    $ultima = $resumo->ultimaPalestra();
     $pct = $resumo->percentualOnline();
     $tiles = [
         ['valor' => $resumo->totalPalestras(), 'rotulo' => 'Palestras', 'bg' => 'bg-cream'],
         ['valor' => $resumo->totalTemas(), 'rotulo' => 'Temas abordados', 'bg' => 'bg-[#EAF0F6]'],
-        ['valor' => $ano ?? '—', 'rotulo' => 'Ativo no CEMA desde', 'bg' => 'bg-[#EAF2EC]'],
+        ['valor' => $ultima ? ucfirst(str_replace('.', '', $ultima->translatedFormat('M/Y'))) : '—', 'rotulo' => 'Última palestra', 'bg' => 'bg-[#EAF2EC]'],
         ['valor' => $pct !== null ? $pct.'%' : '—', 'rotulo' => 'Palestras online', 'bg' => 'bg-surface'],
     ];
 @endphp

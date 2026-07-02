@@ -18,20 +18,25 @@ class LeitorAgendaMysql implements LeitorAgenda
 
     public function entradas(): array
     {
-        // Somente publish/future; ignora sobras de lixeira (slug terminando em __trashed).
-        // ORDER BY ID ASC => o post original (ID menor) vem primeiro; o dedupe do
-        // importador mantém esse (slug limpo) e trata a cópia (-2) só como 301.
+        // Somente publish/future; ORDER BY ID ASC => o post original (ID menor) vem
+        // primeiro; o dedupe do importador mantém esse (slug limpo) e trata a cópia
+        // (-2) só como 301.
         $rows = $this->db->select(
-            "SELECT ID, post_name, post_status, DATE(post_date) AS data_post
+            "SELECT ID, post_name, DATE(post_date) AS data_post
              FROM wp_posts
              WHERE post_type = 'agenda-reforma'
                AND post_status IN ('publish', 'future')
-               AND post_name NOT LIKE '%\\_\\_trashed' ESCAPE '\\'
              ORDER BY ID ASC"
         );
 
         $out = [];
         foreach ($rows as $r) {
+            // Ignora sobras de lixeira (slug terminando em __trashed); filtro em PHP
+            // evita depender de escape de curinga em LIKE.
+            if (str_ends_with($r->post_name, '__trashed')) {
+                continue;
+            }
+
             $id = (int) $r->ID;
             $meta = $this->metasDe($id);
             $dataPost = $r->data_post; // 'AAAA-MM-DD'

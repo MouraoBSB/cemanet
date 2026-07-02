@@ -1,0 +1,125 @@
+/* Agenda Reforma Íntima — front público. Thiago Mourão — https://github.com/MouraoBSB — 2026-07-02 */
+
+@layer components {
+    /* Hero */
+    .agenda-hero {
+        background:
+            radial-gradient(circle at 72% 28%, rgba(110, 159, 203, 0.40), transparent 52%),
+            linear-gradient(135deg, #0b1030 0%, #1a1f4a 48%, #2c2f64 100%);
+    }
+
+    @keyframes cemaFloat {
+        0%, 100% {
+            transform: rotate(-4deg) translateY(0);
+        }
+        50% {
+            transform: rotate(-4deg) translateY(-12px);
+        }
+    }
+    .agenda-capa {
+        animation: cemaFloat 6s ease-in-out infinite;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .agenda-capa {
+            animation: none;
+            transform: rotate(-4deg);
+        }
+    }
+
+    /* Célula do calendário — quadrado branco com marcador bookmark */
+    .agenda-dia {
+        height: 54px;
+        border-radius: 9px;
+        border: 1px solid #ECE9F3;
+        background: #fff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 3px;
+        font-size: 13.5px;
+        color: #3a3553;
+        text-decoration: none;
+        transition: all 0.14s ease;
+    }
+    a.agenda-dia:hover {
+        background: var(--color-cream);
+        border-color: #E2D9C2;
+    }
+    .agenda-dia--vazio {
+        background: #FAFAFB;
+        color: #b6b3c3;
+    }
+    .agenda-dia--hoje {
+        border: 2px solid var(--color-primary);
+    }
+    .agenda-dia--sel {
+        background: var(--color-primary);
+        color: #fff;
+        box-shadow: 0 8px 18px rgba(78, 68, 131, 0.28);
+    }
+    .agenda-bookmark {
+        color: #c6bee6;
+    }
+    .agenda-dia--hoje .agenda-bookmark {
+        color: var(--color-primary);
+    }
+    .agenda-dia--sel .agenda-bookmark {
+        color: #fff;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        a.agenda-dia:hover {
+            transform: none;
+        }
+    }
+
+    /* Blocos do card do dia */
+    .agenda-bloco {
+        padding-block: 22px;
+        border-top: 1px solid var(--color-border-muted);
+    }
+    .agenda-bloco:first-child {
+        padding-top: 0;
+        border-top: 0;
+    }
+    .agenda-bloco-titulo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-family: var(--font-display, 'Work Sans', sans-serif);
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--color-primary);
+    }
+    .agenda-tick {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 9999px;
+        background: var(--color-gold);
+        box-shadow: 0 0 0 3px rgba(242, 168, 30, 0.18);
+    }
+    .agenda-subtitulo {
+        margin-top: 8px;
+        font-family: var(--font-display, 'Work Sans', sans-serif);
+        font-weight: 600;
+        color: var(--color-text-ink);
+    }
+    .agenda-prosa {
+        margin-top: 8px;
+        font-family: var(--font-serif, 'Roboto Slab', serif);
+        font-size: 16px;
+        line-height: 1.82;
+        color: #3a3553;
+        text-align: justify;
+        hyphens: auto;
+    }
+    .agenda-prosa p {
+        margin-bottom: 16px;
+    }
+    .agenda-prosa a {
+        color: var(--color-secondary);
+        text-decoration: underline;
+    }
+}

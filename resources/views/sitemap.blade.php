@@ -24,4 +24,21 @@
         <priority>0.7</priority>
     </url>
     @endforeach
+
+    {{-- Agenda Reforma Íntima — URL nua ("hoje" evergreen) --}}
+    <url>
+        <loc>{{ route('agenda.index') }}</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.9</priority>
+    </url>
+
+    {{-- Agenda Reforma Íntima — dias publicados --}}
+    @foreach ($agendaDias as $agendaDia)
+    <url>
+        <loc>{{ route('agenda.show', $agendaDia->data->format('Y-m-d')) }}</loc>
+        <lastmod>{{ $agendaDia->updated_at->toAtomString() }}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    @endforeach
 </urlset>

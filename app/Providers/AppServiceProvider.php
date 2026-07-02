@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Importacao\LeitorAgenda;
+use App\Importacao\LeitorAgendaMysql;
 use App\Importacao\LeitorBlog;
 use App\Importacao\LeitorBlogMysql;
 use App\Importacao\LeitorLegado;
@@ -24,6 +26,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind(LeitorLegado::class, LeitorLegadoMysql::class);
         $this->app->bind(LeitorBlog::class, LeitorBlogMysql::class);
+        $this->app->bind(LeitorAgenda::class, LeitorAgendaMysql::class);
         $this->app->bind(FonteReflexao::class, ReflexaoConfig::class);
     }
 

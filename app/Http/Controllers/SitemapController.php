@@ -4,6 +4,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AgendaDia;
 use App\Models\Categoria;
 use App\Models\Post;
 use Illuminate\Http\Response;
@@ -18,8 +19,12 @@ class SitemapController extends Controller
 
         $categorias = Categoria::orderBy('ordem')->get(['slug']);
 
+        $agendaDias = AgendaDia::publicado()
+            ->orderBy('data')
+            ->get(['data', 'updated_at']);
+
         return response()
-            ->view('sitemap', compact('posts', 'categorias'))
+            ->view('sitemap', compact('posts', 'categorias', 'agendaDias'))
             ->header('Content-Type', 'application/xml');
     }
 }

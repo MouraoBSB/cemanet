@@ -34,11 +34,47 @@ class AgendaDiaTest extends TestCase
         $this->assertStringNotContainsString('<script', (string) $dia->fresh()->prece);
     }
 
+    public function test_mutator_remove_script_nos_4_campos_html(): void
+    {
+        $script = '<script>alert(1)</script>';
+
+        $dia = AgendaDia::factory()->create([
+            'reflexao' => '<p>Reflexão</p>'.$script,
+            'meta_mes_texto' => '<p>Meta do mês</p>'.$script,
+            'meta_dia_texto' => '<p>Meta do dia</p>'.$script,
+            'prece' => '<p>Prece</p>'.$script,
+        ]);
+
+        $dia = $dia->fresh();
+
+        $this->assertStringNotContainsString('<script', (string) $dia->reflexao);
+        $this->assertStringNotContainsString('<script', (string) $dia->meta_mes_texto);
+        $this->assertStringNotContainsString('<script', (string) $dia->meta_dia_texto);
+        $this->assertStringNotContainsString('<script', (string) $dia->prece);
+    }
+
     public function test_mutator_valor_nulo_permanece_nulo(): void
     {
         $dia = AgendaDia::factory()->create(['prece' => null]);
 
         $this->assertNull($dia->fresh()->prece);
+    }
+
+    public function test_mutator_valor_nulo_permanece_nulo_nos_4_campos_html(): void
+    {
+        $dia = AgendaDia::factory()->create([
+            'reflexao' => null,
+            'meta_mes_texto' => null,
+            'meta_dia_texto' => null,
+            'prece' => null,
+        ]);
+
+        $dia = $dia->fresh();
+
+        $this->assertNull($dia->reflexao);
+        $this->assertNull($dia->meta_mes_texto);
+        $this->assertNull($dia->meta_dia_texto);
+        $this->assertNull($dia->prece);
     }
 
     public function test_meta_mes_resolve_por_ano_e_mes(): void

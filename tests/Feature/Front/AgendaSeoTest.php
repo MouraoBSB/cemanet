@@ -6,11 +6,26 @@ namespace Tests\Feature\Front;
 
 use App\Models\AgendaDia;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Tests\TestCase;
 
 class AgendaSeoTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        Carbon::setTestNow(Carbon::create(2026, 7, 1, 12, 0, 0, 'America/Sao_Paulo'));
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+
+        parent::tearDown();
+    }
 
     public function test_show_tem_jsonld_article_breadcrumb_e_canonical(): void
     {

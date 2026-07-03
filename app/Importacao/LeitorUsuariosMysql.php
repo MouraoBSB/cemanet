@@ -56,7 +56,7 @@ class LeitorUsuariosMysql implements LeitorUsuarios
         if ($serializado === '') {
             return [];
         }
-        $a = @unserialize($serializado);
+        $a = @unserialize($serializado, ['allowed_classes' => false]);
 
         return is_array($a) ? array_values(array_filter($a, fn ($x) => is_string($x) && $x !== '')) : [];
     }

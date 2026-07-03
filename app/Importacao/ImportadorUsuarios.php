@@ -114,7 +114,7 @@ class ImportadorUsuarios
 
         // cursos_realizados (repeater serializado) → delete + recriação ordenada
         $user->cursos()->delete();
-        $cursos = @unserialize($meta['cursos'] ?? '');
+        $cursos = @unserialize($meta['cursos'] ?? '', ['allowed_classes' => false]);
         if (is_array($cursos)) {
             $ordem = 0;
             foreach ($cursos as $item) {
@@ -140,6 +140,7 @@ class ImportadorUsuarios
         $valor = trim($valor);
 
         // Unix timestamp (inteiro, pode ser negativo para nascimentos antes de 1970)
+        // Converte timestamp Unix usando o timezone da app (APP_TIMEZONE) — datas em nível de dia.
         if (preg_match('/^-?\d+$/', $valor)) {
             $ano = (int) date('Y', (int) $valor);
             if ($ano < 1900 || $ano > (int) date('Y')) {

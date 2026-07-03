@@ -13,10 +13,10 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
         $admin = User::updateOrCreate(
-            ['email' => env('ADMIN_EMAIL', 'admin@cemanet.org.br')],
+            ['email' => env('ADMIN_EMAIL', 'admin@cema.local')],
             [
                 'name' => env('ADMIN_NAME', 'Administrador CEMA'),
-                'password' => Hash::make(env('ADMIN_PASSWORD', 'trocar-esta-senha')),
+                'password' => Hash::make(env('ADMIN_PASSWORD', 'password')),
                 'email_verified_at' => now(),
             ],
         );

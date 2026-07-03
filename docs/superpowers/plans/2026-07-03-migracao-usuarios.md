@@ -1708,8 +1708,27 @@ class LeitorUsuariosMysql implements LeitorUsuarios
 
 - [ ] **Step 5: Verificar o SQL real contra o legado (guard — só há Fake nos testes)**
 
-Run: `docker exec cema-app php artisan tinker --execute="dump(iterator_to_array((new App\Importacao\LeitorUsuariosMysql)->usuarios())[0]);"`
-Expected: um array com `email`, `roles`, `setores`, `senha` começando com `$wp$`/`$P$`. (Túnel SSH ativo.)
+Conferir um usuário **rico e conhecido** (não o `[0]`, que pode vir vazio), para garantir que os
+nomes de meta (`locais_de_trabalho_*`, `_socio`, `_whatsapp`, …) trazem setores/cargos/sócio/whatsapp
+preenchidos. Create `storage/app/_verifica_leitor.php`:
+
+```php
+<?php
+require '/var/www/html/vendor/autoload.php';
+$app = require '/var/www/html/bootstrap/app.php';
+$app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+
+$us = collect(iterator_to_array((new \App\Importacao\LeitorUsuariosMysql)->usuarios()));
+// usuário mais rico (mais setores + cargos) — evita o [0] potencialmente vazio
+dump($us->sortByDesc(fn ($x) => count($x['setores']) + count($x['cargos']))->first());
+// confira também o SEU próprio registro conhecido (troque o e-mail):
+dump($us->firstWhere('email', 'SEU-EMAIL-NO-LEGADO'));
+```
+
+Run (com o túnel SSH ativo): `docker exec cema-app php /var/www/html/storage/app/_verifica_leitor.php`
+depois `rm ./storage/app/_verifica_leitor.php`.
+Expected: o usuário rico traz `setores`/`cargos`/`socio`/`meta.whatsapp` **preenchidos** e `senha`
+começando com `$wp$`/`$P$`; o seu registro aparece com os dados esperados.
 
 - [ ] **Step 6: Pint + commit**
 
@@ -2047,16 +2066,67 @@ Expected: ~145 importados, ~5 ignorados (4 admin + 1 subscriber); rodar 2× → 
 
 ## Task 10: Gate do painel por papel + AdminSeeder
 
+> **CRÍTICO (regressão):** mudar `canAccessPanel` para estrito por papel quebra TODOS os
+> testes Filament/Mídia das fatias anteriores, que hoje fazem `actingAs(User::factory()->create())`
+> **sem papel**. Esta task PRIMEIRO cria um helper `actingAsAdmin()` na `TestCase` base e
+> refatora esses testes, DEPOIS aperta o gate, e termina rodando a **suíte completa** (não `--filter`)
+> para pegar qualquer regressão.
+
 **Files:**
+- Modify: `tests/TestCase.php` (helper `actingAsAdmin`)
+- Modify (refatorar `actingAs`): `tests/Feature/Filament/PalestranteResourceTest.php`, `PalestraResourceTest.php`, `AssuntoResourceTest.php`, `PostResourceTest.php`, `BibliotecaResourceTest.php`, `InserirDaBibliotecaTest.php`, `UploadLimitesTest.php`, `AgendaDiaResourceTest.php`, `AgendaMetaMesResourceTest.php`, `ConfiguracoesAgendaTest.php`, `tests/Feature/Midia/ColarMidiaTest.php`
 - Modify: `app/Models/User.php` (`canAccessPanel`)
 - Create: `database/seeders/AdminSeeder.php`
+- Modify: `.env.example` (ADMIN_EMAIL/ADMIN_PASSWORD)
 - Test: `tests/Feature/Usuarios/GatePainelTest.php`
 
 **Interfaces:**
 - Consumes: papéis (Task 5), `HasRoles` (Task 1).
-- Produces: `canAccessPanel` libera só `administrador`/`diretor`; `AdminSeeder` cria o admin do site novo.
+- Produces: `TestCase::actingAsAdmin(): User` (semeia o papel + loga um admin); `canAccessPanel` libera só `administrador`/`diretor`; `AdminSeeder` cria o admin do site novo.
 
-- [ ] **Step 1: Escrever o teste (TDD)**
+- [ ] **Step 1: Criar o helper `actingAsAdmin` na TestCase base**
+
+Modify `tests/TestCase.php`:
+
+```php
+<?php
+
+namespace Tests;
+
+use App\Models\User;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Spatie\Permission\Models\Role;
+
+abstract class TestCase extends BaseTestCase
+{
+    /** Loga um usuário com papel administrador (para os testes do painel Filament). */
+    protected function actingAsAdmin(): User
+    {
+        Role::findOrCreate('administrador', 'web');
+        $user = User::factory()->create();
+        $user->assignRole('administrador');
+        $this->actingAs($user);
+
+        return $user;
+    }
+}
+```
+
+- [ ] **Step 2: Refatorar os testes que logam sem papel**
+
+Nos 10 arquivos abaixo, trocar `$this->actingAs(User::factory()->create());` por `$this->actingAsAdmin();`
+(pode haver `use App\Models\User;` que fica sem uso — remover se o Pint apontar):
+
+`AgendaDiaResourceTest.php`, `AgendaMetaMesResourceTest.php`, `AssuntoResourceTest.php`, `BibliotecaResourceTest.php`, `ConfiguracoesAgendaTest.php`, `InserirDaBibliotecaTest.php`, `PalestraResourceTest.php`, `PostResourceTest.php`, `UploadLimitesTest.php`, `tests/Feature/Midia/ColarMidiaTest.php` (3 ocorrências).
+
+Em `PalestranteResourceTest.php` (usa `$this->admin` em vários testes), trocar o setUp:
+
+```php
+$this->admin = $this->actingAsAdmin();
+```
+(remove as duas linhas `$this->admin = User::factory()->create();` e `$this->actingAs($this->admin);`).
+
+- [ ] **Step 3: Escrever o teste do gate**
 
 Create `tests/Feature/Usuarios/GatePainelTest.php`:
 
@@ -2066,23 +2136,19 @@ Create `tests/Feature/Usuarios/GatePainelTest.php`:
 namespace Tests\Feature\Usuarios;
 
 use App\Models\User;
-use Database\Seeders\EstruturaCemaSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class GatePainelTest extends TestCase
 {
     use RefreshDatabase;
 
-    protected function setUp(): void
-    {
-        parent::setUp();
-        (new EstruturaCemaSeeder)->run();
-    }
-
     public function test_diretor_acessa_e_frequentador_nao(): void
     {
+        Role::findOrCreate('diretor', 'web');
+        Role::findOrCreate('frequentador', 'web');
         $painel = Filament::getPanel('admin');
 
         $diretor = User::factory()->create();
@@ -2096,12 +2162,12 @@ class GatePainelTest extends TestCase
 }
 ```
 
-- [ ] **Step 2: Rodar o teste (deve falhar — hoje libera todos em testing)**
+- [ ] **Step 4: Rodar o teste (deve falhar — hoje libera todos em testing)**
 
 Run: `docker exec cema-app php artisan test --filter=GatePainelTest`
 Expected: FAIL (frequentador ainda acessa).
 
-- [ ] **Step 3: Ajustar `canAccessPanel`**
+- [ ] **Step 5: Ajustar `canAccessPanel`**
 
 Modify `app/Models/User.php`:
 
@@ -2112,7 +2178,7 @@ public function canAccessPanel(Panel $panel): bool
 }
 ```
 
-- [ ] **Step 4: Criar o AdminSeeder**
+- [ ] **Step 6: Criar o AdminSeeder + variáveis de ambiente**
 
 Create `database/seeders/AdminSeeder.php`:
 
@@ -2145,20 +2211,32 @@ class AdminSeeder extends Seeder
 }
 ```
 
-- [ ] **Step 5: Rodar o teste (deve passar)**
+Adicionar em `.env` e `.env.example`:
+
+```
+ADMIN_EMAIL=admin@cemanet.org.br
+ADMIN_PASSWORD=trocar-esta-senha
+```
+
+- [ ] **Step 7: Rodar o teste do gate (deve passar)**
 
 Run: `docker exec cema-app php artisan test --filter=GatePainelTest`
 Expected: PASS.
 
-- [ ] **Step 6: Criar o admin no dev + Pint + commit**
+- [ ] **Step 8: Rodar a SUÍTE COMPLETA (pega a regressão dos testes refatorados)**
+
+Run: `docker exec cema-app php artisan test`
+Expected: TODA a suíte verde. Se algum teste Filament/Mídia falhar por 403/acesso, é porque ficou um `actingAs` sem papel — corrigir no arquivo apontado e rodar de novo.
+
+- [ ] **Step 9: Criar o admin no dev + Pint + commit**
 
 Run: `docker exec cema-app php artisan db:seed --class=AdminSeeder`
 Expected: admin criado (idempotente).
 
 ```bash
 docker exec cema-app ./vendor/bin/pint
-git add app/Models/User.php database/seeders/AdminSeeder.php tests/Feature/Usuarios/GatePainelTest.php
-git commit -m "feat(usuarios): gate do painel por papel (diretor/admin) + AdminSeeder"
+git add tests app/Models/User.php database/seeders/AdminSeeder.php .env.example
+git commit -m "feat(usuarios): gate do painel por papel + helper actingAsAdmin + AdminSeeder"
 ```
 
 ---
@@ -2199,10 +2277,14 @@ TextInput::make('name')->label('Nome')->required(),
 TextInput::make('email')->label('E-mail')->email()->required()->unique(ignoreRecord: true),
 Toggle::make('socio')->label('Sócio'),
 Toggle::make('ativo')->label('Ativo')->default(true),
+// Papel: `roles` é morphToMany (Spatie) → o Filament salva via sync. maxItems(1) força
+// papel único (hierarquia linear). NÃO usar ->options() junto do relationship (conflita).
 Select::make('roles')
     ->label('Papel')
     ->relationship('roles', 'name')
-    ->options(\Spatie\Permission\Models\Role::pluck('name', 'name'))
+    ->multiple()
+    ->maxItems(1)
+    ->preload()
     ->required(),
 Select::make('setores')
     ->label('Setores')
@@ -2250,45 +2332,74 @@ Select::make('departamento_id')->label('Departamento')
     ->hidden(fn (\Filament\Forms\Get $get) => $get('institucional')),
 ```
 
-- [ ] **Step 5: Teste de fumaça do UserResource (renderiza + lista)**
+- [ ] **Step 5: Testes do UserResource (renderiza + o Select de papel SALVA)**
 
-Create `tests/Feature/Usuarios/UsuarioResourceTest.php`:
+Create `tests/Feature/Usuarios/UsuarioResourceTest.php`. O 2º teste é o guard contra o
+Select de papel finicky do Spatie — prova que preencher o form realmente atribui o papel:
 
 ```php
 <?php
 
 namespace Tests\Feature\Usuarios;
 
+use App\Filament\Resources\Users\Pages\CreateUser;
 use App\Models\User;
 use Database\Seeders\EstruturaCemaSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class UsuarioResourceTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        (new EstruturaCemaSeeder)->run();
+        $this->actingAsAdmin();
+    }
+
     public function test_admin_acessa_listagem_de_usuarios(): void
     {
-        (new EstruturaCemaSeeder)->run();
-        $admin = User::factory()->create();
-        $admin->assignRole('administrador');
+        $this->get('/admin/users')->assertSuccessful();
+    }
 
-        $this->actingAs($admin)
-            ->get('/admin/users')
-            ->assertSuccessful();
+    public function test_form_do_admin_salva_o_papel(): void
+    {
+        $trabalhador = Role::findByName('trabalhador');
+
+        Livewire::test(CreateUser::class)
+            ->fillForm([
+                'name' => 'Fulano de Teste',
+                'email' => 'fulano@teste.com',
+                'password' => 'senha-super-forte-2026',
+                'roles' => [$trabalhador->id],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $user = User::where('email', 'fulano@teste.com')->first();
+        $this->assertNotNull($user);
+        $this->assertTrue($user->hasRole('trabalhador'));
     }
 }
 ```
 
-- [ ] **Step 6: Rodar o teste**
+> Ajustar o namespace da Page (`App\Filament\Resources\Users\Pages\CreateUser`) e a rota
+> (`/admin/users`) conforme o que o scaffold do Filament 5 gerou (o padrão do projeto é
+> `App\Filament\Resources\{Plural}\Pages\{Acao}{Singular}`).
+
+- [ ] **Step 6: Rodar os testes**
 
 Run: `docker exec cema-app php artisan test --filter=UsuarioResourceTest`
-Expected: PASS. (Se a rota for `/admin/usuarios`, ajustar conforme o slug gerado.)
+Expected: PASS (2 testes). Se `test_form_do_admin_salva_o_papel` falhar, o Select de papel
+não está sincronizando — revisar a config do `Select::make('roles')` (Step 2).
 
 - [ ] **Step 7: Verificação manual + Pint + commit**
 
-Verificação: abrir `http://localhost:8000/admin`, logar com o admin (AdminSeeder), conferir que Usuários/Departamentos/Setores/Cargos aparecem, que um usuário migrado mostra papel/setores/sócio, e que dá para trocar o papel via Select.
+Verificação: abrir `http://localhost:8000/admin`, logar com o admin (AdminSeeder), conferir que Usuários/Departamentos/Setores/Cargos aparecem, que um usuário migrado mostra papel/setores/sócio, e que dá para trocar o papel via Select **e salvar** (recarregar e confirmar que persistiu).
 
 ```bash
 docker exec cema-app ./vendor/bin/pint

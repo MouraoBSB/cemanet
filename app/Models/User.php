@@ -9,11 +9,14 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password'])]
+#[Fillable(['name', 'email', 'password', 'origem_legado_id', 'socio', 'ativo'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser
 {
@@ -26,6 +29,33 @@ class User extends Authenticatable implements FilamentUser
         return app()->environment('local', 'testing');
     }
 
+    public function perfil(): HasOne
+    {
+        return $this->hasOne(PerfilMembro::class);
+    }
+
+    public function cursos(): HasMany
+    {
+        return $this->hasMany(CursoRealizado::class);
+    }
+
+    public function setores(): BelongsToMany
+    {
+        return $this->belongsToMany(Setor::class, 'setor_usuario')
+            ->withPivot('funcao', 'desde')->withTimestamps();
+    }
+
+    public function cargos(): BelongsToMany
+    {
+        return $this->belongsToMany(Cargo::class, 'cargo_usuario')->withTimestamps();
+    }
+
+    public function atributos(): BelongsToMany
+    {
+        return $this->belongsToMany(Atributo::class, 'atributo_usuario')
+            ->withPivot('desde', 'ate')->withTimestamps();
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -36,6 +66,8 @@ class User extends Authenticatable implements FilamentUser
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'socio' => 'boolean',
+            'ativo' => 'boolean',
         ];
     }
 }

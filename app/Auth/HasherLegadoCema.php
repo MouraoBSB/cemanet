@@ -46,6 +46,9 @@ class HasherLegadoCema extends BcryptHasher
         if (substr($setting, 0, 3) !== '$P$' && substr($setting, 0, 3) !== '$H$') {
             return $output;
         }
+        if (strlen($setting) < 12) {
+            return $output;
+        }
         $countLog2 = strpos(self::ITOA64, $setting[3]);
         if ($countLog2 < 7 || $countLog2 > 30) {
             return $output;

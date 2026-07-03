@@ -5,7 +5,6 @@
 namespace Tests\Feature\Midia;
 
 use App\Models\Biblioteca;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -23,7 +22,7 @@ class ColarMidiaTest extends TestCase
     public function test_admin_autenticado_cola_imagem_e_recebe_url_portavel(): void
     {
         Storage::fake('public');
-        $this->actingAs(User::factory()->create());
+        $this->actingAsAdmin();
 
         $resp = $this->post($this->url(), [
             'imagem' => UploadedFile::fake()->image('paste.png', 800, 600),
@@ -55,7 +54,7 @@ class ColarMidiaTest extends TestCase
     public function test_rejeita_arquivo_que_nao_e_imagem_com_422_json(): void
     {
         Storage::fake('public');
-        $this->actingAs(User::factory()->create());
+        $this->actingAsAdmin();
 
         $this->post($this->url(), [
             'imagem' => UploadedFile::fake()->create('doc.pdf', 100, 'application/pdf'),
@@ -69,7 +68,7 @@ class ColarMidiaTest extends TestCase
     public function test_dedup_mesma_imagem_retorna_mesma_url(): void
     {
         Storage::fake('public');
-        $this->actingAs(User::factory()->create());
+        $this->actingAsAdmin();
 
         // Mesmo conteúdo de bytes nas duas chamadas.
         $bytes = UploadedFile::fake()->image('a.png', 800, 600)->getContent();

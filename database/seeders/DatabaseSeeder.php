@@ -2,10 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,19 +14,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Admin DURÁVEL e idempotente (sobrevive a db:seed; sem usuário aleatório).
-        // Credenciais via .env (não versionadas); o model não tem mais o cast 'hashed'
-        // (HasherLegadoCema cuida do legado), então a senha é hasheada aqui explicitamente.
-        User::updateOrCreate(
-            ['email' => env('ADMIN_EMAIL', 'admin@cema.local')],
-            [
-                'name' => env('ADMIN_NAME', 'Admin CEMA'),
-                'password' => Hash::make(env('ADMIN_PASSWORD', 'password')),
-                'email_verified_at' => now(),
-            ],
-        );
-
+        // EstruturaCemaSeeder cria os papéis (Role) antes do AdminSeeder atribuir
+        // 'administrador' — ordem importa: syncRoles() falha se o papel ainda não existe.
         $this->call(CategoriaSeeder::class);
         $this->call(EstruturaCemaSeeder::class);
+
+        // Admin DURÁVEL e idempotente (sobrevive a db:seed; sem usuário aleatório), já com
+        // o papel administrador — fonte única do admin do site novo (ver AdminSeeder).
+        $this->call(AdminSeeder::class);
     }
 }

@@ -25,8 +25,7 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        // Acesso ao admin só fora de produção até existir gate por papel (Fase 2).
-        return app()->environment('local', 'testing');
+        return $this->hasAnyRole(['administrador', 'diretor']);
     }
 
     public function perfil(): HasOne

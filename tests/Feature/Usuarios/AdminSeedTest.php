@@ -24,5 +24,6 @@ class AdminSeedTest extends TestCase
         $this->assertNotNull($admin);
         $this->assertStringStartsWith('$2y$', $admin->password); // hasheada, nunca texto plano
         $this->assertTrue(Auth::attempt(['email' => $email, 'password' => env('ADMIN_PASSWORD', 'password')]));
+        $this->assertTrue($admin->hasRole('administrador'));
     }
 }

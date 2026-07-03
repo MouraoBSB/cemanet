@@ -7,7 +7,6 @@ use App\Filament\Resources\Palestras\Pages\EditPalestra;
 use App\Models\Assunto;
 use App\Models\Palestra;
 use App\Models\Palestrante;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -19,7 +18,7 @@ class PalestraResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->actingAs(User::factory()->create());
+        $this->actingAsAdmin();
     }
 
     public function test_cria_palestra_com_assuntos_destaques_e_um_palestrante(): void

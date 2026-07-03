@@ -26,8 +26,7 @@ class PalestranteResourceTest extends TestCase
     {
         parent::setUp();
 
-        $this->admin = User::factory()->create();
-        $this->actingAs($this->admin);
+        $this->admin = $this->actingAsAdmin();
     }
 
     public function test_pagina_listagem_renderiza(): void

@@ -139,15 +139,15 @@ class ImportadorUsuarios
         }
         $valor = trim($valor);
 
-        // Unix timestamp (inteiro, pode ser negativo para nascimentos antes de 1970)
-        // Converte timestamp Unix usando o timezone da app (APP_TIMEZONE) — datas em nível de dia.
+        // Unix timestamp: o date-picker do legado grava meia-noite UTC do dia escolhido;
+        // interpretar em UTC (gmdate) para nao deslocar 1 dia no fuso da app.
         if (preg_match('/^-?\d+$/', $valor)) {
-            $ano = (int) date('Y', (int) $valor);
-            if ($ano < 1900 || $ano > (int) date('Y')) {
+            $ano = (int) gmdate('Y', (int) $valor);
+            if ($ano < 1900 || $ano > (int) gmdate('Y')) {
                 return null; // descarta timestamps absurdos
             }
 
-            return date('Y-m-d', (int) $valor);
+            return gmdate('Y-m-d', (int) $valor);
         }
 
         // já em Y-m-d (defensivo)

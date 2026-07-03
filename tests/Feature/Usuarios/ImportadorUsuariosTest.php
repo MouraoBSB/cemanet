@@ -87,6 +87,6 @@ class ImportadorUsuariosTest extends TestCase
         (new ImportadorUsuarios($fake, app(TransformadorUsuarios::class)))->importar(fn ($m) => null);
 
         $ana = User::where('email', 'ana@exemplo.com')->first();
-        $this->assertSame('1973-02-08', $ana->perfil->data_nascimento->format('Y-m-d'));
+        $this->assertSame('1973-02-09', $ana->perfil->data_nascimento->format('Y-m-d'));
     }
 }

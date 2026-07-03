@@ -12,11 +12,17 @@ class AdminSeeder extends Seeder
 {
     public function run(): void
     {
+        $senha = env('ADMIN_PASSWORD');
+
+        if (blank($senha)) {
+            throw new \RuntimeException('Defina ADMIN_PASSWORD no .env antes de rodar o AdminSeeder.');
+        }
+
         $admin = User::updateOrCreate(
             ['email' => env('ADMIN_EMAIL', 'admin@cema.local')],
             [
                 'name' => env('ADMIN_NAME', 'Administrador CEMA'),
-                'password' => Hash::make(env('ADMIN_PASSWORD', 'password')),
+                'password' => Hash::make($senha),
                 'email_verified_at' => now(),
             ],
         );

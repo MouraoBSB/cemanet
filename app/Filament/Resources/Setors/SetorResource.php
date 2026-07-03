@@ -29,6 +29,8 @@ class SetorResource extends Resource
 {
     protected static ?string $model = Setor::class;
 
+    protected static ?string $slug = 'setores';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleGroup;
 
     protected static ?string $navigationLabel = 'Setores';

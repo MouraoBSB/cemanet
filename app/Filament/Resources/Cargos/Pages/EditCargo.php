@@ -16,4 +16,13 @@ class EditCargo extends EditRecord
             DeleteAction::make(),
         ];
     }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        if (! empty($data['institucional'])) {
+            $data['departamento_id'] = null;
+        }
+
+        return $data;
+    }
 }

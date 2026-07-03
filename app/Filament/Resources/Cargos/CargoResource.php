@@ -66,7 +66,8 @@ class CargoResource extends Resource
 
                         Toggle::make('institucional')
                             ->label('Institucional (sem departamento)')
-                            ->live(),
+                            ->live()
+                            ->afterStateUpdated(fn ($state, callable $set) => $state ? $set('departamento_id', null) : null),
 
                         Select::make('departamento_id')
                             ->label('Departamento')

@@ -65,7 +65,9 @@ class User extends Authenticatable implements FilamentUser
     {
         return [
             'email_verified_at' => 'datetime',
-            'password' => 'hashed',
+            // Sem cast 'hashed': re-hashearia hashes legados $wp$/$P$ na escrita
+            // (não passam em Hash::isHashed), corrompendo a senha migrada.
+            // O rehash transparente (App\Auth\HasherLegadoCema) moderniza no 1º login.
             'socio' => 'boolean',
             'ativo' => 'boolean',
         ];

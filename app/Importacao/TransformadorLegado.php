@@ -47,7 +47,7 @@ class TransformadorLegado
 
         set_error_handler(static fn () => true);
         try {
-            $dados = unserialize($serializado);
+            $dados = unserialize($serializado, ['allowed_classes' => false]);
         } finally {
             restore_error_handler();
         }

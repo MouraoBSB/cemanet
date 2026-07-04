@@ -28,10 +28,12 @@
 
             <section class="rounded-lg bg-white p-6 shadow-card">
                 <h3 class="mb-4 font-display font-semibold text-primary">Contato</h3>
-                <dt class="text-xs uppercase tracking-wide text-text-muted">WhatsApp
-                    <span class="ml-1 rounded bg-surface px-1.5 py-0.5 text-[10px] font-normal normal-case text-text-muted">{{ $perfil->whatsapp_publico ? 'visível para outros membros' : 'visível só para a casa' }}</span>
-                </dt>
-                <dd class="mt-0.5 text-text">{{ $perfil->whatsapp ?: '—' }}</dd>
+                <dl>
+                    <dt class="text-xs uppercase tracking-wide text-text-muted">WhatsApp
+                        <span class="ml-1 rounded bg-surface px-1.5 py-0.5 text-[10px] font-normal normal-case text-text-muted">{{ $perfil->whatsapp_publico ? 'visível para outros membros' : 'visível só para a casa' }}</span>
+                    </dt>
+                    <dd class="mt-0.5 text-text">{{ $perfil->whatsapp ?: '—' }}</dd>
+                </dl>
             </section>
 
             <section class="rounded-lg bg-surface p-6 shadow-card ring-1 ring-border">

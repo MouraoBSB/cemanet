@@ -8,6 +8,8 @@
         "test:js": "vitest run"
     },
     "devDependencies": {
+        "@fontsource/poppins": "^5.2.7",
+        "@fontsource/work-sans": "^5.2.8",
         "@tailwindcss/vite": "^4.0.0",
         "@tiptap/core": "^3.0.0",
         "@tiptap/extension-document": "^3.0.0",

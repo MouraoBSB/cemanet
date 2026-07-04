@@ -5,7 +5,6 @@
 namespace Tests\Feature\Filament;
 
 use App\Filament\Resources\Posts\Pages\CreatePost;
-use App\Models\User;
 use Filament\Forms\Components\RichEditor;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -18,7 +17,7 @@ class UploadLimitesTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->actingAs(User::factory()->create());
+        $this->actingAsAdmin();
     }
 
     public function test_campo_conteudo_aceita_anexo_de_ate_20mb(): void

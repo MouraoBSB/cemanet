@@ -6,7 +6,6 @@ namespace Tests\Feature\Filament;
 
 use App\Filament\Pages\ConfiguracoesAgenda;
 use App\Models\ConfiguracaoAgenda;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -20,7 +19,7 @@ class ConfiguracoesAgendaTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->actingAs(User::factory()->create());
+        $this->actingAsAdmin();
     }
 
     public function test_configuracoes_agenda_renderiza(): void

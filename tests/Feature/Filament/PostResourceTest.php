@@ -12,7 +12,6 @@ use App\Models\Categoria;
 use App\Models\Configuracao;
 use App\Models\Post;
 use App\Models\Tag;
-use App\Models\User;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -27,7 +26,7 @@ class PostResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->actingAs(User::factory()->create());
+        $this->actingAsAdmin();
     }
 
     public function test_lista_renderiza(): void

@@ -8,7 +8,6 @@ use App\Filament\Resources\Bibliotecas\BibliotecaResource;
 use App\Filament\Resources\Bibliotecas\Pages\ListBibliotecas;
 use App\Models\Biblioteca;
 use App\Models\Post;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -26,7 +25,7 @@ class BibliotecaResourceTest extends TestCase
 
         Storage::fake('public');
 
-        $this->actingAs(User::factory()->create());
+        $this->actingAsAdmin();
     }
 
     /** Cria uma mídia na biblioteca para uso nos testes. */

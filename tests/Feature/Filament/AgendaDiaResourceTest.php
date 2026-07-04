@@ -6,7 +6,6 @@ namespace Tests\Feature\Filament;
 
 use App\Filament\Resources\Agenda\Pages\CreateAgendaDia;
 use App\Models\AgendaDia;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -18,7 +17,7 @@ class AgendaDiaResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->actingAs(User::factory()->create());
+        $this->actingAsAdmin();
     }
 
     public function test_cria_dia(): void

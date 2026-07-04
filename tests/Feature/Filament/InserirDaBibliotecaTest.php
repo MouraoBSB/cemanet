@@ -6,7 +6,6 @@ namespace Tests\Feature\Filament;
 
 use App\Filament\Resources\Posts\Pages\CreatePost;
 use App\Models\Biblioteca;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -20,7 +19,7 @@ class InserirDaBibliotecaTest extends TestCase
     public function test_inserir_existente_dispara_comando_com_url_portavel(): void
     {
         Storage::fake('public');
-        $this->actingAs(User::factory()->create());
+        $this->actingAsAdmin();
 
         $media = Biblioteca::instance()
             ->addMediaFromString(UploadedFile::fake()->image('x.png', 800, 600)->getContent())

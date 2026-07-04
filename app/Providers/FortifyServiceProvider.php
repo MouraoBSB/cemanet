@@ -4,6 +4,7 @@
 
 namespace App\Providers;
 
+use App\Actions\Fortify\CreateNewUser;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -39,6 +40,8 @@ class FortifyServiceProvider extends ServiceProvider
 
             return $user;
         });
+
+        Fortify::createUsersUsing(CreateNewUser::class);
 
         Fortify::loginView(fn () => view('auth.login'));
         Fortify::registerView(fn () => view('auth.register'));

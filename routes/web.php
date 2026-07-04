@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AgendaController;
+use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\MidiaController;
@@ -9,9 +10,35 @@ use App\Http\Controllers\PalestranteController;
 use App\Http\Controllers\SitemapController;
 use App\Models\AgendaSlugLegado;
 use App\Models\Post;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
+use Laravel\Fortify\Http\Controllers\NewPasswordController;
+use Laravel\Fortify\Http\Controllers\PasswordResetLinkController;
+use Laravel\Fortify\Http\Controllers\RegisteredUserController;
 
 Route::get('/', fn () => view('pages.inicio'))->name('home');
+
+// Autenticação pública de membro (Fortify headless — rotas pt-BR, nomes preservados).
+Route::middleware('guest')->group(function () {
+    Route::get('/entrar', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::post('/entrar', [AuthenticatedSessionController::class, 'store']);
+
+    Route::get('/cadastro', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('/cadastro', [RegisteredUserController::class, 'store'])->middleware('throttle:6,1');
+
+    Route::get('/esqueci-a-senha', [PasswordResetLinkController::class, 'create'])->name('password.request');
+    Route::post('/esqueci-a-senha', [PasswordResetLinkController::class, 'store'])->name('password.email')->middleware('throttle:6,1');
+
+    Route::get('/redefinir-senha/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
+    Route::post('/redefinir-senha', [NewPasswordController::class, 'store'])->name('password.update');
+});
+
+Route::post('/sair', [AuthenticatedSessionController::class, 'destroy'])->name('logout')->middleware('auth');
+
+// Login social via Google (controller implementado na Task 5 — rotas já registradas aqui).
+Route::get('/auth/google', [GoogleController::class, 'redirect'])->name('google.redirect');
+Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name('google.callback');
 
 Route::get('/palestra_publica', [PalestraController::class, 'index'])->name('palestras.index');
 
@@ -67,10 +94,11 @@ Route::get('/midia/{media}/{conversao?}', [MidiaController::class, 'serve'])
     ->where('media', '[0-9]+')
     ->where('conversao', '[a-z]+');
 
-// Catch-all raiz: redireciona slugs de posts existentes → /sementeira/{slug} (301).
-// DEVE ser a última rota do arquivo.
-Route::get('/{slug}', function (string $slug) {
-    abort_unless(Post::where('slug', $slug)->exists(), 404);
-
-    return redirect()->route('blog.show', ['slug' => $slug], 301);
-})->where('slug', '[a-z0-9-]+');
+// Fallback: avaliado SEMPRE por último. Slug de post no root → /sementeira/{slug} (301); senão 404.
+Route::fallback(function (Request $request) {
+    $slug = ltrim($request->path(), '/');
+    if (preg_match('/^[a-z0-9-]+$/', $slug) && Post::where('slug', $slug)->exists()) {
+        return redirect()->route('blog.show', ['slug' => $slug], 301);
+    }
+    abort(404);
+});

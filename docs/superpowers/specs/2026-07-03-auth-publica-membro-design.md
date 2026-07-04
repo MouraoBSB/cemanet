@@ -54,13 +54,18 @@ back-end via `git merge main` após o merge do PR #7; o código só começa depo
 | GET/POST | `/entrar` | `login` | Fortify login view / AttemptToAuthenticate |
 | POST | `/sair` | `logout` | Fortify logout |
 | GET/POST | `/cadastro` | `register` | Fortify register view / CreateNewUser |
-| GET/POST | `/esqueci-a-senha` | `password.request` | Fortify forgot-password |
-| GET/POST | `/redefinir-senha` | `password.reset` | Fortify reset-password |
+| GET | `/esqueci-a-senha` | `password.request` | Fortify: form "esqueci a senha" |
+| POST | `/esqueci-a-senha` | `password.email` | Fortify: envia o link de reset |
+| GET | `/redefinir-senha/{token}` | `password.reset` | Fortify: form de redefinição (**token na URL**) |
+| POST | `/redefinir-senha` | `password.update` | Fortify: grava a nova senha |
 | GET | `/auth/google` | `google.redirect` | `GoogleController@redirect` |
 | GET | `/auth/google/callback` | `google.callback` | `GoogleController@callback` |
 
-- **Nomes** iguais aos do Fortify (`login`, `register`, `password.request`, `password.reset`, `logout`) —
-  o broker/notificação de reset e os redirects resolvem **pelo nome**, não pela URL.
+- **Nomes** iguais aos do Fortify (`login`, `register`, `logout`, `password.request`, `password.email`,
+  `password.reset`, `password.update`). Crítico no reset: a notificação gera o link via
+  `route('password.reset', ['token' => …, 'email' => …])`, então a rota **GET** precisa do `{token}` e do
+  nome `password.reset`; os POSTs precisam de `password.email`/`password.update` para os handlers do Fortify
+  baterem. Resolvem **pelo nome**, não pela URL.
 - **`/auth/google/callback` NÃO é traduzido** (já cadastrado assim no Google Console).
 - ⚙️ **Ordem determinística:** o catch-all `Route::get('/{slug}', …)` do `web.php` vira
   **`Route::fallback(…)`** — o Laravel sempre o avalia por último, blindando auth/Socialite/Minha Conta
@@ -86,15 +91,19 @@ Já autentica. Rate-limit no `POST /cadastro`.
 
 ### Google — `App\Http\Controllers\Auth\GoogleController`
 - `redirect()` → `Socialite::driver('google')->redirect()`.
-- `callback()` → usuário do Google; casa por **e-mail** com `User` existente:
+- `callback()` → usuário do Google; casa por **`google_id`** primeiro, depois por **e-mail**
+  (`User::where('google_id', $sub)->first() ?? User::where('email', $email)->first()`) — mais robusto; o
+  e-mail segue como vínculo inicial dos migrados:
   - existe: se `ativo=false` → bloqueia (mensagem específica); senão grava `google_id` (se vazio) e loga.
   - não existe: cria `frequentador` (e-mail já verificado, `google_id` = `sub`, `perfis_membro` vazio,
     `password = Hash::make(Str::random(64))` — inutilizável mas não-nula; "esqueci a senha" cobre a
     criação de senha local depois). Loga.
 
-### Reset de senha — broker padrão do Laravel
-`/esqueci-a-senha` envia link (nome `password.request`); `/redefinir-senha` redefine (`password.reset`).
-Em local, **Mailpit** (`localhost:8025`) captura o e-mail. **Não** é verificação de e-mail.
+### Reset de senha — broker padrão do Laravel (4 rotas)
+`GET /esqueci-a-senha` (`password.request`) exibe o form → `POST /esqueci-a-senha` (`password.email`) envia
+o link. O link aponta para `GET /redefinir-senha/{token}` (`password.reset`, **token na URL**) → `POST
+/redefinir-senha` (`password.update`) grava a nova senha. Em local, **Mailpit** (`localhost:8025`) captura
+o e-mail. **Não** é verificação de e-mail.
 
 ## Schema
 
@@ -132,7 +141,9 @@ CSRF (padrão) · rate-limit em **login, cadastro e reset** · mensagens **gené
 - Rate-limit em login e cadastro.
 - Google callback: e-mail existente → loga e grava `google_id`; e-mail novo → cria `frequentador` +
   `google_id` + perfil; `ativo=false` → bloqueado.
-- Reset: envia link (assert Notification) e redefine a senha.
+- Reset: envia link (assert Notification), a rota `password.reset` recebe `{token}`, e redefine a senha.
+- **Usuário criado via Google** (senha aleatória) consegue **definir uma senha via "esqueci a senha"** e logar com ela.
+- **"Lembrar de mim"** persiste a sessão (cookie `remember`).
 - **Regressão de rotas:** `/entrar`, `/cadastro`, `/auth/google/callback` resolvem; o redirect **301** de
   slug de post no root (`/{slug}` → `/sementeira/{slug}`) **continua funcionando** via `Route::fallback`.
 - `/admin` inalterado: `canAccessPanel` gateia; login do Filament separado do fluxo público.

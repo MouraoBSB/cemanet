@@ -518,6 +518,11 @@ Create `resources/views/components/layout/conta.blade.php`:
 @props(['titulo' => null, 'ativo' => 'painel'])
 <x-layout.app :title="$titulo">
     <x-conta.saudacao />
+    @if (session('status'))
+        <div class="mx-auto max-w-[1240px] px-6 pt-6">
+            <p class="rounded-md bg-accent/15 px-4 py-3 text-sm text-success" role="status">{{ session('status') }}</p>
+        </div>
+    @endif
     <div class="mx-auto grid max-w-[1240px] gap-6 px-6 py-8 desktop-sm:grid-cols-[220px_1fr]">
         <aside class="desktop-sm:sticky desktop-sm:top-24 desktop-sm:self-start">
             <x-conta.nav :ativo="$ativo" />
@@ -672,7 +677,7 @@ Replace `resources/views/conta/painel.blade.php`:
             </div>
 
             @forelse ($proximas as $palestra)
-                <x-palestra.linha :palestra="$palestra" wire:key="proxima-{{ $palestra->id }}" />
+                <x-palestra.linha :palestra="$palestra" />
             @empty
                 <p class="rounded-md bg-surface px-4 py-6 text-center text-sm text-text-muted">Nenhuma palestra agendada no momento.</p>
             @endforelse
@@ -1003,13 +1008,12 @@ Modify `resources/views/components/layout/header.blade.php` — dentro do `<asid
         </div>
 ```
 
-- [ ] **Step 5: Rodar (deve passar) + regressão + Pint + commit**
+- [ ] **Step 5: Rodar (deve passar) + Pint + commit**
 
 Run: `docker exec cema-app php artisan test --filter=HeaderAuthTest`
 Expected: PASS (2 testes).
 
-Run: `docker exec cema-app php artisan test --filter=Agenda --filter=Palestra` (amostra de páginas públicas que usam o header — confirmar que renderizam para guest).
-Expected: PASS (o header condicional não quebra as páginas públicas).
+> A regressão das páginas públicas que usam o header é coberta pela suíte completa (verificação final). Não usar `--filter` duplicado (`--filter=A --filter=B`) — o CLI só considera o último.
 
 ```bash
 docker exec cema-app ./vendor/bin/pint
@@ -1337,10 +1341,10 @@ git commit -m "feat(conta): edicao do perfil (Livewire) com upload de foto + atu
 - Consumes: o input `wire:model="foto"` e o `$wire` do componente `EditarPerfil`.
 - Produces: enquadramento quadrado client-side; o recorte substitui o arquivo enviado ao Livewire.
 
-- [ ] **Step 1: Instalar o Cropper.js**
+- [ ] **Step 1: Instalar o Cropper.js (⚠️ pinar na v1)**
 
-Run: `docker exec cema-app npm install cropperjs`
-Expected: `cropperjs` adicionado ao `package.json`.
+Run: `docker exec cema-app npm install cropperjs@^1.6.2`
+Expected: `cropperjs` v1.x no `package.json`. **NÃO** instalar sem pin — `npm install cropperjs` traz a **v2**, com API totalmente diferente (sem `getCroppedCanvas`), que quebraria o `cropper-perfil.js` deste plano.
 
 - [ ] **Step 2: Entrada Vite dedicada**
 
@@ -1426,7 +1430,7 @@ Modify `resources/views/livewire/conta/editar-perfil.blade.php`:
                 @endif
             </div>
             <div>
-                {{-- Enhancement progressivo: sem JS, este input envia o arquivo direto (thumb central). --}}
+                {{-- Ao escolher, o x-on:change abre o cropper; o recorte quadrado vira o upload. Ver a verificação manual no Step 5b (wire:model + cropper). --}}
                 <input type="file" wire:model="foto" x-on:change="aoEscolher" accept="image/jpeg,image/png,image/webp"
                        class="block text-sm text-text file:mr-3 file:rounded-pill file:border-0 file:bg-surface file:px-4 file:py-2 file:text-sm file:text-primary">
                 <p class="mt-1 text-xs text-text-muted">Tamanho máximo: 1 MB. A capa é gerada automaticamente.</p>
@@ -1456,6 +1460,12 @@ Expected: build sem erros; o bundle `cropper-perfil` é gerado.
 
 Run: `docker exec cema-app php artisan test --filter=EditarPerfilTest`
 Expected: PASS (4 testes — o upload server-side segue igual; o recorte é client-side, não testado no servidor).
+
+- [ ] **Step 5b: Verificação manual do cropper (navegador — client-side, fora dos testes)**
+
+Abrir Meu Perfil → Editar → escolher uma foto. Confirmar: (a) o cropper abre; (b) "Usar recorte" envia o recorte quadrado (avatar atualiza); (c) **não há upload duplicado**; (d) **Cancelar não deixa o original montado**.
+
+⚠️ Risco conhecido: o input tem `wire:model="foto"` **e** `x-on:change="aoEscolher"` — a ordem Alpine×Livewire no evento `change` não é garantida, então o `wire:model` pode subir o **original** antes do recorte (upload duplo; ao cancelar, o original fica montado). Como o form é Livewire (exige JS de qualquer forma), **não há caminho sem-JS real** para esta foto. Se o problema ocorrer, **desacople**: remova `wire:model="foto"` do input (mantendo só `x-on:change="aoEscolher"`) e deixe o cropper ser a ÚNICA via de upload (`$wire.upload('foto', ...)`); a validação e o `@error('foto')` continuam iguais.
 
 - [ ] **Step 6: Pint + commit**
 

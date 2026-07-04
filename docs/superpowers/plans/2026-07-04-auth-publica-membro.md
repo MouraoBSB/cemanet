@@ -30,7 +30,7 @@ Spec: `docs/superpowers/specs/2026-07-03-auth-publica-membro-design.md`.
 
 - `config/fortify.php` — features (registration + resetPasswords), home, guard.
 - `config/services.php` — bloco `google`.
-- `app/Providers/FortifyServiceProvider.php` — `ignoreRoutes`, view bindings, `authenticateUsing`, `createUsersUsing`, rate-limiter `login`.
+- `app/Providers/FortifyServiceProvider.php` — `ignoreRoutes`, view bindings, `authenticateUsing`, `createUsersUsing`. (O throttle do login vem do pipeline do Fortify — `EnsureLoginIsNotThrottled` + `LoginRateLimiter` embutido, 5/min por `usuário|ip` — habilitado via `limiters.login = null` no `config/fortify.php`; sem `RateLimiter::for('login')` custom.)
 - `app/Actions/Fortify/CreateNewUser.php` + `PasswordValidationRules.php` (stub do Fortify).
 - `app/Http/Controllers/Auth/GoogleController.php`.
 - `database/migrations/2026_07_04_000001_add_google_id_to_users_table.php`.
@@ -111,6 +111,7 @@ Substituir o conteúdo relevante de `config/fortify.php`:
 - `'home' => '/',`
 - `'features' => [ Features::registration(), Features::resetPasswords() ],` (remover `emailVerification`, `updateProfileInformation`, `updatePasswords`, `twoFactorAuthentication` se presentes).
 - `'views' => true,`
+- `'limiters' => ['login' => null],` — **crítico.** Com `null`, o `loginPipeline()` do Fortify mantém `EnsureLoginIsNotThrottled` no pipeline (throttle embutido `LoginRateLimiter`, 5/min por `usuário|ip`, dispara `Lockout`). Se ficasse `'login'`, o Fortify tiraria esse middleware do pipeline e passaria a exigir o middleware de rota `throttle:login` — que NÃO existe nas rotas headless do `web.php` → login sem throttle e sem `Lockout`.
 - Garantir `'guard' => 'web'` e `'passwords' => 'users'`.
 
 - [ ] **Step 7: Configurar `config/services.php` (Google)**
@@ -185,9 +186,9 @@ git commit -m "feat(auth): instala fortify+socialite, google_id e config (sem ve
 - Consumes: Fortify instalado (Task 1).
 - Produces: `Fortify::ignoreRoutes()`; view bindings (`auth.login`/`auth.register`/`auth.forgot-password`/`auth.reset-password`); rotas nomeadas (`login`,`register`,`logout`,`password.request`,`password.email`,`password.reset`,`password.update`); `Route::fallback`. As actions `authenticateUsing`/`createUsersUsing` são adicionadas nas Tasks 3-4.
 
-- [ ] **Step 1: Provider — ignoreRoutes + view bindings + rate-limiter**
+- [ ] **Step 1: Provider — ignoreRoutes + view bindings**
 
-Reescrever `app/Providers/FortifyServiceProvider.php` (mantendo o namespace e o cabeçalho de autoria):
+Reescrever `app/Providers/FortifyServiceProvider.php` (mantendo o namespace e o cabeçalho de autoria). **Sem `RateLimiter::for('login')`** — o throttle do login vem do pipeline do Fortify (ver Task 1, Step 6: `limiters.login = null`):
 
 ```php
 <?php
@@ -196,11 +197,8 @@ Reescrever `app/Providers/FortifyServiceProvider.php` (mantendo o namespace e o 
 
 namespace App\Providers;
 
-use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
 
 class FortifyServiceProvider extends ServiceProvider
@@ -216,15 +214,11 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::registerView(fn () => view('auth.register'));
         Fortify::requestPasswordResetLinkView(fn () => view('auth.forgot-password'));
         Fortify::resetPasswordView(fn (Request $request) => view('auth.reset-password', ['request' => $request]));
-
-        RateLimiter::for('login', function (Request $request) {
-            $chave = Str::transliterate(Str::lower($request->input(Fortify::username())).'|'.$request->ip());
-
-            return Limit::perMinute(5)->by($chave);
-        });
     }
 }
 ```
+
+> O throttle de login (5/min por `usuário|ip`, com evento `Lockout`) é o `LoginRateLimiter` embutido do Fortify, ativado pelo `EnsureLoginIsNotThrottled` no `loginPipeline()` — que só permanece no pipeline porque `limiters.login = null`. Nada a registrar aqui.
 
 - [ ] **Step 2: Rotas de auth no `web.php` (acima do fallback) + trocar catch-all por `Route::fallback`**
 
@@ -548,7 +542,7 @@ class LoginTest extends TestCase
 
         $this->from('/entrar')->post('/entrar', ['email' => $user->email, 'password' => 'segredo123'])
             ->assertRedirect('/entrar')
-            ->assertSessionHasErrors(['email' => 'Sua conta está inativa. Fale com a secretaria da casa.']);
+            ->assertSessionHasErrors(['email' => 'Sua conta está inativa, entre em contato com o administrador do sistema.']);
         $this->assertGuest();
     }
 
@@ -580,7 +574,7 @@ class LoginTest extends TestCase
             $this->post('/entrar', ['email' => $user->email, 'password' => 'errada']);
         }
 
-        Event::assertDispatched(Lockout::class); // throttle do Fortify (limiter 'login') bloqueou
+        Event::assertDispatched(Lockout::class); // throttle do pipeline do Fortify (EnsureLoginIsNotThrottled, 5/min) bloqueou
     }
 }
 ```
@@ -604,7 +598,7 @@ Fortify::authenticateUsing(function (Request $request) {
 
     if (! $user->ativo) {
         throw ValidationException::withMessages([
-            Fortify::username() => 'Sua conta está inativa. Fale com a secretaria da casa.',
+            Fortify::username() => 'Sua conta está inativa, entre em contato com o administrador do sistema.',
         ]);
     }
 
@@ -691,6 +685,17 @@ class CadastroTest extends TestCase
             'password' => 'senha-super-forte-2026', 'password_confirmation' => 'senha-super-forte-2026',
         ])->assertRedirect('/cadastro')->assertSessionHasErrors('email');
     }
+
+    public function test_rate_limit_no_cadastro_apos_6_tentativas(): void
+    {
+        foreach (range(1, 6) as $i) {
+            // e-mail sem "@" falha a validação (nenhum usuário criado), mas a requisição conta no throttle:6,1
+            $this->post('/cadastro', ['name' => 'X', 'email' => "tentativa{$i}", 'password' => 'x', 'password_confirmation' => 'x']);
+        }
+
+        $this->post('/cadastro', ['name' => 'X', 'email' => 'tentativa7', 'password' => 'x', 'password_confirmation' => 'x'])
+            ->assertStatus(429); // 7ª tentativa no mesmo minuto barrada pelo throttle da rota
+    }
 }
 ```
 
@@ -758,7 +763,7 @@ Fortify::createUsersUsing(\App\Actions\Fortify\CreateNewUser::class);
 - [ ] **Step 5: Rodar (deve passar)**
 
 Run: `docker exec cema-app php artisan test --filter=CadastroTest`
-Expected: PASS (2 testes).
+Expected: PASS (3 testes).
 
 - [ ] **Step 6: Pint + commit**
 
@@ -897,7 +902,7 @@ class GoogleController extends Controller
         if ($user) {
             if (! $user->ativo) {
                 return redirect()->route('login')
-                    ->withErrors(['email' => 'Sua conta está inativa. Fale com a secretaria da casa.']);
+                    ->withErrors(['email' => 'Sua conta está inativa, entre em contato com o administrador do sistema.']);
             }
             if (! $user->google_id) {
                 $user->forceFill(['google_id' => $g->getId()])->save();

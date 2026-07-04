@@ -32,5 +32,7 @@
         <env name="PULSE_ENABLED" value="false"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
+        <env name="ADMIN_PASSWORD" value="senha-teste-forte-2026"/>
+        <env name="ADMIN_EMAIL" value="admin@cema.local"/>
     </php>
 </phpunit>

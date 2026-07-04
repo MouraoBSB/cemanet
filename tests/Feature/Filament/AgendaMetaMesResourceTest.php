@@ -6,7 +6,6 @@ namespace Tests\Feature\Filament;
 
 use App\Filament\Resources\Agenda\Pages\CreateAgendaMetaMes;
 use App\Models\AgendaMetaMes;
-use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -18,7 +17,7 @@ class AgendaMetaMesResourceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->actingAs(User::factory()->create());
+        $this->actingAsAdmin();
     }
 
     public function test_cria_meta_mes(): void

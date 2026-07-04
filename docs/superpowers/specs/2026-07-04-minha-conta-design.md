@@ -35,12 +35,15 @@ login/sessão, `User` com `HasRoles` + `perfil()`/`setores()`/`cargos()`/`socio`
    no perfil (sem foto de capa, um cover seria um 2º herói redundante).
 5. **Foto = Spatie Media Library** (consistência com `Palestrante`), via trait `RegistraImagensPadrao`. A coluna
    `foto_perfil` (string, nunca preenchida) é **dropada** (migration incremental + removida do `$fillable`); a Media
-   Library a substitui.
+   Library a substitui. A coleção `foto` usa `larguraWeb: 640` (o avatar nunca aparece em 1600px); `thumb` 400×400.
 6. **`iniciais()` extraído** para trait `Concerns\TemIniciais` (fonte do nome sobrescrevível), aplicada em `User`
    (de `name`) e `Palestrante` (de `nome`) — **saída idêntica à atual** (os testes de `iniciais` do Palestrante
    permanecem verdes).
 7. **Atuação/papel/sócio** são **somente-leitura** ("gerido pela casa") — nunca entram como propriedades graváveis
    do componente Livewire.
+8. **Cropper client-side (quadrado)** no upload da foto (ex.: Cropper.js): o membro enquadra o rosto antes de enviar,
+   e o recorte quadrado evita o corte central ruim do `Fit::Crop`. O JS do cropper carrega **só na página de edição**
+   (orçamento de performance), com enhancement progressivo (sem JS, o input de arquivo simples ainda envia).
 
 ## Arquitetura
 
@@ -97,8 +100,12 @@ Faixa de saudação como header + botão "Editar perfil". Cards:
   `frequentador` **sem** setores → linha discreta "Você ainda não atua em um setor da casa"; papel e Sócio aparecem sempre.
 
 ### Edição (Livewire `EditarPerfil`)
-- **Foto:** `WithFileUploads`, preview, regra `['image','max:1024']` (~1 MB), fallback nas iniciais; grava na coleção
-  `foto` (Spatie). **Sem** upload de capa.
+- **Foto (com cropper):** cropper client-side (ex.: Cropper.js), proporção **quadrada** (1:1) — o membro seleciona o
+  arquivo, enquadra o rosto, vê o preview, e o **recorte** (canvas → Blob) vira o upload do Livewire (`WithFileUploads`).
+  A imagem sobe já quadrada; as conversões `web`/`thumb` só redimensionam (sem corte central ruim). Fallback nas iniciais
+  quando não há foto; **sem** upload de capa. Enhancement progressivo: sem JS, o input de arquivo simples ainda envia (o
+  `thumb` central se aplica). Validação: `['image','mimes:jpg,jpeg,png,webp','max:1024']`. O JS do cropper carrega **só
+  nesta página** (entrada Vite dedicada ou `@assets` do Livewire), nunca site-wide.
 - **Dados pessoais** editáveis: `name` → `User`; `data_nascimento`, `endereco` → `perfil`.
 - **Contato:** `whatsapp` + toggle switch `whatsapp_publico` → `perfil`.
 - **Minha atuação** renderizada **travada/somente-leitura** (sem inputs).
@@ -123,7 +130,8 @@ Faixa de saudação como header + botão "Editar perfil". Cards:
 - **Migration incremental:** `Schema::table('perfis_membro', fn ($t) => $t->dropColumn('foto_perfil'))` (+ `down` que
   recria `string('foto_perfil')->nullable()`). Remover `'foto_perfil'` do `$fillable` do `PerfilMembro`.
 - **`PerfilMembro implements HasMedia`**, `use InteractsWithMedia, RegistraImagensPadrao`; `COLECAO_FOTO='foto'`;
-  `registerMediaCollections()` → `registrarColecaoImagem(self::COLECAO_FOTO)`; accessors `fotoUrl()`/`fotoThumbUrl()`
+  `registerMediaCollections()` → `registrarColecaoImagem(self::COLECAO_FOTO, larguraWeb: 640)` (conversão `web` ≤640px;
+  `thumb` 400×400 quadrado; o original é capado ≤2000px pelo listener padrão); accessors `fotoUrl()`/`fotoThumbUrl()`
   (mesmo padrão de `Palestrante`).
 - **Trait `App\Models\Concerns\TemIniciais`:** algoritmo **idêntico ao atual** de `Palestrante::iniciais` (1ª letra das
   2 primeiras palavras, maiúsculas, fallback `'?'`); fonte do nome via método sobrescrevível `nomeParaIniciais()`
@@ -146,8 +154,10 @@ Faixa de saudação como header + botão "Editar perfil". Cards:
 - **Perfil (view):** mostra editável × read-only; `frequentador` sem setor exibe a linha discreta; papel e Sócio sempre aparecem.
 - **Header:** menu do membro quando logado; Entrar/Cadastrar quando guest.
 - Pós-login redireciona para `/minha-conta`.
-- **Livewire `EditarPerfil`:** validação; salvar `name`/`data_nascimento`/`endereco`/`whatsapp`/toggle; upload de foto
-  grava na Media Library (coleção `foto`); **tentativa de setar papel/socio/setor é ignorada** (propriedade inexistente).
+- **Livewire `EditarPerfil`:** validação (incl. `mimes:jpg,jpeg,png,webp` e `max:1024` na foto); salvar
+  `name`/`data_nascimento`/`endereco`/`whatsapp`/toggle; upload de foto grava na Media Library (coleção `foto`) e gera as
+  conversões `web`/`thumb`; **tentativa de setar papel/socio/setor é ignorada** (propriedade inexistente). O recorte é
+  client-side (não testado no servidor); o teste do servidor cobre a validação e o armazenamento do arquivo enviado.
 - **Iniciais:** a trait produz a saída atual; os **testes existentes de `Palestrante::iniciais` permanecem verdes**.
 
 ## Critério de pronto

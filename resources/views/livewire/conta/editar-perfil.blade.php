@@ -19,7 +19,7 @@
                 {{-- Sem wire:model (desacoplado): o x-on:change abre o cropper e o recorte quadrado é a ÚNICA via de upload ($wire.upload no confirmar()) — determinístico, sem upload duplo nem original ao cancelar. --}}
                 <input type="file" x-on:change="aoEscolher" accept="image/jpeg,image/png,image/webp"
                        class="block text-sm text-text file:mr-3 file:rounded-pill file:border-0 file:bg-surface file:px-4 file:py-2 file:text-sm file:text-primary">
-                <p class="mt-1 text-xs text-text-muted">Tamanho máximo: 1 MB. A capa é gerada automaticamente.</p>
+                <p class="mt-1 text-xs text-text-muted">Tamanho máximo: 1 MB. As versões da foto são geradas automaticamente.</p>
                 @error('foto') <p class="mt-1 text-sm text-danger">{{ $message }}</p> @enderror
             </div>
         </div>

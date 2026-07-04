@@ -22,7 +22,17 @@ class GoogleController extends Controller
 
     public function callback(): RedirectResponse
     {
-        $g = Socialite::driver('google')->user();
+        try {
+            $g = Socialite::driver('google')->user();
+        } catch (\Throwable $e) {
+            return redirect()->route('login')
+                ->withErrors(['email' => 'Não foi possível autenticar com o Google. Tente novamente.']);
+        }
+
+        if (blank($g->getEmail())) {
+            return redirect()->route('login')
+                ->withErrors(['email' => 'Não foi possível obter seu e-mail do Google. Cadastre-se com e-mail e senha.']);
+        }
 
         $user = User::where('google_id', $g->getId())->first()
             ?? User::where('email', $g->getEmail())->first();

@@ -22,7 +22,7 @@ class GoogleLoginTest extends TestCase
         Role::findOrCreate('frequentador', 'web');
     }
 
-    private function mockGoogle(string $id, string $email, string $nome = 'Membro Google'): void
+    private function mockGoogle(string $id, ?string $email, string $nome = 'Membro Google'): void
     {
         $abstract = Mockery::mock(SocialiteUser::class);
         $abstract->shouldReceive('getId')->andReturn($id);
@@ -65,5 +65,23 @@ class GoogleLoginTest extends TestCase
 
         $this->get('/auth/google/callback')->assertRedirect(route('login'));
         $this->assertGuest();
+    }
+
+    public function test_google_sem_email_redireciona_com_erro(): void
+    {
+        $this->mockGoogle('g-sememail', null);
+
+        $this->get('/auth/google/callback')->assertRedirect(route('login'));
+        $this->assertGuest();
+        $this->assertDatabaseCount('users', 0);
+    }
+
+    public function test_google_nao_sobrescreve_google_id_existente(): void
+    {
+        $user = User::factory()->create(['email' => 'link@x.com', 'google_id' => 'g-original', 'ativo' => true]);
+        $this->mockGoogle('g-diferente', 'link@x.com');
+
+        $this->get('/auth/google/callback')->assertRedirect('/');
+        $this->assertSame('g-original', $user->fresh()->google_id);
     }
 }

@@ -16,7 +16,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasRoles;
 
-#[Fillable(['name', 'email', 'password', 'origem_legado_id', 'socio', 'ativo', 'email_verified_at'])]
+#[Fillable(['name', 'email', 'password', 'origem_legado_id', 'socio', 'ativo', 'email_verified_at', 'google_id'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable implements FilamentUser
 {

@@ -36,6 +36,10 @@ back-end via `git merge main` após o merge do PR #7; o código só começa depo
    e-mail não é identificador provado; alguém poderia pré-criar `vitima@gmail.com` e a vítima cair nessa
    conta ao entrar pelo Google. Risco **baixo/aceitável** aqui (papel `frequentador`, só dados do próprio
    perfil, sem transação) — revisitar se entrar algo sensível.
+5. **Enumeração de e-mail (trade-off aceito):** com cadastro aberto e sem verificação de e-mail, as telas
+   de cadastro e "esqueci a senha" revelam se um e-mail existe — inerente ao modelo. O login permanece
+   genérico. Aceito para o contexto (`frequentador`, baixa sensibilidade); revisitar cadastro + reset +
+   anti-abuso em conjunto se necessário.
 
 ## Arquitetura
 

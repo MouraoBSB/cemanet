@@ -276,21 +276,36 @@ No **host**:
 npm i -D @fontsource/poppins @fontsource/work-sans
 ```
 
+- [ ] **Step 1.5: Confirmar os nomes reais dos arquivos de subset (host)**
+
+O fontsource v5 expõe um CSS por subset+peso (`{subset}-{peso}.css`). Confirmar que os arquivos referenciados no Step 2 existem no pacote instalado **antes** de escrevê-los:
+
+```bash
+ls node_modules/@fontsource/poppins/latin-400.css node_modules/@fontsource/poppins/latin-ext-400.css node_modules/@fontsource/poppins/latin-500.css node_modules/@fontsource/poppins/latin-ext-500.css node_modules/@fontsource/poppins/latin-600.css node_modules/@fontsource/poppins/latin-ext-600.css
+ls node_modules/@fontsource/work-sans/latin-400.css node_modules/@fontsource/work-sans/latin-ext-400.css node_modules/@fontsource/work-sans/latin-600.css node_modules/@fontsource/work-sans/latin-ext-600.css
+```
+Esperado: todos existem. Se algum nome divergir (ex.: peso indisponível para um subset), ajustar o `@import` correspondente no Step 2 para o arquivo real. Se um peso não existir em subset, usar o `{peso}.css` cheio só para aquele peso (não regredir todos para o cheio).
+
 - [ ] **Step 2: Reescrever `resources/css/filament/admin/theme.css`**
 
-Conteúdo final:
+Conteúdo final (fontes por subset `latin` + `latin-ext` — cobre pt-BR e nomes europeus, enxuga o build ao dropar vietnamese/devanagari do `{peso}.css` cheio):
 
 ```css
 /* Tema CEMA para o painel /admin — camada visual (Filament 5.6, Tailwind v4).
    Fontes self-hosted via fontsource (sem CDN); acentos de marca sobre o tema base.
    Thiago Mourão — https://github.com/MouraoBSB — 2026-07-04 */
 
-/* Fontes CEMA self-hosted — Poppins (corpo) e Work Sans (títulos). */
-@import '@fontsource/poppins/400.css';
-@import '@fontsource/poppins/500.css';
-@import '@fontsource/poppins/600.css';
-@import '@fontsource/work-sans/400.css';
-@import '@fontsource/work-sans/600.css';
+/* Fontes CEMA self-hosted — Poppins (corpo) e Work Sans (títulos), subsets latin + latin-ext. */
+@import '@fontsource/poppins/latin-400.css';
+@import '@fontsource/poppins/latin-ext-400.css';
+@import '@fontsource/poppins/latin-500.css';
+@import '@fontsource/poppins/latin-ext-500.css';
+@import '@fontsource/poppins/latin-600.css';
+@import '@fontsource/poppins/latin-ext-600.css';
+@import '@fontsource/work-sans/latin-400.css';
+@import '@fontsource/work-sans/latin-ext-400.css';
+@import '@fontsource/work-sans/latin-600.css';
+@import '@fontsource/work-sans/latin-ext-600.css';
 
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
 

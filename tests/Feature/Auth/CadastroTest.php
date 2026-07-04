@@ -26,7 +26,7 @@ class CadastroTest extends TestCase
             'email' => 'fulano@exemplo.com',
             'password' => 'senha-super-forte-2026',
             'password_confirmation' => 'senha-super-forte-2026',
-        ])->assertRedirect('/');
+        ])->assertRedirect('/minha-conta');
 
         $user = User::where('email', 'fulano@exemplo.com')->first();
         $this->assertNotNull($user);

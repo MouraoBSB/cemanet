@@ -38,7 +38,7 @@ class GoogleLoginTest extends TestCase
     {
         $this->mockGoogle('g-123', 'novo@gmail.com');
 
-        $this->get('/auth/google/callback')->assertRedirect('/');
+        $this->get('/auth/google/callback')->assertRedirect('/minha-conta');
 
         $user = User::where('email', 'novo@gmail.com')->first();
         $this->assertNotNull($user);
@@ -53,7 +53,7 @@ class GoogleLoginTest extends TestCase
         $user = User::factory()->create(['email' => 'migrado@gmail.com', 'google_id' => null, 'ativo' => true]);
         $this->mockGoogle('g-999', 'migrado@gmail.com');
 
-        $this->get('/auth/google/callback')->assertRedirect('/');
+        $this->get('/auth/google/callback')->assertRedirect('/minha-conta');
         $this->assertSame('g-999', $user->fresh()->google_id);
         $this->assertAuthenticatedAs($user);
     }
@@ -81,7 +81,7 @@ class GoogleLoginTest extends TestCase
         $user = User::factory()->create(['email' => 'link@x.com', 'google_id' => 'g-original', 'ativo' => true]);
         $this->mockGoogle('g-diferente', 'link@x.com');
 
-        $this->get('/auth/google/callback')->assertRedirect('/');
+        $this->get('/auth/google/callback')->assertRedirect('/minha-conta');
         $this->assertSame('g-original', $user->fresh()->google_id);
     }
 }

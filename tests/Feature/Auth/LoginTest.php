@@ -20,7 +20,7 @@ class LoginTest extends TestCase
         $user = User::factory()->create(['password' => Hash::make('segredo123'), 'ativo' => true]);
 
         $this->post('/entrar', ['email' => $user->email, 'password' => 'segredo123'])
-            ->assertRedirect('/');
+            ->assertRedirect('/minha-conta');
         $this->assertAuthenticatedAs($user);
     }
 
@@ -29,7 +29,7 @@ class LoginTest extends TestCase
         $pre = base64_encode(hash_hmac('sha384', 'segredo123', 'wp-sha384', true));
         $user = User::factory()->create(['password' => '$wp'.password_hash($pre, PASSWORD_BCRYPT), 'ativo' => true]);
 
-        $this->post('/entrar', ['email' => $user->email, 'password' => 'segredo123'])->assertRedirect('/');
+        $this->post('/entrar', ['email' => $user->email, 'password' => 'segredo123'])->assertRedirect('/minha-conta');
         $this->assertAuthenticatedAs($user);
         $this->assertStringStartsWith('$2y$', $user->fresh()->password); // modernizou
     }

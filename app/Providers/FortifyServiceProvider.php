@@ -7,7 +7,9 @@ namespace App\Providers;
 use App\Actions\Fortify\CreateNewUser;
 use App\Actions\Fortify\ResetUserPassword;
 use App\Models\User;
+use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Http\Request;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\ValidationException;
@@ -49,5 +51,23 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::registerView(fn () => view('auth.register'));
         Fortify::requestPasswordResetLinkView(fn () => view('auth.forgot-password'));
         Fortify::resetPasswordView(fn (Request $request) => view('auth.reset-password', ['request' => $request]));
+
+        // E-mail de redefinição de senha em pt-BR, na identidade CEMA (o padrão do Laravel vem em inglês).
+        ResetPassword::toMailUsing(function ($notifiable, string $token) {
+            $url = route('password.reset', [
+                'token' => $token,
+                'email' => $notifiable->getEmailForPasswordReset(),
+            ]);
+            $minutos = config('auth.passwords.users.expire', 60);
+
+            return (new MailMessage)
+                ->subject('Redefinição de senha — CEMA')
+                ->greeting('Olá!')
+                ->line('Recebemos um pedido para redefinir a senha da sua conta no CEMA.')
+                ->action('Redefinir senha', $url)
+                ->line("Este link expira em {$minutos} minutos.")
+                ->line('Se você não fez esse pedido, ignore este e-mail — nada muda.')
+                ->salutation('Abraço fraterno, Equipe CEMA');
+        });
     }
 }

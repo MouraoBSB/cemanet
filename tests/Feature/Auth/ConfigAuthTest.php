@@ -1,5 +1,7 @@
 <?php
 
+// Thiago Mourão — https://github.com/MouraoBSB — 2026-07-04
+
 namespace Tests\Feature\Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;

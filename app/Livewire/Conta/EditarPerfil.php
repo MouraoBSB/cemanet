@@ -42,7 +42,7 @@ class EditarPerfil extends Component
     {
         return [
             'name' => ['required', 'string', 'max:255'],
-            'data_nascimento' => ['nullable', 'date'],
+            'data_nascimento' => ['nullable', 'date', 'before:today'],
             'endereco' => ['nullable', 'string', 'max:500'],
             'whatsapp' => ['nullable', 'string', 'max:30'],
             'whatsapp_publico' => ['boolean'],

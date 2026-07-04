@@ -25,7 +25,9 @@ class HeaderAuthTest extends TestCase
             ->assertSee(route('login'), false)
             ->assertSee(route('register'), false)
             ->assertSee('Entrar')
-            ->assertSee('Cadastrar');
+            ->assertSee('Cadastrar')
+            ->assertDontSee('Minha Conta')
+            ->assertDontSee('Sair');
     }
 
     public function test_membro_logado_ve_menu_da_conta(): void
@@ -36,6 +38,7 @@ class HeaderAuthTest extends TestCase
         $this->actingAs($user)->get('/')
             ->assertSee('Minha Conta')
             ->assertSee('Sair')
-            ->assertSee('Bruno'); // primeiro nome na saudação do header
+            ->assertSee('Bruno') // primeiro nome na saudação do header
+            ->assertDontSee('Cadastrar');
     }
 }

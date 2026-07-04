@@ -71,9 +71,9 @@
             </section>
         </div>
 
-        {{-- EDIÇÃO (preenchida no Task 7) --}}
+        {{-- EDIÇÃO --}}
         <div x-show="editando" x-cloak>
-            {{-- <livewire:conta.editar-perfil :perfil="$perfil" /> entra aqui no Task 7 --}}
+            <livewire:conta.editar-perfil />
         </div>
     </div>
 </x-layout.conta>

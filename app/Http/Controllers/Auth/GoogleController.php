@@ -53,6 +53,7 @@ class GoogleController extends Controller
         }
 
         Auth::login($user, remember: true);
+        request()->session()->regenerate(); // evita session fixation (paridade com o PrepareAuthenticatedSession do Fortify)
 
         return redirect()->intended('/');
     }

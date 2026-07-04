@@ -1,6 +1,9 @@
 {{-- Thiago Mourão — https://github.com/MouraoBSB — 2026-07-04 --}}
+@assets
+    @vite('resources/js/cropper-perfil.js')
+@endassets
 <form wire:submit="salvar" class="space-y-6">
-    <section class="rounded-lg bg-white p-6 shadow-card">
+    <section class="rounded-lg bg-white p-6 shadow-card" x-data="cropperPerfil">
         <h3 class="mb-4 font-display font-semibold text-primary">Foto de perfil</h3>
         <div class="flex items-center gap-4">
             <div class="size-20 overflow-hidden rounded-full bg-primary/10">
@@ -13,10 +16,22 @@
                 @endif
             </div>
             <div>
-                <input type="file" wire:model="foto" accept="image/jpeg,image/png,image/webp"
+                {{-- Ao escolher, o x-on:change abre o cropper; o recorte quadrado vira o upload. Ver a verificação manual no Step 5b (wire:model + cropper). --}}
+                <input type="file" wire:model="foto" x-on:change="aoEscolher" accept="image/jpeg,image/png,image/webp"
                        class="block text-sm text-text file:mr-3 file:rounded-pill file:border-0 file:bg-surface file:px-4 file:py-2 file:text-sm file:text-primary">
                 <p class="mt-1 text-xs text-text-muted">Tamanho máximo: 1 MB. A capa é gerada automaticamente.</p>
                 @error('foto') <p class="mt-1 text-sm text-danger">{{ $message }}</p> @enderror
+            </div>
+        </div>
+
+        {{-- Modal do cropper --}}
+        <div x-show="aberto" x-cloak class="fixed inset-0 z-[80] flex items-center justify-center bg-black/60 p-4">
+            <div class="w-full max-w-md rounded-lg bg-white p-4">
+                <div class="max-h-[60vh] overflow-hidden"><img x-ref="imagem" alt="Recorte da foto" class="block max-w-full"></div>
+                <div class="mt-3 flex justify-end gap-2">
+                    <button type="button" @click="fechar" class="rounded-pill px-4 py-2 text-sm text-text-muted hover:text-primary">Cancelar</button>
+                    <button type="button" @click="confirmar" class="rounded-pill bg-primary px-4 py-2 text-sm font-medium text-white">Usar recorte</button>
+                </div>
             </div>
         </div>
     </section>

@@ -58,7 +58,24 @@ class AdminPanelProvider extends PanelProvider
             ->brandLogoHeight('2rem')
             ->favicon(asset('images/logos/logo-icone.png'))
             ->colors([
-                'primary' => Color::hex('#4E4483'),
+                // Paleta primária explícita (rampa fiel aos tokens: 600=#4E4483, 900=#2F2952).
+                // O Color::hex de tom único gera um 600 claro (rampa de lightness fixa do
+                // Filament) -> CTA lavanda com texto escuro. Ancorando o 600 no roxo da marca
+                // (#4E4483, contraste 8,5:1 com branco) o botão preenchido fica encorpado e o
+                // Filament escolhe texto branco.
+                'primary' => [
+                    50 => '#f4f4fe',
+                    100 => '#e8e7fc',
+                    200 => '#d4d1f6',
+                    300 => '#b8b4e7',
+                    400 => '#9089c7',
+                    500 => '#6d64a5',
+                    600 => '#4e4483',
+                    700 => '#433a71',
+                    800 => '#393161',
+                    900 => '#2f2952',
+                    950 => '#1b1634',
+                ],
                 'info' => Color::hex('#6E9FCB'),
                 'warning' => Color::hex('#F2A81E'),
                 'danger' => Color::hex('#C33A36'),

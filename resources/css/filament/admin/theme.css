@@ -20,11 +20,17 @@
 @source '../../../../resources/views/filament/**/*';
 
 :root {
-    /* Filament deriva --font-sans de var(--font-family): define o corpo como Poppins. */
-    --font-family: 'Poppins';
     /* Acentos de marca. */
     --cema-gold: #f2a81e;
-    --cema-cream-bg: #faf7f0;
+    --cema-cream: #f3eddd; /* token CEMA */
+    --cema-cream-bg: color-mix(in srgb, var(--cema-cream) 45%, #ffffff); /* creme bem leve derivado do token (~#faf7f0) */
+}
+
+/* Corpo em Poppins. O Filament injeta inline `:root { --font-family: 'Inter Variable' }`
+   DEPOIS do <link> do tema; html:root (especificidade 0,1,1) vence esse :root (0,1,0)
+   por especificidade, independente da ordem de origem — sem !important. */
+html:root {
+    --font-family: 'Poppins';
 }
 
 /* Superfície quente: canvas do painel em creme bem leve (sidebar/cards seguem neutros). */

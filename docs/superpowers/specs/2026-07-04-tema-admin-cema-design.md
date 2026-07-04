@@ -84,11 +84,21 @@ Wiring no `AdminPanelProvider->panel()`:
 
 ### 2. Fontes (self-hosted, sem CDN)
 
-- O `theme.css` define a família de corpo do painel como **Poppins** e a de
-  títulos/marca como **Work Sans**, reusando os arquivos que o `bunny()` já
-  produz no build (nenhuma chamada à CDN do Google/Bunny).
-- O helper `->font()` do Filament (que puxaria a CDN do Bunny) **não** é usado —
-  a fonte entra pelo `@font-face`/variável de família do tema.
+O `theme.css` é um bundle **separado** do `app.css`; o `/admin` carrega só o
+`theme.css` e **não** passa pela diretiva `@vite` do Blade — logo, o
+`fonts.css` que o `bunny()` gera (e injeta globalmente via `@vite`) **não**
+chega ao painel. Os `.woff2` do `bunny()` também têm nomes hasheados no build,
+sem caminho estável para referência a partir do fonte. Por isso as `@font-face`
+precisam estar **dentro do próprio bundle do tema**, via **fontsource**:
+
+- `npm i -D @fontsource/poppins @fontsource/work-sans` (host — o container não
+  tem Node).
+- No `theme.css`: `@import '@fontsource/poppins/400.css';` e
+  `@import '@fontsource/work-sans/400.css';` + `@import '@fontsource/work-sans/600.css';`.
+  O Vite empacota os `.woff2` + `@font-face` no bundle do tema — determinístico,
+  self-hosted, sem CDN e sem autoria manual de `@font-face`/`unicode-range`.
+- A família de corpo do painel fica **Poppins** e a de títulos/marca **Work Sans**.
+- O helper `->font()` do Filament (que puxaria a CDN do Bunny) **não** é usado.
 
 ### 3. Cores semânticas (`->colors` no provider)
 
@@ -136,7 +146,10 @@ inventado além do andaime `Neutral`):
 - Não reescrever o `editor.css` nem mudar seu registro.
 - Não alterar breakpoints/responsividade do Filament (ele já é responsivo por
   padrão).
-- Não introduzir dependência externa nem CDN de fonte.
+- Nenhuma CDN de fonte em runtime. As duas `devDependencies` do fontsource
+  (`@fontsource/poppins`, `@fontsource/work-sans`) só existem em build e
+  produzem `.woff2` self-hosted — não são dependência de runtime nem chamada
+  externa.
 
 ## Salvaguardas
 

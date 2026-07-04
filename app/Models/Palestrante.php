@@ -5,6 +5,7 @@
 namespace App\Models;
 
 use App\Models\Concerns\RegistraImagensPadrao;
+use App\Models\Concerns\TemIniciais;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -15,7 +16,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Palestrante extends Model implements HasMedia
 {
-    use HasFactory, InteractsWithMedia, RegistraImagensPadrao;
+    use HasFactory, InteractsWithMedia, RegistraImagensPadrao, TemIniciais;
 
     public const COLECAO_FOTO = 'foto';
 
@@ -71,17 +72,6 @@ class Palestrante extends Model implements HasMedia
         return Attribute::get(
             fn (): ?string => $this->getFirstMediaUrl(self::COLECAO_FOTO, 'thumb') ?: null,
         );
-    }
-
-    /** Iniciais (1ª letra das 2 primeiras palavras do nome), maiúsculas — fallback do avatar. */
-    protected function iniciais(): Attribute
-    {
-        return Attribute::get(function (): string {
-            $palavras = preg_split('/\s+/', trim((string) $this->nome), -1, PREG_SPLIT_NO_EMPTY) ?: [];
-            $letras = array_map(fn ($p) => mb_strtoupper(mb_substr($p, 0, 1)), array_slice($palavras, 0, 2));
-
-            return $letras === [] ? '?' : implode('', $letras);
-        });
     }
 
     protected function bio(): Attribute

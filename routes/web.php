@@ -4,6 +4,7 @@ use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CalendarioController;
+use App\Http\Controllers\ContaController;
 use App\Http\Controllers\MidiaController;
 use App\Http\Controllers\PalestraController;
 use App\Http\Controllers\PalestranteController;
@@ -32,6 +33,12 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/redefinir-senha/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
     Route::post('/redefinir-senha', [NewPasswordController::class, 'store'])->name('password.update');
+});
+
+// Área do membro (self-service) — sob autenticação.
+Route::middleware('auth')->prefix('minha-conta')->name('conta.')->group(function () {
+    Route::get('/', [ContaController::class, 'painel'])->name('painel');
+    Route::get('/perfil', [ContaController::class, 'perfil'])->name('perfil');
 });
 
 Route::post('/sair', [AuthenticatedSessionController::class, 'destroy'])->name('logout')->middleware('auth');

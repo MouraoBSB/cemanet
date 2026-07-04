@@ -46,7 +46,7 @@ class ResetSenhaTest extends TestCase
 
         // agora loga com a senha local recém-criada
         $this->post('/entrar', ['email' => 'google@x.com', 'password' => 'nova-senha-forte-2026'])
-            ->assertRedirect('/');
+            ->assertRedirect('/minha-conta');
         $this->assertAuthenticatedAs($user->fresh());
     }
 }

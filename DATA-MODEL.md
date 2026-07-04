@@ -1,8 +1,21 @@
 # DATA-MODEL — Novo site do CEMA
 
 Modelado a partir do conteúdo real do site atual. Tudo via **migrations**;
-nomes em pt-BR para o domínio. Esta versão cobre a **fatia Palestras** (Fase 1);
-os demais módulos seguem o mesmo padrão.
+nomes em pt-BR para o domínio. Cobre os módulos já implementados (Mídia,
+Palestras, Blog "Sementeira de Luz", Usuários/organização, Agenda) e os
+planejados (Comentários); os demais seguem o mesmo padrão.
+
+## Mídia (Spatie Media Library)
+
+Tabela `media` (`database/migrations/2026_06_26_204926_create_media_table.php`) é o
+repositório único de arquivos de imagem do sistema. A Media Library guarda o
+**original enviado** — capado ao teto de cada coleção (≤2000px; ≤1200px na coleção
+`og`) pelo listener `App\Listeners\CaparOriginalDaMidia`, sem trocar de formato — e
+gera as **conversões em WebP** `web` e `thumb` (síncronas) via trait reutilizável
+`App\Models\Concerns\RegistraImagensPadrao`. Usada por: `Palestrante` (coleção
+`foto`), `Post` (coleções `destacada`, `galeria`, `og`, `conteudo`, `corpo`),
+`PerfilMembro` (coleção `foto`), `Biblioteca` (coleção `biblioteca`),
+`ConfiguracaoAgenda` (coleção `capa`).
 
 ## Tabelas — módulo Palestras
 
@@ -15,9 +28,17 @@ o papel é definido por palestra, no pivô.
 | id | bigint PK | |
 | nome | string | |
 | slug | string unique | usado na resolução da importação |
-| foto | string null | caminho da imagem migrada |
 | bio | text null | |
+| email | string null | |
+| telefone | string null | |
+| mostrar_email | bool default false | |
+| mostrar_telefone | bool default false | |
+| ativo | bool default true | |
+| chamada | string null | texto de chamada/destaque do palestrante |
 | timestamps | | |
+
+Foto via Media Library (coleção `foto`, tabela `media`), não coluna — accessors
+`foto_url`/`foto_thumb_url` (conversões `web`/`thumb`; ver seção "Mídia" acima).
 
 ### `palestras`
 | Coluna | Tipo | Notas |
@@ -26,15 +47,24 @@ o papel é definido por palestra, no pivô.
 | titulo | string | |
 | slug | string unique | |
 | subtitulo | string null | (excerpt no WP) |
+| resumo | text null | resumo curto adicional |
 | descricao | longtext null | (content no WP; HTML) |
+| referencias_evangelicas | text null | referências evangélicas (texto livre) |
 | data_da_palestra | datetime | sempre num domingo; vem de meta Unix |
+| duracao | string(40) null | duração da palestra |
 | link_youtube | string null | preservar exatamente |
+| slide | string null | link do slide (Drive) |
 | cor_fundo | string null | `escolher_cor_do_fundo` |
+| online | bool default false | flag online/presencial |
 | publico_online | int null | |
 | publico_presencial | int null | |
 | publico_total | int null | |
+| curtidas | unsigned int default 0 | contador de curtidas públicas |
 | status | string | `publicado`/`rascunho` |
 | timestamps | | |
+
+Colunas `slide`/`duracao`/`referencias_evangelicas`/`curtidas` vieram depois da
+criação (migration `2026_06_29_100001_add_slide_duracao_refs_curtidas_to_palestras.php`).
 
 ### `assuntos` (taxonomia hierárquica `assuntos-principais`)
 | Coluna | Tipo | Notas |
@@ -64,6 +94,20 @@ Regra de negócio (validar na aplicação, não só no schema):
 | destaque | string | título curto do tópico |
 | texto | text | descrição |
 | ordem | int | |
+
+### `palestra_referencias` (repeater de obras/referências citadas)
+| Coluna | Tipo | Notas |
+|---|---|---|
+| id | bigint PK | |
+| palestra_id | FK→palestras | |
+| obra | string | |
+| autor | string null | |
+| nota | text null | |
+| ordem | unsigned int default 0 | |
+| timestamps | | |
+
+Model `PalestraReferencia`; relação `Palestra::referencias()`.
+(migration `2026_06_29_100002_create_palestra_referencias_table.php`)
 
 ## Mapeamento REST (site atual) → MySQL
 
@@ -140,8 +184,7 @@ nova URL `/sementeira/{slug}` + 301.
 | slug | string unique | `post_name` (idempotência) |
 | resumo | text null | dek ← `post_excerpt` |
 | conteudo | longtext | `post_content` (HTML limpo + sanitizado) |
-| imagem_destacada | string null | ← `_thumbnail_id` (re-hospedada no storage) |
-| imagem_destacada_alt | string null | ← `_wp_attachment_image_alt` |
+| imagem_destacada_alt | string null | ← `_wp_attachment_image_alt` (alt da imagem da coleção `destacada`) |
 | criado_por_id | bigint null FK→users | autoria **administrativa** (não pública); null na importação |
 | categoria_principal_id | bigint null FK→categorias | ← `rank_math_primary_category` |
 | destaque | bool default false | herói da listagem (fallback: mais recente) |
@@ -151,10 +194,13 @@ nova URL `/sementeira/{slug}` + 301.
 | status | enum(`publicado`,`rascunho`,`agendado`) | `post_status` |
 | wp_id | unsigned bigint unique null | id legado (idempotência + vínculo post↔palestra futuro) |
 | seo_titulo / seo_descricao / seo_keyword | string null | Rank Math → fallback Yoast |
-| og_imagem | string null | ← `rank_math_og_content_image` (fallback: imagem destacada) |
 | robots_noindex | bool default false | controle de indexação |
 | canonical | string null | URL canônica custom (raro) |
 | timestamps | | |
+
+Imagem destacada, galeria e OG customizado vivem na Media Library (tabela `media`),
+coleções `destacada`/`galeria`/`og` do model `Post` (ver seção "Mídia" acima) — não
+são mais colunas de `posts` nem tabela `post_imagens` própria.
 
 ### `categorias`
 `id` · `nome` · `slug` unique · `cor` (hex do design) · `descricao` null · `ordem` · `wp_term_id` null.
@@ -168,8 +214,12 @@ Amor ao Próximo (`#89AB98`), Datas Comemorativas (`#F2A81E`), CEMA em Ação (`
 - `categoria_post` (N:N): `post_id` FK · `categoria_id` FK.
 - `post_tag` (N:N): `post_id` FK · `tag_id` FK.
 - `post_faqs`: `id` · `post_id` FK · `pergunta` · `resposta` text · `ordem`. ← meta `_faq`.
-- `post_imagens` (galeria): `id` · `post_id` FK · `caminho` · `url_legado` · `alt` null · `ordem`.
-  ← meta `_fotos_carrossel_` (baixar/re-hospedar cada imagem).
+
+### `bibliotecas`
+Singleton (`tipo` unique, default `principal`) dono da coleção de Media Library
+`biblioteca`: pool central de imagens reutilizáveis inseridas no corpo dos posts,
+referenciadas por URL estável `/midia/{id}/web`. (migration
+`2026_06_28_000002_create_bibliotecas_table.php`; model `Biblioteca`.)
 
 ## Comentários do blog (Fase 2)
 
@@ -203,12 +253,16 @@ Regras de negócio (validar na aplicação):
 - **LGPD**: exigir `consentimento_lgpd` no fluxo anônimo; e-mail só interno.
 - Exibir publicamente apenas `status = aprovado`.
 
-## Módulo Usuários e Área de membros (fase futura)
+## Módulo Usuários e Área de membros (implementado — audiência pendente)
 
 Modelado no estudo de 2026-06-25 (introspecção do legado + verificação adversarial
 multiagente). Resolve a classificação de usuários separando **quatro dimensões
 ortogonais** que o WordPress achatava num único "papel". Tudo via migrations; CRUD
 no Filament (nada hardcoded); importação idempotente a partir do banco `legado`.
+
+Catálogos, pivôs de lotação/atributo e RBAC (Spatie) já implementados (migrations
+`2026_07_03_*` e `2026_07_04_*`). Pendente: tabelas `audiencias` e
+`log_mudancas_papel`.
 
 ### Princípio — 4 dimensões ortogonais
 
@@ -233,23 +287,24 @@ Duas perguntas de autorização, mecanismos distintos:
 `descricao?`, `ativo`, `ordem`.
 
 **`setores`** — atividades; `departamento_id` **nullable** (nulo = PAMANA / incertos),
-`nome`, `slug` unique, `edita_conteudo` (bool), `provisorio` (bool — vínculo incerto),
-`ativo`.
+`nome`, `slug` unique, `provisorio` (bool — vínculo incerto), `ativo`.
 
 **`cargos`** — direção: `nome`, `slug` unique, `departamento_id` **nullable**,
-`institucional` (bool), `alcance` enum(`departamental`,`institucional_restrito`,`total`),
-`ativo`.
+`institucional` (bool), `ativo`.
 
 **`atributos`** — marcas ortogonais (hoje só sócio): `nome`, `slug` unique, `descricao?`.
 
 ### Usuário e perfil
 
-**`users`** (acréscimos à auth): `login?` (referência/rastreio, **não** é credencial),
-`socio` (bool, indexado — espelho de `atributo_usuario`), `origem_legado_id?` (unique —
-`wp_users.ID`), `ativo`. **Identidade = e-mail** (login por e-mail).
+**`users`** (acréscimos à auth): `socio` (bool, indexado — espelho de
+`atributo_usuario`), `origem_legado_id?` (unique — `wp_users.ID`), `ativo`,
+`google_id?` (unique — id do provedor Google/Socialite). **Identidade = e-mail**
+(login por e-mail; login social casa por `google_id`/e-mail).
 
 **`perfis_membro`** (1:1): `user_id` unique, `whatsapp?`, `whatsapp_publico` (bool),
-`data_nascimento?`, `endereco?` (**texto único**, sem parser), `foto_perfil?`.
+`data_nascimento?`, `endereco?` (**texto único**, sem parser). Foto via Media
+Library (coleção `foto`, conversões `web` ≤640px + `thumb` 400×400 quadrado —
+accessors `foto_url`/`foto_thumb_url`), não coluna.
 
 **`cursos_realizados`** (1:N): `user_id`, `nome`, `ano?`, `local?`, `ordem`.
 
@@ -314,6 +369,35 @@ de papéis/permissões — **edição restrita ao admin**.
   será resolvido quando as mensagens mediúnicas forem migradas.
 
 Detalhes do legado e cobertura real em [DB-LEGADO.md](DB-LEGADO.md).
+
+## Agenda
+
+Devocional diário "Agenda de Reforma Íntima", migrado do legado.
+
+### `agenda_metas_mes`
+`id` · `ano` · `mes` · `titulo` · unique(`ano`,`mes`).
+
+### `agenda_dias`
+`id` · `data` unique · `reflexao` (HTML) · `meta_mes_texto` (HTML) · `meta_dia_titulo`
+· `meta_dia_texto` (HTML) · `prece` (HTML) · `status` (`publicado`/`rascunho`) ·
+`wp_id` unique null (rastreio do legado).
+
+### `agenda_slugs_legado`
+`id` · `slug` unique (post_name legado, numérico ou de data) · `data` (destino do
+301 — N slugs podem apontar para a mesma data). Sem timestamps.
+
+### `agenda_configuracoes`
+Singleton dono da coleção de Media Library `capa` — capa da Agenda, conversão
+`web` ≤1200px.
+
+(migrations `2026_07_02_000001` a `2026_07_02_000004`; models `AgendaMetaMes`,
+`AgendaDia`, `AgendaSlugLegado`, `ConfiguracaoAgenda`.)
+
+## Configurações
+
+### `configuracoes`
+`id` · `chave` unique · `valor` text null · timestamps. Store genérico
+chave/valor (model `Configuracao`, helpers estáticos `valor()`/`definir()`).
 
 ## Próximos módulos (resumo)
 

@@ -5,6 +5,7 @@
 namespace App\Providers;
 
 use App\Actions\Fortify\CreateNewUser;
+use App\Actions\Fortify\ResetUserPassword;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -42,6 +43,7 @@ class FortifyServiceProvider extends ServiceProvider
         });
 
         Fortify::createUsersUsing(CreateNewUser::class);
+        Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
 
         Fortify::loginView(fn () => view('auth.login'));
         Fortify::registerView(fn () => view('auth.register'));

@@ -52,8 +52,18 @@ class AdminPanelProvider extends PanelProvider
                 [MidiaController::class, 'colar'],
             )->name('midia.colar'))
             ->login()
+            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->darkMode(false)
+            ->brandLogo(asset('images/logos/logo-horizontal.png'))
+            ->brandLogoHeight('2rem')
+            ->favicon(asset('images/logos/logo-icone.png'))
             ->colors([
-                'primary' => Color::hex('#4e4483'),
+                'primary' => Color::hex('#4E4483'),
+                'info' => Color::hex('#6E9FCB'),
+                'warning' => Color::hex('#F2A81E'),
+                'danger' => Color::hex('#C33A36'),
+                'success' => Color::hex('#008000'),
+                'gray' => Color::Neutral,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')

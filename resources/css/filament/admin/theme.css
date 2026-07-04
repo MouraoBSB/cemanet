@@ -1,0 +1,56 @@
+/* Tema CEMA para o painel /admin — camada visual (Filament 5.6, Tailwind v4).
+   Fontes self-hosted via fontsource (sem CDN); acentos de marca sobre o tema base.
+   Thiago Mourão — https://github.com/MouraoBSB — 2026-07-04 */
+
+/* Fontes CEMA self-hosted — Poppins (corpo) e Work Sans (títulos), subsets latin + latin-ext. */
+@import '@fontsource/poppins/latin-400.css';
+@import '@fontsource/poppins/latin-ext-400.css';
+@import '@fontsource/poppins/latin-500.css';
+@import '@fontsource/poppins/latin-ext-500.css';
+@import '@fontsource/poppins/latin-600.css';
+@import '@fontsource/poppins/latin-ext-600.css';
+@import '@fontsource/work-sans/latin-400.css';
+@import '@fontsource/work-sans/latin-ext-400.css';
+@import '@fontsource/work-sans/latin-600.css';
+@import '@fontsource/work-sans/latin-ext-600.css';
+
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@source '../../../../app/Filament/**/*';
+@source '../../../../resources/views/filament/**/*';
+
+:root {
+    /* Acentos de marca. */
+    --cema-gold: #f2a81e;
+    --cema-cream: #f3eddd; /* token CEMA */
+    --cema-cream-bg: color-mix(in srgb, var(--cema-cream) 45%, #ffffff); /* creme bem leve derivado do token (~#faf7f0) */
+}
+
+/* Corpo em Poppins. O Filament injeta inline `:root { --font-family: 'Inter Variable' }`
+   DEPOIS do <link> do tema; html:root (especificidade 0,1,1) vence esse :root (0,1,0)
+   por especificidade, independente da ordem de origem — sem !important. */
+html:root {
+    --font-family: 'Poppins';
+}
+
+/* Superfície quente: canvas do painel em creme bem leve (sidebar/cards seguem neutros). */
+.fi-body {
+    background-color: var(--cema-cream-bg);
+}
+
+/* Títulos em Work Sans (cabeçalho de página e páginas simples/login). */
+.fi-header-heading,
+.fi-simple-header-heading {
+    font-family: 'Work Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Pílula só em botões e badges (inputs e cards mantêm o raio padrão). */
+.fi-btn,
+.fi-badge {
+    border-radius: 9999px;
+}
+
+/* Acento dourado: espinha à esquerda no item de menu ativo da sidebar. */
+.fi-sidebar-item.fi-active > .fi-sidebar-item-btn {
+    box-shadow: inset 3px 0 0 0 var(--cema-gold);
+}

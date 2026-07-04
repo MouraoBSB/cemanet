@@ -1,3 +1,4 @@
+{{-- Thiago Mourão — https://github.com/MouraoBSB — 2026-07-04 --}}
 <x-layout.auth titulo="Entrar">
     @if (session('status'))
         <p class="mb-4 rounded-md bg-accent/15 px-3 py-2 text-sm text-success" role="status">{{ session('status') }}</p>

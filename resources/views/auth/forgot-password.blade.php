@@ -1,3 +1,4 @@
+{{-- Thiago Mourão — https://github.com/MouraoBSB — 2026-07-04 --}}
 <x-layout.auth titulo="Esqueci a senha">
     @if (session('status'))
         <p class="mb-4 rounded-md bg-accent/15 px-3 py-2 text-sm text-success" role="status">{{ session('status') }}</p>
@@ -8,8 +9,9 @@
         <div>
             <label for="email" class="block text-sm font-medium">E-mail</label>
             <input id="email" name="email" type="email" required autofocus autocomplete="email" value="{{ old('email') }}"
+                   @error('email') aria-invalid="true" aria-describedby="email-erro" @enderror
                    class="mt-1 w-full rounded-md border border-border px-3 py-2 focus:border-primary focus:ring-primary">
-            @error('email')<p class="mt-1 text-sm text-danger">{{ $message }}</p>@enderror
+            @error('email')<p id="email-erro" class="mt-1 text-sm text-danger">{{ $message }}</p>@enderror
         </div>
         <button type="submit" class="w-full rounded-pill bg-primary px-4 py-2.5 font-medium text-white hover:bg-primary/90">Enviar link</button>
     </form>

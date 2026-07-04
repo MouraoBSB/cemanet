@@ -1,23 +1,27 @@
+{{-- Thiago Mourão — https://github.com/MouraoBSB — 2026-07-04 --}}
 <x-layout.auth titulo="Criar conta">
     <form method="POST" action="{{ route('register') }}" class="space-y-4">
         @csrf
         <div>
             <label for="name" class="block text-sm font-medium">Nome</label>
             <input id="name" name="name" type="text" required autofocus autocomplete="name" value="{{ old('name') }}"
+                   @error('name') aria-invalid="true" aria-describedby="name-erro" @enderror
                    class="mt-1 w-full rounded-md border border-border px-3 py-2 focus:border-primary focus:ring-primary">
-            @error('name')<p class="mt-1 text-sm text-danger">{{ $message }}</p>@enderror
+            @error('name')<p id="name-erro" class="mt-1 text-sm text-danger">{{ $message }}</p>@enderror
         </div>
         <div>
             <label for="email" class="block text-sm font-medium">E-mail</label>
             <input id="email" name="email" type="email" required autocomplete="email" value="{{ old('email') }}"
+                   @error('email') aria-invalid="true" aria-describedby="email-erro" @enderror
                    class="mt-1 w-full rounded-md border border-border px-3 py-2 focus:border-primary focus:ring-primary">
-            @error('email')<p class="mt-1 text-sm text-danger">{{ $message }}</p>@enderror
+            @error('email')<p id="email-erro" class="mt-1 text-sm text-danger">{{ $message }}</p>@enderror
         </div>
         <div>
             <label for="password" class="block text-sm font-medium">Senha</label>
             <input id="password" name="password" type="password" required autocomplete="new-password"
+                   @error('password') aria-invalid="true" aria-describedby="password-erro" @enderror
                    class="mt-1 w-full rounded-md border border-border px-3 py-2 focus:border-primary focus:ring-primary">
-            @error('password')<p class="mt-1 text-sm text-danger">{{ $message }}</p>@enderror
+            @error('password')<p id="password-erro" class="mt-1 text-sm text-danger">{{ $message }}</p>@enderror
         </div>
         <div>
             <label for="password_confirmation" class="block text-sm font-medium">Confirmar senha</label>

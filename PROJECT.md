@@ -37,22 +37,31 @@ admin → páginas públicas → dados migrados) antes de seguir para o próximo
 | Local | Docker (MySQL/Mailpit/Adminer) | "Banco próprio" reproduzível; local == produção |
 | Produção | VPS Linux + Docker | Controle e portabilidade |
 | 1º ciclo | Fatia vertical: módulo **Palestras** | Prova a arquitetura inteira num módulo |
-| Acesso ao atual | Snapshot/design-system (design) + REST GET (dados) | Reaproveita o que já temos; sem risco ao WP vivo |
+| Acesso ao atual | Snapshot/design-system (design) + banco `legado` via túnel SSH, somente leitura (fonte PREFERIDA de dados — ver `DB-LEGADO.md`) + REST GET (alternativa/complemento) | Banco legado é mais rico (schema real, postmeta, relações Jet, repeaters serializados); REST cobre o que o túnel não expõe |
 | Comentários (blog) | Sistema **próprio** (Livewire), **aberto sem conta** (nome+e-mail), login/Google **opcional**, moderado no Filament | Não trava o visitante; dados na casa (LGPD); leve (SEO/perf); sem widget de terceiro (Disqus/Facebook) |
 | Editor do blog | **RichEditor** (TipTap/HTML) nativo do Filament 5, com **alinhamento/float e redimensionamento de imagem** | Migração simples (preserva o HTML do Gutenberg); edição tipo Word; foto **ao lado do texto** (contorno) e **tamanho ajustável**; layouts ricos via bloco/extensão quando necessário |
-| Mídia/imagens | **Spatie Media Library** (+ image-optimizer): resize, WebP, srcset, remoção de EXIF; upload múltiplo e reordenável no Filament. **Capa na entrada (~2000px) e NÃO guarda o original** | "Joga e mastiga" — otimiza no upload e resolve a UX da galeria num só lugar; padrão Laravel; melhor a longo prazo; acervo em alta fica fora do sistema (ex.: Drive) |
+| Mídia/imagens | **Spatie Media Library**: guarda o **original preservado** no disco (capado a ≤2000px no lado maior; ≤1200px na coleção `og`) + conversões **WebP** (`web` e `thumb`, síncronas) geradas pelo trait `App\Models\Concerns\RegistraImagensPadrao`; upload múltiplo e reordenável no Filament | Mantém o arquivo de origem como fallback/reprocessamento; o site consome só as conversões WebP otimizadas; padrão Laravel, reutilizável por qualquer model `HasMedia` |
 | Biblioteca de mídia | **Sobre a Media Library (Opção B):** pool central, imagens **referenciadas por URL** (não posse do post); dedup por hash; tool "Inserir da biblioteca" no editor | Um só sistema de mídia; reusa cap+conversões; **generaliza o fix do corpo** (referência → some a classe de bug do editor); Curator traria 2º sistema sem ganho turnkey no editor |
 | Referência de mídia portável | Mídia usada **no conteúdo** é servida por **rota estável do app** (resolve o storage atual), não por caminho cru `/storage/...` | Permite migrar o storage (S3/CDN) no futuro **sem quebrar** as imagens já dentro dos posts |
+
+Desde o 1º ciclo (Palestras), o projeto já entregou ponta a ponta os módulos
+Palestrantes, Calendário de Palestras, Agenda Reforma Íntima, Blog "Sementeira
+de Luz" + Biblioteca de Mídia, Usuários (estrutura organizacional e papéis),
+Autenticação, Minha Conta, e-mail transacional e o tema do painel `/admin`. O
+estado fase a fase vive em [ROADMAP.md](ROADMAP.md).
 
 ## Inventário de conteúdo (do site atual, via REST)
 
 | Tipo | Qtd | | Tipo | Qtd |
 |---|--:|---|---|--:|
 | Páginas | 21 | | Palestras públicas | 123 |
-| Posts (blog) | 43 | | Palestrantes/diretores | 57 |
+| Posts (blog) | 44¹ | | Palestrantes/diretores | 57 |
 | Mídia | 827 | | Evangelho | 102 |
 | Eventos | 53 | | Mensagens mediúnicas | 132 |
 | Agenda Reforma | 52 | | Autores espirituais | 19 |
+
+¹ Contagem original via REST era 43; a importação real do banco `legado`
+trouxe 44 posts publicados (ver `DATA-MODEL.md` e `CLAUDE.md`).
 
 Taxonomias: `assuntos-principais` (hierárquica, ~140 termos),
 `capitulos-do-evangelho`, `nivel-de-acesso` (área de membros), entre outras.

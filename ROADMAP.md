@@ -3,6 +3,21 @@
 Construção incremental, local-first. Cada fase é entregue ponta a ponta e
 verificada antes da seguinte. Marque o estado ao concluir.
 
+## Estado atual (2026-07-04)
+
+Módulos entregues ponta a ponta até aqui: **Fundação** (Fase 0), **Palestras**
+(banco + admin + importação + público), **Palestrantes** (listagem e perfil
+single), **Calendário de Palestras**, **Agenda Reforma Íntima** (banco + admin +
+importação + público + SEO), **Blog "Sementeira de Luz"** (Posts + editor
+RichEditor + Biblioteca de mídia), **Usuários** (RBAC + departamentos/setores/
+cargos + importação do legado), **Autenticação pública** (Fortify + Google),
+**Minha Conta**, **E-mail transacional** e o **tema do painel `/admin`** na
+identidade CEMA. Detalhe de cada fatia nas seções abaixo.
+
+Próximo foco pendente: **Comentários** do blog, **gate de conteúdo por nível de
+acesso** (auth + roles/policies), os demais CPTs (Evangelho da semana/Capítulos,
+Eventos, Mensagens mediúnicas/Autores espirituais) e o **deploy** (Docker no VPS).
+
 ## Fase 0 — Fundação  ✅ concluída
 
 Objetivo: ambiente reproduzível rodando, com Laravel + Filament + MySQL.
@@ -42,6 +57,8 @@ Objetivo: o módulo Palestras completo, do banco ao público, com dados migrados
       papel/role (hoje `canAccessPanel` libera local/testing e bloqueia produção);
       prevenção de ciclos profundos na taxonomia; re-sanitizar as 123 `descricao` já
       importadas (rodar a importação idempotente 1× pós-deploy normaliza pelo mutator).
+      Já corrigido: `allowed_classes=false` no `unserialize` do `TransformadorLegado`
+      (fix de segurança mesclado).
 - [x] Front público: listagem + página individual em **`/palestra_publica`** (URL
       compatível com o WP; redirect 301 de `/palestras`), layout base responsivo
       (header mega-menu/off-canvas + footer), i18n pt-BR, interações Alpine.
@@ -75,15 +92,15 @@ entregues. Cada fatia: spec + plano (`docs/superpowers/`) → subagent-driven-de
       **Sem filtro de área nesta fase** (o handoff presume uma taxonomia de área fictícia;
       `Palestrante` não tem campo `area` — feature adiada para quando houver taxonomia real).
       *(PR #3, merge `9d556cd`; suíte completa 370 verdes)*
-- [ ] **Palestrante — detalhe (single)** `/palestrantes/{slug}`: hero roxo (foto 3:4 em
-      moldura ou **iniciais** em gradiente, eyebrow, H1, **frase de chamada** — coluna nova
-      `chamada`, opcional — chips das áreas + CTA calendário), bloco de estatísticas reais
+- [x] **Palestrante — detalhe (single)** `/palestrantes/{slug}`: hero roxo (foto 3:4 em
+      moldura ou **iniciais** em gradiente, eyebrow, H1, **frase de chamada** — coluna
+      `chamada`), chips das áreas + CTA calendário, bloco de estatísticas reais
       (palestras · temas · ativo desde · % online), "Sobre" com prosa, grade de palestras
       reaproveitando `<x-palestra.card>` com **filtro por tema + ordenação client-side
       (Alpine)**, e sidebar sticky (próxima palestra em destaque · áreas de atuação clicáveis
       · compartilhar). Áreas = `assuntos` distintos (**sem** taxonomia de "área" fictícia);
       cor rotacionada `id % 8`. Migração **aditiva** `chamada` (nunca `migrate:fresh`).
-      *(spec/plano em revisão)*
+      *(PR #4, merge `15663ca`)*
 
 ## Fase 2+ — Expansão  🔄 em andamento
 
@@ -92,9 +109,18 @@ Ordem sugerida (cada um como nova fatia vertical):
       (busca reativa Livewire) + perfil `/palestrantes/{slug}` (bio, contato
       condicional, palestras ministradas, `schema.org/Person`); só ativos; menu
       habilitado; link na single da palestra. *(Plano 6 — 73 testes verdes)*
+- [x] **Padrão de mídia (Spatie Media Library)** — adotado como padrão transversal:
+      Post (destacada/galeria/og/corpo), Palestrante (foto), Agenda (capa), User/Conta
+      (foto de perfil); original preservado no disco + conversões WebP (`web`/`thumb`)
+      geradas pelo trait reutilizável `App\Models\Concerns\RegistraImagensPadrao`.
+      *(commits `1203cbd`, `00f57ba`, `958f84e`, `6c028e2`)*
 - [ ] Evangelho da semana + Capítulos do Evangelho
 - [ ] Eventos
-- [ ] Agenda Reforma Íntima (com calendário)
+- [x] **Agenda Reforma Íntima (com calendário)** — models `AgendaMetaMes`/`AgendaDia`/
+      `AgendaSlugLegado`, importação idempotente do legado, admin Filament (dias/metas
+      do mês/configurações), front SSR (`/agenda-reforma-intima` +
+      `/agenda-reforma-intima/{data}`, redirect 301 do legado), calendário navegável,
+      SEO (sitemap, JSON-LD, canonical), capa via Media Library. *(PR #5, merge `80d6ece`)*
 - [ ] Mensagens mediúnicas + Autores espirituais
 - [ ] **Blog (Sementeira de Luz)** — módulo **Posts entregue** (admin + front + posts
       importados + editor/mídia abaixo). Pendentes: **Comentários** e **Páginas institucionais**.
@@ -119,6 +145,19 @@ Ordem sugerida (cada um como nova fatia vertical):
         aprovado uma vez, os próximos daquele e-mail **auto-publicam**.
         Anti-spam (honeypot + hCaptcha condicional + rate limit por IP) e
         **consentimento LGPD**. Sem widget de terceiro. Modelo em `DATA-MODEL.md`.
-- [ ] Área de membros (taxonomia `nivel-de-acesso` → auth + roles/policies)
+- [x] **Usuários** — modelo de classificação/autorização (spatie/laravel-permission +
+      `nivel` em roles), catálogos departamentos/setores/cargos, importação idempotente
+      do legado (hasher phpass/$wp$, `cema:importar-usuarios`), Filament Resources
+      (Usuário/Departamento/Setor/Cargo), gate do painel por papel. *(PR #7, merge `982889b`)*
+- [x] **Autenticação pública** (login por senha, cadastro aberto, Google OAuth via
+      Socialite, reset de senha pt-BR, Fortify headless). *(PR #8, merge `212fdfe`;
+      e-mail transacional PR #9, merge `4cc57fc`)*
+- [x] **Minha Conta** (área self-service: Painel, Meu Perfil com edição/foto+cropper,
+      header auth-aware). *(PR #10, merge `1a7a2ab`)*
+- [ ] Gate de conteúdo por **nível de acesso** (roles/policies restringindo
+      páginas/palestras por taxonomia `nivel-de-acesso`) — ainda pendente.
+- [x] **Tema do painel Filament** — identidade CEMA (paleta primária explícita,
+      fontes Fontsource, dark mode off), polish de contraste do CTA.
+      *(PR #12, merge `db942fe`; PR #13, merge `86cfa01`)*
 - [ ] Busca, formulários (contato/newsletter via Mailpit→SMTP), SEO/sitemap
 - [ ] Deploy Docker no VPS (pipeline, backups do MySQL, observabilidade)

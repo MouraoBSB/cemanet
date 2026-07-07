@@ -21,6 +21,11 @@
                        class="block text-sm text-text file:mr-3 file:rounded-pill file:border-0 file:bg-surface file:px-4 file:py-2 file:text-sm file:text-primary">
                 <p class="mt-1 text-xs text-text-muted">Tamanho máximo: 1 MB.</p>
                 @error('foto') <p class="mt-1 text-sm text-danger">{{ $message }}</p> @enderror
+                @if ($this->temFoto() && ! $removerFoto)
+                    <button type="button" wire:click="removerFoto" class="mt-2 text-sm text-danger underline">Remover foto</button>
+                @elseif ($removerFoto)
+                    <p class="mt-2 text-xs text-text-muted">A foto será removida ao salvar.</p>
+                @endif
             </div>
         </div>
 

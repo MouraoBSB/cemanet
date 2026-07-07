@@ -26,6 +26,8 @@ class EditarPerfil extends Component
 
     public $foto = null;
 
+    public bool $removerFoto = false;
+
     public function mount(): void
     {
         $user = auth()->user();
@@ -50,6 +52,17 @@ class EditarPerfil extends Component
         ];
     }
 
+    public function removerFoto(): void
+    {
+        $this->removerFoto = true;
+        $this->foto = null; // remover e enviar são mutuamente exclusivos
+    }
+
+    public function temFoto(): bool
+    {
+        return auth()->user()->perfil()->firstOrCreate([])->hasMedia(PerfilMembro::COLECAO_FOTO);
+    }
+
     public function salvar()
     {
         $dados = $this->validate();
@@ -69,6 +82,12 @@ class EditarPerfil extends Component
                 $perfil->addMedia($this->foto->getRealPath())
                     ->usingFileName('foto.'.$this->foto->getClientOriginalExtension())
                     ->toMediaCollection(PerfilMembro::COLECAO_FOTO);
+                $perfil->foto_definida_pelo_membro = true;
+                $perfil->save();
+            } elseif ($this->removerFoto) {
+                $perfil->clearMediaCollection(PerfilMembro::COLECAO_FOTO);
+                $perfil->foto_definida_pelo_membro = true;
+                $perfil->save();
             }
         });
 

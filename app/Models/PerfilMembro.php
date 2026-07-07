@@ -23,14 +23,30 @@ class PerfilMembro extends Model implements HasMedia
         'user_id', 'whatsapp', 'whatsapp_publico', 'data_nascimento', 'endereco',
     ];
 
+    // Valor padrão em memória logo após create(): sem isso, o atributo fica null até um
+    // fresh()/refresh(), pois a coluna não é fillable e o INSERT delega o default ao banco.
+    protected $attributes = [
+        'foto_definida_pelo_membro' => false,
+    ];
+
     protected function casts(): array
     {
-        return ['whatsapp_publico' => 'boolean', 'data_nascimento' => 'date'];
+        return [
+            'whatsapp_publico' => 'boolean',
+            'data_nascimento' => 'date',
+            'foto_definida_pelo_membro' => 'boolean',
+        ];
     }
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /** Auto-população (migração/Google) só age se o membro não definiu a foto e não há foto ainda. */
+    public function podeAutoPopularFoto(): bool
+    {
+        return ! $this->foto_definida_pelo_membro && ! $this->hasMedia(self::COLECAO_FOTO);
     }
 
     public function registerMediaCollections(): void

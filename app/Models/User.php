@@ -26,7 +26,9 @@ class User extends Authenticatable implements FilamentUser
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->hasAnyRole(['administrador', 'diretor']);
+        // Painel /admin é exclusivo de administrador. É o ÚNICO portão do painel (não há rota,
+        // policy ou middleware que gateie por papel além deste). Diretores NÃO acessam o /admin.
+        return $this->hasRole('administrador');
     }
 
     public function perfil(): HasOne

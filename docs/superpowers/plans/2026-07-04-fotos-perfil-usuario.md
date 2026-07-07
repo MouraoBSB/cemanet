@@ -98,10 +98,12 @@ class PerfilMembroFotoGuardTest extends TestCase
     public function test_nao_auto_popula_quando_ja_ha_foto(): void
     {
         $perfil = PerfilMembro::create(['user_id' => User::factory()->create()->id]);
-        $perfil->addMedia(UploadedFile::fake()->image('f.jpg')->getRealPath())
+        // addMediaFromString(->get()): fake()->getRealPath() sozinho tem o tmpfile GC'd antes de o
+        // Spatie ler (bug de lifetime determinístico). Padrão do projeto + constraint §18.
+        $perfil->addMediaFromString(UploadedFile::fake()->image('f.jpg')->get())
             ->usingFileName('f.jpg')->toMediaCollection(PerfilMembro::COLECAO_FOTO);
 
-        $this->assertTrue($perfil->fresh()->foto_definida_pelo_membro === false);
+        $this->assertFalse($perfil->fresh()->foto_definida_pelo_membro);
         $this->assertFalse($perfil->fresh()->podeAutoPopularFoto());
     }
 }
@@ -324,7 +326,9 @@ class ImportadorFotosUsuariosTest extends TestCase
     {
         $user = User::factory()->create(['origem_legado_id' => 77]);
         $perfil = PerfilMembro::create(['user_id' => $user->id]);
-        $perfil->addMedia(UploadedFile::fake()->image('já.jpg')->getRealPath())
+        // Semear foto via addMediaFromString(->get()): fake()->getRealPath() sozinho tem o tmpfile
+        // GC'd antes do Spatie ler (bug de lifetime determinístico). Padrão do projeto + constraint §18.
+        $perfil->addMediaFromString(UploadedFile::fake()->image('ja.jpg')->get())
             ->usingFileName('ja.jpg')->toMediaCollection(PerfilMembro::COLECAO_FOTO);
 
         $resumo = $this->importador(
@@ -772,7 +776,9 @@ public function test_remover_foto_limpa_colecao_e_seta_flag(): void
 {
     $user = $this->usuarioLogado(); // helper existente no arquivo (ou criar+actingAs)
     $perfil = $user->perfil()->firstOrCreate([]);
-    $perfil->addMedia(\Illuminate\Http\UploadedFile::fake()->image('f.jpg')->getRealPath())
+    // Semear foto via addMediaFromString(->get()): fake()->getRealPath() sozinho tem o tmpfile
+    // GC'd antes do Spatie ler (bug de lifetime determinístico). Padrão do projeto + constraint §18.
+    $perfil->addMediaFromString(\Illuminate\Http\UploadedFile::fake()->image('f.jpg')->get())
         ->usingFileName('f.jpg')->toMediaCollection(\App\Models\PerfilMembro::COLECAO_FOTO);
 
     \Livewire\Livewire::test(\App\Livewire\Conta\EditarPerfil::class)

@@ -1,151 +1,230 @@
 # Migração das fotos de perfil de usuário — Design
 
-**Data:** 2026-07-04 · **Fatia:** Fotos de perfil (legado → Media Library) + avatar do Google · **Branch:** `fase-fotos-perfil`
+**Data:** 2026-07-04 · **Fatia:** Fotos de perfil (legado → Media Library) + avatar do Google + remover foto/precedência do membro · **Branch:** `fase-fotos-perfil`
 
 ## Objetivo
 
-Dar foto de perfil aos membros. Hoje o `ImportadorUsuarios` migra tudo do usuário
-(identidade, papéis, lotação, whatsapp, nascimento, endereço, cursos) **menos a
-foto** — era o "passo opcional" adiado. Esta fatia cobre duas frentes complementares:
+Dar foto de perfil aos membros e deixar o membro no controle da própria foto. Hoje
+o `ImportadorUsuarios` migra tudo do usuário **menos a foto**, o `EditarPerfil`
+deixa trocar mas **não remover**, e nada auto-popula avatar. Esta fatia cobre:
 
 - **A) Migração das fotos locais** que o membro subiu no site atual → Media Library.
-- **B) Avatar do Google** capturado no login, para quem entra por Google e ainda
-  não tem foto.
+- **B) Avatar do Google** capturado no login (em fila), para quem entra por Google.
+- **C) "Remover foto" no Minha Conta** + **precedência do membro** sobre a
+  auto-população (flag `foto_definida_pelo_membro`).
 
-Quem não tiver foto por nenhum caminho continua nas **iniciais** (fallback da app,
-já pronto).
+Quem não tiver foto por nenhum caminho continua nas **iniciais** (fallback pronto).
 
 ## Contexto (o que existe)
 
-- `App\Importacao\BaixadorImagem` — baixa uma **URL** para o disco `public`
-  (`baixarPara($url, $pasta, $nome)`, idempotente por caminho; retorna `null` em
-  URL vazia/HTTP falho/exceção). Já usado pelo import de palestrantes.
-- `App\Models\PerfilMembro` — `implements HasMedia`, coleção `foto`
-  (`COLECAO_FOTO`), singleFile, com conversões WebP `web` (≤640px) + `thumb`
-  (400×400 quadrado) via trait `RegistraImagensPadrao`; accessors
-  `foto_url`/`foto_thumb_url`.
-- `App\Importacao\LeitorUsuariosMysql.usuarios()` — lê `users` + `usermeta` do
-  banco `legado`, mas **não** lê nenhuma meta de foto hoje. `LeitorLegadoMysql`
-  resolve `_thumbnail_id → wp_posts.guid` (padrão a reusar para attachment id).
-- `App\Http\Controllers\Auth\GoogleController` — cria o usuário + perfil no login
-  Google, mas **não** captura `$g->getAvatar()`.
+- `App\Importacao\BaixadorImagem::baixarPara($url, $pasta, $nome)` — baixa uma
+  **URL** para o disco `public` e devolve o **caminho relativo** ao disco (ex.:
+  `usuarios/5.jpg`), idempotente por caminho; `null` em URL vazia/HTTP falho/exceção.
+  (Tem também `baixarCapado()` que valida esquema `http(s)` e loga aviso — ver
+  achado sobre reuso.)
+- `App\Models\PerfilMembro` — `HasMedia`, coleção `foto` (`COLECAO_FOTO`),
+  **singleFile**, conversões WebP `web` (Fit::Max 640) + `thumb` (Fit::Crop
+  400×400) via `RegistraImagensPadrao`; accessors `foto_url`/`foto_thumb_url`.
+  **As conversões rodam síncronas (`nonQueued`)** — o GD precisa abrir os bytes.
+- `App\Importacao\LeitorLegadoMysql::urlDaImagem()` resolve `_thumbnail_id →
+  wp_posts.guid` — padrão a reusar para attachment id.
+- `App\Importacao\ImportadorPalestras` (linhas ~89-92) é o **precedente correto**
+  de anexar foto baixada: guard `Storage::disk('public')->exists($p)` +
+  `addMedia(Storage::disk('public')->path($p))->toMediaCollection(...)`.
+- `App\Http\Controllers\Auth\GoogleController` — cria usuário + perfil no login,
+  mas **não** captura `$g->getAvatar()`.
+- `App\Livewire\Conta\EditarPerfil` — edita o perfil; foto via cropper
+  (`$wire.upload`) desacoplada; propriedades em whitelist (blindagem).
+- Os 4 comandos `cema:importar-*` **checam a conexão `legado`**
+  (`instanceof Leitor*Mysql` + `DB::connection('legado')->getPdo()`) com mensagem
+  amigável de túnel SSH antes de rodar.
 
 ### Fontes de foto no legado (DB-LEGADO.md) — cobertura baixa
 | Meta | Cobertura | Formato |
 |---|---|---|
-| `_foto_de_perfil` | 3% | serializado `{id, url}` (foto de perfil custom do CEMA) |
+| `_foto_de_perfil` | 3% | serializado `{id, url}` (foto custom do CEMA) |
 | `wp_user_avatar` | 14% | attachment id (avatar genérico) |
 
-`nsl_user_avatar_md5` (avatar social) e Gravatar ficam **fora** (decisão do dono).
+`nsl_user_avatar_md5` e Gravatar ficam **fora** (decisão do dono).
 
-## Decisões (fixadas no brainstorming)
+## Decisões (brainstorming + verificação adversarial)
 
-1. **Fontes: só as fotos locais** — `_foto_de_perfil` + `wp_user_avatar`. Sem
-   Gravatar nem avatar social.
-2. **Candidatas em ordem** — o leitor devolve uma **lista ordenada** de URLs
-   candidatas por usuário; o importador tenta na sequência até uma baixar (cobre
-   o caso raro da foto prioritária com link quebrado). Ordem:
-   `_foto_de_perfil`.url → `_foto_de_perfil`.id→guid → `wp_user_avatar`.id→guid.
-3. **Comando separado, best-effort, re-executável** — `cema:importar-fotos-usuarios`,
-   desacoplado do `cema:importar-usuarios` (baixar imagem é lento/falível; uma
-   falha de rede não pode derrubar o import de dados).
-4. **Avatar do Google no login** — capturado em **fila**, quando o membro não tem
-   foto.
-5. **Nunca sobrescrever foto existente** (regra transversal — ver abaixo).
+1. **Fontes: só as fotos locais** — `_foto_de_perfil` + `wp_user_avatar`.
+2. **Candidatas em ordem** — o leitor devolve `fotos_urls` (lista ordenada); o
+   importador tenta na sequência até uma baixar. Ordem: `_foto_de_perfil`.url →
+   `_foto_de_perfil`.id→guid → `wp_user_avatar`.id→guid.
+3. **Comando separado, best-effort, re-executável** — `cema:importar-fotos-usuarios`.
+4. **Avatar do Google no login** — job em fila, quando o membro não tem foto.
+5. **Precedência do membro (flag `foto_definida_pelo_membro`)** — o membro pode
+   **remover** a foto, e a auto-população **nunca** vence o membro (ver §Regra
+   transversal).
+6. **Corrida entre migração e Google: tolerada** — os dois caminhos raramente
+   coincidem, e o pior caso é "qual foto do mesmo usuário fica" (sem dado sensível,
+   sem corrupção). Não vale `lockForUpdate`; guard revalidado no ponto de anexar
+   estreita a janela.
 
 ## Arquitetura
 
-Duas partes, reusando `BaixadorImagem` + a coleção `foto` do `PerfilMembro`:
-
-- **A** estende o leitor (`fotos_urls` por usuário) + um importador dedicado
-  (`ImportadorFotosUsuarios`) chamado por um comando novo.
-- **B** um job em fila (`CapturarAvatarGoogleJob`) disparado pelo `GoogleController`.
+Três partes, reusando `BaixadorImagem` + a coleção `foto` do `PerfilMembro`, mais
+uma **coluna nova** `perfis_membro.foto_definida_pelo_membro` (bool, default false;
+migration **incremental**).
 
 ## Parte A — migração das fotos locais
 
 ### Leitor
-`LeitorUsuariosMysql.usuarios()` passa a incluir, em cada usuário, a chave
-**`fotos_urls`**: `array<string>` de URLs candidatas em ordem de prioridade,
-já deduplicada e sem vazias. Resolução:
+`LeitorUsuariosMysql::usuarios()` passa a incluir em cada usuário a chave
+**`fotos_urls`**: `array<string>` de URLs candidatas em ordem, deduplicada e sem
+vazias. Resolução (padrão defensivo já usado em `itens()`):
 
-1. `_foto_de_perfil` → `unserialize(..., ['allowed_classes' => false])`; se for
-   array: (a) `url` (se não-vazia); (b) resolve `id` → `wp_posts.guid` (se `id`).
+1. `@unserialize($meta['_foto_de_perfil'] ?? '', ['allowed_classes' => false])`;
+   se `is_array`: (a) `url` (se não-vazia); (b) resolve `id` → `wp_posts.guid`.
 2. `wp_user_avatar` (attachment id) → `wp_posts.guid`.
 
-O `LeitorUsuariosFake` aceita `fotos_urls` nos itens injetados (para os testes).
-O `ImportadorUsuarios` (import de dados) **ignora** essa chave — nada muda nele.
+**`@unserialize` inválido, `id` sem `guid` correspondente ou meta ausente = a
+candidata simplesmente não entra na lista** (não interrompe a leitura dos demais).
+O `LeitorUsuariosFake` aceita `fotos_urls` nos itens injetados. O
+`ImportadorUsuarios` (import de dados) **ignora** a chave — nada muda nele.
 
-> A resolução attachment→guid reusa o padrão do `LeitorLegadoMysql`
-> (`SELECT guid FROM wp_posts WHERE ID = ?`).
+> A resolução attachment→guid reusa o SQL de `LeitorLegadoMysql::urlDaImagem`
+> (`SELECT guid FROM wp_posts WHERE ID = ?`). **Verificar contra o legado real**
+> (§Verificação) — é SQL novo em `usermeta`, só coberto por Fake.
 
 ### Importador + comando
-- `App\Importacao\ImportadorFotosUsuarios` — itera `leitor->usuarios()`; para cada
-  usuário:
-  1. Acha o `User` local por `origem_legado_id` (pula se não existe — ex.: admin/
-     hash ignorado no import de dados).
-  2. Pega/cria o `PerfilMembro`. **Se já houver foto na coleção `foto`, pula**
-     (guard transversal).
-  3. Tenta cada URL de `fotos_urls` em ordem via `BaixadorImagem::baixarPara(...,
-     'usuarios', (string)$origemId)` até uma retornar caminho; então
-     `addMedia(...)->toMediaCollection(PerfilMembro::COLECAO_FOTO)`.
-  4. Contabiliza: anexadas / puladas (já tinham foto) / sem-candidata / falhas
-     (todas as URLs falharam) — retorna resumo, best-effort (falha vira aviso,
-     segue).
+- `App\Importacao\ImportadorFotosUsuarios::importar(callable $log): array` —
+  retorna `array{anexadas:int, puladas:int, sem_candidata:int, falhas:int,
+  avisos:string[]}` (mesmo formato dos irmãos, com a chave `avisos`). Para cada
+  usuário do leitor:
+  1. Acha o `User` local por `origem_legado_id` (pula se não existe — admin/hash
+     ignorado no import de dados).
+  2. `PerfilMembro::firstOrCreate(['user_id' => $user->id])`.
+  3. **Guard transversal**: se `foto_definida_pelo_membro` **ou** a coleção `foto`
+     não estiver vazia → pula (conta em `puladas`).
+  4. Tenta cada URL de `fotos_urls` em ordem via
+     `BaixadorImagem::baixarPara($url, 'fotos-usuarios', "legado-{$user->id}")`
+     até uma devolver caminho; então, seguindo o precedente do
+     `ImportadorPalestras`: `if (Storage::disk('public')->exists($caminho))
+     $perfil->addMedia(Storage::disk('public')->path($caminho))->toMediaCollection(
+     PerfilMembro::COLECAO_FOTO)`. Todas falharam → `falhas` + aviso.
+  - **Namespace do arquivo** usa o **id local do User** (`legado-{id}`), nunca
+    `origem_legado_id`, para não colidir com a Parte B (ver Riscos).
 - `App\Console\Commands\ImportarFotosUsuarios` (`cema:importar-fotos-usuarios`) —
-  injeta o leitor + importador, imprime o resumo. Idempotente e re-executável.
+  **replica o guard de conexão `legado`** dos comandos irmãos (`instanceof
+  LeitorUsuariosMysql` + `DB::connection('legado')->getPdo()` com a mensagem de
+  túnel SSH) antes de rodar; injeta leitor + importador; itera `avisos` no resumo.
+  Idempotente e re-executável.
 
-## Parte B — avatar do Google no login
+## Parte B — avatar do Google no login (fila)
 
 - `App\Jobs\CapturarAvatarGoogleJob implements ShouldQueue` — `(int $userId,
-  string $avatarUrl)`. No `handle()`: acha `User` + `PerfilMembro`; **se já houver
-  foto, retorna**; senão baixa `$avatarUrl` via `BaixadorImagem` → coleção `foto`.
-  Falha vira log (best-effort). (Segurança contra corrida: revalida "sem foto"
-  dentro do job.)
-- `GoogleController.callback()` — depois de resolver o usuário (novo ou existente)
-  e antes/depois do login, **se o perfil não tem foto e `$g->getAvatar()` existe**,
-  despacha `CapturarAvatarGoogleJob`. Em fila, não bloqueia o redirect do login.
+  string $avatarUrl)`. No `handle()`:
+  1. Acha o `User`; `PerfilMembro::firstOrCreate(['user_id' => $userId])`
+     (**não** assume perfil existente).
+  2. **Guard transversal**: se `foto_definida_pelo_membro` **ou** a coleção `foto`
+     não estiver vazia → retorna.
+  3. Baixa `$avatarUrl` via `BaixadorImagem::baixarPara($avatarUrl,
+     'fotos-usuarios', "google-{$userId}")` → anexa à coleção `foto` (mesmo
+     padrão de path do §A). Falha → log, sem crash.
+- `GoogleController::callback()` — depois de resolver o usuário (novo/existente) e
+  logar, **se `$g->getAvatar()` existe e o perfil não tem foto e
+  `!foto_definida_pelo_membro`**, despacha `CapturarAvatarGoogleJob`. Em fila, não
+  bloqueia o redirect.
+- **Retry por login (tolerado):** se o download falhar, o job é re-enfileirado no
+  próximo login (o guard só barra quando há foto/flag). Aceito como best-effort —
+  avatar do Google é confiável; falha persistente é rara. Sem cooldown (YAGNI).
 
-## Regra transversal — nunca sobrescrever
+## Parte C — "Remover foto" + precedência do membro (Minha Conta)
 
-Em **todos** os caminhos (migração, Google, re-execução), a foto só é setada **se
-o perfil não tiver nenhuma mídia na coleção `foto`**. Consequências:
+- **Coluna** `perfis_membro.foto_definida_pelo_membro` (bool, default false).
+  Setada **só por código controlado** (não é propriedade bindável do Livewire —
+  blindagem preservada).
+- **`EditarPerfil`**:
+  - Botão **"Remover foto"** no card da foto, visível **só quando há foto** na
+    coleção. Marca uma remoção **pendente** (`$removerFoto = true`), aplicada no
+    **`salvar()`** (Cancelar/sair descarta — estado Livewire). A UI indica "será
+    removida ao salvar".
+  - No `salvar()` (dentro da transação):
+    - se `$removerFoto`: `$perfil->clearMediaCollection(COLECAO_FOTO)` + setar
+      `foto_definida_pelo_membro = true`;
+    - se um novo `$foto` foi enviado (fluxo existente): anexar + setar
+      `foto_definida_pelo_membro = true`.
+  - Enviar foto nova e remover são mutuamente exclusivos (enviar foto limpa o
+    `$removerFoto`).
 
-- Foto que o membro subiu no **Minha Conta sempre vence**.
-- Re-rodar a migração é seguro (não duplica, não troca).
-- Entre legado e Google, quem chegar primeiro fica (migração roda em lote; Google,
-  no login).
-- Conversões WebP (`web` 640 / `thumb` 400 quadrado) saem automáticas do
-  `PerfilMembro` no `addMedia`.
+## Regra transversal — precedência do membro
+
+A auto-população (Parte A **e** Parte B) só age quando **`foto_definida_pelo_membro
+=== false` E a coleção `foto` está vazia**. Consequências:
+
+| flag | coleção `foto` | auto-popula? |
+|---|---|---|
+| false | vazia | **sim** (migração/Google) |
+| false | tem foto | não (idempotente; não troca uma auto-foto) |
+| true (membro subiu/removeu) | qualquer | **não** (membro sempre vence) |
+
+- Membro que **removeu** → flag true, coleção vazia → **iniciais grudam** (Google
+  não re-adiciona).
+- Membro que **subiu** (inclusive antes desta fatia, com flag ainda false) →
+  protegido pelo "coleção não-vazia".
+- Re-rodar a migração é seguro; conversões WebP saem automáticas no `addMedia`.
 
 ## Testes
 
-- **Migração** (`ImportadorFotosUsuarios`, com `LeitorUsuariosFake` + `Http::fake`):
-  - usuário com `fotos_urls` e perfil sem foto → mídia anexada na coleção `foto`;
-  - **idempotência**: 2ª rodada não re-anexa (perfil já tem foto);
-  - **guard**: perfil com foto pré-existente não é tocado;
-  - **ordem/fallback**: 1ª URL falha (HTTP 404) → baixa a 2ª;
-  - usuário sem `fotos_urls` (ou sem `User` local) → nenhuma mídia, sem erro.
-- **Google** (`CapturarAvatarGoogleJob` + fluxo): mock do Socialite ganha
-  `getAvatar`;
-  - job anexa quando o perfil não tem foto;
-  - **guard**: perfil com foto não é tocado;
-  - o login **enfileira** o job (`Queue::fake` / `Bus::fake`), não roda inline.
+- **Leitor** (`LeitorUsuariosFakeTest`/novo): `fotos_urls` presente é repassado;
+  o `ImportadorUsuarios` de dados segue verde com a chave nova (não a lê).
+- **Migração** (`ImportadorFotosUsuarios`): usar um **stub de `BaixadorImagem`**
+  (ou `Http::fake` devolvendo **bytes de imagem reais** via
+  `UploadedFile::fake()->image(...)->get()`, seguindo o `ImportadorPalestrasTest`)
+  — senão as conversões síncronas do Spatie falham e o teste não prova nada.
+  Casos: perfil sem foto/flag false → mídia anexada; **idempotência** (2ª rodada
+  pula); **guard flag** (flag true não é tocado); **guard coleção** (perfil com
+  foto não é tocado); **ordem/fallback** (1ª URL 404 → baixa a 2ª); sem
+  `fotos_urls`/sem `User` local → nada, sem erro.
+- **Google** (`CapturarAvatarGoogleJob` + fluxo): **atualizar o helper
+  `mockGoogle()`** de `GoogleLoginTest.php` para estubar `getAvatar` (param
+  opcional `?string $avatarUrl = null`) — senão os 3 testes que chegam ao login
+  quebram (`BadMethodCallException`). Casos: login **enfileira** o job
+  (`Bus::fake`/`Queue::fake`) quando sem foto+flag false; **não** enfileira quando
+  há foto ou flag true; job anexa quando sem foto; job com perfil ausente
+  `firstOrCreate` (não crasha).
+- **Remover foto** (`EditarPerfilTest`): remover no salvar limpa a coleção → cai
+  nas iniciais **e seta o flag**; botão só aparece com foto; enviar foto seta o
+  flag; **flag respeitado** — após remover, um `ImportadorFotosUsuarios`/job do
+  Google **não** re-popula.
+
+## Verificação (antes do merge)
+
+- Suíte completa verde + Pint (gate padrão).
+- **Túnel SSH `legado` no ar** e conferência manual do SQL novo do
+  `LeitorUsuariosMysql` (via `tinker`), cobrindo casos reais de
+  `_foto_de_perfil`/`wp_user_avatar` e os `wp_posts.guid` resultantes — o SQL em
+  `usermeta` é novo e só coberto por Fake (ver memória
+  `verificar-leitor-legado-contra-banco-real`; o túnel estava **fora** na
+  verificação adversarial, então o formato `wp_user_avatar` = int simples ainda
+  **não** foi confirmado ao vivo).
+- Verificação visual do Minha Conta: botão "Remover foto" aparece/some, remoção
+  aplica no salvar, Cancelar descarta.
 
 ## Não-objetivos
 
 - Gravatar e avatar social `nsl_user_avatar_md5` (não migra).
-- Sobrescrever/substituir foto que o membro já tem.
-- Alterar o `cema:importar-usuarios` (import de dados) além de o leitor passar a
-  expor `fotos_urls` (que ele ignora).
-- Backfill de avatar do Google para usuários **já** logados no passado (só a partir
-  do próximo login).
+- Sobrescrever/substituir foto que o membro já definiu.
+- Alterar o `cema:importar-usuarios` além de o leitor expor `fotos_urls` (ignorada).
+- Backfill de avatar do Google para logins passados (só a partir do próximo login).
+- Cooldown/retry sofisticado do job (best-effort aceito).
 
 ## Riscos e mitigações
 
-- **`wp_posts.guid` desatualizado/errado** (WP nem sempre mantém a guid como URL
-  atual): as candidatas em ordem + best-effort + fallback nas iniciais absorvem;
-  o import de palestrantes usa guid e funciona.
-- **Download lento/falho**: comando separado (não afeta o import de dados) e job em
-  fila (não bloqueia login); ambos best-effort com log.
-- **Corrida** (dois caminhos setando ao mesmo tempo): guard "sem foto" revalidado
-  no ponto de anexar; singleFile evita duplicata.
+- **Colisão de nome de arquivo Parte A × Parte B** (achado crítico): resolvida
+  usando o **id local do User** com prefixos disjuntos (`legado-{id}` /
+  `google-{id}`) — nunca `origem_legado_id` (nulo para usuário só-Google, e num
+  espaço de ids diferente). Como `addMedia` **move** o arquivo, não há acúmulo.
+- **`wp_posts.guid` desatualizado / formato do meta inesperado**: candidatas em
+  ordem + best-effort + fallback nas iniciais absorvem; leitor com parsing
+  defensivo; **verificação contra o legado real antes do merge** (§Verificação).
+- **`Http::fake` com bytes não-imagem** faria as conversões síncronas do Spatie
+  falharem: testes usam bytes de imagem reais / stub do `BaixadorImagem`.
+- **`getAvatar()` no mock estrito do Socialite** quebra o `GoogleLoginTest`:
+  `mockGoogle()` é atualizado para estubar `getAvatar`.
+- **Corrida** migração×Google: tolerada (§Decisão 6) — guard revalidado no ponto
+  de anexar; sem `singleFile` "evitando" nada (singleFile **substitui**, não
+  protege — a proteção é o guard flag+coleção).

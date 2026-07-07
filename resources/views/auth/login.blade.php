@@ -25,6 +25,7 @@
     </form>
 
     <a href="{{ route('google.redirect') }}" class="mt-3 flex w-full items-center justify-center gap-2 rounded-pill border border-border px-4 py-2.5 font-medium hover:bg-surface">
+        <x-icon.google />
         Entrar com Google
     </a>
 

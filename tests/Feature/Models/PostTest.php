@@ -105,8 +105,10 @@ class PostTest extends TestCase
 
         $galeria = $post->getMedia(Post::COLECAO_GALERIA);
         $this->assertCount(2, $galeria);
-        $this->assertSame('primeira.jpg', $galeria->first()->file_name);
-        $this->assertSame('segunda.jpg', $galeria->last()->file_name);
+        // O original é reencodado para WebP no upload (padrão único de imagens),
+        // então o file_name passa a terminar em .webp preservando a ordem de inserção.
+        $this->assertSame('primeira.webp', $galeria->first()->file_name);
+        $this->assertSame('segunda.webp', $galeria->last()->file_name);
     }
 
     public function test_cor_categoria_retorna_cor_da_principal(): void

@@ -5,6 +5,7 @@
 namespace Tests\Feature\Conta;
 
 use App\Livewire\Conta\EditarPerfil;
+use App\Models\PerfilMembro;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
@@ -90,5 +91,54 @@ class EditarPerfilTest extends TestCase
         $this->assertFalse($user->socio);                     // socio intocado
         $this->assertTrue($user->hasRole('frequentador'));    // papel intocado
         $this->assertCount(0, $user->setores);                // setores intocados
+    }
+
+    public function test_remover_foto_limpa_colecao_e_seta_flag(): void
+    {
+        Storage::fake('public');
+        $user = $this->membro();
+        $user->perfil->addMediaFromString(UploadedFile::fake()->image('f.jpg')->get())
+            ->usingFileName('f.jpg')
+            ->toMediaCollection(PerfilMembro::COLECAO_FOTO);
+
+        Livewire::actingAs($user)->test(EditarPerfil::class)
+            ->call('marcarRemocaoFoto')
+            ->call('salvar')
+            ->assertHasNoErrors();
+
+        $this->assertFalse($user->perfil->fresh()->hasMedia(PerfilMembro::COLECAO_FOTO));
+        $this->assertTrue($user->perfil->fresh()->foto_definida_pelo_membro);
+    }
+
+    public function test_upload_seta_flag_do_membro(): void
+    {
+        Storage::fake('public');
+        $user = $this->membro();
+
+        Livewire::actingAs($user)->test(EditarPerfil::class)
+            ->set('foto', UploadedFile::fake()->image('nova.jpg', 800, 800))
+            ->call('salvar')
+            ->assertHasNoErrors();
+
+        $this->assertTrue($user->perfil->fresh()->foto_definida_pelo_membro);
+        $this->assertTrue($user->perfil->fresh()->hasMedia(PerfilMembro::COLECAO_FOTO));
+    }
+
+    public function test_novo_upload_cancela_remocao_pendente(): void
+    {
+        Storage::fake('public');
+        $user = $this->membro();
+        $user->perfil->addMediaFromString(UploadedFile::fake()->image('f.jpg')->get())
+            ->usingFileName('f.jpg')
+            ->toMediaCollection(PerfilMembro::COLECAO_FOTO);
+
+        Livewire::actingAs($user)->test(EditarPerfil::class)
+            ->call('marcarRemocaoFoto')
+            ->set('foto', UploadedFile::fake()->image('nova.jpg', 800, 800))
+            ->assertSet('removerFoto', false)
+            ->call('salvar')
+            ->assertHasNoErrors();
+
+        $this->assertTrue($user->perfil->fresh()->hasMedia(PerfilMembro::COLECAO_FOTO));
     }
 }

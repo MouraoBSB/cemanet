@@ -5,6 +5,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\CapturarAvatarGoogleJob;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -64,6 +65,14 @@ class GoogleController extends Controller
 
         Auth::login($user, remember: true);
         request()->session()->regenerate(); // evita session fixation (paridade com o PrepareAuthenticatedSession do Fortify)
+
+        $avatar = $g->getAvatar();
+        if ($avatar) {
+            $perfil = $user->perfil()->firstOrCreate([]);
+            if ($perfil->podeAutoPopularFoto()) {
+                CapturarAvatarGoogleJob::dispatch($user->id, $avatar);
+            }
+        }
 
         return redirect()->intended('/minha-conta');
     }

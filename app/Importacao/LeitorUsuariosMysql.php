@@ -4,6 +4,7 @@
 
 namespace App\Importacao;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 class LeitorUsuariosMysql implements LeitorUsuarios
@@ -36,6 +37,7 @@ class LeitorUsuariosMysql implements LeitorUsuarios
                     'endereco' => $meta['_endereco'] ?? null,
                     'cursos' => $meta['cursos_realizados'] ?? null,
                 ],
+                'fotos_urls' => $this->candidatasFoto($meta, $conn),
             ];
         }
     }
@@ -59,5 +61,43 @@ class LeitorUsuariosMysql implements LeitorUsuarios
         $a = @unserialize($serializado, ['allowed_classes' => false]);
 
         return is_array($a) ? array_values(array_filter($a, fn ($x) => is_string($x) && $x !== '')) : [];
+    }
+
+    /**
+     * URLs candidatas de foto do usuário, em ordem de prioridade (deduplicadas, sem vazias).
+     * Parse defensivo: dado corrompido ou id sem guid → candidata ausente, sem interromper.
+     */
+    private function candidatasFoto(Collection $meta, $conn): array
+    {
+        $urls = [];
+
+        // 1) _foto_de_perfil: serializado {id, url}
+        $fp = @unserialize((string) ($meta['_foto_de_perfil'] ?? ''), ['allowed_classes' => false]);
+        if (is_array($fp)) {
+            if (! empty($fp['url']) && is_string($fp['url'])) {
+                $urls[] = $fp['url'];
+            }
+            if (! empty($fp['id'])) {
+                $urls[] = $this->guidDoAttachment($conn, (int) $fp['id']);
+            }
+        }
+
+        // 2) wp_user_avatar: attachment id
+        if (! empty($meta['wp_user_avatar'])) {
+            $urls[] = $this->guidDoAttachment($conn, (int) $meta['wp_user_avatar']);
+        }
+
+        // remove vazias/nulas e deduplica preservando a ordem
+        return array_values(array_unique(array_filter($urls, fn ($u) => is_string($u) && $u !== '')));
+    }
+
+    private function guidDoAttachment($conn, int $id): ?string
+    {
+        if ($id <= 0) {
+            return null;
+        }
+        $row = $conn->table('posts')->where('ID', $id)->where('post_type', 'attachment')->first();
+
+        return $row->guid ?? null;
     }
 }

@@ -12,7 +12,7 @@
 
 - **Guard da auto-população (Partes A e B):** agir **só se** `PerfilMembro::podeAutoPopularFoto()` for true, i.e. `foto_definida_pelo_membro === false` **E** a coleção `foto` estiver vazia.
 - **Downloads:** `BaixadorImagem::baixarCapado($url, 2000)` → `addMediaFromString($bytes)->usingFileName(<nome>)->toMediaCollection(PerfilMembro::COLECAO_FOTO)`. Nunca `baixarPara`/staging em disco.
-- **`foto_definida_pelo_membro`** vira `true` quando o membro **sobe** OU **remove** a foto no `EditarPerfil`. Setada por **código controlado** — **não** é propriedade bindável do Livewire (blindagem).
+- **`foto_definida_pelo_membro`** vira `true` quando o membro **sobe** OU **remove** a foto no `EditarPerfil`. Setada por **código controlado** — **não** é propriedade bindável do Livewire (blindagem) e **fica fora do `$fillable`**. Consequência para **testes e código**: **nunca** setar via mass-assignment (`create([... 'foto_definida_pelo_membro' => true])`) — o app não usa strict mode e o valor seria descartado em silêncio, deixando o flag `false`. Setar sempre pela via controlada: `$p = PerfilMembro::create(['user_id' => …]); $p->foto_definida_pelo_membro = true; $p->save();`.
 - **Coluna nova** via migration **incremental**. 🚫 NUNCA `migrate:fresh`/`refresh`/`wipe`/`reset` nem seed/factory destrutivo.
 - **Comando** `cema:importar-fotos-usuarios` replica o guard de conexão `legado` (`instanceof LeitorUsuariosMysql` + `DB::connection('legado')->getPdo()`).
 - **Testes de foto usam bytes de imagem REAIS** (`UploadedFile::fake()->image(...)->get()`) — as conversões `web`/`thumb` do Spatie rodam **síncronas** e o GD precisa abrir os bytes. Mock de `BaixadorImagem::baixarCapado` devolvendo esses bytes.
@@ -85,11 +85,13 @@ class PerfilMembroFotoGuardTest extends TestCase
 
     public function test_nao_auto_popula_quando_flag_true(): void
     {
-        $perfil = PerfilMembro::create([
-            'user_id' => User::factory()->create()->id,
-            'foto_definida_pelo_membro' => true,
-        ]);
+        // O flag NÃO está no $fillable (blindagem) → mass-assignment o descartaria em
+        // silêncio (app sem strict mode). Setar sempre pela via controlada.
+        $perfil = PerfilMembro::create(['user_id' => User::factory()->create()->id]);
+        $perfil->foto_definida_pelo_membro = true;
+        $perfil->save();
 
+        $this->assertTrue($perfil->fresh()->foto_definida_pelo_membro);
         $this->assertFalse($perfil->podeAutoPopularFoto());
     }
 
@@ -337,7 +339,10 @@ class ImportadorFotosUsuariosTest extends TestCase
     public function test_respeita_flag_do_membro(): void
     {
         $user = User::factory()->create(['origem_legado_id' => 77]);
-        PerfilMembro::create(['user_id' => $user->id, 'foto_definida_pelo_membro' => true]);
+        // flag fora do $fillable → setar pela via controlada (mass-assignment o descartaria)
+        $perfil = PerfilMembro::create(['user_id' => $user->id]);
+        $perfil->foto_definida_pelo_membro = true;
+        $perfil->save();
 
         $resumo = $this->importador(
             [['origem_id' => 77, 'fotos_urls' => ['https://x/a.jpg']]],
@@ -634,7 +639,10 @@ class CapturarAvatarGoogleJobTest extends TestCase
     {
         $this->comBaixador(UploadedFile::fake()->image('g.jpg')->get());
         $user = User::factory()->create();
-        PerfilMembro::create(['user_id' => $user->id, 'foto_definida_pelo_membro' => true]);
+        // flag fora do $fillable → setar pela via controlada (mass-assignment o descartaria)
+        $perfil = PerfilMembro::create(['user_id' => $user->id]);
+        $perfil->foto_definida_pelo_membro = true;
+        $perfil->save();
 
         (new CapturarAvatarGoogleJob($user->id, 'https://lh3/g.jpg'))->handle(app(BaixadorImagem::class));
 

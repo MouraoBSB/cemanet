@@ -52,7 +52,9 @@ class EditarPerfil extends Component
         ];
     }
 
-    public function removerFoto(): void
+    // NÃO renomear para removerFoto(): colidiria com a propriedade $removerFoto e o
+    // wire:click resolveria o nome para a propriedade (bool), sem chamar o método (clique morto).
+    public function marcarRemocaoFoto(): void
     {
         $this->removerFoto = true;
         $this->foto = null; // remover e enviar são mutuamente exclusivos

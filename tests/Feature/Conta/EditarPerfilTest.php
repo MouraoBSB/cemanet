@@ -102,7 +102,7 @@ class EditarPerfilTest extends TestCase
             ->toMediaCollection(PerfilMembro::COLECAO_FOTO);
 
         Livewire::actingAs($user)->test(EditarPerfil::class)
-            ->call('removerFoto')
+            ->call('marcarRemocaoFoto')
             ->call('salvar')
             ->assertHasNoErrors();
 
@@ -133,7 +133,7 @@ class EditarPerfilTest extends TestCase
             ->toMediaCollection(PerfilMembro::COLECAO_FOTO);
 
         Livewire::actingAs($user)->test(EditarPerfil::class)
-            ->call('removerFoto')
+            ->call('marcarRemocaoFoto')
             ->set('foto', UploadedFile::fake()->image('nova.jpg', 800, 800))
             ->assertSet('removerFoto', false)
             ->call('salvar')

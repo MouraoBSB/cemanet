@@ -4,8 +4,10 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Jobs\CapturarAvatarGoogleJob;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Bus;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 use Mockery;
@@ -22,13 +24,14 @@ class GoogleLoginTest extends TestCase
         Role::findOrCreate('frequentador', 'web');
     }
 
-    private function mockGoogle(string $id, ?string $email, string $nome = 'Membro Google'): void
+    private function mockGoogle(string $id, ?string $email, string $nome = 'Membro Google', ?string $avatar = null): void
     {
         $abstract = Mockery::mock(SocialiteUser::class);
         $abstract->shouldReceive('getId')->andReturn($id);
         $abstract->shouldReceive('getEmail')->andReturn($email);
         $abstract->shouldReceive('getName')->andReturn($nome);
         $abstract->shouldReceive('getNickname')->andReturn(null);
+        $abstract->shouldReceive('getAvatar')->andReturn($avatar);
         $provider = Mockery::mock('Laravel\Socialite\Contracts\Provider');
         $provider->shouldReceive('user')->andReturn($abstract);
         Socialite::shouldReceive('driver')->with('google')->andReturn($provider);
@@ -83,5 +86,25 @@ class GoogleLoginTest extends TestCase
 
         $this->get('/auth/google/callback')->assertRedirect('/minha-conta');
         $this->assertSame('g-original', $user->fresh()->google_id);
+    }
+
+    public function test_login_google_com_avatar_enfileira_job_quando_sem_foto(): void
+    {
+        Bus::fake();
+        $this->mockGoogle('g-777', 'foto@gmail.com', avatar: 'https://lh3.google/a.jpg');
+
+        $this->get('/auth/google/callback')->assertRedirect('/minha-conta');
+
+        Bus::assertDispatched(CapturarAvatarGoogleJob::class);
+    }
+
+    public function test_login_google_sem_avatar_nao_enfileira(): void
+    {
+        Bus::fake();
+        $this->mockGoogle('g-778', 'semfoto@gmail.com'); // avatar null
+
+        $this->get('/auth/google/callback')->assertRedirect('/minha-conta');
+
+        Bus::assertNotDispatched(CapturarAvatarGoogleJob::class);
     }
 }

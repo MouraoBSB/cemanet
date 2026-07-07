@@ -58,9 +58,16 @@ class EditarPerfil extends Component
         $this->foto = null; // remover e enviar são mutuamente exclusivos
     }
 
+    public function updatedFoto(): void
+    {
+        if ($this->foto) {
+            $this->removerFoto = false; // novo upload cancela a remoção pendente
+        }
+    }
+
     public function temFoto(): bool
     {
-        return auth()->user()->perfil()->firstOrCreate([])->hasMedia(PerfilMembro::COLECAO_FOTO);
+        return (bool) (auth()->user()->perfil?->hasMedia(PerfilMembro::COLECAO_FOTO));
     }
 
     public function salvar()

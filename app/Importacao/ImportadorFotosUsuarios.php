@@ -41,11 +41,22 @@ class ImportadorFotosUsuarios
             }
 
             $anexou = false;
+            $guardViolado = false;
             foreach ($candidatas as $url) {
                 $bytes = $this->baixador->baixarCapado($url, 2000);
                 if ($bytes === null) {
                     continue;
                 }
+
+                // Guard revalidado no ponto de anexar: o download pode levar até ~30s e, nesse
+                // meio-tempo, o membro pode ter definido a própria foto — a coleção é singleFile,
+                // então anexar aqui sobrescreveria o que ele acabou de enviar. Não conta como
+                // anexada nem como falha: para o importador, esse usuário já está resolvido.
+                if (! $perfil->fresh()->podeAutoPopularFoto()) {
+                    $guardViolado = true;
+                    break;
+                }
+
                 $perfil->addMediaFromString($bytes)
                     ->usingFileName(basename(parse_url($url, PHP_URL_PATH) ?? 'foto.jpg') ?: 'foto.jpg')
                     ->toMediaCollection(PerfilMembro::COLECAO_FOTO);
@@ -55,7 +66,9 @@ class ImportadorFotosUsuarios
                 break;
             }
 
-            if (! $anexou) {
+            if ($guardViolado) {
+                $puladas++;
+            } elseif (! $anexou) {
                 $falhas++;
                 $avisos[] = "Nenhuma URL baixou para {$user->email}";
             }

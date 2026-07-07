@@ -120,6 +120,48 @@ class ImportadorFotosUsuariosTest extends TestCase
         $this->assertSame(1, $resumo['sem_candidata']);
     }
 
+    public function test_nao_sobrescreve_foto_definida_durante_o_download(): void
+    {
+        $user = User::factory()->create(['origem_legado_id' => 77]);
+        $perfil = PerfilMembro::create(['user_id' => $user->id]);
+
+        // Simula o membro definindo a própria foto ENQUANTO o download da candidata está em andamento.
+        $m = Mockery::mock(BaixadorImagem::class);
+        $m->shouldReceive('baixarCapado')->andReturnUsing(function () use ($perfil) {
+            $perfil->addMediaFromString(UploadedFile::fake()->image('membro.jpg')->get())
+                ->usingFileName('membro.jpg')
+                ->toMediaCollection(PerfilMembro::COLECAO_FOTO);
+
+            return UploadedFile::fake()->image('google.jpg', 800, 800)->get();
+        });
+
+        $resumo = $this->importador(
+            [['origem_id' => 77, 'fotos_urls' => ['https://x/a.jpg']]],
+            $m,
+        )->importar(fn ($m) => null);
+
+        $this->assertSame(0, $resumo['anexadas']);
+        $this->assertSame(
+            'membro.jpg',
+            $perfil->fresh()->getFirstMedia(PerfilMembro::COLECAO_FOTO)->file_name,
+        );
+    }
+
+    public function test_conta_falha_quando_nenhuma_url_baixa(): void
+    {
+        $user = User::factory()->create(['origem_legado_id' => 77]);
+        PerfilMembro::create(['user_id' => $user->id]);
+
+        $resumo = $this->importador(
+            [['origem_id' => 77, 'fotos_urls' => ['https://x/quebrada.jpg']]],
+            $this->baixadorQueRetorna(null),
+        )->importar(fn ($m) => null);
+
+        $this->assertSame(1, $resumo['falhas']);
+        $this->assertSame(0, $resumo['anexadas']);
+        $this->assertNotEmpty($resumo['avisos']);
+    }
+
     protected function tearDown(): void
     {
         Mockery::close();

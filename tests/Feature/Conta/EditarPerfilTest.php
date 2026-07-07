@@ -123,4 +123,22 @@ class EditarPerfilTest extends TestCase
         $this->assertTrue($user->perfil->fresh()->foto_definida_pelo_membro);
         $this->assertTrue($user->perfil->fresh()->hasMedia(PerfilMembro::COLECAO_FOTO));
     }
+
+    public function test_novo_upload_cancela_remocao_pendente(): void
+    {
+        Storage::fake('public');
+        $user = $this->membro();
+        $user->perfil->addMediaFromString(UploadedFile::fake()->image('f.jpg')->get())
+            ->usingFileName('f.jpg')
+            ->toMediaCollection(PerfilMembro::COLECAO_FOTO);
+
+        Livewire::actingAs($user)->test(EditarPerfil::class)
+            ->call('removerFoto')
+            ->set('foto', UploadedFile::fake()->image('nova.jpg', 800, 800))
+            ->assertSet('removerFoto', false)
+            ->call('salvar')
+            ->assertHasNoErrors();
+
+        $this->assertTrue($user->perfil->fresh()->hasMedia(PerfilMembro::COLECAO_FOTO));
+    }
 }

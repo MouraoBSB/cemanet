@@ -36,6 +36,13 @@ class CapturarAvatarGoogleJob implements ShouldQueue
             return;
         }
 
+        // Guard revalidado no ponto de anexar: o download pode levar até ~30s e, nesse
+        // meio-tempo, o membro pode ter definido a própria foto — a coleção é singleFile,
+        // então anexar aqui sobrescreveria o que ele acabou de enviar.
+        if (! $perfil->fresh()->podeAutoPopularFoto()) {
+            return;
+        }
+
         $perfil->addMediaFromString($bytes)
             ->usingFileName('google-avatar.jpg')
             ->toMediaCollection(PerfilMembro::COLECAO_FOTO);

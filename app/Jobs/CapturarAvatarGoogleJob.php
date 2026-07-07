@@ -40,6 +40,8 @@ class CapturarAvatarGoogleJob implements ShouldQueue
         // meio-tempo, o membro pode ter definido a própria foto — a coleção é singleFile,
         // então anexar aqui sobrescreveria o que ele acabou de enviar.
         if (! $perfil->fresh()->podeAutoPopularFoto()) {
+            Log::info('Avatar do Google descartado: o membro definiu a própria foto durante o download', ['user' => $user->id]);
+
             return;
         }
 

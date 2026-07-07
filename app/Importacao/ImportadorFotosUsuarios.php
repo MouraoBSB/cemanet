@@ -54,6 +54,7 @@ class ImportadorFotosUsuarios
                 // anexada nem como falha: para o importador, esse usuário já está resolvido.
                 if (! $perfil->fresh()->podeAutoPopularFoto()) {
                     $guardViolado = true;
+                    $log("Foto pulada (membro definiu a própria durante o download): {$user->email}");
                     break;
                 }
 

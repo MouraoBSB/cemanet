@@ -17,20 +17,22 @@ Quem não tiver foto por nenhum caminho continua nas **iniciais** (fallback pron
 
 ## Contexto (o que existe)
 
-- `App\Importacao\BaixadorImagem::baixarPara($url, $pasta, $nome)` — baixa uma
-  **URL** para o disco `public` e devolve o **caminho relativo** ao disco (ex.:
-  `usuarios/5.jpg`), idempotente por caminho; `null` em URL vazia/HTTP falho/exceção.
-  (Tem também `baixarCapado()` que valida esquema `http(s)` e loga aviso — ver
-  achado sobre reuso.)
+- `App\Importacao\BaixadorImagem::baixarCapado($url, $teto)` — valida o esquema
+  `http(s)` (bloqueia guid/lixo não-URL, com `Log::warning`), baixa e devolve os
+  **bytes em memória** capados ao lado maior `$teto`; `null` em URL inválida/HTTP
+  falho/exceção. É o método usado aqui (**não** `baixarPara`): bytes em memória
+  eliminam qualquer arquivo de staging — logo, sem colisão de caminho.
 - `App\Models\PerfilMembro` — `HasMedia`, coleção `foto` (`COLECAO_FOTO`),
   **singleFile**, conversões WebP `web` (Fit::Max 640) + `thumb` (Fit::Crop
   400×400) via `RegistraImagensPadrao`; accessors `foto_url`/`foto_thumb_url`.
   **As conversões rodam síncronas (`nonQueued`)** — o GD precisa abrir os bytes.
 - `App\Importacao\LeitorLegadoMysql::urlDaImagem()` resolve `_thumbnail_id →
   wp_posts.guid` — padrão a reusar para attachment id.
-- `App\Importacao\ImportadorPalestras` (linhas ~89-92) é o **precedente correto**
-  de anexar foto baixada: guard `Storage::disk('public')->exists($p)` +
-  `addMedia(Storage::disk('public')->path($p))->toMediaCollection(...)`.
+- `App\Importacao\ImportadorBlog` (linhas ~62-99) é o **precedente** de anexar
+  imagem por bytes: `$bytes = $baixador->baixarCapado($url, 2000)` +
+  `addMediaFromString($bytes)->usingFileName(basename(parse_url($url,
+  PHP_URL_PATH) ?? 'foto.jpg'))->toMediaCollection(...)` (o Spatie isola cada
+  mídia em seu diretório — `usingFileName` não colide entre usuários).
 - `App\Http\Controllers\Auth\GoogleController` — cria usuário + perfil no login,
   mas **não** captura `$g->getAvatar()`.
 - `App\Livewire\Conta\EditarPerfil` — edita o perfil; foto via cropper
@@ -100,13 +102,11 @@ O `LeitorUsuariosFake` aceita `fotos_urls` nos itens injetados. O
   3. **Guard transversal**: se `foto_definida_pelo_membro` **ou** a coleção `foto`
      não estiver vazia → pula (conta em `puladas`).
   4. Tenta cada URL de `fotos_urls` em ordem via
-     `BaixadorImagem::baixarPara($url, 'fotos-usuarios', "legado-{$user->id}")`
-     até uma devolver caminho; então, seguindo o precedente do
-     `ImportadorPalestras`: `if (Storage::disk('public')->exists($caminho))
-     $perfil->addMedia(Storage::disk('public')->path($caminho))->toMediaCollection(
-     PerfilMembro::COLECAO_FOTO)`. Todas falharam → `falhas` + aviso.
-  - **Namespace do arquivo** usa o **id local do User** (`legado-{id}`), nunca
-    `origem_legado_id`, para não colidir com a Parte B (ver Riscos).
+     `BaixadorImagem::baixarCapado($url, 2000)` até uma devolver bytes; então
+     (padrão do `ImportadorBlog`): `$perfil->addMediaFromString($bytes)
+     ->usingFileName(basename(parse_url($url, PHP_URL_PATH) ?? 'foto.jpg'))
+     ->toMediaCollection(PerfilMembro::COLECAO_FOTO)`. Todas falharam → `falhas`
+     + aviso. Bytes em memória → sem arquivo de staging, sem colisão entre A e B.
 - `App\Console\Commands\ImportarFotosUsuarios` (`cema:importar-fotos-usuarios`) —
   **replica o guard de conexão `legado`** dos comandos irmãos (`instanceof
   LeitorUsuariosMysql` + `DB::connection('legado')->getPdo()` com a mensagem de
@@ -121,9 +121,9 @@ O `LeitorUsuariosFake` aceita `fotos_urls` nos itens injetados. O
      (**não** assume perfil existente).
   2. **Guard transversal**: se `foto_definida_pelo_membro` **ou** a coleção `foto`
      não estiver vazia → retorna.
-  3. Baixa `$avatarUrl` via `BaixadorImagem::baixarPara($avatarUrl,
-     'fotos-usuarios', "google-{$userId}")` → anexa à coleção `foto` (mesmo
-     padrão de path do §A). Falha → log, sem crash.
+  3. `$bytes = BaixadorImagem::baixarCapado($avatarUrl, 2000)`; se não-nulo,
+     `$perfil->addMediaFromString($bytes)->usingFileName('google-avatar.jpg')
+     ->toMediaCollection(PerfilMembro::COLECAO_FOTO)`. Falha → log, sem crash.
 - `GoogleController::callback()` — depois de resolver o usuário (novo/existente) e
   logar, **se `$g->getAvatar()` existe e o perfil não tem foto e
   `!foto_definida_pelo_membro`**, despacha `CapturarAvatarGoogleJob`. Em fila, não
@@ -194,13 +194,14 @@ A auto-população (Parte A **e** Parte B) só age quando **`foto_definida_pelo_
 ## Verificação (antes do merge)
 
 - Suíte completa verde + Pint (gate padrão).
-- **Túnel SSH `legado` no ar** e conferência manual do SQL novo do
-  `LeitorUsuariosMysql` (via `tinker`), cobrindo casos reais de
-  `_foto_de_perfil`/`wp_user_avatar` e os `wp_posts.guid` resultantes — o SQL em
-  `usermeta` é novo e só coberto por Fake (ver memória
-  `verificar-leitor-legado-contra-banco-real`; o túnel estava **fora** na
-  verificação adversarial, então o formato `wp_user_avatar` = int simples ainda
-  **não** foi confirmado ao vivo).
+- **GATE OBRIGATÓRIO, BLOQUEIA O MERGE (reforçado pelo dono): túnel SSH `legado`
+  no ar** + conferência manual do SQL novo do `LeitorUsuariosMysql` via `tinker`,
+  cobrindo casos reais de `_foto_de_perfil`/`wp_user_avatar`, confirmando o
+  **formato do meta_value** (int simples vs. serializado) e os `wp_posts.guid`
+  resultantes. Um guid errado **anexaria a foto errada** — por isso é bloqueante e
+  não opcional. O SQL em `usermeta` é novo, só coberto por Fake; o formato do
+  `wp_user_avatar` **não** foi confirmado ao vivo (túnel fora na verificação). Ver
+  memória `verificar-leitor-legado-contra-banco-real`.
 - Verificação visual do Minha Conta: botão "Remover foto" aparece/some, remoção
   aplica no salvar, Cancelar descarta.
 
@@ -214,10 +215,10 @@ A auto-população (Parte A **e** Parte B) só age quando **`foto_definida_pelo_
 
 ## Riscos e mitigações
 
-- **Colisão de nome de arquivo Parte A × Parte B** (achado crítico): resolvida
-  usando o **id local do User** com prefixos disjuntos (`legado-{id}` /
-  `google-{id}`) — nunca `origem_legado_id` (nulo para usuário só-Google, e num
-  espaço de ids diferente). Como `addMedia` **move** o arquivo, não há acúmulo.
+- **Colisão de nome de arquivo Parte A × Parte B** (achado crítico): eliminada de
+  raiz por `baixarCapado()` (bytes em memória, **sem** arquivo de staging no disco)
+  + `addMediaFromString()` (o Spatie isola cada mídia no próprio diretório) — não
+  há caminho compartilhado onde a foto de um usuário sobreponha a de outro.
 - **`wp_posts.guid` desatualizado / formato do meta inesperado**: candidatas em
   ordem + best-effort + fallback nas iniciais absorvem; leitor com parsing
   defensivo; **verificação contra o legado real antes do merge** (§Verificação).

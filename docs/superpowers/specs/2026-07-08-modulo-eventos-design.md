@@ -76,6 +76,9 @@ escopo). Faixa de datas dos eventos: 2023-12-02 → 2026-06-27.
 | `_galeria-de-imagens` | **11/54** | **CSV de ids** de attachment | mídia coleção `galeria` |
 | `_descricao_evento` | 3/54 | descrição curta | descartável (corpo real = `post_content`) |
 
+> **`local`:** presente em 54/54, mas **não-vazio em 47/54** (7 vazios) → o bloco "Serviço" usa
+> fallback (endereço da sede ou "Local a confirmar"), nunca renderiza vazio (§6.4).
+
 **Taxonomia (uma só): `_departamentos_tax`** — 49/54 eventos classificados, **N:N** (67 vínculos;
 alguns eventos em vários departamentos; **5 sem departamento**). Termos **planos** (`parent=0`),
 casando com a tabela `departamentos` nova por **sigla**:
@@ -118,8 +121,11 @@ inferido na importação (§5).
 | ativo | boolean | default true |
 | timestamps | | |
 
-**Seed** (`updateOrCreate` por slug): `brecho` `#89AB98` · `feirao` `#6E9FCB` · `familia`
-`#E79048` · `campanha` `#F2A81E` (`cor_texto=#3a3266`) · `estudo` `#4E4483`.
+**Seed** (`updateOrCreate` por slug), com **`cor_texto` garantindo contraste WCAG AA** (os fundos
+claros reprovam com texto branco): `brecho` `#89AB98` (`cor_texto=#26242E`) · `feirao` `#6E9FCB`
+(`cor_texto=#26242E`) · `familia` `#E79048` (`cor_texto=#26242E`) · `campanha` `#F2A81E`
+(`cor_texto=#3a3266`) · `estudo` `#4E4483` (texto branco — fundo escuro, ok). Validar a razão
+exata de contraste no plano.
 
 ### `eventos` — a entidade
 | Coluna | Tipo | Notas |
@@ -143,11 +149,13 @@ inferido na importação (§5).
 **Índices:** `slug` unique · `wp_id` unique · `data_inicio` · `data_fim` · `status` · `visibilidade` ·
 `categoria_id`.
 
-> **Por que `string(5)` para horas** e não `time`/cast: o projeto exige portabilidade
-> SQLite(testes)×MySQL(prod) (memória `padrao-data-mutator-portavel`). Guardar `HH:MM` como string
-> normalizada evita as divergências de tipo `TIME`/cast entre os bancos; a hora é dado de
-> **exibição** e de composição do datetime do `.ics`, não chave de ordenação (ordena-se por
-> `data_inicio`). Datas usam o **mutator `Attribute`** (get→Carbon, set→`Y-m-d`), como em `AgendaDia`.
+> **Por que `string(5)` para horas** (`HH:MM`) e não `time`/cast: portabilidade
+> SQLite(testes)×MySQL(prod) (memória `padrao-data-mutator-portavel`). **Validação** (no mutator do
+> model **e** no Filament): regex `^\d{2}:\d{2}$` + faixa `00–23`/`00–59`, **sempre zero-padded**
+> (`08:30`, nunca `8:30`). **Ordenação:** primária por `data_inicio`, secundária por `hora_inicio`
+> com **"dia inteiro" (`null`) primeiro** dentro do mesmo dia
+> (`orderByRaw('hora_inicio IS NULL DESC')` → depois `orderBy('hora_inicio')`). Datas usam o
+> **mutator `Attribute`** (get→Carbon, set→`Y-m-d`), como em `AgendaDia`.
 
 ### `departamento_evento` — pivot N:N (evento ↔ departamento)
 `evento_id` (FK cascade) · `departamento_id` (FK cascade) · `unique(evento_id, departamento_id)`.
@@ -199,8 +207,10 @@ Espelha o pipeline existente (interface + leitor MySQL + importador + command + 
     `America/Sao_Paulo`. `data_fim`/`hora_fim` ficam **null** (não existem no legado).
   - **`mostrar_horario`** normalizado (`true`/`on`→true; ``/`false`→false); quando **false**,
     `hora_inicio = null` (não divulga a hora — coerente com "dia inteiro").
-  - **`evento_publico`** normalizado → `visibilidade`: `true`/`on` → `publico`; ``/`false` →
-    **`logados`** (padrão; dono revisa os ~7 casos no admin) + aviso.
+  - **`evento_publico`** normalizado → `visibilidade`: `true`/`on` → `publico`. **Ambíguos**
+    (``/`false`, ~7 casos) → **fail-closed em `diretoria`** (o mais fechado; se algum for reunião
+    de diretoria, não vaza) + **aviso** para curadoria manual no admin. (Não `logados`, que
+    exporia a todos os frequentadores antes da revisão.)
   - **`local`** → `local` (texto livre; sem geocodificar/parsear).
   - **Categoria** ← `ClassificadorCategoria` (resolve `categoria_id` por slug).
   - **Departamentos** ← `sync()` por **sigla** contra `departamentos` (49/54; **loga** siglas não
@@ -258,6 +268,8 @@ Filtros sincronizados na URL (`#[Url]`): `q` (busca por título), `mes` (`AAAA-M
   menor `data_inicio`), **independente dos filtros** (hero fixo do topo). É calculado **no
   controller** (`index()`) e seu `id` é passado ao componente como prop `destaqueId`; a query da
   aba "Próximos" faz `->where('id','!=',$destaqueId)` para **não duplicar** o destaque na grade.
+  **Se não houver evento futuro visível, o bloco não é renderizado** (nunca usar um evento
+  encerrado como destaque).
 - **Abas:** "Próximos" (`data_fim>=hoje`, ordem **crescente**) × "Já aconteceram"
   (`data_fim<hoje`, ordem **decrescente**).
 - **Busca:** `titulo LIKE %q%` (case-insensitive) sobre a aba ativa.
@@ -278,20 +290,24 @@ Filtros sincronizados na URL (`#[Url]`): `q` (busca por título), `mes` (`AAAA-M
   faixa do flyer (WebP, `loading=lazy`) com **selo de categoria** (cor da categoria) e **selo de
   status** (`StatusEvento`); título + metadados (período/local com ícones stroke verde); hover
   eleva (`-translate-y-1` + sombra). Passados: flyer em grayscale + selo "Encerrado".
-- **`eventos/show.blade.php`** — hero com breadcrumb multinível + par de selos (categoria +
-  status); barra de ações (Facebook `sharer.php?u=`, WhatsApp `wa.me/?text=`, "Copiar link", e
+- **`eventos/show.blade.php`** — hero com breadcrumb `Início › Eventos › {título}` (**último nó =
+  título do evento**, não a categoria) + par de selos (categoria + status); barra de ações (Facebook `sharer.php?u=`, WhatsApp `wa.me/?text=`, "Copiar link", e
   **"Adicionar à agenda"** = link Google Calendar `render?action=TEMPLATE&text=…&dates={ini}/{fim}
   &details={url}&location={local}`); corpo 2 colunas (`lead` + parágrafos à esquerda; **card
   `sticky top-[90px]`** com flyer + período/local + CTAs à direita); bloco **"Serviço"**
-  (parcial `_servico`: período, horário, local, endereço da sede [constante], categoria,
-  departamento(s)); **galeria** (parcial `_galeria`, só `@if` houver); **"Outros eventos"**
+  (parcial `_servico`: período, horário, **local com fallback** — `config('cema.endereco')` ou
+  "Local a confirmar" quando vazio [7/54], categoria, departamento(s)); **galeria** (parcial `_galeria`, só `@if` houver); **"Outros eventos"**
   (parcial `_relacionados`, até 3); `<x-slot:head>` com JSON-LD **`Event`** (+ `noindex` se
   restrito). Modal **assinar** (`eventos/assinar-modal`) reaproveitado de Palestras (Google/Apple/
   download a partir de `route('eventos.feed-ics')`).
 - **`resources/css/eventos.css`** (import em `app.css`) — estilos auxiliares (selos, grayscale,
   sticky, pulse do "Próximo destaque").
-- **Endereço da sede** como constante institucional (config/constante):
-  `Quadra 02, Lote 16, Vila Vicentina, Planaltina-DF`.
+- **Endereço da sede** — **fonte única** `config('cema.endereco')` (novo `config/cema.php`),
+  grafia canônica do repo **"Quadra 02, Lote 16, Vila Vicentina, Planaltina, DF"**. Consolidar as
+  **4 cópias hardcoded** de hoje (`app/Support/Palestras/FeedIcs.php` const `LOCAL_PRESENCIAL`;
+  `resources/views/palestras/show.blade.php` e `calendario.blade.php` no JSON-LD;
+  `resources/views/components/layout/footer.blade.php` — este com grafia divergente "Vicentina —
+  Planaltina") para lerem dessa fonte. **Não criar 5ª cópia.**
 
 ## 7. Visibilidade / autorização (infra nova — hoje não existe no front)
 
@@ -346,19 +362,25 @@ Em `app/Filament/Resources/Eventos/`, molde `PalestraResource` (cabeçalho de au
 
 ## 9. Camada `App\Support\Eventos\` (lógica pura, testável) + `App\Enums`
 
-- **`StatusEvento`** — a partir de `data_inicio`/`data_fim` vs hoje (TZ Brasília): retorna
-  `estado` (`futuro`/`acontecendo`/`passado`), `rotulo` do selo e `cor`:
-  - `hoje > data_fim` → **"Encerrado"** (roxo translúcido) · `data_inicio <= hoje <= data_fim`
-    (multi-dia em curso) → **"Acontecendo agora"** (`#C33A36`) · dias==0 → **"É hoje"** (`#C33A36`)
-    · dias==1 → **"É amanhã"** (`#E79048`) · 2–7 → **"Faltam N dias"** (`#E79048`) · >7 →
-    **"Em N dias"** (`#89AB98`). (Regras do design §06, estendidas para intervalos.)
+- **`StatusEvento`** — a partir de `data_inicio`/`data_fim` vs hoje (TZ Brasília; `data_fim`
+  coalescido a `data_inicio`), retorna `estado` (`futuro`/`acontecendo`/`passado`), `rotulo` do
+  selo e `cor`, **nesta ordem de avaliação**:
+  - `hoje > data_fim` → **"Encerrado"** (roxo translúcido)
+  - **`data_fim > data_inicio` E `data_inicio <= hoje <= data_fim`** → **"Acontecendo agora"**
+    (`#C33A36`) — **só multi-dia**; a guarda `data_fim > data_inicio` impede que um evento de **um
+    dia hoje** caia aqui (senão "É hoje" viraria código morto)
+  - dias==0 → **"É hoje"** (`#C33A36`) · dias==1 → **"É amanhã"** (`#E79048`) · 2–7 → **"Faltam N
+    dias"** (`#E79048`) · >7 → **"Em N dias"** (`#89AB98`)
+  - (`dias` = `data_inicio` − hoje, em dias. Regras do design §06, estendidas para intervalos.)
 - **`PeriodoEvento`** — `formata(Evento): string` ("27 de junho de 2026 · 8h30–12h" / "27 a 29 de
   junho de 2026" / "30 de junho a 2 de julho" / "dia inteiro") + `erros(array $dados): array`
   (validação usada no Filament).
 - **`FeedIcs`** — clone de `App\Support\Palestras\FeedIcs`: `escapar()`, `dobrar()` (line-folding
-  UTF-8), `vevento(Evento)` (`UID: evento-{id}@cemanet.org.br`; `DTSTART`/`DTEND` reais — **dia
-  inteiro → `VALUE=DATE`** cobrindo o intervalo; com hora → UTC `Ymd\THis\Z`, `hora_fim` ou +2h;
-  multi-dia respeita `data_fim`), `documento(iterable)` (`VCALENDAR` + `X-WR-CALNAME`/`TIMEZONE`).
+  UTF-8), `vevento(Evento)` (`UID: evento-{id}@cemanet.org.br`; **com hora** → `DTSTART`/`DTEND` em
+  UTC `Ymd\THis\Z`, fim = `hora_fim` ou +2h, respeitando `data_fim` no multi-dia; **dia inteiro** →
+  `DTSTART;VALUE=DATE`=`data_inicio` e `DTEND;VALUE=DATE`=**`data_fim` + 1 dia** — DTEND é
+  **exclusivo** no iCal; sem o +1 dia, Google/Apple encurtam o evento em 1 dia),
+  `documento(iterable)` (`VCALENDAR` + `X-WR-CALNAME`/`TIMEZONE`).
 - **`App\Enums\VisibilidadeEvento`** — §7.
 
 ## 10. SEO · performance · A11y
@@ -399,10 +421,13 @@ Em `app/Filament/Resources/Eventos/`, molde `PalestraResource` (cabeçalho de au
   período/serviço renderizados; galeria só quando há fotos.
 - **SEO:** JSON-LD `Event`/`BreadcrumbList` presentes; `og:type`/`og:url` **não** duplicados;
   `noindex` em restrito; URLs públicas no sitemap.
-- **ICS:** `FeedIcsTest` (VEVENT com hora × dia inteiro `VALUE=DATE` × multi-dia; `hora_fim`
-  ausente → +2h); feed agregado só públicos futuros; `.ics` de restrito só serve a quem pode.
-- **Unit:** `StatusEventoTest` (todos os selos, incl. "Acontecendo agora"); `PeriodoEventoTest`
-  (formatos + `erros()`).
+- **ICS:** `FeedIcsTest` (VEVENT com hora × dia inteiro × multi-dia; `hora_fim` ausente → +2h;
+  **dia inteiro: `DTEND;VALUE=DATE` = `data_fim` + 1 dia**, pois DTEND é exclusivo); feed agregado
+  só públicos futuros; `.ics` de restrito só serve a quem pode.
+- **Unit:** `StatusEventoTest` — todos os selos, **incl. o caso-armadilha: evento de UM dia hoje
+  = "É hoje" (não "Acontecendo agora")** e multi-dia em curso = "Acontecendo agora";
+  `PeriodoEventoTest` (formatos + `erros()`); validação de hora (`08:30` aceito; `8:30`/`25:00`
+  rejeitados).
 - **301:** `/_evento` e `/_evento/{slug}` → novas URLs (`assertRedirect` + `assertStatus(301)`).
 - **Verificação manual** no `localhost` (admin: criar evento multi-dia, dia inteiro, restrito;
   front: destaque, abas, filtros, Google Calendar, galeria, restrito 404 anônimo). **Pint** antes
@@ -427,7 +452,7 @@ Em `app/Filament/Resources/Eventos/`, molde `PalestraResource` (cabeçalho de au
 4. **Selo "Acontecendo agora"** acrescentado para eventos de vários dias em curso (o design era
    de data única).
 5. **Visibilidade por papel** (novo) estende o binário `evento_publico` do legado; não-público
-   legado → `logados` (revisável).
+   legado ambíguo → **`diretoria`** (fail-closed, revisável).
 6. **URL `/eventos`** (o legado usava `/_evento/`) com 301.
 
 ## 14. Ordem de implementação (sugestão / faseamento)
@@ -438,13 +463,19 @@ Em `app/Filament/Resources/Eventos/`, molde `PalestraResource` (cabeçalho de au
    Conferir tabelas existentes antes; só `migrate` incremental.
 2. **Importador.** `LeitorEventos`/`LeitorEventosMysql` + bind + `ClassificadorCategoria` +
    `ImportadorEventos` + `cema:importar-eventos` + testes. Rodar a importação e **revisar avisos**.
-3. **Front público.** Rotas (+301), `EventoController`, `Eventos\Lista`, casca + parciais
+3. **Front público (já nasce com visibilidade).** **Primeiro** a base de autorização sobre o enum
+   `VisibilidadeEvento` (criado na fase 1): `User::nivelMaximo()`, `Evento::podeSerVistoPor()` e o
+   `scopeVisiveisPara()` — para que **toda** query do front nasça filtrando por visibilidade (não
+   construir "aberto" e parafusar autorização depois; risco de vazar evento restrito). Em seguida:
+   rotas (+301), `EventoController` (com `abort_unless($e->podeSerVistoPor(...))` → **404** no
+   `show`/`calendario`), `Eventos\Lista` (query via `scopeVisiveisPara`), casca + parciais
    (`_card`/`_servico`/`_galeria`/`_relacionados`), `eventos.css`, `FeedIcs` + `StatusEvento`,
    Google Calendar + modal assinar.
-4. **Visibilidade + SEO + polish + testes.** `VisibilidadeEvento`/`podeSerVistoPor`/
-   `scopeVisiveisPara`/`EventoPolicy`/`User::nivelMaximo`; JSON-LD `Event`; tokens Tailwind
-   (`gold`/`footer-bg`/Roboto Mono); sitemap; suíte completa + conferência no `localhost`; Pint;
-   branch/commit.
+4. **Blindagem de visibilidade + SEO + polish + testes.** `EventoPolicy` (view/viewAny); exclusão
+   dos restritos do **sitemap** e do **feed `.ics`**; `noindex` + `Cache-Control: private` na single
+   restrita; a **matriz de testes de visibilidade** (anônimo/frequentador/trabalhador/diretor/admin
+   × 4 níveis, 404 p/ quem não pode); JSON-LD `Event`; tokens Tailwind (`gold`/`footer-bg`/Roboto
+   Mono); sitemap; suíte completa + conferência no `localhost`; Pint; branch/commit.
 
 ## 15. Arquivos a criar/editar (mapa)
 
@@ -452,6 +483,7 @@ Em `app/Filament/Resources/Eventos/`, molde `PalestraResource` (cabeçalho de au
 `database/migrations/*_create_categorias_table.php`, `*_create_eventos_table.php`,
 `*_create_departamento_evento_table.php`, `*_add_cor_icone_to_departamentos_table.php`;
 `database/seeders/CategoriaSeeder.php` (ou dentro do `EstruturaCemaSeeder`);
+`config/cema.php` (endereço institucional — fonte única);
 `app/Models/Evento.php`, `app/Models/Categoria.php`;
 `app/Enums/VisibilidadeEvento.php`;
 `app/Support/Eventos/StatusEvento.php`, `PeriodoEvento.php`, `FeedIcs.php`;
@@ -473,4 +505,7 @@ testes em `tests/Feature/Importacao/`, `tests/Feature/Front/`, `tests/Unit/Suppo
 (cor/ícone); `app/Http/Controllers/SitemapController.php` + `resources/views/sitemap.blade.php`
 (eventos públicos); `resources/css/app.css` (`@import 'eventos.css'` + tokens `@theme`);
 `config/navegacao.php` (ativar item "Eventos" → `eventos.index`);
+**endereço → `config('cema.endereco')`** em `app/Support/Palestras/FeedIcs.php`,
+`resources/views/palestras/show.blade.php`, `resources/views/palestras/calendario.blade.php` e
+`resources/views/components/layout/footer.blade.php` (consolida as 4 cópias hardcoded);
 `ROADMAP.md`/`DATA-MODEL.md`/`DB-LEGADO.md` (registrar a fatia ao concluir).

@@ -19,7 +19,7 @@ class LeitorEventosMysql implements LeitorEventos
     public function eventos(): array
     {
         $posts = $this->db->select(
-            "SELECT ID, post_title, post_name, post_excerpt, post_content, post_status, post_date
+            "SELECT ID, post_title, post_name, post_excerpt, post_content
              FROM wp_posts
              WHERE post_type = '_evento' AND post_status = 'publish'"
         );
@@ -104,7 +104,7 @@ class LeitorEventosMysql implements LeitorEventos
     private function siglasDepartamento(int $postId): array
     {
         $rows = $this->db->select(
-            "SELECT t.name FROM wp_term_relationships tr
+            "SELECT DISTINCT t.name FROM wp_term_relationships tr
              JOIN wp_term_taxonomy tt ON tt.term_taxonomy_id = tr.term_taxonomy_id
              JOIN wp_terms t ON t.term_id = tt.term_id
              WHERE tr.object_id = ? AND tt.taxonomy = '_departamentos_tax'",

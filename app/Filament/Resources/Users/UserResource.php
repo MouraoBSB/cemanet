@@ -24,7 +24,9 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Columns\ViewColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
 
 class UserResource extends Resource
@@ -130,6 +132,10 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
+                ViewColumn::make('avatar')
+                    ->label('')
+                    ->view('filament.tables.columns.avatar-usuario'),
+
                 TextColumn::make('name')
                     ->label('Nome')
                     ->searchable()
@@ -175,6 +181,12 @@ class UserResource extends Resource
                     DeleteBulkAction::make()->label('Excluir selecionados'),
                 ]),
             ]);
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        // Eager load do perfil + mídia: a coluna de avatar lê foto_thumb_url por linha (~145 users) → evita N+1.
+        return parent::getEloquentQuery()->with(['perfil.media']);
     }
 
     public static function getRelations(): array

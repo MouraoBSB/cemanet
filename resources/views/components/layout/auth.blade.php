@@ -11,7 +11,7 @@
 <body class="min-h-full bg-cream font-sans text-text-ink antialiased">
     <main class="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-10">
         <a href="{{ url('/') }}" class="mb-8 flex justify-center" aria-label="Voltar ao site do CEMA">
-            <span class="font-display text-2xl font-bold text-primary">CEMA</span>
+            <img src="{{ asset('images/logos/logo-horizontal.png') }}" alt="CEMA" class="h-10 w-auto">
         </a>
 
         <section class="rounded-lg bg-white p-6 shadow-card sm:p-8">

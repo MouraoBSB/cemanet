@@ -305,7 +305,7 @@ git commit -m "feat(eventos): LeitorEventosMysql (leitor read-only do CPT _event
 
 **Interfaces:**
 - Consumes: `LeitorEventos`, `BaixadorImagem`, `TransformadorLegado`, `ClassificadorCategoria`, models `Evento`/`CategoriaEvento`/`Departamento`, enum `VisibilidadeEvento`.
-- Produces: `ImportadorEventos` — `__construct(LeitorEventos $leitor, BaixadorImagem $baixador)`; `importar(?callable $log = null): array` → `['eventos' => int, 'avisos' => string[]]`. Idempotente (upsert por slug; limpa mídia antes de reanexar).
+- Produces: `ImportadorEventos` — `__construct(LeitorEventos $leitor, BaixadorImagem $baixador)`; `importar(?callable $log = null): array` → `['eventos' => int, 'avisos' => string[], 'contadores' => ['publicos'=>int,'diretoria'=>int,'sem_categoria'=>int,'deptos_nao_resolvidos'=>int]]`. Idempotente (upsert por slug; limpa mídia antes de reanexar).
 
 - [ ] **Step 1: Write the failing test**
 
@@ -428,6 +428,8 @@ class ImportadorEventosTest extends TestCase
         $this->assertNull($evento->categoria_evento_id); // "Reunião de Diretoria" não casa nenhuma categoria
         $this->assertNotEmpty(array_filter($resumo['avisos'], fn ($a) => str_contains($a, 'diretoria')));
         $this->assertNotEmpty(array_filter($resumo['avisos'], fn ($a) => str_contains($a, 'categoria não inferida')));
+        $this->assertSame(1, $resumo['contadores']['diretoria']);
+        $this->assertSame(1, $resumo['contadores']['sem_categoria']);
     }
 
     public function test_mostrar_horario_off_zera_a_hora(): void
@@ -502,6 +504,8 @@ class ImportadorEventos
 {
     private array $avisos = [];
 
+    private array $contadores = [];
+
     public function __construct(
         private LeitorEventos $leitor,
         private BaixadorImagem $baixador,
@@ -511,13 +515,16 @@ class ImportadorEventos
     {
         $log ??= fn (string $m) => null;
         $this->avisos = [];
+        $this->contadores = ['publicos' => 0, 'diretoria' => 0, 'sem_categoria' => 0, 'deptos_nao_resolvidos' => 0];
 
         $processados = 0;
 
         foreach ($this->leitor->eventos() as $d) {
             $dataHora = TransformadorLegado::unixParaData($d['data_do_evento'] ?? null);
 
-            if ($dataHora === null) {
+            // Defensivo: (int) de uma string de data ("2026-...") vira ano-inteiro e gera 1970.
+            // O legado é TS Unix confirmado; um resultado anterior a 2000 é lixo → pula com aviso.
+            if ($dataHora === null || $dataHora->year < 2000) {
                 $this->avisos[] = "[{$d['slug']}] sem data_do_evento válida — evento pulado";
 
                 continue;
@@ -532,7 +539,10 @@ class ImportadorEventos
                 // Visibilidade: público (true) senão fail-closed em diretoria.
                 $publico = TransformadorLegado::statusParaAtivo($d['evento_publico'] ?? null);
                 $visibilidade = $publico ? VisibilidadeEvento::Publico : VisibilidadeEvento::Diretoria;
-                if (! $publico) {
+                if ($publico) {
+                    $this->contadores['publicos']++;
+                } else {
+                    $this->contadores['diretoria']++;
                     $this->avisos[] = "[{$d['slug']}] evento não-público → visibilidade=diretoria (revisar)";
                 }
 
@@ -540,6 +550,7 @@ class ImportadorEventos
                 $catSlug = ClassificadorCategoria::paraSlug((string) ($d['titulo'] ?? ''));
                 $categoriaId = $catSlug ? CategoriaEvento::where('slug', $catSlug)->value('id') : null;
                 if ($catSlug === null) {
+                    $this->contadores['sem_categoria']++;
                     $this->avisos[] = "[{$d['slug']}] categoria não inferida (revisar no admin)";
                 }
 
@@ -591,6 +602,7 @@ class ImportadorEventos
                 $siglas = $d['departamentos_siglas'] ?? [];
                 $departamentos = Departamento::whereIn('sigla', $siglas)->get();
                 foreach (array_diff($siglas, $departamentos->pluck('sigla')->all()) as $sigla) {
+                    $this->contadores['deptos_nao_resolvidos']++;
                     $this->avisos[] = "[{$d['slug']}] departamento não resolvido: {$sigla}";
                 }
                 $evento->departamentos()->sync($departamentos->pluck('id')->all());
@@ -601,7 +613,7 @@ class ImportadorEventos
             $processados++;
         }
 
-        return ['eventos' => $processados, 'avisos' => $this->avisos];
+        return ['eventos' => $processados, 'avisos' => $this->avisos, 'contadores' => $this->contadores];
     }
 }
 ```
@@ -726,6 +738,8 @@ class ImportarEventos extends Command
 
         $this->newLine();
         $this->info("Importação concluída: {$resumo['eventos']} eventos.");
+        $c = $resumo['contadores'];
+        $this->line("  Públicos: {$c['publicos']} · Diretoria: {$c['diretoria']} · Sem categoria: {$c['sem_categoria']} · Deptos não resolvidos: {$c['deptos_nao_resolvidos']}");
         if (! empty($resumo['avisos'])) {
             $this->warn('Avisos ('.count($resumo['avisos']).'):');
             foreach ($resumo['avisos'] as $aviso) {
@@ -774,10 +788,11 @@ O `LeitorEventosMysql` é **Fake-only** na suíte; o SQL real precisa ser confer
 docker compose exec app php artisan cema:importar-eventos
 ```
 
-Conferir: **~54 eventos** importados; rodar **2×** (2ª rodada não duplica — idempotência); revisar os **avisos** (não-públicos→diretoria; categorias não inferidas; departamentos não resolvidos como DECOM). Amostrar 3-5 eventos no `/admin`:
+Conferir: **~54 eventos** importados; rodar **2×** (2ª rodada não duplica — idempotência); ler o **agregado** impresso no fim (públicos / diretoria / sem categoria / deptos não resolvidos) e os **avisos** por-evento. Amostrar 3-5 eventos no `/admin`:
 - **data/hora** batem com o site atual (fuso America/Sao_Paulo; sem deslocamento);
 - **flyer** e **galeria** anexados (URLs `guid` do host de mídia atual resolveram → 200);
-- **departamentos** por sigla e **categoria** inferida corretas;
+- **departamentos** por sigla corretos;
+- **categoria inferida correta** — e **auditar a coluna Categoria dos 54, NÃO só os nulos**: a heurística `match(true)` do `ClassificadorCategoria` é **sensível à ordem** (`feirao`/'livros' antes de `campanha`; `familia`/'encontro' antes de `estudo`), e uma inferência **errada** (ex.: "Campanha de Livros"→feirao) **não gera aviso**. Se vários errarem, mover as regras mais específicas para cima no `match` e reimportar (idempotente);
 - os **13 `data_do_evento` duplicados** não causaram problema (o `metasDe` pega o 1º valor);
 - o **CSV da galeria** (`_galeria-de-imagens`) explodiu na ordem certa.
 

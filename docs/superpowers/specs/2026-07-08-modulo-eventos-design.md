@@ -108,7 +108,11 @@ inferido na importação (§5).
 
 > Migrations **aditivas**; conferir tabelas existentes antes; **nunca** `migrate:fresh`.
 
-### `categorias` — o eixo público (novo; catálogo CRUD, molde de `departamentos`)
+### `categorias_evento` — o eixo público (novo; catálogo CRUD, molde de `departamentos`)
+
+> ⚠️ **Nome próprio** para não colidir com `categorias`/`Categoria`/`CategoriaSeeder` (categorias do
+> **BLOG**, já existentes, `belongsToMany Post`). Model `CategoriaEvento`, tabela `categorias_evento`,
+> FK `categoria_evento_id`, seeder `CategoriaEventoSeeder`, Resource `CategoriaEventoResource`.
 | Coluna | Tipo | Notas |
 |---|---|---|
 | id | bigint PK | |
@@ -140,14 +144,14 @@ exata de contraste no plano.
 | data_fim | date null | mutator `Y-m-d`; null → assume `data_inicio` |
 | hora_fim | string(5) null | `HH:MM` |
 | local | string null | texto livre |
-| categoria_id | FK null → `categorias` | `nullOnDelete` (evento interno pode não ter categoria pública) |
+| categoria_evento_id | FK null → `categorias_evento` | `nullOnDelete` (evento interno pode não ter categoria pública) |
 | visibilidade | string | `publico`\|`logados`\|`trabalhadores`\|`diretoria` (default `publico`) |
 | status | string | `publicado`\|`rascunho` (default `publicado`) |
 | wp_id | unsigned bigint null | id legado (rastreio + 301); `unique` |
 | timestamps | | |
 
 **Índices:** `slug` unique · `wp_id` unique · `data_inicio` · `data_fim` · `status` · `visibilidade` ·
-`categoria_id`.
+`categoria_evento_id`.
 
 > **Por que `string(5)` para horas** (`HH:MM`) e não `time`/cast: portabilidade
 > SQLite(testes)×MySQL(prod) (memória `padrao-data-mutator-portavel`). **Validação** (no mutator do
@@ -174,12 +178,12 @@ Conversões WebP `web`/`thumb` automáticas; original capado (padrão do projeto
 - **`App\Models\Evento`** — `const STATUS_*`, `const VISIBILIDADE_*` (ou via enum, abaixo);
   mutators `data_inicio`/`data_fim` (Carbon↔`Y-m-d`); setters de `conteudo`/`resumo` sanitizam
   (`clean($v,'conteudo')`); implementa `HasMedia` + `RegistraImagensPadrao`. Relações:
-  `categoria()` (belongsTo), `departamentos()` (belongsToMany via `departamento_evento`,
+  `categoria()` (belongsTo `CategoriaEvento`, FK `categoria_evento_id`), `departamentos()` (belongsToMany via `departamento_evento`,
   `withTimestamps`). Scopes: `publicado()`, `visiveisPara(?User)` (§7), `proximos()`/`anteriores()`
   (por `data_fim` coalescido a `data_inicio` vs `now()`). Accessors de apresentação: `periodo`
   (→ `PeriodoEvento`), `status` (→ `StatusEvento`), `flyerUrl`, `ehPassado`. Método de
   autorização `podeSerVistoPor(?User): bool` (fonte única, §7).
-- **`App\Models\Categoria`** — fillable (`nome`,`slug`,`cor`,`cor_texto`,`icone`,`ordem`,`ativo`);
+- **`App\Models\CategoriaEvento`** (tabela `categorias_evento`) — fillable (`nome`,`slug`,`cor`,`cor_texto`,`icone`,`ordem`,`ativo`);
   scope `ativo()`; `hasMany(Evento)`.
 - **`App\Models\Departamento`** (existente) — adicionar `cor`/`icone` ao `$fillable` e a relação
   `eventos()` (belongsToMany).
@@ -212,7 +216,7 @@ Espelha o pipeline existente (interface + leitor MySQL + importador + command + 
     de diretoria, não vaza) + **aviso** para curadoria manual no admin. (Não `logados`, que
     exporia a todos os frequentadores antes da revisão.)
   - **`local`** → `local` (texto livre; sem geocodificar/parsear).
-  - **Categoria** ← `ClassificadorCategoria` (resolve `categoria_id` por slug).
+  - **Categoria** ← `ClassificadorCategoria` (resolve `categoria_evento_id` por slug).
   - **Departamentos** ← `sync()` por **sigla** contra `departamentos` (49/54; **loga** siglas não
     resolvidas — não cria às cegas; DECOM ausente é esperado).
   - **Mídia:** `_thumbnail_id` → coleção `flyer` (48/54); `_galeria-de-imagens` → coleção `galeria`
@@ -346,7 +350,7 @@ Em `app/Filament/Resources/Eventos/`, molde `PalestraResource` (cabeçalho de au
   - *Data & Local*: `DatePicker data_inicio` (`->native(false)->displayFormat('d/m/Y')->required()`),
     `TimePicker hora_inicio` (`->seconds(false)`, nullable), `DatePicker data_fim` (nullable),
     `TimePicker hora_fim` (nullable), `TextInput local`.
-  - *Classificação*: `Select categoria_id` (relação, com badge de cor), `Select departamentos`
+  - *Classificação*: `Select categoria_evento_id` (relação, com badge de cor), `Select departamentos`
     (multiple, relação).
   - *Publicação*: `Select status`, `Select visibilidade` (enum `VisibilidadeEvento`).
   - **Validação de período** via `App\Support\Eventos\PeriodoEvento::erros($data)` (classe pura,
@@ -356,7 +360,7 @@ Em `app/Filament/Resources/Eventos/`, molde `PalestraResource` (cabeçalho de au
   - Tabela: coluna **flyer** (thumb), **período** (via accessor), **categoria** (badge colorido),
     **departamentos**, **status** (badge), **visibilidade** (badge); filtros por
     categoria/departamento/status/visibilidade; `defaultSort('data_inicio','desc')`.
-- **`CategoriaResource`** — CRUD simples (nome, slug auto, `ColorPicker cor`, `cor_texto`, `icone`,
+- **`CategoriaEventoResource`** (pasta `CategoriasEvento`) — CRUD simples (nome, slug auto, `ColorPicker cor`, `cor_texto`, `icone`,
   `ordem`, `ativo`); ordenação por `ordem`.
 - **`DepartamentoResource`** (existente) — acrescentar `ColorPicker cor` e `icone` ao form.
 
@@ -393,7 +397,7 @@ Em `app/Filament/Resources/Eventos/`, molde `PalestraResource` (cabeçalho de au
   (não duplicar `og:type`/`og:url`); `og:image` = flyer.
 - **Tokens Tailwind v4:** reconciliar no `@theme` os tokens do handoff de Eventos ausentes na raiz
   — **`gold #F2A81E`**, **`footer-bg #2F2952`**, **`text-ink #26242E`** e a família **Roboto Mono**
-  (eyebrows/metadados/selos). A cor da categoria vem do banco (`categorias.cor`), aplicada inline.
+  (eyebrows/metadados/selos). A cor da categoria vem do banco (`categorias_evento.cor`), aplicada inline.
 - **Mobile-first:** grades `repeat(auto-fit/auto-fill, minmax(...,1fr))` colapsam para 1 coluna;
   tipografia fluida `clamp()`; filtros `flex-wrap`; card sticky segue o fluxo no mobile.
 - **A11y:** cards como `<a>` com rótulo; abas `role=tab`/`tablist` + foco visível; `aria-label` nas
@@ -457,9 +461,9 @@ Em `app/Filament/Resources/Eventos/`, molde `PalestraResource` (cabeçalho de au
 
 ## 14. Ordem de implementação (sugestão / faseamento)
 
-1. **Dados + Admin.** Migrations (`categorias`, `eventos`, `departamento_evento`, alter
+1. **Dados + Admin.** Migrations (`categorias_evento`, `eventos`, `departamento_evento`, alter
    `departamentos`) + models + seed de categorias + `VisibilidadeEvento` + `EventoResource`/
-   `CategoriaResource` (+ cor/ícone no `DepartamentoResource`). Suporte `PeriodoEvento` (validação).
+   `CategoriaEventoResource` (+ cor/ícone no `DepartamentoResource`). Suporte `PeriodoEvento` (validação).
    Conferir tabelas existentes antes; só `migrate` incremental.
 2. **Importador.** `LeitorEventos`/`LeitorEventosMysql` + bind + `ClassificadorCategoria` +
    `ImportadorEventos` + `cema:importar-eventos` + testes. Rodar a importação e **revisar avisos**.
@@ -480,18 +484,18 @@ Em `app/Filament/Resources/Eventos/`, molde `PalestraResource` (cabeçalho de au
 ## 15. Arquivos a criar/editar (mapa)
 
 **Criar:**
-`database/migrations/*_create_categorias_table.php`, `*_create_eventos_table.php`,
+`database/migrations/*_create_categorias_evento_table.php`, `*_create_eventos_table.php`,
 `*_create_departamento_evento_table.php`, `*_add_cor_icone_to_departamentos_table.php`;
-`database/seeders/CategoriaSeeder.php` (ou dentro do `EstruturaCemaSeeder`);
+`database/seeders/CategoriaEventoSeeder.php`;
 `config/cema.php` (endereço institucional — fonte única);
-`app/Models/Evento.php`, `app/Models/Categoria.php`;
+`app/Models/Evento.php`, `app/Models/CategoriaEvento.php`;
 `app/Enums/VisibilidadeEvento.php`;
 `app/Support/Eventos/StatusEvento.php`, `PeriodoEvento.php`, `FeedIcs.php`;
 `app/Policies/EventoPolicy.php`;
 `app/Importacao/LeitorEventos.php`, `LeitorEventosMysql.php`, `ImportadorEventos.php`,
 `ClassificadorCategoria.php`; `app/Console/Commands/ImportarEventos.php`;
 `app/Http/Controllers/EventoController.php`; `app/Livewire/Eventos/Lista.php`;
-`app/Filament/Resources/Eventos/EventoResource.php` (+ Pages), `Categorias/CategoriaResource.php`
+`app/Filament/Resources/Eventos/EventoResource.php` (+ Pages), `CategoriasEvento/CategoriaEventoResource.php`
 (+ Pages);
 `resources/views/eventos/index.blade.php`, `show.blade.php`, `_card.blade.php`, `_servico.blade.php`,
 `_galeria.blade.php`, `_relacionados.blade.php`, `livewire/eventos/lista.blade.php`,

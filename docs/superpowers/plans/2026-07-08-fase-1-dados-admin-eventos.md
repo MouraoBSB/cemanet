@@ -2,16 +2,18 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Criar a base de dados do módulo Eventos (tabelas `categorias`, `eventos`, pivot `departamento_evento`, cor/ícone em `departamentos`) e o admin Filament (CRUD de Evento e Categoria), deixando o dono capaz de cadastrar eventos com data início/fim, hora início/fim, categoria, departamentos e visibilidade.
+**Goal:** Criar a base de dados do módulo Eventos (tabelas `categorias_evento`, `eventos`, pivot `departamento_evento`, cor/ícone em `departamentos`) e o admin Filament (CRUD de Evento e Categoria de Evento), deixando o dono capaz de cadastrar eventos com data início/fim, hora início/fim, categoria, departamentos e visibilidade.
 
-**Architecture:** Fatia vertical espelhando o molde de Palestras. Datas via mutator `Attribute` (Carbon↔`Y-m-d`, portável SQLite×MySQL); horas como `string(5)` `HH:MM` normalizadas no mutator; visibilidade como enum PHP nativo com nível mínimo; mídia (flyer + galeria) via trait `RegistraImagensPadrao`; validação de período numa classe pura `App\Support\Eventos\PeriodoEvento`. Categoria (belongsTo) e Departamentos (belongsToMany) usam o binding nativo de relacionamento do Filament (sem trait de sync).
+**Architecture:** Fatia vertical espelhando o molde de Palestras. Datas via mutator `Attribute` (Carbon↔`Y-m-d`, portável SQLite×MySQL); horas como `string(5)` `HH:MM` normalizadas no mutator; visibilidade como enum PHP nativo com nível mínimo; mídia (flyer + galeria) via trait `RegistraImagensPadrao`; validação de período numa classe pura `App\Support\Eventos\PeriodoEvento` (fonte única, usada no admin e — na Fase 2 — na importação). Categoria (belongsTo) e Departamentos (belongsToMany) usam o binding nativo de relacionamento do Filament (sem trait de sync).
 
 **Tech Stack:** PHP 8.3 · Laravel 13 · Filament 5 · MySQL 8 (dev/prod) · SQLite (testes) · spatie/laravel-medialibrary · spatie/laravel-permission · mews/purifier (`clean()`).
+
+> **⚠️ Nota de nomenclatura (colisão evitada):** o projeto **já tem** `Categoria`/`categorias`/`CategoriaSeeder`/`CategoriaFactory` — são as **categorias do BLOG** (`belongsToMany Post`). São domínio diferente (tópicos de post × tipos de evento) e **não** compartilham tabela. Por isso o eixo de categoria dos EVENTOS usa nomes próprios: model **`CategoriaEvento`**, tabela **`categorias_evento`**, FK **`eventos.categoria_evento_id`**, seeder **`CategoriaEventoSeeder`**, Resource **`CategoriaEventoResource`** (pasta `CategoriasEvento`). Nunca `Categoria`/`categorias`.
 
 ## Global Constraints
 
 - **Idioma:** tudo em pt-BR (identificadores de domínio, labels, mensagens, comentários, commits). Sintaxe/APIs de terceiros no original.
-- **Banco:** só `php artisan migrate` **incremental**. 🚫 **PROIBIDO** `migrate:fresh`/`refresh`/`wipe`/`reset` e seed/factory destrutivo (apagam os 123 palestras/44 posts importados). Conferir tabela/coluna existente antes de criar.
+- **Banco:** só `php artisan migrate` **incremental**. 🚫 **PROIBIDO** `migrate:fresh`/`refresh`/`wipe`/`reset` e seed/factory destrutivo (apagam os 123 palestras/44 posts importados). Conferir tabela/coluna/model/Resource existente **antes** de criar (esta fase já teve 1 colisão — ver nota acima).
 - **Datas:** colunas `date` usam mutator `Attribute` (get→Carbon, set→`Y-m-d` string); consultar/comparar por string `Y-m-d`. **NUNCA** cast nativo `date`.
 - **Horas:** `string(5)` `HH:MM` zero-padded; validar `^([01]\d|2[0-3]):[0-5]\d$`.
 - **Autoria:** cabeçalho `// Thiago Mourão — https://github.com/MouraoBSB — 2026-07-08` em todo arquivo PHP novo.
@@ -21,17 +23,17 @@
 
 ---
 
-### Task 1: Tabela `categorias` + model `Categoria` + seeder
+### Task 1: Tabela `categorias_evento` + model `CategoriaEvento` + seeder
 
 **Files:**
-- Create: `database/migrations/2026_07_08_000001_create_categorias_table.php`
-- Create: `app/Models/Categoria.php`
-- Create: `database/seeders/CategoriaSeeder.php`
-- Modify: `database/seeders/DatabaseSeeder.php` (registrar `CategoriaSeeder`)
-- Test: `tests/Feature/Eventos/CategoriaSeederTest.php`
+- Create: `database/migrations/2026_07_08_000001_create_categorias_evento_table.php`
+- Create: `app/Models/CategoriaEvento.php`
+- Create: `database/seeders/CategoriaEventoSeeder.php`
+- Modify: `database/seeders/DatabaseSeeder.php` (registrar `CategoriaEventoSeeder`)
+- Test: `tests/Feature/Eventos/CategoriaEventoSeederTest.php`
 
 **Interfaces:**
-- Produces: `App\Models\Categoria` (`$fillable` = nome, slug, cor, cor_texto, icone, ordem, ativo; `casts` ativo→bool, ordem→int; `scopeAtivo(Builder): Builder`; `eventos(): HasMany`). `CategoriaSeeder::CATEGORIAS` (const `slug => [nome, cor, cor_texto]`). Tabela `categorias`.
+- Produces: `App\Models\CategoriaEvento` (`$fillable` = nome, slug, cor, cor_texto, icone, ordem, ativo; `casts` ativo→bool, ordem→int; `scopeAtivo(Builder): Builder`; `eventos(): HasMany`). `CategoriaEventoSeeder::CATEGORIAS` (const `slug => [nome, cor, cor_texto]`). Tabela `categorias_evento`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -42,23 +44,23 @@
 
 namespace Tests\Feature\Eventos;
 
-use App\Models\Categoria;
-use Database\Seeders\CategoriaSeeder;
+use App\Models\CategoriaEvento;
+use Database\Seeders\CategoriaEventoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class CategoriaSeederTest extends TestCase
+class CategoriaEventoSeederTest extends TestCase
 {
     use RefreshDatabase;
 
     public function test_semeia_as_cinco_categorias_e_e_idempotente(): void
     {
-        $this->seed(CategoriaSeeder::class);
-        $this->seed(CategoriaSeeder::class); // 2ª vez não duplica
+        $this->seed(CategoriaEventoSeeder::class);
+        $this->seed(CategoriaEventoSeeder::class); // 2ª vez não duplica
 
-        $this->assertSame(5, Categoria::count());
+        $this->assertSame(5, CategoriaEvento::count());
 
-        $brecho = Categoria::where('slug', 'brecho')->first();
+        $brecho = CategoriaEvento::where('slug', 'brecho')->first();
         $this->assertSame('Brechó Solidário', $brecho->nome);
         $this->assertSame('#89AB98', $brecho->cor);
         $this->assertSame('#26242E', $brecho->cor_texto);
@@ -67,22 +69,22 @@ class CategoriaSeederTest extends TestCase
 
     public function test_scope_ativo_filtra_inativas(): void
     {
-        $this->seed(CategoriaSeeder::class);
-        Categoria::where('slug', 'estudo')->update(['ativo' => false]);
+        $this->seed(CategoriaEventoSeeder::class);
+        CategoriaEvento::where('slug', 'estudo')->update(['ativo' => false]);
 
-        $this->assertSame(4, Categoria::ativo()->count());
+        $this->assertSame(4, CategoriaEvento::ativo()->count());
     }
 }
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `docker compose exec -T app php artisan test --filter=CategoriaSeederTest`
-Expected: FAIL (classe `Categoria`/`CategoriaSeeder` inexistente; tabela `categorias` ausente).
+Run: `docker compose exec -T app php artisan test --filter=CategoriaEventoSeederTest`
+Expected: FAIL (classe `CategoriaEvento`/`CategoriaEventoSeeder` inexistente; tabela `categorias_evento` ausente).
 
 - [ ] **Step 3: Create the migration**
 
-`database/migrations/2026_07_08_000001_create_categorias_table.php`:
+`database/migrations/2026_07_08_000001_create_categorias_evento_table.php`:
 
 ```php
 <?php
@@ -95,7 +97,7 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('categorias', function (Blueprint $table) {
+        Schema::create('categorias_evento', function (Blueprint $table) {
             $table->id();
             $table->string('nome');
             $table->string('slug')->unique();
@@ -110,14 +112,14 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('categorias');
+        Schema::dropIfExists('categorias_evento');
     }
 };
 ```
 
-- [ ] **Step 4: Create the `Categoria` model**
+- [ ] **Step 4: Create the `CategoriaEvento` model**
 
-`app/Models/Categoria.php`:
+`app/Models/CategoriaEvento.php`:
 
 ```php
 <?php
@@ -130,8 +132,10 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Categoria extends Model
+class CategoriaEvento extends Model
 {
+    protected $table = 'categorias_evento';
+
     protected $fillable = ['nome', 'slug', 'cor', 'cor_texto', 'icone', 'ordem', 'ativo'];
 
     protected function casts(): array
@@ -153,7 +157,7 @@ class Categoria extends Model
 
 - [ ] **Step 5: Create the seeder and register it**
 
-`database/seeders/CategoriaSeeder.php`:
+`database/seeders/CategoriaEventoSeeder.php`:
 
 ```php
 <?php
@@ -162,10 +166,10 @@ class Categoria extends Model
 
 namespace Database\Seeders;
 
-use App\Models\Categoria;
+use App\Models\CategoriaEvento;
 use Illuminate\Database\Seeder;
 
-class CategoriaSeeder extends Seeder
+class CategoriaEventoSeeder extends Seeder
 {
     /** As 5 categorias públicas de evento: slug => [nome, cor de fundo, cor do texto]. */
     public const CATEGORIAS = [
@@ -180,7 +184,7 @@ class CategoriaSeeder extends Seeder
     {
         $ordem = 0;
         foreach (self::CATEGORIAS as $slug => [$nome, $cor, $corTexto]) {
-            Categoria::updateOrCreate(
+            CategoriaEvento::updateOrCreate(
                 ['slug' => $slug],
                 ['nome' => $nome, 'cor' => $cor, 'cor_texto' => $corTexto, 'ordem' => $ordem++],
             );
@@ -192,19 +196,19 @@ class CategoriaSeeder extends Seeder
 Em `database/seeders/DatabaseSeeder.php`, dentro de `run()`, adicionar a chamada (depois das existentes):
 
 ```php
-$this->call(CategoriaSeeder::class);
+$this->call(CategoriaEventoSeeder::class);
 ```
 
 - [ ] **Step 6: Run migration and test to verify PASS**
 
-Run: `docker compose exec -T app php artisan migrate && docker compose exec -T app php artisan test --filter=CategoriaSeederTest`
-Expected: migration `2026_07_08_000001_create_categorias_table` aplicada; testes PASS.
+Run: `docker compose exec -T app php artisan migrate && docker compose exec -T app php artisan test --filter=CategoriaEventoSeederTest`
+Expected: migration `2026_07_08_000001_create_categorias_evento_table` aplicada; testes PASS.
 
 - [ ] **Step 7: Commit**
 
 ```bash
-git add database/migrations/2026_07_08_000001_create_categorias_table.php app/Models/Categoria.php database/seeders/CategoriaSeeder.php database/seeders/DatabaseSeeder.php tests/Feature/Eventos/CategoriaSeederTest.php
-git commit -m "feat(eventos): tabela categorias + model + seeder das 5 categorias"
+git add database/migrations/2026_07_08_000001_create_categorias_evento_table.php app/Models/CategoriaEvento.php database/seeders/CategoriaEventoSeeder.php database/seeders/DatabaseSeeder.php tests/Feature/Eventos/CategoriaEventoSeederTest.php
+git commit -m "feat(eventos): tabela categorias_evento + model + seeder das 5 categorias"
 ```
 
 ---
@@ -330,7 +334,8 @@ git commit -m "feat(eventos): enum VisibilidadeEvento com nivel minimo"
 
 **Interfaces:**
 - Produces:
-  - `PeriodoEvento::erros(?string $dataInicio, ?string $horaInicio, ?string $dataFim, ?string $horaFim): array` — mensagens pt-BR (vazio = válido). Consumido pela importação (Fase 2) e como referência de validação.
+  - `PeriodoEvento::erros(?string $dataInicio, ?string $horaInicio, ?string $dataFim, ?string $horaFim): array` — mensagens pt-BR (vazio = válido). Fonte única de validação de período; consumida pelo admin (Task 6) e pela importação (Fase 2).
+  - `PeriodoEvento::horaFimAntesNoMesmoDia(?string $dataInicio, ?string $horaInicio, ?string $dataFim, ?string $horaFim): bool` — regra reaproveitada por `erros()` e pelo campo do Filament (Task 6).
   - `PeriodoEvento::formata(string $dataInicio, ?string $horaInicio, ?string $dataFim, ?string $horaFim): string` — período por extenso pt-BR. Consumido por `Evento::getPeriodoAttribute()` (Task 5).
   - `PeriodoEvento::horaValida(string $hora): bool`.
 
@@ -380,6 +385,14 @@ class PeriodoEventoTest extends TestCase
     {
         $erros = PeriodoEvento::erros('2026-06-27', '10:00', '2026-06-27', '09:00');
         $this->assertContains('No mesmo dia, a hora de término deve ser posterior à de início.', $erros);
+    }
+
+    public function test_hora_fim_antes_no_mesmo_dia_helper(): void
+    {
+        $this->assertTrue(PeriodoEvento::horaFimAntesNoMesmoDia('2026-06-27', '10:00', null, '09:00'));
+        $this->assertTrue(PeriodoEvento::horaFimAntesNoMesmoDia('2026-06-27', '10:00', '2026-06-27', '09:00'));
+        $this->assertFalse(PeriodoEvento::horaFimAntesNoMesmoDia('2026-06-27', '10:00', '2026-06-28', '09:00')); // dias diferentes
+        $this->assertFalse(PeriodoEvento::horaFimAntesNoMesmoDia('2026-06-27', '08:00', null, '12:00'));
     }
 
     public function test_erros_hora_formato_invalido(): void
@@ -435,12 +448,24 @@ use Illuminate\Support\Str;
 /**
  * Regras de período de um evento (data/hora início–fim), em classe pura e testável.
  * Datas comparadas como string Y-m-d (portável); horas como string HH:MM zero-padded.
+ * Fonte única de validação: usada no admin (EventoResource) e na importação.
  */
 class PeriodoEvento
 {
     public static function horaValida(string $hora): bool
     {
         return (bool) preg_match('/^([01]\d|2[0-3]):[0-5]\d$/', $hora);
+    }
+
+    /** True se, no mesmo dia, a hora de término não é posterior à de início. */
+    public static function horaFimAntesNoMesmoDia(?string $dataInicio, ?string $horaInicio, ?string $dataFim, ?string $horaFim): bool
+    {
+        $mesmoDia = ($dataFim === null || $dataFim === '' || $dataFim === $dataInicio);
+
+        return $mesmoDia
+            && $horaInicio !== null && $horaInicio !== '' && self::horaValida($horaInicio)
+            && $horaFim !== null && $horaFim !== '' && self::horaValida($horaFim)
+            && $horaFim <= $horaInicio;
     }
 
     /** Mensagens de erro de validação (vazio = válido). */
@@ -464,11 +489,7 @@ class PeriodoEvento
             $erros[] = 'A data de término não pode ser anterior à data de início.';
         }
 
-        $mesmoDia = ($dataFim === null || $dataFim === '' || $dataFim === $dataInicio);
-        if ($mesmoDia
-            && $horaInicio !== null && $horaInicio !== '' && self::horaValida($horaInicio)
-            && $horaFim !== null && $horaFim !== '' && self::horaValida($horaFim)
-            && $horaFim <= $horaInicio) {
+        if (self::horaFimAntesNoMesmoDia($dataInicio, $horaInicio, $dataFim, $horaFim)) {
             $erros[] = 'No mesmo dia, a hora de término deve ser posterior à de início.';
         }
 
@@ -536,7 +557,7 @@ class PeriodoEvento
 - [ ] **Step 4: Run test to verify it passes**
 
 Run: `docker compose exec -T app php artisan test --filter=PeriodoEventoTest`
-Expected: PASS (9 testes).
+Expected: PASS (10 testes).
 
 - [ ] **Step 5: Commit**
 
@@ -687,8 +708,8 @@ git commit -m "feat(eventos): cor/icone em departamentos + relacao eventos"
 - Test: `tests/Feature/Eventos/EventoModelTest.php`
 
 **Interfaces:**
-- Consumes: `Categoria` (Task 1), `Departamento` (Task 4), `VisibilidadeEvento` (Task 2), `PeriodoEvento` (Task 3), trait `RegistraImagensPadrao`.
-- Produces: `App\Models\Evento implements HasMedia` — `$fillable` (titulo, slug, resumo, conteudo, data_inicio, hora_inicio, data_fim, hora_fim, local, categoria_id, visibilidade, status, wp_id); consts `STATUS_PUBLICADO`/`STATUS_RASCUNHO`, `COLECAO_FLYER='flyer'`/`COLECAO_GALERIA='galeria'`; cast `visibilidade => VisibilidadeEvento`; mutators de `data_inicio`/`data_fim` (Carbon↔`Y-m-d`), `hora_inicio`/`hora_fim` (normaliza `HH:MM`), `conteudo` (sanitiza); `scopePublicado`; relações `categoria(): BelongsTo`, `departamentos(): BelongsToMany`; accessor `periodo`; accessor `flyerUrl`. Tabelas `eventos` e `departamento_evento`.
+- Consumes: `CategoriaEvento` (Task 1), `Departamento` (Task 4), `VisibilidadeEvento` (Task 2), `PeriodoEvento` (Task 3), trait `RegistraImagensPadrao`.
+- Produces: `App\Models\Evento implements HasMedia` — `$fillable` (titulo, slug, resumo, conteudo, data_inicio, hora_inicio, data_fim, hora_fim, local, categoria_evento_id, visibilidade, status, wp_id); consts `STATUS_PUBLICADO`/`STATUS_RASCUNHO`, `COLECAO_FLYER='flyer'`/`COLECAO_GALERIA='galeria'`; cast `visibilidade => VisibilidadeEvento`; mutators de `data_inicio`/`data_fim` (Carbon↔`Y-m-d`), `hora_inicio`/`hora_fim` (normaliza `HH:MM`), `conteudo` (sanitiza); `scopePublicado`; relações `categoria(): BelongsTo` (`CategoriaEvento`, FK `categoria_evento_id`), `departamentos(): BelongsToMany`; accessor `periodo`; accessor `flyerUrl`. Tabelas `eventos` e `departamento_evento`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -700,7 +721,7 @@ git commit -m "feat(eventos): cor/icone em departamentos + relacao eventos"
 namespace Tests\Feature\Eventos;
 
 use App\Enums\VisibilidadeEvento;
-use App\Models\Categoria;
+use App\Models\CategoriaEvento;
 use App\Models\Departamento;
 use App\Models\Evento;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -755,10 +776,10 @@ class EventoModelTest extends TestCase
 
     public function test_relacoes_categoria_e_departamentos(): void
     {
-        $cat = Categoria::create(['nome' => 'Brechó', 'slug' => 'brecho', 'cor' => '#89AB98']);
+        $cat = CategoriaEvento::create(['nome' => 'Brechó', 'slug' => 'brecho', 'cor' => '#89AB98']);
         $dep = Departamento::create(['sigla' => 'DEPRO', 'nome' => 'Promoções', 'slug' => 'depro']);
 
-        $evento = $this->eventoBase(['categoria_id' => $cat->id]);
+        $evento = $this->eventoBase(['categoria_evento_id' => $cat->id]);
         $evento->departamentos()->sync([$dep->id]);
 
         $this->assertSame('brecho', $evento->fresh()->categoria->slug);
@@ -814,7 +835,7 @@ return new class extends Migration
             $table->date('data_fim')->nullable();
             $table->string('hora_fim', 5)->nullable();
             $table->string('local')->nullable();
-            $table->foreignId('categoria_id')->nullable()->constrained('categorias')->nullOnDelete();
+            $table->foreignId('categoria_evento_id')->nullable()->constrained('categorias_evento')->nullOnDelete();
             $table->string('visibilidade')->default('publico');
             $table->string('status')->default('publicado');
             $table->unsignedBigInteger('wp_id')->nullable()->unique();
@@ -904,7 +925,7 @@ class Evento extends Model implements HasMedia
     protected $fillable = [
         'titulo', 'slug', 'resumo', 'conteudo',
         'data_inicio', 'hora_inicio', 'data_fim', 'hora_fim',
-        'local', 'categoria_id', 'visibilidade', 'status', 'wp_id',
+        'local', 'categoria_evento_id', 'visibilidade', 'status', 'wp_id',
     ];
 
     protected function casts(): array
@@ -928,7 +949,7 @@ class Evento extends Model implements HasMedia
 
     public function categoria(): BelongsTo
     {
-        return $this->belongsTo(Categoria::class);
+        return $this->belongsTo(CategoriaEvento::class, 'categoria_evento_id');
     }
 
     public function departamentos(): BelongsToMany
@@ -1017,18 +1038,19 @@ git commit -m "feat(eventos): tabela eventos + pivot departamento_evento + model
 
 ---
 
-### Task 6: `EventoResource` (Filament) + Pages
+### Task 6: `EventoResource` (Filament) + Pages + validação de período
 
 **Files:**
 - Create: `app/Filament/Resources/Eventos/EventoResource.php`
+- Create: `app/Filament/Resources/Eventos/Pages/ValidaPeriodoEvento.php` (trait)
 - Create: `app/Filament/Resources/Eventos/Pages/ListEventos.php`
 - Create: `app/Filament/Resources/Eventos/Pages/CreateEvento.php`
 - Create: `app/Filament/Resources/Eventos/Pages/EditEvento.php`
 - Test: `tests/Feature/Filament/EventoResourceTest.php`
 
 **Interfaces:**
-- Consumes: `Evento`, `Categoria`, `Departamento`, `VisibilidadeEvento`, `ComponentesImagem::upload`.
-- Produces: Resource Filament com form em Tabs (Conteúdo, Data & Local, Classificação, Publicação), tabela com período/categoria/status/visibilidade, e Pages `ListEventos`/`CreateEvento`/`EditEvento`. Categoria e Departamentos gravados pelo binding nativo de `->relationship()`.
+- Consumes: `Evento`, `CategoriaEvento`, `Departamento`, `VisibilidadeEvento`, `PeriodoEvento`, `ComponentesImagem::upload`.
+- Produces: Resource Filament com form em Tabs (Conteúdo, Data & Local, Classificação, Publicação), tabela com período/categoria/status/visibilidade, e Pages `ListEventos`/`CreateEvento`/`EditEvento`. Validação de período: campo (`afterOrEqual` + closure via `PeriodoEvento::horaFimAntesNoMesmoDia`) **e** rede server-side (`PeriodoEvento::erros` no trait `ValidaPeriodoEvento`, fonte única). Categoria (`categoria_evento_id`) e Departamentos gravados pelo binding nativo de `->relationship()`.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1040,7 +1062,7 @@ git commit -m "feat(eventos): tabela eventos + pivot departamento_evento + model
 namespace Tests\Feature\Filament;
 
 use App\Filament\Resources\Eventos\Pages\CreateEvento;
-use App\Models\Categoria;
+use App\Models\CategoriaEvento;
 use App\Models\Departamento;
 use App\Models\Evento;
 use App\Models\User;
@@ -1064,7 +1086,7 @@ class EventoResourceTest extends TestCase
 
     public function test_cria_evento_com_categoria_e_departamentos(): void
     {
-        $cat = Categoria::create(['nome' => 'Brechó', 'slug' => 'brecho', 'cor' => '#89AB98']);
+        $cat = CategoriaEvento::create(['nome' => 'Brechó', 'slug' => 'brecho', 'cor' => '#89AB98']);
         $dep = Departamento::create(['sigla' => 'DEPRO', 'nome' => 'Promoções', 'slug' => 'depro']);
 
         $this->actingAs($this->admin());
@@ -1074,7 +1096,7 @@ class EventoResourceTest extends TestCase
                 'titulo' => 'Brechó de Junho',
                 'slug' => 'brecho-de-junho',
                 'data_inicio' => '2026-06-27',
-                'categoria_id' => $cat->id,
+                'categoria_evento_id' => $cat->id,
                 'departamentos' => [$dep->id],
                 'visibilidade' => 'publico',
                 'status' => Evento::STATUS_PUBLICADO,
@@ -1084,7 +1106,7 @@ class EventoResourceTest extends TestCase
 
         $evento = Evento::firstWhere('slug', 'brecho-de-junho');
         $this->assertNotNull($evento);
-        $this->assertSame($cat->id, $evento->categoria_id);
+        $this->assertSame($cat->id, $evento->categoria_evento_id);
         $this->assertTrue($evento->departamentos->contains($dep));
     }
 
@@ -1103,6 +1125,24 @@ class EventoResourceTest extends TestCase
             ])
             ->call('create')
             ->assertHasFormErrors(['data_fim']);
+    }
+
+    public function test_bloqueia_hora_fim_antes_no_mesmo_dia(): void
+    {
+        $this->actingAs($this->admin());
+
+        Livewire::test(CreateEvento::class)
+            ->fillForm([
+                'titulo' => 'Hora invertida',
+                'slug' => 'hora-invertida',
+                'data_inicio' => '2026-06-27',
+                'hora_inicio' => '10:00',
+                'hora_fim' => '09:00',
+                'visibilidade' => 'publico',
+                'status' => Evento::STATUS_PUBLICADO,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['hora_fim']);
     }
 }
 ```
@@ -1129,6 +1169,7 @@ use App\Filament\Resources\Eventos\Pages\EditEvento;
 use App\Filament\Resources\Eventos\Pages\ListEventos;
 use App\Filament\Support\ComponentesImagem;
 use App\Models\Evento;
+use App\Support\Eventos\PeriodoEvento;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -1215,11 +1256,7 @@ class EventoResource extends Resource
                             ->seconds(false)
                             ->rules([
                                 fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
-                                    $di = $get('data_inicio');
-                                    $df = $get('data_fim');
-                                    $hi = $get('hora_inicio');
-                                    $mesmoDia = ! $df || $df === $di;
-                                    if ($mesmoDia && $hi && $value && $value <= $hi) {
+                                    if (PeriodoEvento::horaFimAntesNoMesmoDia($get('data_inicio'), $get('hora_inicio'), $get('data_fim'), $value)) {
                                         $fail('No mesmo dia, a hora de término deve ser posterior à de início.');
                                     }
                                 },
@@ -1230,7 +1267,7 @@ class EventoResource extends Resource
                         ->maxLength(255),
                 ]),
                 Tabs\Tab::make('Classificação')->schema([
-                    Select::make('categoria_id')
+                    Select::make('categoria_evento_id')
                         ->label('Categoria')
                         ->relationship('categoria', 'nome')
                         ->searchable()
@@ -1293,7 +1330,7 @@ class EventoResource extends Resource
                         Evento::STATUS_PUBLICADO => 'Publicado',
                         Evento::STATUS_RASCUNHO => 'Rascunho',
                     ]),
-                SelectFilter::make('categoria_id')
+                SelectFilter::make('categoria_evento_id')
                     ->label('Categoria')
                     ->relationship('categoria', 'nome'),
                 SelectFilter::make('visibilidade')
@@ -1325,7 +1362,43 @@ class EventoResource extends Resource
 }
 ```
 
-- [ ] **Step 4: Create the three Pages**
+- [ ] **Step 4: Create the validation trait and the three Pages**
+
+`app/Filament/Resources/Eventos/Pages/ValidaPeriodoEvento.php`:
+
+```php
+<?php
+
+// Thiago Mourão — https://github.com/MouraoBSB — 2026-07-08
+
+namespace App\Filament\Resources\Eventos\Pages;
+
+use App\Support\Eventos\PeriodoEvento;
+use Illuminate\Validation\ValidationException;
+
+/**
+ * Rede server-side de validação de período (fonte única = PeriodoEvento::erros),
+ * complementando as regras de campo do form. Usada por Create e Edit.
+ */
+trait ValidaPeriodoEvento
+{
+    protected function validarPeriodo(array $data): array
+    {
+        $erros = PeriodoEvento::erros(
+            $data['data_inicio'] ?? null,
+            $data['hora_inicio'] ?? null,
+            $data['data_fim'] ?? null,
+            $data['hora_fim'] ?? null,
+        );
+
+        if ($erros !== []) {
+            throw ValidationException::withMessages(['data_inicio' => $erros]);
+        }
+
+        return $data;
+    }
+}
+```
 
 `app/Filament/Resources/Eventos/Pages/ListEventos.php`:
 
@@ -1361,7 +1434,14 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreateEvento extends CreateRecord
 {
+    use ValidaPeriodoEvento;
+
     protected static string $resource = EventoResource::class;
+
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        return $this->validarPeriodo($data);
+    }
 }
 ```
 
@@ -1378,11 +1458,18 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditEvento extends EditRecord
 {
+    use ValidaPeriodoEvento;
+
     protected static string $resource = EventoResource::class;
 
     protected function getHeaderActions(): array
     {
         return [DeleteAction::make()];
+    }
+
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return $this->validarPeriodo($data);
     }
 }
 ```
@@ -1390,7 +1477,7 @@ class EditEvento extends EditRecord
 - [ ] **Step 5: Run test to verify it passes**
 
 Run: `docker compose exec -T app php artisan test --filter=EventoResourceTest`
-Expected: PASS (2). Se `Heroicon::OutlinedCalendarDays` não existir na versão instalada, usar `Heroicon::OutlinedCalendar` (conferir `vendor/filament/support/src/Icons/Heroicon.php`).
+Expected: PASS (3). Se `Heroicon::OutlinedCalendarDays` não existir na versão instalada, usar `Heroicon::OutlinedCalendar` (conferir `vendor/filament/support/src/Icons/Heroicon.php`).
 
 - [ ] **Step 6: Commit**
 
@@ -1401,19 +1488,19 @@ git commit -m "feat(eventos): EventoResource (Filament) com data/hora, classific
 
 ---
 
-### Task 7: `CategoriaResource` + cor/ícone no `DepartamentoResource`
+### Task 7: `CategoriaEventoResource` + cor/ícone no `DepartamentoResource`
 
 **Files:**
-- Create: `app/Filament/Resources/Categorias/CategoriaResource.php`
-- Create: `app/Filament/Resources/Categorias/Pages/ListCategorias.php`
-- Create: `app/Filament/Resources/Categorias/Pages/CreateCategoria.php`
-- Create: `app/Filament/Resources/Categorias/Pages/EditCategoria.php`
+- Create: `app/Filament/Resources/CategoriasEvento/CategoriaEventoResource.php`
+- Create: `app/Filament/Resources/CategoriasEvento/Pages/ListCategoriaEventos.php`
+- Create: `app/Filament/Resources/CategoriasEvento/Pages/CreateCategoriaEvento.php`
+- Create: `app/Filament/Resources/CategoriasEvento/Pages/EditCategoriaEvento.php`
 - Modify: `app/Filament/Resources/Departamentos/DepartamentoResource.php` (adicionar `cor` + `icone` ao form)
-- Test: `tests/Feature/Filament/CategoriaResourceTest.php`
+- Test: `tests/Feature/Filament/CategoriaEventoResourceTest.php`
 
 **Interfaces:**
-- Consumes: `Categoria`, `ColorPicker`.
-- Produces: CRUD Filament de Categoria; campos `cor`/`icone` no form de Departamento.
+- Consumes: `CategoriaEvento`, `ColorPicker`.
+- Produces: CRUD Filament de Categoria de Evento; campos `cor`/`icone` no form de Departamento.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1424,15 +1511,15 @@ git commit -m "feat(eventos): EventoResource (Filament) com data/hora, classific
 
 namespace Tests\Feature\Filament;
 
-use App\Filament\Resources\Categorias\Pages\CreateCategoria;
-use App\Models\Categoria;
+use App\Filament\Resources\CategoriasEvento\Pages\CreateCategoriaEvento;
+use App\Models\CategoriaEvento;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
-class CategoriaResourceTest extends TestCase
+class CategoriaEventoResourceTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -1443,7 +1530,7 @@ class CategoriaResourceTest extends TestCase
         $admin->assignRole('administrador');
         $this->actingAs($admin);
 
-        Livewire::test(CreateCategoria::class)
+        Livewire::test(CreateCategoriaEvento::class)
             ->fillForm([
                 'nome' => 'Vigília',
                 'slug' => 'vigilia',
@@ -1454,31 +1541,31 @@ class CategoriaResourceTest extends TestCase
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $this->assertSame('#123456', Categoria::firstWhere('slug', 'vigilia')->cor);
+        $this->assertSame('#123456', CategoriaEvento::firstWhere('slug', 'vigilia')->cor);
     }
 }
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `docker compose exec -T app php artisan test --filter=CategoriaResourceTest`
+Run: `docker compose exec -T app php artisan test --filter=CategoriaEventoResourceTest`
 Expected: FAIL (Resource/Pages inexistentes).
 
-- [ ] **Step 3: Create the `CategoriaResource`**
+- [ ] **Step 3: Create the `CategoriaEventoResource`**
 
-`app/Filament/Resources/Categorias/CategoriaResource.php`:
+`app/Filament/Resources/CategoriasEvento/CategoriaEventoResource.php`:
 
 ```php
 <?php
 
 // Thiago Mourão — https://github.com/MouraoBSB — 2026-07-08
 
-namespace App\Filament\Resources\Categorias;
+namespace App\Filament\Resources\CategoriasEvento;
 
-use App\Filament\Resources\Categorias\Pages\CreateCategoria;
-use App\Filament\Resources\Categorias\Pages\EditCategoria;
-use App\Filament\Resources\Categorias\Pages\ListCategorias;
-use App\Models\Categoria;
+use App\Filament\Resources\CategoriasEvento\Pages\CreateCategoriaEvento;
+use App\Filament\Resources\CategoriasEvento\Pages\EditCategoriaEvento;
+use App\Filament\Resources\CategoriasEvento\Pages\ListCategoriaEventos;
+use App\Models\CategoriaEvento;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -1497,15 +1584,15 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 
-class CategoriaResource extends Resource
+class CategoriaEventoResource extends Resource
 {
-    protected static ?string $model = Categoria::class;
+    protected static ?string $model = CategoriaEvento::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;
 
-    protected static ?string $modelLabel = 'Categoria';
+    protected static ?string $modelLabel = 'Categoria de evento';
 
-    protected static ?string $pluralModelLabel = 'Categorias';
+    protected static ?string $pluralModelLabel = 'Categorias de evento';
 
     protected static ?string $recordTitleAttribute = 'nome';
 
@@ -1577,30 +1664,30 @@ class CategoriaResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => ListCategorias::route('/'),
-            'create' => CreateCategoria::route('/create'),
-            'edit' => EditCategoria::route('/{record}/edit'),
+            'index' => ListCategoriaEventos::route('/'),
+            'create' => CreateCategoriaEvento::route('/create'),
+            'edit' => EditCategoriaEvento::route('/{record}/edit'),
         ];
     }
 }
 ```
 
-- [ ] **Step 4: Create the three Categoria Pages**
+- [ ] **Step 4: Create the three Pages**
 
-`app/Filament/Resources/Categorias/Pages/ListCategorias.php`:
+`app/Filament/Resources/CategoriasEvento/Pages/ListCategoriaEventos.php`:
 
 ```php
 <?php
 
-namespace App\Filament\Resources\Categorias\Pages;
+namespace App\Filament\Resources\CategoriasEvento\Pages;
 
-use App\Filament\Resources\Categorias\CategoriaResource;
+use App\Filament\Resources\CategoriasEvento\CategoriaEventoResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
-class ListCategorias extends ListRecords
+class ListCategoriaEventos extends ListRecords
 {
-    protected static string $resource = CategoriaResource::class;
+    protected static string $resource = CategoriaEventoResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -1609,36 +1696,36 @@ class ListCategorias extends ListRecords
 }
 ```
 
-`app/Filament/Resources/Categorias/Pages/CreateCategoria.php`:
+`app/Filament/Resources/CategoriasEvento/Pages/CreateCategoriaEvento.php`:
 
 ```php
 <?php
 
-namespace App\Filament\Resources\Categorias\Pages;
+namespace App\Filament\Resources\CategoriasEvento\Pages;
 
-use App\Filament\Resources\Categorias\CategoriaResource;
+use App\Filament\Resources\CategoriasEvento\CategoriaEventoResource;
 use Filament\Resources\Pages\CreateRecord;
 
-class CreateCategoria extends CreateRecord
+class CreateCategoriaEvento extends CreateRecord
 {
-    protected static string $resource = CategoriaResource::class;
+    protected static string $resource = CategoriaEventoResource::class;
 }
 ```
 
-`app/Filament/Resources/Categorias/Pages/EditCategoria.php`:
+`app/Filament/Resources/CategoriasEvento/Pages/EditCategoriaEvento.php`:
 
 ```php
 <?php
 
-namespace App\Filament\Resources\Categorias\Pages;
+namespace App\Filament\Resources\CategoriasEvento\Pages;
 
-use App\Filament\Resources\Categorias\CategoriaResource;
+use App\Filament\Resources\CategoriasEvento\CategoriaEventoResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
 
-class EditCategoria extends EditRecord
+class EditCategoriaEvento extends EditRecord
 {
-    protected static string $resource = CategoriaResource::class;
+    protected static string $resource = CategoriaEventoResource::class;
 
     protected function getHeaderActions(): array
     {
@@ -1663,14 +1750,14 @@ TextInput::make('icone')
 
 - [ ] **Step 6: Run test to verify it passes**
 
-Run: `docker compose exec -T app php artisan test --filter=CategoriaResourceTest`
+Run: `docker compose exec -T app php artisan test --filter=CategoriaEventoResourceTest`
 Expected: PASS. Se `Heroicon::OutlinedTag`/`ColorColumn` não existirem na versão, conferir alternativas em `vendor/filament/` (`Heroicon::OutlinedTag` costuma existir; `ColorColumn` é `Filament\Tables\Columns\ColorColumn`).
 
 - [ ] **Step 7: Commit**
 
 ```bash
-git add app/Filament/Resources/Categorias app/Filament/Resources/Departamentos/DepartamentoResource.php tests/Feature/Filament/CategoriaResourceTest.php
-git commit -m "feat(eventos): CategoriaResource + cor/icone no DepartamentoResource"
+git add app/Filament/Resources/CategoriasEvento app/Filament/Resources/Departamentos/DepartamentoResource.php tests/Feature/Filament/CategoriaEventoResourceTest.php
+git commit -m "feat(eventos): CategoriaEventoResource + cor/icone no DepartamentoResource"
 ```
 
 ---
@@ -1689,13 +1776,15 @@ Expected: sem drift (ou aplica o formato). Commitar se houver ajuste: `git commi
 
 - [ ] **Step 3: Conferência real no admin**
 
-Após editar Blade/PHP no dev, `docker compose restart app worker` (OPcache com `validate_timestamps=0`). Abrir `/admin`, criar um Evento (dia único com hora; multi-dia sem hora = dia inteiro; um restrito=diretoria), uma Categoria, e conferir cor no Departamento. Confirmar que salvam e listam corretamente e que a validação de data_fim < data_inicio bloqueia.
+Após editar Blade/PHP no dev, `docker compose restart app worker` (OPcache com `validate_timestamps=0`). Abrir `/admin`, criar um Evento (dia único com hora; multi-dia sem hora = dia inteiro; um restrito=diretoria), uma Categoria de Evento, e conferir cor no Departamento. Confirmar que salvam e listam corretamente e que a validação de `data_fim < data_inicio` e de `hora_fim` no mesmo dia bloqueia. Conferir que o **blog** (posts↔categorias) continua intacto (nenhuma colisão com `categorias`).
 
 ---
 
 ## Notas de verificação do plano (self-review)
 
-- **Cobertura do spec (Fase 1 = §4 modelo, §8 admin, parte de §9):** `categorias` (Task 1), `eventos` (Task 5), pivot `departamento_evento` (Task 5), cor/ícone em `departamentos` (Task 4), mídia flyer+galeria (Task 5), `VisibilidadeEvento` (Task 2), `PeriodoEvento` validação/formatação (Task 3), `EventoResource`/`CategoriaResource`/Departamento (Tasks 6–7). **Fora desta fase (fases seguintes):** `StatusEvento`, `FeedIcs`, autorização (`podeSerVistoPor`/`scopeVisiveisPara`/Policy), front público, importador, `config('cema.endereco')`, tokens Tailwind, sitemap, navegação pública.
-- **Ordem de migrations:** `000001` categorias → `000002` altera departamentos → `000003` eventos (FK categoria) → `000004` pivot (FK eventos+departamentos). Cada `migrate` incremental só vê migrations até a task corrente; sem referência a tabela inexistente.
-- **Sync de relações:** categoria (`categoria_id`) e departamentos (`->relationship()->multiple()`) usam o binding nativo do Filament — **sem** trait de sync (diferente de Palestras, que precisava por causa do pivot com `papel`).
+- **Colisão com o blog resolvida:** o eixo de categoria de EVENTOS usa `CategoriaEvento`/`categorias_evento`/`categoria_evento_id`/`CategoriaEventoSeeder`/`CategoriaEventoResource`, **sem tocar** em `Categoria`/`categorias`/`CategoriaSeeder`/`CategoriaFactory` do blog. Antes de criar os arquivos Filament, confirmar que `app/Filament/Resources/CategoriasEvento/` não existe.
+- **Cobertura do spec (Fase 1 = §4 modelo, §8 admin, parte de §9):** `categorias_evento` (Task 1), `eventos` (Task 5), pivot `departamento_evento` (Task 5), cor/ícone em `departamentos` (Task 4), mídia flyer+galeria (Task 5), `VisibilidadeEvento` (Task 2), `PeriodoEvento` validação/formatação (Task 3), `EventoResource`/`CategoriaEventoResource`/Departamento (Tasks 6–7). **Fora desta fase:** `StatusEvento`, `FeedIcs`, autorização (`podeSerVistoPor`/`scopeVisiveisPara`/Policy), front público, importador, `config('cema.endereco')`, tokens Tailwind, sitemap, navegação pública.
+- **Validação de período como fonte única:** a regra "hora fim no mesmo dia" vive só em `PeriodoEvento::horaFimAntesNoMesmoDia()` (usada por `erros()` e pelo campo do Filament). O trait `ValidaPeriodoEvento` chama `PeriodoEvento::erros()` como rede server-side (evita divergência). Testes cobrem `data_fim < data_inicio` e `hora_fim <= hora_inicio` no mesmo dia (ambos `assertHasFormErrors`).
+- **Ordem de migrations:** `000001` categorias_evento → `000002` altera departamentos → `000003` eventos (FK categoria_evento_id) → `000004` pivot (FK eventos+departamentos). Cada `migrate` incremental só vê migrations até a task corrente; sem referência a tabela inexistente.
+- **Sync de relações:** categoria (`categoria_evento_id`) e departamentos (`->relationship()->multiple()`) usam o binding nativo do Filament — **sem** trait de sync (diferente de Palestras, que precisava por causa do pivot com `papel`).
 - **Riscos de API do Filament v5:** confirmar nomes de ícones (`Heroicon::OutlinedCalendarDays`/`OutlinedTag`) e `ColorColumn` na versão instalada (fallbacks anotados nas Tasks 6/7).

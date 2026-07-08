@@ -7,6 +7,7 @@ namespace App\Console\Commands;
 use App\Importacao\ImportadorEventos;
 use App\Importacao\LeitorEventos;
 use App\Importacao\LeitorEventosMysql;
+use App\Models\CategoriaEvento;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -29,6 +30,13 @@ class ImportarEventos extends Command
 
                 return self::FAILURE;
             }
+        }
+
+        // Autodiagnóstico: sem categorias cadastradas, importaria os 54 todos sem categoria (fail-fast).
+        if (CategoriaEvento::count() === 0) {
+            $this->error('Nenhuma categoria de evento cadastrada. Rode antes: php artisan db:seed --class=CategoriaEventoSeeder');
+
+            return self::FAILURE;
         }
 
         $resumo = $importador->importar(fn (string $m) => $this->info($m));

@@ -40,4 +40,20 @@ class ImportarEventosCommandTest extends TestCase
         $this->assertSame(1, Evento::count());
         $this->assertSame('feirao', Evento::firstWhere('slug', 'feirao-de-livros')->categoria->slug);
     }
+
+    public function test_aborta_sem_categorias_cadastradas(): void
+    {
+        // NÃO semeia categorias; leitor fake pula a guarda de túnel → dispara o autodiagnóstico.
+        $this->app->bind(LeitorEventos::class, fn () => new class implements LeitorEventos
+        {
+            public function eventos(): array
+            {
+                return [];
+            }
+        });
+
+        $this->artisan('cema:importar-eventos')->assertFailed();
+
+        $this->assertSame(0, Evento::count());
+    }
 }

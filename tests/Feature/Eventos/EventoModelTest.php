@@ -51,6 +51,14 @@ class EventoModelTest extends TestCase
         $this->assertStringContainsString('Oi', (string) $evento->conteudo);
     }
 
+    public function test_resumo_e_sanitizado(): void
+    {
+        $evento = $this->eventoBase(['resumo' => '<p>Chamada</p><script>alert(1)</script>']);
+
+        $this->assertStringNotContainsString('<script>', (string) $evento->resumo);
+        $this->assertStringContainsString('Chamada', (string) $evento->resumo);
+    }
+
     public function test_visibilidade_e_enum(): void
     {
         $evento = $this->eventoBase(['visibilidade' => VisibilidadeEvento::Diretoria]);

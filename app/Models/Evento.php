@@ -98,6 +98,13 @@ class Evento extends Model implements HasMedia
         );
     }
 
+    protected function resumo(): Attribute
+    {
+        return Attribute::make(
+            set: fn (?string $v) => $v !== null ? clean($v, 'conteudo') : null,
+        );
+    }
+
     /** Período por extenso (via classe pura). Usa os valores crus Y-m-d. */
     public function getPeriodoAttribute(): string
     {

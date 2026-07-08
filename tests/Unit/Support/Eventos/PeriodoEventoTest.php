@@ -56,6 +56,12 @@ class PeriodoEventoTest extends TestCase
         $this->assertNotEmpty(PeriodoEvento::erros('2026-06-27', '8:30', null, null));
     }
 
+    public function test_erros_hora_fim_sem_hora_inicio(): void
+    {
+        $this->assertNotEmpty(PeriodoEvento::erros('2026-06-27', null, null, '09:00'));
+        $this->assertSame([], PeriodoEvento::erros('2026-06-27', '08:00', null, '09:00')); // com início, ok
+    }
+
     public function test_formata_dia_unico_com_hora(): void
     {
         $this->assertSame('27 de junho de 2026 · 8h30 – 12h',

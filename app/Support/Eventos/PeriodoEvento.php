@@ -5,7 +5,6 @@
 namespace App\Support\Eventos;
 
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Str;
 
 /**
  * Regras de período de um evento (data/hora início–fim), em classe pura e testável.
@@ -47,6 +46,10 @@ class PeriodoEvento
             }
         }
 
+        if (($horaFim !== null && $horaFim !== '') && ($horaInicio === null || $horaInicio === '')) {
+            $erros[] = 'A hora de término foi informada sem a hora de início. Informe a hora de início ou deixe ambas em branco (dia inteiro).';
+        }
+
         if ($dataFim !== null && $dataFim !== '' && $dataFim < $dataInicio) {
             $erros[] = 'A data de término não pode ser anterior à data de início.';
         }
@@ -76,7 +79,7 @@ class PeriodoEvento
 
     private static function dataExtenso(Carbon $d): string
     {
-        return Str::ucfirst($d->translatedFormat('j \d\e F \d\e Y'));
+        return $d->translatedFormat('j \d\e F \d\e Y');
     }
 
     private static function faixaHoraria(?string $horaInicio, ?string $horaFim): string
@@ -104,13 +107,13 @@ class PeriodoEvento
     private static function intervaloDatas(Carbon $i, Carbon $f): string
     {
         if ($i->year !== $f->year) {
-            return Str::ucfirst($i->translatedFormat('j \d\e F \d\e Y')).' a '.$f->translatedFormat('j \d\e F \d\e Y');
+            return $i->translatedFormat('j \d\e F \d\e Y').' a '.$f->translatedFormat('j \d\e F \d\e Y');
         }
 
         if ($i->month !== $f->month) {
-            return Str::ucfirst($i->translatedFormat('j \d\e F')).' a '.$f->translatedFormat('j \d\e F \d\e Y');
+            return $i->translatedFormat('j \d\e F').' a '.$f->translatedFormat('j \d\e F \d\e Y');
         }
 
-        return Str::ucfirst($i->translatedFormat('j')).' a '.$f->translatedFormat('j \d\e F \d\e Y');
+        return $i->translatedFormat('j').' a '.$f->translatedFormat('j \d\e F \d\e Y');
     }
 }

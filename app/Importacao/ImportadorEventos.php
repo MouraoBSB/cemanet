@@ -59,7 +59,7 @@ class ImportadorEventos
                 // Categoria (heurística pelo título).
                 $catSlug = ClassificadorCategoria::paraSlug((string) ($d['titulo'] ?? ''));
                 $categoriaId = $catSlug ? CategoriaEvento::where('slug', $catSlug)->value('id') : null;
-                if ($catSlug === null) {
+                if ($categoriaId === null) {
                     $this->contadores['sem_categoria']++;
                     $this->avisos[] = "[{$d['slug']}] categoria não inferida (revisar no admin)";
                 }

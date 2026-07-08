@@ -8,6 +8,7 @@ use App\Enums\VisibilidadeEvento;
 use App\Importacao\BaixadorImagem;
 use App\Importacao\ImportadorEventos;
 use App\Importacao\LeitorEventos;
+use App\Models\CategoriaEvento;
 use App\Models\Departamento;
 use App\Models\Evento;
 use Database\Seeders\CategoriaEventoSeeder;
@@ -151,6 +152,18 @@ class ImportadorEventosTest extends TestCase
         $this->assertTrue($evento->departamentos->contains('sigla', 'DEPRO'));
         $this->assertFalse($evento->departamentos->contains('sigla', 'DECOM'));
         $this->assertNotEmpty(array_filter($resumo['avisos'], fn ($a) => str_contains($a, 'DECOM')));
+    }
+
+    public function test_categoria_inferida_mas_nao_cadastrada_gera_aviso(): void
+    {
+        CategoriaEvento::where('slug', 'brecho')->delete(); // slug some do banco, mas o título ainda infere 'brecho'
+
+        $resumo = $this->importar([$this->eventoLegado(['flyer_url' => null, 'galeria_urls' => []])]);
+
+        $evento = Evento::firstWhere('slug', 'brecho-solidario-27-de-junho');
+        $this->assertNull($evento->categoria_evento_id);
+        $this->assertSame(1, $resumo['contadores']['sem_categoria']);
+        $this->assertNotEmpty(array_filter($resumo['avisos'], fn ($a) => str_contains($a, 'categoria não inferida')));
     }
 
     public function test_e_idempotente(): void

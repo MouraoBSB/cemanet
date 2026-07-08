@@ -5,11 +5,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Departamento extends Model
 {
-    protected $fillable = ['sigla', 'nome', 'slug', 'descricao', 'ativo', 'ordem'];
+    protected $fillable = ['sigla', 'nome', 'slug', 'descricao', 'cor', 'icone', 'ativo', 'ordem'];
 
     protected function casts(): array
     {
@@ -24,5 +25,10 @@ class Departamento extends Model
     public function cargos(): HasMany
     {
         return $this->hasMany(Cargo::class);
+    }
+
+    public function eventos(): BelongsToMany
+    {
+        return $this->belongsToMany(Evento::class, 'departamento_evento', 'departamento_id', 'evento_id');
     }
 }

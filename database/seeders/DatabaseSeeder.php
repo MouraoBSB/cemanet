@@ -22,5 +22,7 @@ class DatabaseSeeder extends Seeder
         // Admin DURÁVEL e idempotente (sobrevive a db:seed; sem usuário aleatório), já com
         // o papel administrador — fonte única do admin do site novo (ver AdminSeeder).
         $this->call(AdminSeeder::class);
+
+        $this->call(CategoriaEventoSeeder::class);
     }
 }

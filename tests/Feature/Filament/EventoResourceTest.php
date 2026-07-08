@@ -87,4 +87,27 @@ class EventoResourceTest extends TestCase
             ->call('create')
             ->assertHasFormErrors(['hora_fim']);
     }
+
+    public function test_cria_evento_com_horas_validas_e_periodo_correto(): void
+    {
+        $this->actingAs($this->admin());
+
+        Livewire::test(CreateEvento::class)
+            ->fillForm([
+                'titulo' => 'Encontro com horário',
+                'slug' => 'encontro-com-horario',
+                'data_inicio' => '2026-06-27',
+                'hora_inicio' => '08:00',
+                'hora_fim' => '12:00',
+                'visibilidade' => 'publico',
+                'status' => Evento::STATUS_PUBLICADO,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $evento = Evento::firstWhere('slug', 'encontro-com-horario');
+        $this->assertSame('08:00', $evento->hora_inicio);
+        $this->assertSame('12:00', $evento->hora_fim);
+        $this->assertSame('27 de junho de 2026 · 8h – 12h', $evento->periodo);
+    }
 }

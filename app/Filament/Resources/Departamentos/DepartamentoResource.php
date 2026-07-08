@@ -13,6 +13,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
@@ -78,6 +79,14 @@ class DepartamentoResource extends Resource
                         Textarea::make('descricao')
                             ->label('Descrição')
                             ->columnSpanFull(),
+
+                        ColorPicker::make('cor')
+                            ->label('Cor')
+                            ->rules(['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/']),
+
+                        TextInput::make('icone')
+                            ->label('Ícone (opcional)')
+                            ->maxLength(255),
 
                         Toggle::make('ativo')
                             ->label('Ativo')

@@ -7,6 +7,8 @@ use App\Importacao\LeitorAgenda;
 use App\Importacao\LeitorAgendaMysql;
 use App\Importacao\LeitorBlog;
 use App\Importacao\LeitorBlogMysql;
+use App\Importacao\LeitorEventos;
+use App\Importacao\LeitorEventosMysql;
 use App\Importacao\LeitorLegado;
 use App\Importacao\LeitorLegadoMysql;
 use App\Importacao\LeitorUsuarios;
@@ -31,6 +33,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(LeitorLegado::class, LeitorLegadoMysql::class);
         $this->app->bind(LeitorBlog::class, LeitorBlogMysql::class);
         $this->app->bind(LeitorAgenda::class, LeitorAgendaMysql::class);
+        $this->app->bind(LeitorEventos::class, LeitorEventosMysql::class);
         $this->app->bind(LeitorUsuarios::class, LeitorUsuariosMysql::class);
         $this->app->bind(FonteReflexao::class, ReflexaoConfig::class);
     }

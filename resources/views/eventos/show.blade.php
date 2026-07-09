@@ -2,26 +2,27 @@
     use Illuminate\Support\Str;
     $s = $evento->status_selo;
     $resumoTexto = trim(strip_tags((string) $evento->resumo));
-    $descricaoSeo = Str::limit($resumoTexto, 155);
+    $descricaoSeo = Str::limit($resumoTexto, 155) ?: null;
     $inicioIso = \Illuminate\Support\Carbon::parse($evento->getRawOriginal('data_inicio').' '.($evento->hora_inicio ?? '00:00'), \App\Support\Eventos\StatusEvento::FUSO)->toIso8601String();
     $jsonLd = json_encode(array_filter([
         '@context' => 'https://schema.org',
         '@type' => 'Event',
         'name' => $evento->titulo,
         'startDate' => $inicioIso,
-        'eventStatus' => $evento->ehPassado ? 'https://schema.org/EventScheduled' : 'https://schema.org/EventScheduled',
+        'eventStatus' => 'https://schema.org/EventScheduled',
         'location' => ['@type' => 'Place', 'name' => config('cema.nome'), 'address' => config('cema.endereco')],
-        'organizer' => ['@type' => 'Organization', 'name' => 'CEMA'],
+        'organizer' => ['@type' => 'Organization', 'name' => config('cema.nome')],
         'description' => $descricaoSeo ?: null,
         'image' => $evento->flyerUrl ?: null,
     ]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG);
 
     $gcInicio = $evento->inicioUtc()->format('Ymd\THis\Z');
     $gcFim = $evento->fimUtc()->format('Ymd\THis\Z');
+    $gcLocal = $evento->local ? $evento->local.' — '.config('cema.endereco') : config('cema.endereco');
     $googleAgenda = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='.urlencode($evento->titulo)
         .'&dates='.$gcInicio.'/'.$gcFim
         .'&details='.urlencode(route('eventos.show', $evento->slug))
-        .'&location='.urlencode(($evento->local ?: '').' — '.config('cema.endereco'));
+        .'&location='.urlencode($gcLocal);
 
     $urlAtual = route('eventos.show', $evento->slug);
 @endphp
@@ -66,7 +67,7 @@
     {{-- Barra de ações: compartilhar + adicionar à agenda --}}
     <section class="border-b border-border-muted bg-white">
         <div class="mx-auto max-w-[1100px] px-6 py-4"
-             x-data="{ url: @js($urlAtual), titulo: @js($evento->titulo), copiado: false,
+             x-data="{ url: @js($urlAtual), copiado: false,
                 copiar() { navigator.clipboard.writeText(this.url).then(() => { this.copiado = true; setTimeout(() => this.copiado = false, 2000); }); } }">
             <div class="flex flex-wrap items-center gap-2.5">
                 <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($urlAtual) }}" target="_blank" rel="noopener noreferrer"
@@ -106,7 +107,7 @@
             </div>
 
             {{-- Sidebar sticky --}}
-            <aside class="sticky top-[90px] space-y-5">
+            <aside class="space-y-5 desktop-sm:sticky desktop-sm:top-24">
                 @if ($evento->flyerUrl)
                     <div class="overflow-hidden rounded-xl border border-border-muted bg-cream">
                         <img src="{{ $evento->flyerUrl }}" alt="{{ $evento->titulo }}" loading="lazy" width="320" height="400" class="w-full object-cover">

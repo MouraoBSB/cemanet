@@ -34,4 +34,19 @@ class EventoSingleSeoTest extends TestCase
         $r->assertSee('name="description"', false);
         $r->assertDontSee('<p>Venha</p>', false);
     }
+
+    public function test_single_sem_resumo_usa_descricao_padrao_do_site(): void
+    {
+        $cat = CategoriaEvento::create(['nome' => 'Palestra', 'slug' => 'palestra', 'cor' => '#89AB98']);
+        Evento::create([
+            'titulo' => 'Encontro Sem Resumo', 'slug' => 'encontro-sem-resumo', 'resumo' => null,
+            'data_inicio' => '2026-06-27', 'hora_inicio' => '08:30',
+            'categoria_evento_id' => $cat->id, 'visibilidade' => VisibilidadeEvento::Publico,
+            'status' => Evento::STATUS_PUBLICADO, 'local' => 'CEMA',
+        ]);
+
+        $r = $this->get('/eventos/encontro-sem-resumo')->assertOk();
+        $r->assertDontSee('name="description" content=""', false);
+        $r->assertSee('Centro Espírita Maria Madalena', false);
+    }
 }

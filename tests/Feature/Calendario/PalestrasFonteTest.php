@@ -54,4 +54,17 @@ class PalestrasFonteTest extends TestCase
 
         $this->assertStringContainsString('A Próxima', (new PalestrasFonte)->proxima(null)->titulo);
     }
+
+    public function test_meses_separam_proximas_de_realizadas_por_modo(): void
+    {
+        $futura = Carbon::now()->addMonths(2)->startOfMonth()->setTime(19, 0);
+        $passada = Carbon::now()->subMonths(2)->startOfMonth()->setTime(19, 0);
+        $this->palestra(['slug' => 'fut', 'data_da_palestra' => $futura]);
+        $this->palestra(['slug' => 'pas', 'data_da_palestra' => $passada]);
+
+        $fonte = new PalestrasFonte;
+
+        $this->assertSame([$futura->format('Y-m')], $fonte->meses('proximas', null));
+        $this->assertSame([$passada->format('Y-m')], $fonte->meses('realizadas', null));
+    }
 }

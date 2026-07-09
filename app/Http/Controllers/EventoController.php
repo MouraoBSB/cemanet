@@ -6,9 +6,11 @@ namespace App\Http\Controllers;
 
 use App\Enums\VisibilidadeEvento;
 use App\Models\Evento;
+use App\Support\Eventos\FeedIcs;
 use App\Support\Eventos\StatusEvento;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class EventoController extends Controller
 {
@@ -22,7 +24,7 @@ class EventoController extends Controller
             ->publicado()
             ->visiveisPara($usuario)
             ->whereRaw('COALESCE(data_fim, data_inicio) >= ?', [now(StatusEvento::FUSO)->toDateString()])
-            ->with(['categoria', 'departamentos'])
+            ->with(['categoria', 'departamentos', 'media'])
             ->orderBy('data_inicio')
             ->first();
 
@@ -34,7 +36,7 @@ class EventoController extends Controller
         $usuario = $request->user();
 
         $evento = Evento::query()->publicado()
-            ->with(['categoria', 'departamentos'])
+            ->with(['categoria', 'departamentos', 'media'])
             ->where('slug', $slug)
             ->firstOrFail();
 
@@ -44,7 +46,7 @@ class EventoController extends Controller
         $rel = Evento::query()->publicado()->visiveisPara($usuario)
             ->where('id', '!=', $evento->id)
             ->when($evento->categoria_evento_id, fn (Builder $q) => $q->where('categoria_evento_id', $evento->categoria_evento_id))
-            ->with('categoria')
+            ->with(['categoria', 'media'])
             ->orderByRaw('COALESCE(data_fim, data_inicio) >= ? DESC', [now(StatusEvento::FUSO)->toDateString()])
             ->orderBy('data_inicio')
             ->take(3)->get();
@@ -53,7 +55,7 @@ class EventoController extends Controller
             $exclui = $rel->pluck('id')->push($evento->id)->all();
             $rel = $rel->concat(
                 Evento::query()->publicado()->visiveisPara($usuario)
-                    ->whereNotIn('id', $exclui)->with('categoria')
+                    ->whereNotIn('id', $exclui)->with(['categoria', 'media'])
                     ->orderBy('data_inicio')->take(3 - $rel->count())->get()
             );
         }
@@ -61,6 +63,41 @@ class EventoController extends Controller
         $resposta = response()->view('eventos.show', ['evento' => $evento, 'relacionados' => $rel]);
 
         // Single restrita não pode ficar em cache compartilhado.
+        if ($evento->visibilidade !== VisibilidadeEvento::Publico) {
+            $resposta->header('Cache-Control', 'private, no-store');
+        }
+
+        return $resposta;
+    }
+
+    /** Feed .ics agregado: só eventos PÚBLICOS e não encerrados. */
+    public function feed(Request $request): Response
+    {
+        $eventos = Evento::query()->publicado()
+            ->where('visibilidade', VisibilidadeEvento::Publico->value)
+            ->whereRaw('COALESCE(data_fim, data_inicio) >= ?', [now(StatusEvento::FUSO)->toDateString()])
+            ->orderBy('data_inicio')->get();
+
+        $headers = ['Content-Type' => 'text/calendar; charset=utf-8'];
+        if ($request->boolean('download')) {
+            $headers['Content-Disposition'] = 'attachment; filename="cema-eventos.ics"';
+        }
+
+        return response(FeedIcs::documento($eventos), 200, $headers);
+    }
+
+    /** .ics de UM evento (autoriza como o show; restrito → 404 + Cache-Control private). */
+    public function calendario(Request $request, string $slug): Response
+    {
+        $evento = Evento::query()->publicado()->where('slug', $slug)->firstOrFail();
+        abort_unless($evento->podeSerVistoPor($request->user()), 404); // 404, não 403 (não vaza existência)
+
+        $resposta = response(FeedIcs::documento([$evento]), 200, [
+            'Content-Type' => 'text/calendar; charset=utf-8',
+            'Content-Disposition' => 'attachment; filename="evento-'.$evento->slug.'.ics"',
+        ]);
+
+        // .ics restrito jamais em cache de proxy/compartilhado.
         if ($evento->visibilidade !== VisibilidadeEvento::Publico) {
             $resposta->header('Cache-Control', 'private, no-store');
         }

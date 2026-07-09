@@ -10,11 +10,9 @@
 
     if ($destaque) {
         $ds = $destaque->status_selo;
-        $dGcInicio = $destaque->inicioUtc()->format('Ymd\THis\Z');
-        $dGcFim = $destaque->fimUtc()->format('Ymd\THis\Z');
         $dGcLocal = $destaque->local ? $destaque->local.' — '.config('cema.endereco') : config('cema.endereco');
         $dGoogleAgenda = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='.urlencode($destaque->titulo)
-            .'&dates='.$dGcInicio.'/'.$dGcFim
+            .'&dates='.$destaque->googleCalendarDates()
             .'&details='.urlencode(route('eventos.show', $destaque->slug))
             .'&location='.urlencode($dGcLocal);
     }
@@ -34,6 +32,10 @@
             <h1 class="mt-3 font-display text-4xl font-semibold sm:text-5xl">Eventos</h1>
             <div class="mt-4 h-1 w-16 rounded-full bg-gold"></div>
             <p class="mt-4 max-w-xl font-light text-[#d7def0]">Brechós, palestras temáticas, encontros e atividades abertas à comunidade.</p>
+            <button type="button" x-data @click="$dispatch('open-assinar')"
+                    class="mt-6 inline-flex items-center gap-2 rounded-pill border border-white/30 bg-white/10 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/20">
+                🔔 Assinar calendário
+            </button>
         </div>
     </section>
 
@@ -90,4 +92,6 @@
     <section class="mx-auto max-w-[1240px] px-6 py-12">
         @livewire('eventos.lista', ['destaqueId' => $destaque?->id])
     </section>
+
+    <x-eventos.assinar-modal :feed-url="route('eventos.feed-ics')" />
 </x-layout.app>

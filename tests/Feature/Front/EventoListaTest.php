@@ -8,8 +8,11 @@ use App\Enums\VisibilidadeEvento;
 use App\Livewire\Eventos\Lista;
 use App\Models\CategoriaEvento;
 use App\Models\Evento;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Livewire\Livewire;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class EventoListaTest extends TestCase
@@ -66,5 +69,21 @@ class EventoListaTest extends TestCase
     public function test_estado_vazio(): void
     {
         Livewire::test(Lista::class)->assertSee('Nenhum evento encontrado');
+    }
+
+    public function test_card_mostra_selo_de_visibilidade_so_para_logado(): void
+    {
+        Role::updateOrCreate(['name' => 'diretor', 'guard_name' => 'web'], ['nivel' => 30]);
+        $u = User::factory()->create();
+        $u->assignRole('diretor');
+        // evento público mais próximo assume o destaque (hero), deixando o restrito na grade — onde o card vive.
+        $this->ev('brecho-selo', Carbon::now()->addDays(2)->toDateString());
+        Evento::create(['titulo' => 'Reunião', 'slug' => 'reuniao', 'data_inicio' => Carbon::now()->addDays(5)->toDateString(),
+            'visibilidade' => VisibilidadeEvento::Diretoria, 'status' => Evento::STATUS_PUBLICADO]);
+
+        // anônimo nem vê o card (filtrado) — sem selo
+        $this->get('/eventos')->assertDontSee('Somente diretoria');
+        // diretor vê o card com o selo
+        $this->actingAs($u)->get('/eventos')->assertSee('Somente diretoria');
     }
 }

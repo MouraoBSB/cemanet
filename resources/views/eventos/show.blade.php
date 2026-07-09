@@ -72,11 +72,11 @@
             <div class="flex flex-wrap items-center gap-2.5">
                 <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode($urlAtual) }}" target="_blank" rel="noopener noreferrer"
                    class="flex items-center gap-2 rounded-pill border border-border bg-white px-4 py-2 text-[13px] font-semibold text-primary hover:bg-surface">
-                    <span class="flex size-5 items-center justify-center rounded-full bg-[#3b5998] text-[12px] font-bold text-white">f</span> Facebook
+                    <span class="flex size-5 items-center justify-center rounded-full bg-[#3b5998] text-white"><x-icon.facebook class="size-3" /></span> Facebook
                 </a>
                 <a href="https://wa.me/?text={{ urlencode($evento->titulo.' — '.$urlAtual) }}" target="_blank" rel="noopener noreferrer"
                    class="flex items-center gap-2 rounded-pill border border-border bg-white px-4 py-2 text-[13px] font-semibold text-primary hover:bg-surface">
-                    <span class="flex size-5 items-center justify-center rounded-full bg-[#25d366] text-[11px] font-bold text-white">W</span> WhatsApp
+                    <span class="flex size-5 items-center justify-center rounded-full bg-[#25d366] text-white"><x-icon.whatsapp class="size-3.5" /></span> WhatsApp
                 </a>
                 <button type="button" @click="copiar()"
                         class="rounded-pill border border-border bg-white px-4 py-2 text-[13px] font-semibold text-primary hover:bg-surface">
@@ -96,9 +96,9 @@
             {{-- Conteúdo --}}
             <div>
                 @if ($evento->conteudo)
-                    <div class="max-w-none text-justify hyphens-auto font-serif text-[16px] leading-[1.82] text-[#3a3553]
+                    <div class="max-w-none text-justify hyphens-auto [overflow-wrap:anywhere] font-serif text-[16px] leading-[1.82] text-[#3a3553]
                         [&_p]:mb-[18px] [&>p:first-of-type]:text-lg [&>p:first-of-type]:font-medium
-                        [&_a]:text-secondary [&_a]:underline">
+                        [&_a]:text-secondary [&_a]:underline [&_a]:[overflow-wrap:anywhere]">
                         {!! $evento->conteudo !!}
                     </div>
                 @endif
@@ -126,7 +126,7 @@
                        class="flex items-center justify-center gap-2 rounded-pill bg-primary px-4 py-2.5 text-sm font-semibold text-white hover:opacity-90">📅 Adicionar à agenda</a>
                     <a href="https://wa.me/?text={{ urlencode($evento->titulo.' — '.$urlAtual) }}" target="_blank" rel="noopener noreferrer"
                        class="flex items-center justify-center gap-2 rounded-pill border border-border px-4 py-2.5 text-sm font-semibold text-text-secondary hover:border-primary hover:text-primary">
-                        <span class="flex size-5 items-center justify-center rounded-full bg-[#25d366] text-[11px] font-bold text-white">W</span> Compartilhar no WhatsApp
+                        <span class="flex size-5 items-center justify-center rounded-full bg-[#25d366] text-white"><x-icon.whatsapp class="size-3.5" /></span> Compartilhar no WhatsApp
                     </a>
                 </div>
             </aside>

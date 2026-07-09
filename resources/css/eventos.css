@@ -1,0 +1,27 @@
+/* Estilos auxiliares do módulo Eventos (grade, single, destaque).
+   Thiago Mourão — https://github.com/MouraoBSB — 2026-07-08 */
+@layer components {
+    /* Pulso do selo "Acontecendo agora" / destaque em contagem regressiva curta. */
+    .cema-evt-pulse {
+        animation: cema-evt-pulsa 1.8s ease-in-out infinite;
+    }
+    @keyframes cema-evt-pulsa {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.6; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .cema-evt-pulse { animation: none; }
+    }
+
+    /* Aside "fixo" na single (mapa/CTA/compartilhar) — só a partir do desktop. */
+    .cema-evt-aside-sticky {
+        position: sticky;
+        top: 1.5rem;
+    }
+
+    /* Selo de status/categoria: contraste garantido via cor_texto (inline), aqui só a base visual. */
+    .cema-evt-selo {
+        line-height: 1;
+        white-space: nowrap;
+    }
+}

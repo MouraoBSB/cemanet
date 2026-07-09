@@ -10,6 +10,7 @@
 @import './palestras-calendario.css';
 @import './agenda.css';
 @import './palestrantes.css';
+@import './eventos.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';

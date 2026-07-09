@@ -41,4 +41,21 @@
         <priority>0.7</priority>
     </url>
     @endforeach
+
+    {{-- Eventos — listagem principal --}}
+    <url>
+        <loc>{{ route('eventos.index') }}</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    {{-- Eventos públicos publicados --}}
+    @foreach ($eventos as $ev)
+    <url>
+        <loc>{{ route('eventos.show', $ev->slug) }}</loc>
+        <lastmod>{{ $ev->updated_at->toAtomString() }}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    @endforeach
 </urlset>

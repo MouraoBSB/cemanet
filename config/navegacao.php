@@ -22,7 +22,7 @@ return [
             ],
         ],
         ['rotulo' => 'Mensagens Mediúnicas', 'ativo' => false, 'itens' => []],
-        ['rotulo' => 'Eventos', 'ativo' => false, 'itens' => []],
+        ['rotulo' => 'Eventos', 'rota' => 'eventos.index', 'ativo' => true, 'itens' => []],
         ['rotulo' => 'Vibração', 'ativo' => false, 'itens' => []],
         ['rotulo' => 'Agenda', 'rota' => 'agenda.index', 'ativo' => true, 'itens' => []],
         ['rotulo' => 'Evangelho', 'ativo' => false, 'itens' => []],

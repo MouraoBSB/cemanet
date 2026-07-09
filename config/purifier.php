@@ -117,6 +117,9 @@ return [
         'conteudo' => [
             'HTML.Allowed' => 'p,br,b,strong,i,em,u,s,h2,h3,h4,ul,ol,li,blockquote,a[href|title|target|rel],img[src|alt|width|height],figure,figcaption',
             'HTML.TargetBlank' => true,
+            // Transforma URLs cruas em <a href> na própria árvore do documento (não é regex
+            // sobre HTML: não linka dentro de atributos nem re-linka texto já ancorado).
+            'AutoFormat.Linkify' => true,
             'AutoFormat.RemoveEmpty' => true,
             'URI.AllowedSchemes' => ['http' => true, 'https' => true, 'mailto' => true],
         ],

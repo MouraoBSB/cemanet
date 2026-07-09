@@ -5,6 +5,7 @@ use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\ContaController;
+use App\Http\Controllers\EventoController;
 use App\Http\Controllers\MidiaController;
 use App\Http\Controllers\PalestraController;
 use App\Http\Controllers\PalestranteController;
@@ -73,6 +74,16 @@ Route::get('/palestrantes/{slug}', [PalestranteController::class, 'show'])->name
 // Blog "Sementeira de Luz"
 Route::get('/sementeira', [BlogController::class, 'index'])->name('blog.index');
 Route::get('/sementeira/{slug}', [BlogController::class, 'show'])->name('blog.show');
+
+// Eventos. Estáticas antes de {slug}.
+Route::get('/eventos', [EventoController::class, 'index'])->name('eventos.index');
+Route::get('/eventos/{slug}', [EventoController::class, 'show'])
+    ->name('eventos.show')->where('slug', '[a-z0-9-]+');
+
+// Compat 301 das URLs antigas do WP (/_evento e /_evento/{slug}).
+Route::permanentRedirect('/_evento', '/eventos');
+Route::get('/_evento/{slug}', fn (string $slug) => redirect()->route('eventos.show', ['slug' => $slug], 301))
+    ->where('slug', '[a-z0-9-]+');
 
 // Agenda Reforma Íntima (devocional diário). Estáticas antes de {data}.
 Route::get('/agenda-reforma-intima', [AgendaController::class, 'index'])->name('agenda.index');

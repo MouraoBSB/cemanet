@@ -13,8 +13,8 @@
         'eventStatus' => 'https://schema.org/EventScheduled',
         'location' => [
             '@type' => 'Place',
-            'name' => 'Centro Espírita Maria Madalena',
-            'address' => 'Quadra 02, Lote 16, Vila Vicentina, Planaltina, DF',
+            'name' => config('cema.nome'),
+            'address' => config('cema.endereco'),
         ],
         'performer' => $palestrantes->map(fn ($p) => ['@type' => 'Person', 'name' => $p->nome])->all(),
         'organizer' => ['@type' => 'Organization', 'name' => 'CEMA'],

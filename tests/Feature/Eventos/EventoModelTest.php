@@ -59,6 +59,22 @@ class EventoModelTest extends TestCase
         $this->assertStringContainsString('Chamada', (string) $evento->resumo);
     }
 
+    public function test_conteudo_autolinka_url_crua_sem_duplicar_link_existente(): void
+    {
+        $evento = $this->eventoBase([
+            'conteudo' => '<p>Veja https://cemanet.org.br/palestra_publica/exemplo e '
+                .'<a href="https://exemplo.com">já linkado</a>.</p>',
+        ]);
+
+        $html = (string) $evento->conteudo;
+
+        // URL crua no texto vira link (com target=_blank pelo HTML.TargetBlank do profile).
+        $this->assertStringContainsString('href="https://cemanet.org.br/palestra_publica/exemplo"', $html);
+        // O link já existente não é re-linkado nem duplicado: exatamente 2 âncoras no total.
+        $this->assertSame(2, substr_count($html, '<a '));
+        $this->assertSame(1, substr_count($html, 'href="https://exemplo.com"'));
+    }
+
     public function test_visibilidade_e_enum(): void
     {
         $evento = $this->eventoBase(['visibilidade' => VisibilidadeEvento::Diretoria]);

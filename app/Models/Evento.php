@@ -7,6 +7,7 @@ namespace App\Models;
 use App\Enums\VisibilidadeEvento;
 use App\Models\Concerns\RegistraImagensPadrao;
 use App\Support\Eventos\PeriodoEvento;
+use App\Support\Eventos\StatusEvento;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -52,6 +53,38 @@ class Evento extends Model implements HasMedia
     public function scopePublicado(Builder $query): Builder
     {
         return $query->where('status', self::STATUS_PUBLICADO);
+    }
+
+    /** Regra de visibilidade por papel (fonte única). Admin (nível 100) satisfaz qualquer >=. */
+    public function podeSerVistoPor(?User $usuario): bool
+    {
+        $nivel = $usuario?->nivelMaximo() ?? 0;
+
+        return match ($this->visibilidade) {
+            VisibilidadeEvento::Publico => true,
+            VisibilidadeEvento::Logados => $usuario !== null,
+            VisibilidadeEvento::Trabalhadores => $usuario !== null && $nivel >= VisibilidadeEvento::Trabalhadores->nivelMinimo(),
+            VisibilidadeEvento::Diretoria => $usuario !== null && $nivel >= VisibilidadeEvento::Diretoria->nivelMinimo(),
+        };
+    }
+
+    /** Filtra no banco os eventos que o usuário (ou anônimo) pode ver — não vaza títulos restritos. */
+    public function scopeVisiveisPara(Builder $query, ?User $usuario): Builder
+    {
+        $nivel = $usuario?->nivelMaximo() ?? 0;
+
+        return $query->where(function (Builder $q) use ($usuario, $nivel) {
+            $q->where('visibilidade', VisibilidadeEvento::Publico->value);
+            if ($usuario !== null) {
+                $q->orWhere('visibilidade', VisibilidadeEvento::Logados->value);
+                if ($nivel >= VisibilidadeEvento::Trabalhadores->nivelMinimo()) {
+                    $q->orWhere('visibilidade', VisibilidadeEvento::Trabalhadores->value);
+                }
+                if ($nivel >= VisibilidadeEvento::Diretoria->nivelMinimo()) {
+                    $q->orWhere('visibilidade', VisibilidadeEvento::Diretoria->value);
+                }
+            }
+        });
     }
 
     public function categoria(): BelongsTo
@@ -120,6 +153,38 @@ class Evento extends Model implements HasMedia
     protected function flyerUrl(): Attribute
     {
         return Attribute::get(fn (): ?string => $this->getFirstMediaUrl(self::COLECAO_FLYER, 'web') ?: null);
+    }
+
+    /** @return array{estado:string,rotulo:string,cor:string,cor_texto:string} */
+    public function getStatusSeloAttribute(): array
+    {
+        return StatusEvento::para($this->attributes['data_inicio'] ?? null, $this->attributes['data_fim'] ?? null);
+    }
+
+    public function getEhPassadoAttribute(): bool
+    {
+        return $this->status_selo['estado'] === 'passado';
+    }
+
+    /** Instante de início em UTC (para Google Calendar/ICS com hora); dia inteiro → 00:00. */
+    public function inicioUtc(): Carbon
+    {
+        $data = $this->attributes['data_inicio'];
+        $hora = ($this->hora_inicio ?? '') !== '' ? $this->hora_inicio : '00:00';
+
+        return Carbon::parse("{$data} {$hora}", 'America/Sao_Paulo')->utc();
+    }
+
+    /** Instante de fim em UTC: hora_fim quando há hora; senão início + 2h. */
+    public function fimUtc(): Carbon
+    {
+        if (($this->hora_inicio ?? '') !== '' && ($this->hora_fim ?? '') !== '') {
+            $dataFim = ($this->attributes['data_fim'] ?? null) ?: $this->attributes['data_inicio'];
+
+            return Carbon::parse("{$dataFim} {$this->hora_fim}", 'America/Sao_Paulo')->utc();
+        }
+
+        return $this->inicioUtc()->addHours(2);
     }
 
     /** Normaliza hora para 'HH:MM' zero-padded; aceita 'H:i' ou 'H:i:s'. Inválido passa cru p/ validação acusar. */

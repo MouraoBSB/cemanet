@@ -10,8 +10,6 @@ final class FeedIcs
 {
     public const PRODID = '-//CEMA//Palestras//PT-BR';
 
-    private const LOCAL_PRESENCIAL = 'Centro Espírita Maria Madalena — Quadra 02, Lote 16, Vila Vicentina, Planaltina, DF';
-
     /** Escapa valor para iCal: \, ; , e quebras de linha (CRLF/CR/LF → \n). */
     public static function escapar(string $v): string
     {
@@ -71,7 +69,7 @@ final class FeedIcs
             $p->online ? 'Online' : 'Presencial',
         ]);
         $descricao = implode(' · ', $partes)."\n".route('palestras.show', $p->slug);
-        $local = $p->online ? 'Online — YouTube' : self::LOCAL_PRESENCIAL;
+        $local = $p->online ? 'Online — YouTube' : config('cema.nome').' — '.config('cema.endereco');
 
         return [
             'BEGIN:VEVENT',

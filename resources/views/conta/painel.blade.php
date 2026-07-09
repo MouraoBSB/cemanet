@@ -1,7 +1,7 @@
 {{-- Thiago Mourão — https://github.com/MouraoBSB — 2026-07-04 --}}
 @php
     $atalhos = [
-        ['rotulo' => 'Calendário de palestras', 'rota' => 'palestras.calendario'],
+        ['rotulo' => 'Calendário de palestras', 'rota' => 'calendario.index'],
         ['rotulo' => 'Palestras', 'rota' => 'palestras.index'],
         ['rotulo' => 'Sementeira de Luz', 'rota' => 'blog.index'],
         ['rotulo' => 'Agenda Reforma Íntima', 'rota' => 'agenda.index'],
@@ -17,7 +17,7 @@
         <section class="rounded-lg bg-white p-6 shadow-card">
             <div class="mb-4 flex items-center justify-between">
                 <h2 class="font-display text-lg font-semibold text-primary">Próximas palestras</h2>
-                <a href="{{ route('palestras.calendario') }}" class="text-sm font-medium text-secondary hover:text-primary">Ver todas →</a>
+                <a href="{{ route('calendario.index') }}" class="text-sm font-medium text-secondary hover:text-primary">Ver todas →</a>
             </div>
 
             @forelse ($proximas as $palestra)

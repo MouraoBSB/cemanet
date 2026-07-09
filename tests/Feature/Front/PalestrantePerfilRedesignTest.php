@@ -36,7 +36,7 @@ class PalestrantePerfilRedesignTest extends TestCase
         $resp->assertOk();
         $resp->assertSee('Palestrante'); // eyebrow "Palestrante · CEMA" (maiúsculo é só CSS); assertSee é case-sensitive
         $resp->assertSee('Fulano de Tal');
-        $resp->assertSee(route('palestras.calendario'), false);
+        $resp->assertSee(route('calendario.index', ['tipo' => 'palestras']), false);
         $resp->assertSee('palestranteDetalhe(', false); // wiring do Alpine
     }
 

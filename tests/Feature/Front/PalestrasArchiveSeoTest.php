@@ -23,6 +23,6 @@ class PalestrasArchiveSeoTest extends TestCase
 
         $resp->assertSee(route('palestrantes.index'), false);
         $resp->assertSee(route('blog.index'), false);
-        $resp->assertSee(route('palestras.calendario'), false);
+        $resp->assertSee(route('calendario.index', ['tipo' => 'palestras']), false);
     }
 }

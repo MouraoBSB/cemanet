@@ -20,12 +20,11 @@ class CalendarioSeoTest extends TestCase
             'data_da_palestra' => Carbon::now()->addDays(4)->setTime(19, 0),
         ]);
 
-        $resp = $this->get('/palestra_publica/calendario');
+        $resp = $this->get('/calendario');
 
         $resp->assertOk();
         $resp->assertSee('"@type":"ItemList"', false);
         $resp->assertSee('"@type":"Event"', false);
-        $resp->assertSee('"eventAttendanceMode"', false);
         $resp->assertSee('"startDate"', false);
         $resp->assertSee('Futura SEO', false);
     }

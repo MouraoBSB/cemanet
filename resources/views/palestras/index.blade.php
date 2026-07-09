@@ -26,7 +26,7 @@
                 <div class="mt-4 h-1 w-16 rounded-full bg-gold"></div>
                 <p class="mt-4 max-w-xl font-light text-[#d7def0]">Reflexões à luz do Espiritismo, abertas a todos — todos os domingos, às 19h, presencialmente e ao vivo pelo nosso canal.</p>
             </div>
-            <a href="{{ route('palestras.calendario') }}"
+            <a href="{{ route('calendario.index', ['tipo' => 'palestras']) }}"
                class="flex items-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-5 py-4 transition hover:bg-white/15">
                 <span class="text-2xl text-gold" aria-hidden="true">📅</span>
                 <span class="font-display font-semibold">Calendário de Palestras</span>
@@ -96,7 +96,7 @@
         <div class="border-t border-border-muted pt-8">
             <h2 class="font-display text-lg font-semibold text-primary">Veja também</h2>
             <div class="mt-4 flex flex-wrap gap-3">
-                @foreach ([['Palestrantes', route('palestrantes.index')], ['Calendário de Palestras', route('palestras.calendario')], ['Blog Sementeira de Luz', route('blog.index')]] as [$rotulo, $url])
+                @foreach ([['Palestrantes', route('palestrantes.index')], ['Calendário de Palestras', route('calendario.index', ['tipo' => 'palestras'])], ['Blog Sementeira de Luz', route('blog.index')]] as [$rotulo, $url])
                     <a href="{{ $url }}" class="inline-flex items-center gap-2 rounded-pill border border-border-muted bg-white px-5 py-2.5 text-sm text-[#3a3553] transition hover:border-primary">
                         <span class="size-2 rounded-full bg-accent" aria-hidden="true"></span>{{ $rotulo }}
                     </a>

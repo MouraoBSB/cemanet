@@ -46,7 +46,7 @@
                 @endif
             </div>
 
-            <a href="{{ route('palestras.calendario') }}"
+            <a href="{{ route('calendario.index', ['tipo' => 'palestras']) }}"
                class="inline-flex shrink-0 items-center gap-3 rounded-2xl border border-white/22 bg-white/10 px-5 py-4 backdrop-blur-sm transition hover:bg-white/15">
                 <span class="grid size-11 shrink-0 place-items-center rounded-xl bg-gold text-[#3a3266]" aria-hidden="true">
                     <svg class="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4" stroke-linecap="round"/></svg>

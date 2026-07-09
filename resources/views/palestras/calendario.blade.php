@@ -13,7 +13,7 @@
                     : 'https://schema.org/OfflineEventAttendanceMode',
                 'location' => $p->online
                     ? ['@type' => 'VirtualLocation', 'url' => $p->link_youtube]
-                    : ['@type' => 'Place', 'name' => 'Centro Espírita Maria Madalena', 'address' => 'Quadra 02, Lote 16, Vila Vicentina, Planaltina, DF'],
+                    : ['@type' => 'Place', 'name' => config('cema.nome'), 'address' => config('cema.endereco')],
                 'url' => route('palestras.show', $p->slug),
             ];
             if ($p->palestrantesAtivos->isNotEmpty()) {

@@ -55,7 +55,7 @@
     <div class="border-t border-white/10">
         <div class="mx-auto flex max-w-[1240px] flex-col gap-2 px-6 py-5 text-xs text-[#a89fce] sm:flex-row sm:items-center sm:justify-between">
             <address class="not-italic">
-                Quadra 02, Lote 16, Vila Vicentina — Planaltina, DF · CNPJ 01.600.089/0001-90
+                {{ config('cema.endereco') }} · CNPJ 01.600.089/0001-90
             </address>
             <p>© 2026 CEMA · Todos os direitos reservados · Desenvolvido por DECOM</p>
         </div>

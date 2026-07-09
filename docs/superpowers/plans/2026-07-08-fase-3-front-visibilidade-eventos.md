@@ -8,7 +8,9 @@
 
 **Tech Stack:** PHP 8.3 · Laravel 13 · Livewire 3 · Blade SSR · Tailwind v4 (`@theme` em `resources/css/app.css`) · spatie/laravel-permission (`roles.nivel`).
 
-> **⚠️ Fase grande (9 tasks).** Se preferir PRs menores, dá para fatiar no passe — o corte mais limpo é **pela peça de calendário**: `FeedIcs` (Task 9) + as rotas `.ics`/`feed()`/`calendario()` do controller + o `assinar-modal` + o botão "Adicionar à agenda" formam um sub-conjunto coeso que pode virar um 2º PR; o resto (visibilidade + archive + single + sitemap) é o 1º. Por padrão este plano é um só; decidir no passe.
+> **✅ Fatiado em 2 PRs (decisão do dono):**
+> - **3a (PR 1) = Tasks 1–8.** Recortes: `EventoController` tem **só** `index()` e `show()` (SEM `feed()`/`calendario()`, e **não** criar as rotas `.ics`); o CTA **"Adicionar à agenda"** entra na 3a (link Google Calendar via `Evento::inicioUtc()/fimUtc()`, não depende do `FeedIcs`); **NÃO** incluir `<x-eventos.assinar-modal>` na single/archive (ela chama `route('eventos.feed-ics')` e quebraria com `RouteNotFoundException`).
+> - **3b (PR 2) = Task 9.** `FeedIcs` + adicionar `feed()`/`calendario()` ao controller + as rotas `.ics` + o `<x-eventos.assinar-modal>` na single + `Cache-Control: private, no-store` no `calendario()` restrito.
 
 ## Global Constraints
 
@@ -283,6 +285,12 @@ namespace App\Policies;
 use App\Models\Evento;
 use App\Models\User;
 
+/**
+ * Policy parcial (só view/viewAny) — segura porque o Filament NÃO usa strict authorization
+ * (isAuthorizationStrict = false por padrão; o projeto não altera), então create/update/delete
+ * no /admin seguem permitidos. ⚠️ Se um dia ligarem strictAuthorization, esta policy parcial
+ * passará a lançar LogicException nos métodos ausentes — adicione-os então.
+ */
 class EventoPolicy
 {
     /** Delegada à regra única do model; $user é null-safe (visitante anônimo passa por Gate::forUser(null)). */
@@ -354,7 +362,8 @@ class StatusEventoTest extends TestCase
 
     private function status(string $ini, ?string $fim = null): array
     {
-        return StatusEvento::para($ini, $fim, Carbon::parse($this->hoje));
+        // Mesmo fuso do StatusEvento (senão o offset de 3h mascara erros de limite de dia).
+        return StatusEvento::para($ini, $fim, Carbon::parse($this->hoje, StatusEvento::FUSO));
     }
 
     public function test_encerrado_quando_fim_passou(): void
@@ -382,6 +391,13 @@ class StatusEventoTest extends TestCase
         $this->assertSame('É amanhã', $this->status('2026-06-28')['rotulo']);
         $this->assertSame('Faltam 5 dias', $this->status('2026-07-02')['rotulo']);
         $this->assertSame('Em 30 dias', $this->status('2026-07-27')['rotulo']);
+    }
+
+    public function test_cor_texto_para_contraste(): void
+    {
+        $this->assertSame('#FFFFFF', $this->status('2026-06-20', '2026-06-25')['cor_texto']); // Encerrado (fundo escuro)
+        $this->assertSame('#26242E', $this->status('2026-06-28')['cor_texto']);               // É amanhã (fundo claro)
+        $this->assertSame('#26242E', $this->status('2026-07-27')['cor_texto']);               // Em N dias (fundo claro)
     }
 }
 ```
@@ -414,7 +430,7 @@ class StatusEvento
 {
     public const FUSO = 'America/Sao_Paulo';
 
-    /** @return array{estado:string,rotulo:string,cor:string} */
+    /** @return array{estado:string,rotulo:string,cor:string,cor_texto:string} */
     public static function para(?string $dataInicio, ?string $dataFim, ?CarbonInterface $hoje = null): array
     {
         $hoje = ($hoje ? $hoje->copy() : Carbon::today(self::FUSO))->startOfDay();
@@ -422,21 +438,22 @@ class StatusEvento
         $fim = Carbon::parse((string) ($dataFim ?: $dataInicio), self::FUSO)->startOfDay();
 
         if ($hoje->greaterThan($fim)) {
-            return ['estado' => 'passado', 'rotulo' => 'Encerrado', 'cor' => '#2f2952'];
+            return ['estado' => 'passado', 'rotulo' => 'Encerrado', 'cor' => '#2f2952', 'cor_texto' => '#FFFFFF'];
         }
 
         // Só multi-dia em curso vira "Acontecendo agora" (evento de 1 dia hoje cai em "É hoje").
         if ($fim->greaterThan($inicio) && $hoje->betweenIncluded($inicio, $fim)) {
-            return ['estado' => 'acontecendo', 'rotulo' => 'Acontecendo agora', 'cor' => '#C33A36'];
+            return ['estado' => 'acontecendo', 'rotulo' => 'Acontecendo agora', 'cor' => '#C33A36', 'cor_texto' => '#FFFFFF'];
         }
 
         $dias = (int) $hoje->diffInDays($inicio, false); // início − hoje
 
+        // cor_texto garante contraste WCAG AA: branco nos fundos escuros; tinta #26242E nos claros (#E79048/#89AB98).
         return match (true) {
-            $dias <= 0 => ['estado' => 'futuro', 'rotulo' => 'É hoje', 'cor' => '#C33A36'],
-            $dias === 1 => ['estado' => 'futuro', 'rotulo' => 'É amanhã', 'cor' => '#E79048'],
-            $dias <= 7 => ['estado' => 'futuro', 'rotulo' => "Faltam {$dias} dias", 'cor' => '#E79048'],
-            default => ['estado' => 'futuro', 'rotulo' => "Em {$dias} dias", 'cor' => '#89AB98'],
+            $dias <= 0 => ['estado' => 'futuro', 'rotulo' => 'É hoje', 'cor' => '#C33A36', 'cor_texto' => '#FFFFFF'],
+            $dias === 1 => ['estado' => 'futuro', 'rotulo' => 'É amanhã', 'cor' => '#E79048', 'cor_texto' => '#26242E'],
+            $dias <= 7 => ['estado' => 'futuro', 'rotulo' => "Faltam {$dias} dias", 'cor' => '#E79048', 'cor_texto' => '#26242E'],
+            default => ['estado' => 'futuro', 'rotulo' => "Em {$dias} dias", 'cor' => '#89AB98', 'cor_texto' => '#26242E'],
         };
     }
 }
@@ -447,7 +464,7 @@ class StatusEvento
 Em `app/Models/Evento.php`, adicionar (usam os valores crus Y-m-d):
 
 ```php
-/** @return array{estado:string,rotulo:string,cor:string} */
+/** @return array{estado:string,rotulo:string,cor:string,cor_texto:string} */
 public function getStatusSeloAttribute(): array
 {
     return \App\Support\Eventos\StatusEvento::para($this->attributes['data_inicio'] ?? null, $this->attributes['data_fim'] ?? null);
@@ -501,8 +518,8 @@ git commit -m "feat(eventos): StatusEvento (selo de status/contagem regressiva)"
 - Test: `tests/Feature/Front/EventoRotasTest.php`
 
 **Interfaces:**
-- Consumes: `Evento` (scope `visiveisPara`, `podeSerVistoPor`), `FeedIcs` (Task 9 — o `feed`/`calendario` só são preenchidos quando a Task 9 existir; nesta task, `index`/`show` já funcionam e as rotas `.ics` apontam para métodos que a Task 9 completa. Se a Task 9 for uma fatia 3b separada, criar os métodos `feed`/`calendario` como stubs `abort(404)` aqui e preenchê-los na 3b).
-- Produces: rotas `eventos.index`/`eventos.feed-ics`/`eventos.show`/`eventos.evento-ics`; `EventoController`. Consumido pela Livewire `Lista` (Task 5) e pelas views (Tasks 7–8).
+- Consumes: `Evento` (scope `visiveisPara`, `podeSerVistoPor`), `StatusEvento::FUSO`.
+- Produces (3a): rotas `eventos.index`/`eventos.show` + 301; `EventoController` com `index()`/`show()`. Consumido pela Livewire `Lista` (Task 5) e pelas views (Tasks 7–8). As rotas/métodos `.ics` vêm na Task 9 (3b).
 
 - [ ] **Step 1: Write the failing test**
 
@@ -586,11 +603,9 @@ Expected: FAIL (rotas/controller inexistentes).
 namespace App\Http\Controllers;
 
 use App\Models\Evento;
-use App\Support\Eventos\FeedIcs;
 use App\Support\Eventos\StatusEvento;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class EventoController extends Controller
 {
@@ -649,54 +664,25 @@ class EventoController extends Controller
 
         return $resposta;
     }
-
-    /** Feed .ics agregado: só eventos PÚBLICOS e não encerrados. */
-    public function feed(Request $request): Response
-    {
-        $eventos = Evento::query()->publicado()
-            ->where('visibilidade', \App\Enums\VisibilidadeEvento::Publico->value)
-            ->whereRaw('COALESCE(data_fim, data_inicio) >= ?', [now(StatusEvento::FUSO)->toDateString()])
-            ->with(['categoria'])
-            ->orderBy('data_inicio')
-            ->get();
-
-        $headers = ['Content-Type' => 'text/calendar; charset=utf-8'];
-        if ($request->boolean('download')) {
-            $headers['Content-Disposition'] = 'attachment; filename="cema-eventos.ics"';
-        }
-
-        return response(FeedIcs::documento($eventos), 200, $headers);
-    }
-
-    /** .ics de UM evento (autoriza como o show; restrito só serve a quem pode). */
-    public function calendario(Request $request, string $slug): Response
-    {
-        $evento = Evento::query()->publicado()->where('slug', $slug)->firstOrFail();
-        abort_unless($evento->podeSerVistoPor($request->user()), 404);
-
-        return response(FeedIcs::documento([$evento]), 200, [
-            'Content-Type' => 'text/calendar; charset=utf-8',
-            'Content-Disposition' => 'attachment; filename="evento-'.$evento->slug.'.ics"',
-        ]);
-    }
 }
 ```
+
+> **3a:** o controller tem SÓ `index()` e `show()`. `feed()`/`calendario()` (+ imports `FeedIcs`/`Response`) são adicionados na Task 9 (3b).
 
 - [ ] **Step 4: Rotas + 301** — em `routes/web.php`, no bloco de rotas públicas (estáticas antes de `{slug}`), adicionar (importar `use App\Http\Controllers\EventoController;`):
 
 ```php
 Route::get('/eventos', [EventoController::class, 'index'])->name('eventos.index');
-Route::get('/eventos/calendario.ics', [EventoController::class, 'feed'])->name('eventos.feed-ics');
 Route::get('/eventos/{slug}', [EventoController::class, 'show'])
     ->name('eventos.show')->where('slug', '[a-z0-9-]+');
-Route::get('/eventos/{slug}/calendario.ics', [EventoController::class, 'calendario'])
-    ->name('eventos.evento-ics')->where('slug', '[a-z0-9-]+');
 
 // Compat 301 das URLs antigas do WP (/_evento e /_evento/{slug}).
 Route::permanentRedirect('/_evento', '/eventos');
 Route::get('/_evento/{slug}', fn (string $slug) => redirect()->route('eventos.show', ['slug' => $slug], 301))
     ->where('slug', '[a-z0-9-]+');
 ```
+
+> **3a:** só `/eventos` e `/eventos/{slug}` + 301. As rotas `.ics` (`eventos.feed-ics`, `eventos.evento-ics`) entram na Task 9 (3b) — a `calendario.ics` deve ser inserida **antes** de `/eventos/{slug}`.
 
 > Nesta task já são necessárias as **views** `eventos.index` e `eventos.show` para os testes de rota passarem — elas são criadas nas Tasks 7–8. **Se executar sequencialmente**, criar aqui um esqueleto mínimo das duas (só o `<x-layout.app>` com H1 "Eventos" / o título do evento) e enriquecê-las nas Tasks 7–8; ou reordenar para criar as views antes. O plano assume o esqueleto mínimo aqui e o conteúdo completo nas Tasks 7–8 (os testes de rota deste passo checam status/`assertSee` do título, que o esqueleto já satisfaz).
 
@@ -732,7 +718,7 @@ git commit -m "feat(eventos): rotas /eventos + 301 do legado + EventoController 
 **Files:**
 - Create: `app/Livewire/Eventos/Lista.php`
 - Create: `resources/views/livewire/eventos/lista.blade.php`
-- Create: `resources/views/eventos/_card.blade.php` (card de evento reaproveitado pela grade e por "Outros eventos")
+- Create: `resources/views/components/evento/card.blade.php` (componente `<x-evento.card>` — SINGULAR, convenção do projeto: `components/palestra/card`, `components/blog/card`; reaproveitado pela grade e por "Outros eventos")
 - Create: `resources/css/eventos.css` (+ `@import` em `app.css`)
 - Test: `tests/Feature/Front/EventoListaTest.php`
 
@@ -888,15 +874,20 @@ class Lista extends Component
 
         return view('livewire.eventos.lista', [
             'eventos' => $eventos,
-            'categorias' => CategoriaEvento::ativo()->orderBy('ordem')->get(['nome', 'slug', 'cor']),
+            'categorias' => CategoriaEvento::ativo()->orderBy('ordem')->get(['nome', 'slug', 'cor', 'cor_texto']),
             'meses' => $this->mesesDisponiveis(),
         ]);
     }
 
-    /** Meses 'AAAA-MM' distintos existentes na aba corrente (para o <select>). */
+    /** Meses 'AAAA-MM' distintos existentes NA ABA corrente (o <select> não oferece mês que dá 0 resultado). */
     private function mesesDisponiveis(): array
     {
+        $hoje = now('America/Sao_Paulo')->toDateString();
+
         return $this->baseVisivel()
+            ->when($this->aba === 'anteriores',
+                fn (Builder $q) => $q->whereRaw('COALESCE(data_fim, data_inicio) < ?', [$hoje]),
+                fn (Builder $q) => $q->whereRaw('COALESCE(data_fim, data_inicio) >= ?', [$hoje]))
             ->pluck('data_inicio')
             ->map(fn ($d) => $d->format('Y-m'))
             ->unique()->sortDesc()->values()->all();
@@ -906,9 +897,9 @@ class Lista extends Component
 
 - [ ] **Step 4: View da grade + card + CSS**
 
-`resources/views/livewire/eventos/lista.blade.php` — barra de filtros (abas `role=tab` com sublinhado `border-gold`; busca `wire:model.live.debounce.350ms="q"`; `<select wire:model.live="mes">` populado de `$meses`; chips `wire:click="$set('categoria', '<slug>')"` com "Todas"; contador font-mono `{{ $eventos->total() }} eventos`) + grade `grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-6` com `@foreach ($eventos as $e) <x-eventos.card :evento="$e" wire:key="ev-{{ $e->id }}" /> @endforeach` + paginação; **estado vazio** (`@if ($eventos->isEmpty())`) com a caixa tracejada "Nenhum evento encontrado" + "Ajuste a busca ou os filtros para ver outros eventos.". Use classes Tailwind dos tokens (`bg-surface`, `border-border-muted`, `rounded-pill`, `font-mono`, `text-primary`, `border-gold`). (Estrutura e medidas: molde `resources/views/livewire/palestras/lista.blade.php` + design §arquivo.)
+`resources/views/livewire/eventos/lista.blade.php` — barra de filtros (abas `role=tab` com sublinhado `border-gold`; busca `wire:model.live.debounce.350ms="q"`; `<select wire:model.live="mes">` populado de `$meses`; chips `wire:click="$set('categoria', '<slug>')"` com "Todas"; contador font-mono `{{ $eventos->total() }} eventos`) + grade `grid grid-cols-[repeat(auto-fill,minmax(290px,1fr))] gap-6` com `@foreach ($eventos as $e) <x-evento.card :evento="$e" wire:key="ev-{{ $e->id }}" /> @endforeach` + paginação; **estado vazio** (`@if ($eventos->isEmpty())`) com a caixa tracejada "Nenhum evento encontrado" + "Ajuste a busca ou os filtros para ver outros eventos.". Use classes Tailwind dos tokens (`bg-surface`, `border-border-muted`, `rounded-pill`, `font-mono`, `text-primary`, `border-gold`). (Estrutura e medidas: molde `resources/views/livewire/palestras/lista.blade.php` + design §arquivo.)
 
-`resources/views/eventos/_card.blade.php` — componente de card **anônimo** (`@props(['evento','compacto' => false])`): `<a href="{{ route('eventos.show', $evento->slug) }}">` envolvendo `<article>` (borda `#EBE8E8`, raio 16px, hover `-translate-y-1` + sombra); faixa do flyer (`{{ $evento->flyerUrl ?? asset('images/placeholder-evento.png') }}`, altura 188px ou 170px se `$compacto`, `loading=lazy`, `@class(['grayscale-[.55] opacity-90' => $evento->ehPassado])`); **selo de categoria** (só se `$evento->categoria`): `<span style="background: {{ $evento->categoria->cor }}; color: {{ $evento->categoria->cor_texto ?? '#fff' }}">{{ $evento->categoria->nome }}</span>` (pílula font-mono, topo-esq); **selo de status**: `@php($s = $evento->status_selo)` `<span style="background: {{ $s['cor'] }}; color:#fff">{{ $s['rotulo'] }}</span>` (topo-dir); corpo: `<h3>` título + metadados (período via `$evento->periodo`, local com fallback `{{ $evento->local ?: 'Local a confirmar' }}`, ícones SVG stroke `#89AB98`).
+`resources/views/components/evento/card.blade.php` — componente **anônimo** `<x-evento.card>` (`@props(['evento','compacto' => false])`): `<a href="{{ route('eventos.show', $evento->slug) }}">` envolvendo `<article>` (borda `#EBE8E8`, raio 16px, hover `-translate-y-1` + sombra); faixa do flyer (`{{ $evento->flyerUrl ?? asset('images/logos/logo-icone.png') }}` — **fallback padrão do projeto** (o `components/palestra/card` usa o mesmo; NÃO existe `placeholder-evento.png`); altura 188px ou 170px se `$compacto`, `loading=lazy`, `@class(['grayscale-[.55] opacity-90' => $evento->ehPassado])`); **selo de categoria** (só se `$evento->categoria`): `<span style="background: {{ $evento->categoria->cor }}; color: {{ $evento->categoria->cor_texto ?? '#fff' }}">{{ $evento->categoria->nome }}</span>` (pílula font-mono, topo-esq); **selo de status**: `@php($s = $evento->status_selo)` `<span style="background: {{ $s['cor'] }}; color: {{ $s['cor_texto'] }}">{{ $s['rotulo'] }}</span>` (topo-dir, **contraste WCAG via `cor_texto`**); corpo: `<h3>` título + metadados (período via `$evento->periodo`, local com fallback `{{ $evento->local ?: 'Local a confirmar' }}`, ícones SVG stroke `#89AB98`).
 
 `resources/css/eventos.css` — estilos auxiliares (pulse do "Próximo destaque", `position:sticky` do aside da single, ajustes de selo). Adicionar `@import './eventos.css';` em `resources/css/app.css` (após os `@import` existentes, linhas ~8–12).
 
@@ -928,11 +919,11 @@ git commit -m "feat(eventos): Livewire Lista (grade filtravel por aba/busca/mes/
 **Files:**
 - Modify: `resources/views/eventos/show.blade.php` (conteúdo completo, substitui o esqueleto)
 - Create: `resources/views/eventos/_servico.blade.php`, `resources/views/eventos/_galeria.blade.php`, `resources/views/eventos/_relacionados.blade.php`
-- Create: `resources/views/components/eventos/assinar-modal.blade.php` (clone do de Palestras, apontando p/ `eventos.feed-ics`)
 - Test: `tests/Feature/Front/EventoSingleSeoTest.php`
+- **(3a) NÃO** criar/incluir `assinar-modal` aqui — ele chama `route('eventos.feed-ics')` (Task 9). Fica na 3b.
 
 **Interfaces:**
-- Consumes: `$evento`, `$relacionados` (do `EventoController::show`), `config('cema.endereco')`, `StatusEvento`, `PeriodoEvento`, `x-eventos.card`.
+- Consumes: `$evento`, `$relacionados` (do `EventoController::show`), `config('cema.endereco')`, `StatusEvento`, `PeriodoEvento`, `x-evento.card`.
 - Produces: a single renderizada + JSON-LD `Event` + botão Google Calendar.
 
 - [ ] **Step 1: Write the failing test**
@@ -1023,8 +1014,8 @@ Estrutura (clonar de `resources/views/palestras/show.blade.php`), com um `@php` 
     {{-- Corpo 2 colunas: esquerda (lead + parágrafos + @include('eventos._servico')) ;
          direita <aside class="sticky top-[90px]"> flyer + data/local + CTAs (Google Calendar + WhatsApp) --}}
     {{-- @if ($evento->getMedia('galeria')->isNotEmpty()) @include('eventos._galeria') @endif --}}
-    {{-- @include('eventos._relacionados') (usa $relacionados, <x-eventos.card :compacto="true">) --}}
-    {{-- Modal: <x-eventos.assinar-modal :feedUrl="route('eventos.feed-ics')" /> --}}
+    {{-- @include('eventos._relacionados') (usa $relacionados, <x-evento.card :compacto="true">) --}}
+    {{-- (3b) Modal assinar (Task 9): <x-eventos.assinar-modal :feedUrl="route('eventos.feed-ics')" /> — NÃO na 3a --}}
 </x-layout.app>
 ```
 
@@ -1032,16 +1023,16 @@ Estrutura (clonar de `resources/views/palestras/show.blade.php`), com um `@php` 
 
 `resources/views/eventos/_galeria.blade.php` — grade de miniaturas `getMedia('galeria')` (WebP conversão `web`, `loading=lazy`).
 
-`resources/views/eventos/_relacionados.blade.php` — H2 "Outros eventos" + link "Ver todos →" (`route('eventos.index')`); grade de até 3 `<x-eventos.card :evento="$r" :compacto="true">`.
+`resources/views/eventos/_relacionados.blade.php` — H2 "Outros eventos" + link "Ver todos →" (`route('eventos.index')`); grade de até 3 `<x-evento.card :evento="$r" :compacto="true">`.
 
-`resources/views/components/eventos/assinar-modal.blade.php` — **clone** de `resources/views/components/palestras/assinar-modal.blade.php` (mesmo `@props(['feedUrl'])`, Google/Apple/download), só trocando os textos p/ eventos.
+> **3a:** o CTA "Adicionar à agenda" (`$googleAgenda`) entra normalmente (não depende do `FeedIcs`). O `assinar-modal` (que aponta para `route('eventos.feed-ics')`) fica para a Task 9 (3b).
 
 - [ ] **Step 4: Run test + build + Pint + commit**
 
 Run: `docker compose exec -T app php artisan test --filter=EventoSingleSeoTest`. `npm run build` no host. Pint.
 
 ```bash
-git add resources/views/eventos/show.blade.php resources/views/eventos/_servico.blade.php resources/views/eventos/_galeria.blade.php resources/views/eventos/_relacionados.blade.php resources/views/components/eventos/assinar-modal.blade.php tests/Feature/Front/EventoSingleSeoTest.php
+git add resources/views/eventos/show.blade.php resources/views/eventos/_servico.blade.php resources/views/eventos/_galeria.blade.php resources/views/eventos/_relacionados.blade.php tests/Feature/Front/EventoSingleSeoTest.php
 git commit -m "feat(eventos): single completa (hero+selos+servico+galeria+relacionados+JSON-LD Event+Google Calendar)"
 ```
 
@@ -1054,7 +1045,7 @@ git commit -m "feat(eventos): single completa (hero+selos+servico+galeria+relaci
 - Test: `tests/Feature/Front/EventoArchiveTest.php`
 
 **Interfaces:**
-- Consumes: `$destaque` (do `EventoController::index`), `x-eventos.card`, `@livewire('eventos.lista', ['destaqueId' => $destaque?->id])`.
+- Consumes: `$destaque` (do `EventoController::index`), `x-evento.card`, `@livewire('eventos.lista', ['destaqueId' => $destaque?->id])`.
 - Produces: o archive renderizado + JSON-LD `BreadcrumbList`.
 
 - [ ] **Step 1: Write the failing test**
@@ -1103,7 +1094,7 @@ class EventoArchiveTest extends TestCase
 
 - [ ] **Step 2–4: Implementar, testar, commitar**
 
-`resources/views/eventos/index.blade.php` completo: `<x-slot:head>` com JSON-LD `BreadcrumbList` (Início › Eventos); **hero roxo** (`bg-[linear-gradient(150deg,#4E4483,#2f2952)]`, kicker font-mono "PROGRAMAÇÃO DO CEMA", H1 "Eventos", breadcrumb); **bloco "Próximo destaque"** `@if ($destaque)` sobre `bg-cream` — card 2 colunas raio 22px (flyer + 2 selos via `x-eventos.card`-like inline, título/`periodo`/local, CTAs "Ver evento" [`route('eventos.show', $destaque->slug)`] + "Adicionar à agenda" [link Google Calendar como na single]); `@livewire('eventos.lista', ['destaqueId' => $destaque?->id])`. Medidas/estilos: design §arquivo + molde `palestras/index.blade.php`.
+`resources/views/eventos/index.blade.php` completo: `<x-slot:head>` com JSON-LD `BreadcrumbList` (Início › Eventos); **hero roxo** (`bg-[linear-gradient(150deg,#4E4483,#2f2952)]`, kicker font-mono "PROGRAMAÇÃO DO CEMA", H1 "Eventos", breadcrumb); **bloco "Próximo destaque"** `@if ($destaque)` sobre `bg-cream` — card 2 colunas raio 22px (flyer + 2 selos via `x-evento.card`-like inline, título/`periodo`/local, CTAs "Ver evento" [`route('eventos.show', $destaque->slug)`] + "Adicionar à agenda" [link Google Calendar como na single]); `@livewire('eventos.lista', ['destaqueId' => $destaque?->id])`. Medidas/estilos: design §arquivo + molde `palestras/index.blade.php`.
 
 Run: `docker compose exec -T app php artisan test --filter=EventoArchiveTest`. `npm run build` no host. Pint.
 
@@ -1175,10 +1166,13 @@ git commit -m "feat(eventos): eventos publicos no sitemap + item Eventos no menu
 
 ### Task 9: `App\Support\Eventos\FeedIcs` (ICS) — completar feed/calendario
 
-**Files:**
+**Files (3b — PR 2):**
 - Create: `app/Support/Eventos/FeedIcs.php`
-- (o `EventoController::feed`/`calendario` já chamam `FeedIcs` — Task 4)
-- Test: `tests/Feature/Front/EventoIcsTest.php` (+ `tests/Unit/Support/Eventos/FeedIcsTest.php`)
+- Create: `resources/views/components/eventos/assinar-modal.blade.php` (clone de `components/palestras/assinar-modal`, `@props(['feedUrl'])`, apontando p/ `eventos.feed-ics`)
+- Modify: `app/Http/Controllers/EventoController.php` (adicionar `feed()`/`calendario()` + imports `FeedIcs`/`Response`; `calendario()` restrito → `Cache-Control: private, no-store`)
+- Modify: `routes/web.php` (`eventos.feed-ics` **antes** de `/eventos/{slug}` + `eventos.evento-ics`)
+- Modify: `resources/views/eventos/show.blade.php` (incluir `<x-eventos.assinar-modal :feedUrl="route('eventos.feed-ics')" />`)
+- Test: `tests/Unit/Support/Eventos/FeedIcsTest.php` + `tests/Feature/Front/EventoIcsTest.php`
 
 **Interfaces:**
 - Consumes: `Evento` (data/hora crus, `titulo`, `slug`, `resumo`, `local`).
@@ -1335,13 +1329,50 @@ final class FeedIcs
 }
 ```
 
-- [ ] **Step 4: Teste de rota do feed** (`EventoIcsTest`): `GET /eventos/calendario.ics` → 200 `text/calendar`, contém só públicos futuros; `GET /eventos/{slug}/calendario.ics` de um restrito → 404 para anônimo. Rodar `--filter="FeedIcsTest|EventoIcsTest"`. Pint.
+- [ ] **Step 4: `feed()`/`calendario()` no controller + rotas `.ics` + modal** — adicionar ao `EventoController` (imports `use App\Support\Eventos\FeedIcs;` e `use Illuminate\Http\Response;`):
+
+```php
+/** Feed .ics agregado: só eventos PÚBLICOS e não encerrados. */
+public function feed(Request $request): Response
+{
+    $eventos = Evento::query()->publicado()
+        ->where('visibilidade', \App\Enums\VisibilidadeEvento::Publico->value)
+        ->whereRaw('COALESCE(data_fim, data_inicio) >= ?', [now(StatusEvento::FUSO)->toDateString()])
+        ->orderBy('data_inicio')->get();
+
+    $headers = ['Content-Type' => 'text/calendar; charset=utf-8'];
+    if ($request->boolean('download')) {
+        $headers['Content-Disposition'] = 'attachment; filename="cema-eventos.ics"';
+    }
+
+    return response(FeedIcs::documento($eventos), 200, $headers);
+}
+
+/** .ics de UM evento (autoriza como o show; restrito → 404 + Cache-Control private). */
+public function calendario(Request $request, string $slug): Response
+{
+    $evento = Evento::query()->publicado()->where('slug', $slug)->firstOrFail();
+    abort_unless($evento->podeSerVistoPor($request->user()), 404);
+
+    $resposta = response(FeedIcs::documento([$evento]), 200, [
+        'Content-Type' => 'text/calendar; charset=utf-8',
+        'Content-Disposition' => 'attachment; filename="evento-'.$evento->slug.'.ics"',
+    ]);
+    if ($evento->visibilidade !== \App\Enums\VisibilidadeEvento::Publico) {
+        $resposta->header('Cache-Control', 'private, no-store');
+    }
+
+    return $resposta;
+}
+```
+Rotas (**antes** de `/eventos/{slug}`): `Route::get('/eventos/calendario.ics', [EventoController::class, 'feed'])->name('eventos.feed-ics');` e `Route::get('/eventos/{slug}/calendario.ics', [EventoController::class, 'calendario'])->name('eventos.evento-ics')->where('slug', '[a-z0-9-]+');`. Criar `components/eventos/assinar-modal.blade.php` (clone) e incluí-lo na single.
+Teste `EventoIcsTest`: `/eventos/calendario.ics` → 200 `text/calendar` só públicos futuros; `.ics` de restrito → **404** anônimo; restrito visível a diretor → `Cache-Control: private`. Rodar `--filter="FeedIcsTest|EventoIcsTest"`. Pint.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add app/Support/Eventos/FeedIcs.php tests/Unit/Support/Eventos/FeedIcsTest.php tests/Feature/Front/EventoIcsTest.php
-git commit -m "feat(eventos): FeedIcs (ICS: dia inteiro VALUE=DATE, DTEND+1, hora_fim/+2h) + feed/calendario"
+git add app/Support/Eventos/FeedIcs.php app/Http/Controllers/EventoController.php routes/web.php resources/views/components/eventos/assinar-modal.blade.php resources/views/eventos/show.blade.php tests/Unit/Support/Eventos/FeedIcsTest.php tests/Feature/Front/EventoIcsTest.php
+git commit -m "feat(eventos): FeedIcs (ICS: dia inteiro VALUE=DATE, DTEND+1, hora_fim/+2h) + feed/calendario + modal"
 ```
 
 ---

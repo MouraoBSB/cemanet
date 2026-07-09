@@ -13,7 +13,7 @@
         'eventStatus' => 'https://schema.org/EventScheduled',
         'location' => [
             '@type' => 'Place',
-            'name' => 'Centro Espírita Maria Madalena',
+            'name' => config('cema.nome'),
             'address' => config('cema.endereco'),
         ],
         'performer' => $palestrantes->map(fn ($p) => ['@type' => 'Person', 'name' => $p->nome])->all(),

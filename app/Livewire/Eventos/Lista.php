@@ -75,6 +75,8 @@ class Lista extends Component
             ->when($this->aba === 'anteriores',
                 fn (Builder $q) => $q->whereRaw('COALESCE(data_fim, data_inicio) < ?', [$hoje]),
                 fn (Builder $q) => $q->whereRaw('COALESCE(data_fim, data_inicio) >= ?', [$hoje]))
+            ->when($this->aba !== 'anteriores' && $this->destaqueId,
+                fn (Builder $q) => $q->where('id', '!=', $this->destaqueId))
             ->pluck('data_inicio')
             ->map(fn ($d) => $d->format('Y-m'))
             ->unique()->sortDesc()->values()->all();

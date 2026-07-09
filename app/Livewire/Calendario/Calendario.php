@@ -128,6 +128,14 @@ class Calendario extends Component
             'agora' => $agora,
             'temAnterior' => $temAnterior,
             'temProximo' => $temProximo,
+            'feedsAssinar' => match ($this->tipo) {
+                'palestras' => [['rotulo' => 'Palestras', 'url' => route('palestras.calendario-ics')]],
+                'eventos' => [['rotulo' => 'Eventos', 'url' => route('eventos.feed-ics')]],
+                default => [
+                    ['rotulo' => 'Palestras', 'url' => route('palestras.calendario-ics')],
+                    ['rotulo' => 'Eventos', 'url' => route('eventos.feed-ics')],
+                ],
+            },
         ]);
     }
 

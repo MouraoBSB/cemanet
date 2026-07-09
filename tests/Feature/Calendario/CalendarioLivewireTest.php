@@ -9,6 +9,7 @@ use App\Livewire\Calendario\Calendario;
 use App\Models\Evento;
 use App\Models\Palestra;
 use App\Models\User;
+use App\Support\Calendario\OcorrenciaCalendario;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Livewire\Livewire;
@@ -90,5 +91,91 @@ class CalendarioLivewireTest extends TestCase
             ->set('mes', $foco->format('Y-m'))
             ->set('tipo', 'palestras')
             ->assertSet('mes', Carbon::now()->addDays(10)->format('Y-m'));
+    }
+
+    public function test_selo_de_visibilidade_so_para_logado_em_evento_restrito(): void
+    {
+        $this->semear();
+        // anônimo não vê o restrito (logo, nem o selo)
+        Livewire::test(Calendario::class)->assertDontSee('Somente diretoria');
+        // diretor vê o card restrito COM o selo
+        Livewire::actingAs($this->diretor())->test(Calendario::class)
+            ->assertSee('Reunião Secreta')->assertSee('Somente diretoria');
+    }
+
+    public function test_contador_do_mes_respeita_visibilidade_e_pluraliza_em_pt(): void
+    {
+        $this->semear(); // 1 evento público + 1 evento restrito no mesmo mês (+ 1 palestra)
+        // anônimo (tipo=eventos): só o público conta
+        Livewire::test(Calendario::class)->set('tipo', 'eventos')->assertSee('1 item');
+        // diretor: os DOIS eventos contam → "2 itens". Asserção POSITIVA pega o bug do Str::plural (inglês → "2 items").
+        Livewire::actingAs($this->diretor())->test(Calendario::class)->set('tipo', 'eventos')->assertSee('2 itens');
+    }
+
+    public function test_proxima_e_o_dto_cronologicamente_mais_cedo_entre_fontes(): void
+    {
+        // Evento Y é "dia inteiro" (inicia 00h); Palestra X é às 19h do mesmo dia → o evento vem primeiro.
+        $this->semear();
+        $proxima = Livewire::test(Calendario::class)->viewData('proxima');
+
+        $this->assertInstanceOf(OcorrenciaCalendario::class, $proxima);
+        $this->assertSame('evento', $proxima->tipo);
+    }
+
+    public function test_modo_realizadas_alterna_conjunto_e_reseta_mes(): void
+    {
+        Palestra::factory()->create(['status' => 'publicado', 'data_da_palestra' => Carbon::now()->addMonths(2)->setTime(19, 0)]); // futura
+        Palestra::factory()->create(['status' => 'publicado', 'data_da_palestra' => Carbon::now()->subMonths(2)->setTime(19, 0)]); // passada
+
+        $c = Livewire::test(Calendario::class);
+        $mesProximas = $c->viewData('mesFoco');
+
+        $c->set('modo', 'realizadas'); // dispara updatedModo → reseta $mes
+        $c->assertSet('modo', 'realizadas');
+        $this->assertNotSame($mesProximas, $c->viewData('mesFoco'));
+        $this->assertSame(Carbon::now()->subMonths(2)->format('Y-m'), $c->viewData('mesFoco'));
+    }
+
+    public function test_navegacao_de_mes_respeita_limites(): void
+    {
+        // Âncoras deterministicas (mesmo padrão dos testes acima): sempre no futuro, meses distintos.
+        $mes1 = Carbon::now()->addDays(10)->setTime(19, 0);
+        $mes2 = Carbon::now()->addDays(10)->addMonthNoOverflow()->startOfMonth()->addDays(14)->setTime(19, 0);
+        $mes3 = Carbon::now()->addDays(10)->addMonthsNoOverflow(2)->startOfMonth()->addDays(14)->setTime(19, 0);
+        Palestra::factory()->create(['status' => 'publicado', 'data_da_palestra' => $mes1]);
+        Palestra::factory()->create(['status' => 'publicado', 'data_da_palestra' => $mes2]);
+        Palestra::factory()->create(['status' => 'publicado', 'data_da_palestra' => $mes3]);
+
+        $c = Livewire::test(Calendario::class)->set('tipo', 'palestras');
+        $this->assertSame($mes1->format('Y-m'), $c->viewData('mesFoco'));
+        $this->assertFalse($c->viewData('temAnterior'));
+        $this->assertTrue($c->viewData('temProximo'));
+
+        $c->call('mesProximo');
+        $this->assertSame($mes2->format('Y-m'), $c->viewData('mesFoco'));
+
+        $c->call('mesProximo');
+        $this->assertSame($mes3->format('Y-m'), $c->viewData('mesFoco'));
+        $this->assertFalse($c->viewData('temProximo'));
+
+        $c->call('mesProximo'); // topo: não avança além do limite
+        $this->assertSame($mes3->format('Y-m'), $c->viewData('mesFoco'));
+
+        $c->call('mesAnterior');
+        $this->assertSame($mes2->format('Y-m'), $c->viewData('mesFoco'));
+    }
+
+    public function test_mini_calendario_marca_dia_com_ocorrencia(): void
+    {
+        $quando = Carbon::now()->addDays(10)->setTime(20, 0);
+        Palestra::factory()->create(['status' => 'publicado', 'titulo' => 'Dia Marcado', 'data_da_palestra' => $quando]);
+
+        $matriz = Livewire::test(Calendario::class)->set('tipo', 'palestras')->viewData('matriz');
+
+        $dia = collect($matriz['dias'])->firstWhere('dia', (int) $quando->format('j'));
+        $this->assertNotNull($dia);
+        $this->assertNotEmpty($dia['ocorrencias']);
+        $this->assertSame('Dia Marcado', $dia['ocorrencias'][0]['titulo']);
+        $this->assertNotNull($dia['ancora']);
     }
 }

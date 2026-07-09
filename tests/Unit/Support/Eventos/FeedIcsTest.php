@@ -47,4 +47,30 @@ class FeedIcsTest extends TestCase
         $this->assertStringContainsString('PRODID:-//CEMA//Eventos//PT-BR', $ics);
         $this->assertStringEndsWith("END:VCALENDAR\r\n", $ics);
     }
+
+    public function test_vevento_carimba_dtstamp_e_sequence_do_updated_at(): void
+    {
+        $e = $this->ev([]);
+        $ics = FeedIcs::documento([$e]);
+
+        // DTSTAMP/SEQUENCE vêm de updated_at (determinístico), não de now().
+        $this->assertStringContainsString('DTSTAMP:'.$e->updated_at->copy()->utc()->format('Ymd\THis\Z'), $ics);
+        $this->assertStringContainsString('SEQUENCE:'.$e->updated_at->getTimestamp(), $ics);
+    }
+
+    public function test_dobra_summary_longo_com_acentos_sem_partir_utf8(): void
+    {
+        // Título com vários multibyte e >75 octetos com o prefixo 'SUMMARY:' → precisa dobrar.
+        $titulo = 'Reunião de Confraternização e Reflexão sobre a Caridade Espírita Planaltinense';
+        $ics = FeedIcs::documento([$this->ev(['titulo' => $titulo])]);
+
+        // (0) houve dobra de fato (continuação CRLF + espaço).
+        $this->assertStringContainsString("\r\n ", $ics);
+        // (1) nenhuma linha física excede 75 octetos.
+        foreach (explode("\r\n", $ics) as $fisica) {
+            $this->assertLessThanOrEqual(75, strlen($fisica), "Linha física excede 75 octetos: {$fisica}");
+        }
+        // (2) desdobrar (remover CRLF+espaço) reconstrói o SUMMARY íntegro — nenhum acento partido.
+        $this->assertStringContainsString('SUMMARY:'.$titulo, str_replace("\r\n ", '', $ics));
+    }
 }

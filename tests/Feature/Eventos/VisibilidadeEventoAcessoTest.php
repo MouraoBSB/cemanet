@@ -8,6 +8,7 @@ use App\Enums\VisibilidadeEvento;
 use App\Models\Evento;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
@@ -82,5 +83,15 @@ class VisibilidadeEventoAcessoTest extends TestCase
         $this->assertSame(2, Evento::visiveisPara($this->usuario('diretor'))->count());
         $this->assertSame(2, Evento::visiveisPara($this->usuario('administrador'))->count());
         $this->assertSame(1, Evento::visiveisPara($this->usuario('frequentador'))->count());
+    }
+
+    public function test_policy_view_via_gate(): void
+    {
+        $diretoria = $this->evento(VisibilidadeEvento::Diretoria, 'gate-dir');
+        $publico = $this->evento(VisibilidadeEvento::Publico, 'gate-pub');
+
+        $this->assertTrue(Gate::forUser($this->usuario('diretor'))->allows('view', $diretoria));
+        $this->assertFalse(Gate::forUser(null)->allows('view', $diretoria)); // anônimo negado no restrito
+        $this->assertTrue(Gate::forUser(null)->allows('view', $publico));     // anônimo vê o público
     }
 }

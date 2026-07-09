@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Evento;
 use App\Models\Palestra;
+use App\Support\Palestras\DuracaoPalestra;
 use App\Support\Palestras\FeedIcs;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -22,12 +23,28 @@ class CalendarioController extends Controller
             ->where('data_da_palestra', '>=', now())
             ->with(['palestrantesAtivos'])
             ->orderBy('data_da_palestra')->take(16)->get()
-            ->map(fn (Palestra $p) => [
-                '@type' => 'Event',
-                'name' => $p->titulo,
-                'startDate' => $p->data_da_palestra->toIso8601String(),
-                'url' => route('palestras.show', $p->slug),
-            ]);
+            ->map(function (Palestra $p) {
+                $inicio = $p->data_da_palestra;
+                $fim = $inicio->copy()->addMinutes(DuracaoPalestra::minutos($p->duracao));
+                $ev = [
+                    '@type' => 'Event',
+                    'name' => $p->titulo,
+                    'startDate' => $inicio->toIso8601String(),
+                    'endDate' => $fim->toIso8601String(),
+                    'eventAttendanceMode' => $p->online
+                        ? 'https://schema.org/OnlineEventAttendanceMode'
+                        : 'https://schema.org/OfflineEventAttendanceMode',
+                    'location' => $p->online
+                        ? ['@type' => 'VirtualLocation', 'url' => $p->link_youtube]
+                        : ['@type' => 'Place', 'name' => config('cema.nome'), 'address' => config('cema.endereco')],
+                    'url' => route('palestras.show', $p->slug),
+                ];
+                if ($p->palestrantesAtivos->isNotEmpty()) {
+                    $ev['performer'] = $p->palestrantesAtivos->map(fn ($x) => ['@type' => 'Person', 'name' => $x->nome])->all();
+                }
+
+                return $ev;
+            });
 
         $eventos = Evento::query()->publicado()->visiveisPara(null)
             ->whereRaw('COALESCE(data_fim, data_inicio) >= ?', [now('America/Sao_Paulo')->toDateString()])
@@ -40,6 +57,8 @@ class CalendarioController extends Controller
                     'name' => $e->titulo,
                     'startDate' => $intervalo['inicio'],
                     'endDate' => $intervalo['fim'],
+                    'eventAttendanceMode' => 'https://schema.org/OfflineEventAttendanceMode',
+                    'location' => ['@type' => 'Place', 'name' => config('cema.nome'), 'address' => config('cema.endereco')],
                     'url' => route('eventos.show', $e->slug),
                 ];
             });

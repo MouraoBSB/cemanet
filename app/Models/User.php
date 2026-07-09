@@ -79,4 +79,10 @@ class User extends Authenticatable implements FilamentUser
     {
         return (string) $this->name;
     }
+
+    /** Maior nível entre os papéis do usuário (roles.nivel); 0 se não tiver papel. */
+    public function nivelMaximo(): int
+    {
+        return (int) $this->roles->max('nivel');
+    }
 }

@@ -54,6 +54,38 @@ class Evento extends Model implements HasMedia
         return $query->where('status', self::STATUS_PUBLICADO);
     }
 
+    /** Regra de visibilidade por papel (fonte única). Admin (nível 100) satisfaz qualquer >=. */
+    public function podeSerVistoPor(?User $usuario): bool
+    {
+        $nivel = $usuario?->nivelMaximo() ?? 0;
+
+        return match ($this->visibilidade) {
+            VisibilidadeEvento::Publico => true,
+            VisibilidadeEvento::Logados => $usuario !== null,
+            VisibilidadeEvento::Trabalhadores => $usuario !== null && $nivel >= VisibilidadeEvento::Trabalhadores->nivelMinimo(),
+            VisibilidadeEvento::Diretoria => $usuario !== null && $nivel >= VisibilidadeEvento::Diretoria->nivelMinimo(),
+        };
+    }
+
+    /** Filtra no banco os eventos que o usuário (ou anônimo) pode ver — não vaza títulos restritos. */
+    public function scopeVisiveisPara(Builder $query, ?User $usuario): Builder
+    {
+        $nivel = $usuario?->nivelMaximo() ?? 0;
+
+        return $query->where(function (Builder $q) use ($usuario, $nivel) {
+            $q->where('visibilidade', VisibilidadeEvento::Publico->value);
+            if ($usuario !== null) {
+                $q->orWhere('visibilidade', VisibilidadeEvento::Logados->value);
+                if ($nivel >= VisibilidadeEvento::Trabalhadores->nivelMinimo()) {
+                    $q->orWhere('visibilidade', VisibilidadeEvento::Trabalhadores->value);
+                }
+                if ($nivel >= VisibilidadeEvento::Diretoria->nivelMinimo()) {
+                    $q->orWhere('visibilidade', VisibilidadeEvento::Diretoria->value);
+                }
+            }
+        });
+    }
+
     public function categoria(): BelongsTo
     {
         return $this->belongsTo(CategoriaEvento::class, 'categoria_evento_id');

@@ -42,4 +42,14 @@ enum VisibilidadeEvento: string
 
         return $opcoes;
     }
+
+    public function cor(): string
+    {
+        return match ($this) {
+            self::Publico => '#89AB98',
+            self::Logados => '#6E9FCB',
+            self::Trabalhadores => '#E79048',
+            self::Diretoria => '#C33A36',
+        };
+    }
 }

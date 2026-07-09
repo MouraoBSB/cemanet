@@ -27,6 +27,8 @@ class EventoSingleSeoTest extends TestCase
         $r = $this->get('/eventos/brecho')->assertOk();
         $r->assertSee('schema.org', false);
         $r->assertSee('"@type":"Event"', false);
+        $r->assertSee('"startDate"', false);
+        $r->assertSee('"endDate"', false);        // fim via fimUtc (3b)
         $r->assertSee('calendar.google.com/calendar/render', false);
         $r->assertSee('Serviço');                       // bloco de serviço
         $r->assertSee(config('cema.endereco'));          // endereço da fonte única

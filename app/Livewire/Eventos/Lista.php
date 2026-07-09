@@ -47,7 +47,7 @@ class Lista extends Component
         $hoje = now('America/Sao_Paulo')->toDateString();
 
         $eventos = $this->baseVisivel()
-            ->with(['categoria'])
+            ->with(['categoria', 'media'])
             ->when($this->aba === 'anteriores',
                 fn (Builder $q) => $q->whereRaw('COALESCE(data_fim, data_inicio) < ?', [$hoje])->orderByDesc('data_inicio'),
                 fn (Builder $q) => $q->whereRaw('COALESCE(data_fim, data_inicio) >= ?', [$hoje])

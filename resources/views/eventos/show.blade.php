@@ -4,11 +4,13 @@
     $resumoTexto = trim(strip_tags((string) $evento->resumo));
     $descricaoSeo = Str::limit($resumoTexto, 155) ?: null;
     $inicioIso = \Illuminate\Support\Carbon::parse($evento->getRawOriginal('data_inicio').' '.($evento->hora_inicio ?? '00:00'), \App\Support\Eventos\StatusEvento::FUSO)->toIso8601String();
+    $fimIso = $evento->fimUtc()->setTimezone(\App\Support\Eventos\StatusEvento::FUSO)->toIso8601String();
     $jsonLd = json_encode(array_filter([
         '@context' => 'https://schema.org',
         '@type' => 'Event',
         'name' => $evento->titulo,
         'startDate' => $inicioIso,
+        'endDate' => $fimIso,
         'eventStatus' => 'https://schema.org/EventScheduled',
         'location' => ['@type' => 'Place', 'name' => config('cema.nome'), 'address' => config('cema.endereco')],
         'organizer' => ['@type' => 'Organization', 'name' => config('cema.nome')],
@@ -86,6 +88,10 @@
                    class="flex items-center gap-2 rounded-pill border border-primary px-4 py-2 text-[13px] font-semibold text-primary hover:bg-cream">
                     📅 Adicionar à agenda
                 </a>
+                <button type="button" @click="$dispatch('open-assinar')"
+                        class="flex items-center gap-2 rounded-pill border border-border bg-white px-4 py-2 text-[13px] font-semibold text-primary hover:bg-surface">
+                    🔔 Assinar calendário
+                </button>
             </div>
         </div>
     </section>
@@ -141,5 +147,5 @@
     {{-- Outros eventos --}}
     @include('eventos._relacionados')
 
-    {{-- (3b) Modal assinar (Task 9): <x-eventos.assinar-modal :feedUrl="route('eventos.feed-ics')" /> — NÃO na 3a --}}
+    <x-eventos.assinar-modal :feed-url="route('eventos.feed-ics')" />
 </x-layout.app>

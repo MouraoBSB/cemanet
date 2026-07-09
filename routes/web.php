@@ -77,8 +77,14 @@ Route::get('/sementeira/{slug}', [BlogController::class, 'show'])->name('blog.sh
 
 // Eventos. Estáticas antes de {slug}.
 Route::get('/eventos', [EventoController::class, 'index'])->name('eventos.index');
+
+// Feed .ics agregado (públicos, não encerrados). DEVE vir ANTES de eventos.show.
+Route::get('/eventos/calendario.ics', [EventoController::class, 'feed'])->name('eventos.feed-ics');
+
 Route::get('/eventos/{slug}', [EventoController::class, 'show'])
     ->name('eventos.show')->where('slug', '[a-z0-9-]+');
+Route::get('/eventos/{slug}/calendario.ics', [EventoController::class, 'calendario'])
+    ->name('eventos.evento-ics')->where('slug', '[a-z0-9-]+');
 
 // Compat 301 das URLs antigas do WP (/_evento e /_evento/{slug}).
 Route::permanentRedirect('/_evento', '/eventos');

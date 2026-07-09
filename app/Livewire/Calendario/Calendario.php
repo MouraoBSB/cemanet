@@ -28,22 +28,28 @@ class Calendario extends Component
     public function mount(): void
     {
         $this->normaliza();
-        $meses = $this->mesesModoAsc();
-        if ($this->mes === null || ! in_array($this->mes, $meses, true)) {
-            $this->mes = $this->mesPadrao($meses);
-        }
+        $this->garanteMesValido();
     }
 
     public function updatedModo(): void
     {
         $this->normaliza();
-        $this->mes = $this->mesPadrao($this->mesesModoAsc());
+        $this->garanteMesValido();
     }
 
     public function updatedTipo(): void
     {
         $this->normaliza();
-        $this->mes = $this->mesPadrao($this->mesesModoAsc());
+        $this->garanteMesValido();
+    }
+
+    /** Mantém o mês focado se ainda existe no conjunto atual; senão cai no padrão. */
+    private function garanteMesValido(): void
+    {
+        $meses = $this->mesesModoAsc();
+        if ($this->mes === null || ! in_array($this->mes, $meses, true)) {
+            $this->mes = $this->mesPadrao($meses);
+        }
     }
 
     public function mesAnterior(): void

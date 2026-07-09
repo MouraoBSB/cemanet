@@ -60,4 +60,35 @@ class CalendarioLivewireTest extends TestCase
         Livewire::actingAs($this->diretor())->test(Calendario::class)
             ->assertSee('Reunião Secreta');
     }
+
+    public function test_troca_de_tipo_preserva_o_mes_focado_quando_ainda_valido(): void
+    {
+        // M1 (now+10): palestra + evento; M2 (mês seguinte): SÓ palestra.
+        // Focar M2 (não é o mês-padrão, que seria M1) e trocar p/ 'palestras':
+        // M2 continua existindo entre as palestras → o mês focado deve ser PRESERVADO.
+        // (Reset incondicional cairia em M1 e este teste pegaria a regressão.)
+        $this->semear();
+        $foco = Carbon::now()->addDays(10)->addMonthNoOverflow()->startOfMonth()->addDays(14);
+        Palestra::factory()->create(['status' => 'publicado', 'titulo' => 'Palestra Futura', 'slug' => 'pf', 'data_da_palestra' => $foco->copy()->setTime(19, 0)]);
+        $mesFoco = $foco->format('Y-m');
+
+        Livewire::test(Calendario::class)
+            ->set('mes', $mesFoco)
+            ->set('tipo', 'palestras')
+            ->assertSet('mes', $mesFoco);
+    }
+
+    public function test_troca_de_tipo_que_invalida_o_mes_cai_no_padrao(): void
+    {
+        // M2 existe SÓ via evento; ao trocar p/ 'palestras' o mês some do conjunto
+        // → cai no mês-padrão (M1, primeiro ascendente no modo 'proximas').
+        $this->semear();
+        $foco = Carbon::now()->addDays(10)->addMonthNoOverflow()->startOfMonth()->addDays(14);
+        Evento::create(['titulo' => 'Evento Futuro', 'slug' => 'ef', 'data_inicio' => $foco->toDateString(), 'visibilidade' => VisibilidadeEvento::Publico, 'status' => Evento::STATUS_PUBLICADO]);
+
+        Livewire::test(Calendario::class)
+            ->set('mes', $foco->format('Y-m'))
+            ->set('tipo', 'palestras')
+            ->assertSet('mes', Carbon::now()->addDays(10)->format('Y-m'));
+    }
 }

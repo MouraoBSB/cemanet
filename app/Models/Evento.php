@@ -187,6 +187,49 @@ class Evento extends Model implements HasMedia
         return $this->inicioUtc()->addHours(2);
     }
 
+    /** Verdadeiro quando há hora de início definida (senão o evento é "dia inteiro"). */
+    public function temHora(): bool
+    {
+        return ($this->hora_inicio ?? '') !== '';
+    }
+
+    /**
+     * Parâmetro `dates` do Google Calendar (TEMPLATE).
+     * Com hora: instantes UTC. Dia inteiro: datas Ymd com fim EXCLUSIVO (data_fim, ou início, +1 dia).
+     */
+    public function googleCalendarDates(): string
+    {
+        if ($this->temHora()) {
+            return $this->inicioUtc()->format('Ymd\THis\Z').'/'.$this->fimUtc()->format('Ymd\THis\Z');
+        }
+
+        $inicio = $this->getRawOriginal('data_inicio');
+        $fimExclusivo = Carbon::parse($this->getRawOriginal('data_fim') ?: $inicio)->addDay()->format('Ymd');
+
+        return Carbon::parse($inicio)->format('Ymd').'/'.$fimExclusivo;
+    }
+
+    /**
+     * startDate/endDate para o JSON-LD Event (schema.org).
+     * Com hora: ISO-8601 local (com offset). Dia inteiro: datas Y-m-d, fim INCLUSIVO (último dia real).
+     *
+     * @return array{inicio:string,fim:string}
+     */
+    public function intervaloSchema(): array
+    {
+        if ($this->temHora()) {
+            return [
+                'inicio' => $this->inicioUtc()->setTimezone(StatusEvento::FUSO)->toIso8601String(),
+                'fim' => $this->fimUtc()->setTimezone(StatusEvento::FUSO)->toIso8601String(),
+            ];
+        }
+
+        return [
+            'inicio' => $this->getRawOriginal('data_inicio'),
+            'fim' => $this->getRawOriginal('data_fim') ?: $this->getRawOriginal('data_inicio'),
+        ];
+    }
+
     /** Normaliza hora para 'HH:MM' zero-padded; aceita 'H:i' ou 'H:i:s'. Inválido passa cru p/ validação acusar. */
     private static function normalizaHora(?string $v): ?string
     {

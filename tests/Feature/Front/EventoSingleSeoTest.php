@@ -37,6 +37,19 @@ class EventoSingleSeoTest extends TestCase
         $r->assertDontSee('<p>Venha</p>', false);
     }
 
+    public function test_jsonld_dia_inteiro_multidia_usa_datas_de_inicio_e_fim(): void
+    {
+        Evento::create([
+            'titulo' => 'Semana da Fraternidade', 'slug' => 'semana-fraternidade',
+            'data_inicio' => '2026-06-27', 'data_fim' => '2026-06-29', // sem hora → dia inteiro
+            'visibilidade' => VisibilidadeEvento::Publico, 'status' => Evento::STATUS_PUBLICADO,
+        ]);
+
+        $r = $this->get('/eventos/semana-fraternidade')->assertOk();
+        $r->assertSee('"startDate":"2026-06-27"', false);
+        $r->assertSee('"endDate":"2026-06-29"', false); // último dia real, não início+2h
+    }
+
     public function test_single_sem_resumo_usa_descricao_padrao_do_site(): void
     {
         $cat = CategoriaEvento::create(['nome' => 'Palestra', 'slug' => 'palestra', 'cor' => '#89AB98']);

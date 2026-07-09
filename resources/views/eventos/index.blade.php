@@ -10,11 +10,9 @@
 
     if ($destaque) {
         $ds = $destaque->status_selo;
-        $dGcInicio = $destaque->inicioUtc()->format('Ymd\THis\Z');
-        $dGcFim = $destaque->fimUtc()->format('Ymd\THis\Z');
         $dGcLocal = $destaque->local ? $destaque->local.' — '.config('cema.endereco') : config('cema.endereco');
         $dGoogleAgenda = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='.urlencode($destaque->titulo)
-            .'&dates='.$dGcInicio.'/'.$dGcFim
+            .'&dates='.$destaque->googleCalendarDates()
             .'&details='.urlencode(route('eventos.show', $destaque->slug))
             .'&location='.urlencode($dGcLocal);
     }

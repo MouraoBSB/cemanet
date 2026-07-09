@@ -51,7 +51,7 @@ final class FeedIcs
 
     public static function temHora(Evento $e): bool
     {
-        return $e->hora_inicio !== null && $e->hora_inicio !== '';
+        return $e->temHora();
     }
 
     /** @return list<string> */

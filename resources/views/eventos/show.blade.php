@@ -3,14 +3,13 @@
     $s = $evento->status_selo;
     $resumoTexto = trim(strip_tags((string) $evento->resumo));
     $descricaoSeo = Str::limit($resumoTexto, 155) ?: null;
-    $inicioIso = \Illuminate\Support\Carbon::parse($evento->getRawOriginal('data_inicio').' '.($evento->hora_inicio ?? '00:00'), \App\Support\Eventos\StatusEvento::FUSO)->toIso8601String();
-    $fimIso = $evento->fimUtc()->setTimezone(\App\Support\Eventos\StatusEvento::FUSO)->toIso8601String();
+    $intervalo = $evento->intervaloSchema();
     $jsonLd = json_encode(array_filter([
         '@context' => 'https://schema.org',
         '@type' => 'Event',
         'name' => $evento->titulo,
-        'startDate' => $inicioIso,
-        'endDate' => $fimIso,
+        'startDate' => $intervalo['inicio'],
+        'endDate' => $intervalo['fim'],
         'eventStatus' => 'https://schema.org/EventScheduled',
         'location' => ['@type' => 'Place', 'name' => config('cema.nome'), 'address' => config('cema.endereco')],
         'organizer' => ['@type' => 'Organization', 'name' => config('cema.nome')],
@@ -18,11 +17,9 @@
         'image' => $evento->flyerUrl ?: null,
     ]), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG);
 
-    $gcInicio = $evento->inicioUtc()->format('Ymd\THis\Z');
-    $gcFim = $evento->fimUtc()->format('Ymd\THis\Z');
     $gcLocal = $evento->local ? $evento->local.' — '.config('cema.endereco') : config('cema.endereco');
     $googleAgenda = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text='.urlencode($evento->titulo)
-        .'&dates='.$gcInicio.'/'.$gcFim
+        .'&dates='.$evento->googleCalendarDates()
         .'&details='.urlencode(route('eventos.show', $evento->slug))
         .'&location='.urlencode($gcLocal);
 

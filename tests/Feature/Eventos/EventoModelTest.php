@@ -109,4 +109,28 @@ class EventoModelTest extends TestCase
 
         $this->assertSame('27 de junho de 2026 · 8h30 – 12h', $evento->periodo);
     }
+
+    public function test_google_calendar_dates_com_hora_usa_instantes_utc(): void
+    {
+        $evento = $this->eventoBase(['data_inicio' => '2026-06-27', 'hora_inicio' => '08:00', 'hora_fim' => '12:00']);
+
+        // 08:00–12:00 SP (-03) = 11:00–15:00 UTC
+        $this->assertSame('20260627T110000Z/20260627T150000Z', $evento->googleCalendarDates());
+    }
+
+    public function test_google_calendar_dates_dia_inteiro_multidia_com_fim_exclusivo(): void
+    {
+        $evento = $this->eventoBase(['data_inicio' => '2026-06-27', 'data_fim' => '2026-06-29']); // sem hora → dia inteiro
+
+        // Google (all-day) usa fim EXCLUSIVO: 29 + 1 = 30
+        $this->assertSame('20260627/20260630', $evento->googleCalendarDates());
+    }
+
+    public function test_intervalo_schema_dia_inteiro_usa_datas_inclusivas(): void
+    {
+        $evento = $this->eventoBase(['data_inicio' => '2026-06-27', 'data_fim' => '2026-06-29']); // sem hora
+
+        // schema.org usa fim INCLUSIVO (último dia real), sem +2h do fimUtc()
+        $this->assertSame(['inicio' => '2026-06-27', 'fim' => '2026-06-29'], $evento->intervaloSchema());
+    }
 }

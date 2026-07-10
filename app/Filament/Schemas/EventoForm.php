@@ -21,10 +21,15 @@ use Filament\Schemas\Components\Utilities\Get;
 use Illuminate\Support\Str;
 
 /**
- * Fonte única do formulário de Evento: campos, rótulos, validação e uploads.
- * Consumido pelo painel (EventoResource) e destinado a ser reaproveitado por
- * formulários do site que embutem um Filament Form fora do /admin — daí morar
- * fora do Resource. Mudança de campo entra aqui, uma vez só, e vale nos dois.
+ * Fonte única dos CAMPOS do formulário de Evento: rótulos, componentes, uploads e as
+ * regras de campo (required, unique, afterOrEqual, e hora de término posterior à de
+ * início no mesmo dia). Consumido pelo painel (EventoResource) e destinado a
+ * formulários de Evento embutidos fora do /admin.
+ *
+ * A rede server-side de período NÃO está aqui. PeriodoEvento::erros() cobre dois casos
+ * que as regras de campo não pegam — hora de término sem hora de início, e hora fora
+ * de HH:MM. No painel quem a aplica é o trait ValidaPeriodoEvento. Todo consumidor novo
+ * precisa aplicá-la: getState() sozinho não basta.
  */
 class EventoForm
 {

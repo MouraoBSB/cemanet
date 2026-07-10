@@ -17,6 +17,10 @@
     <meta property="og:url" content="{{ url()->current() }}">
     <link rel="icon" href="{{ asset('images/logos/logo-icone.png') }}" type="image/png">
     <link rel="preconnect" href="https://i.ytimg.com">
+    {{-- Slot opcional, injetado de propósito ANTES do CSS do site: páginas que embutem um
+         Filament Form carregam aqui o tema do painel, e a folha do site — por vir depois —
+         vence a cascata. Vazio nas demais páginas. --}}
+    {{ $headTop ?? '' }}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     {{ $head ?? '' }}
@@ -32,5 +36,9 @@
     <x-layout.footer />
 
     @livewireScripts
+    {{-- Slot opcional, injetado de propósito DEPOIS dos scripts do Livewire: os scripts do
+         Filament registram plugins no Alpine, que só existe após o Livewire carregar.
+         Vazio nas demais páginas. --}}
+    {{ $scripts ?? '' }}
 </body>
 </html>

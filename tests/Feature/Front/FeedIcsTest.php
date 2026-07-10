@@ -114,4 +114,18 @@ class FeedIcsTest extends TestCase
         $localEscapado = FeedIcs::escapar('Centro Espírita Maria Madalena — Quadra 02, Lote 16, Vila Vicentina, Planaltina, DF');
         $this->assertStringContainsString('LOCATION:'.$localEscapado, $desdobrado);
     }
+
+    public function test_vevento_carimba_dtstamp_e_sequence_do_updated_at(): void
+    {
+        $p = Palestra::factory()->create([
+            'status' => Palestra::STATUS_PUBLICADO,
+            'data_da_palestra' => Carbon::create(2026, 6, 21, 19, 0, 0, 'America/Sao_Paulo'),
+        ])->load(['palestrantesAtivos', 'assuntos']);
+
+        $linhas = FeedIcs::vevento($p);
+
+        // DTSTAMP/SEQUENCE vêm de updated_at (determinístico), não de now().
+        $this->assertContains('DTSTAMP:'.$p->updated_at->copy()->utc()->format('Ymd\THis\Z'), $linhas);
+        $this->assertContains('SEQUENCE:'.$p->updated_at->getTimestamp(), $linhas);
+    }
 }

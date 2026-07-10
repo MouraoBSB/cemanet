@@ -71,9 +71,15 @@ final class FeedIcs
         $descricao = implode(' · ', $partes)."\n".route('palestras.show', $p->slug);
         $local = $p->online ? 'Online — YouTube' : config('cema.nome').' — '.config('cema.endereco');
 
+        // DTSTAMP/SEQUENCE (RFC 5545 §3.6.1/§3.8.7.4) de updated_at, NÃO de now(): feed determinístico
+        // (preserva ETag/If-Modified-Since) e o cliente só reprocessa quando a palestra muda.
+        $carimbo = $p->updated_at->copy()->utc();
+
         return [
             'BEGIN:VEVENT',
             'UID:palestra-'.$p->id.'@cemanet.org.br',
+            'DTSTAMP:'.$fmt($carimbo),
+            'SEQUENCE:'.$carimbo->getTimestamp(),
             'DTSTART:'.$fmt($inicio),
             'DTEND:'.$fmt($fim),
             'SUMMARY:'.self::escapar($p->titulo),

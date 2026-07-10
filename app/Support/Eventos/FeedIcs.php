@@ -73,9 +73,18 @@ final class FeedIcs
 
         $descricao = trim(strip_tags((string) $e->resumo))."\n".route('eventos.show', $e->slug);
         $local = $e->local ?: config('cema.endereco');
+        // DTSTAMP/SEQUENCE (RFC 5545 §3.6.1/§3.8.7.4) derivados de updated_at, NÃO de now():
+        // o feed fica determinístico (preserva ETag/If-Modified-Since) e o cliente só reprocessa
+        // o evento quando ele muda de verdade.
+        $carimbo = $e->updated_at->copy()->utc();
 
         return array_merge(
-            ['BEGIN:VEVENT', 'UID:evento-'.$e->id.'@cemanet.org.br'],
+            [
+                'BEGIN:VEVENT',
+                'UID:evento-'.$e->id.'@cemanet.org.br',
+                'DTSTAMP:'.$carimbo->format('Ymd\THis\Z'),
+                'SEQUENCE:'.$carimbo->getTimestamp(),
+            ],
             $dt,
             [
                 'SUMMARY:'.self::escapar($e->titulo),

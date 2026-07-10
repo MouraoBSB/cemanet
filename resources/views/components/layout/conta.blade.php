@@ -1,9 +1,10 @@
 {{-- Thiago Mourão — https://github.com/MouraoBSB — 2026-07-04 --}}
 @props(['titulo' => null, 'ativo' => 'painel'])
 <x-layout.app :title="$titulo">
-    {{-- Repassa os slots do layout do site: sem isto, uma página da conta que precise
-         embutir um Filament Form perderia o tema e os scripts em silêncio. --}}
+    {{-- Repassa os três slots opcionais do layout do site (SEO no $head, tema e scripts do
+         Filament nos outros dois): sem isto, uma página da conta que os use os perderia em silêncio. --}}
     <x-slot:headTop>{{ $headTop ?? '' }}</x-slot:headTop>
+    <x-slot:head>{{ $head ?? '' }}</x-slot:head>
     <x-slot:scripts>{{ $scripts ?? '' }}</x-slot:scripts>
 
     <x-conta.saudacao />

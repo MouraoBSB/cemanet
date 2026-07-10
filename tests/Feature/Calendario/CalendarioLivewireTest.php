@@ -178,4 +178,34 @@ class CalendarioLivewireTest extends TestCase
         $this->assertSame('Dia Marcado', $dia['ocorrencias'][0]['titulo']);
         $this->assertNotNull($dia['ancora']);
     }
+
+    public function test_mini_grid_nao_acende_dia_de_evento_restrito_para_anonimo(): void
+    {
+        // Crown-jewel: a matriz deriva das ocorrências JÁ filtradas por visibilidade. Um evento
+        // 'diretoria' num dia isolado NÃO pode acender a célula para o anônimo — rede explícita
+        // contra uma refatoração futura que monte a matriz por query própria e reabra o vazamento.
+        $base = Carbon::now()->addMonthNoOverflow()->startOfMonth();
+        $diaRestrito = $base->copy()->addDays(9);  // dia 10: só o evento restrito
+        $diaPublico = $base->copy()->addDays(19);  // dia 20: evento público (ancora o mês p/ o anônimo)
+
+        Evento::create(['titulo' => 'Reunião Reservada', 'slug' => 'reuniao-reservada', 'data_inicio' => $diaRestrito->toDateString(),
+            'visibilidade' => VisibilidadeEvento::Diretoria, 'status' => Evento::STATUS_PUBLICADO]);
+        Evento::create(['titulo' => 'Feirão Aberto', 'slug' => 'feirao-aberto', 'data_inicio' => $diaPublico->toDateString(),
+            'visibilidade' => VisibilidadeEvento::Publico, 'status' => Evento::STATUS_PUBLICADO]);
+
+        $mes = $base->format('Y-m');
+        $diaR = (int) $diaRestrito->day;
+
+        // Anônimo: a célula do dia restrito fica APAGADA (o mês existe pelo evento público).
+        $matrizAnon = Livewire::test(Calendario::class)->set('tipo', 'eventos')->set('mes', $mes)->viewData('matriz');
+        $celulaAnon = collect($matrizAnon['dias'])->firstWhere('dia', $diaR);
+        $this->assertSame([], $celulaAnon['ocorrencias']);
+        $this->assertNull($celulaAnon['ancora']);
+
+        // Diretor: a MESMA célula acende.
+        $matrizDir = Livewire::actingAs($this->diretor())->test(Calendario::class)->set('tipo', 'eventos')->set('mes', $mes)->viewData('matriz');
+        $celulaDir = collect($matrizDir['dias'])->firstWhere('dia', $diaR);
+        $this->assertNotEmpty($celulaDir['ocorrencias']);
+        $this->assertNotNull($celulaDir['ancora']);
+    }
 }

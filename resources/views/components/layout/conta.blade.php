@@ -1,6 +1,12 @@
 {{-- Thiago Mourão — https://github.com/MouraoBSB — 2026-07-04 --}}
 @props(['titulo' => null, 'ativo' => 'painel'])
 <x-layout.app :title="$titulo">
+    {{-- Repassa os três slots opcionais do layout do site (SEO no $head, tema e scripts do
+         Filament nos outros dois): sem isto, uma página da conta que os use os perderia em silêncio. --}}
+    <x-slot:headTop>{{ $headTop ?? '' }}</x-slot:headTop>
+    <x-slot:head>{{ $head ?? '' }}</x-slot:head>
+    <x-slot:scripts>{{ $scripts ?? '' }}</x-slot:scripts>
+
     <x-conta.saudacao />
     @if (session('status'))
         <div class="mx-auto max-w-[1240px] px-6 pt-6">

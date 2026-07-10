@@ -17,6 +17,8 @@
     <meta property="og:url" content="{{ url()->current() }}">
     <link rel="icon" href="{{ asset('images/logos/logo-icone.png') }}" type="image/png">
     <link rel="preconnect" href="https://i.ytimg.com">
+    {{-- SPIKE: slot ANTES do CSS do site, p/ páginas com Filament Form (o site sobrescreve). --}}
+    {{ $headTop ?? '' }}
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @livewireStyles
     {{ $head ?? '' }}
@@ -32,5 +34,7 @@
     <x-layout.footer />
 
     @livewireScripts
+    {{-- SPIKE: slot de scripts p/ páginas com Filament Form. --}}
+    {{ $scripts ?? '' }}
 </body>
 </html>

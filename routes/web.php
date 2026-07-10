@@ -42,6 +42,9 @@ Route::middleware('auth')->prefix('minha-conta')->name('conta.')->group(function
     Route::get('/perfil', [ContaController::class, 'perfil'])->name('perfil');
 });
 
+// SPIKE (descartável): Filament Form embutido numa página do site.
+Route::middleware('auth')->get('/minha-conta/spike-evento', fn () => view('spike.evento'))->name('spike.evento');
+
 Route::post('/sair', [AuthenticatedSessionController::class, 'destroy'])->name('logout')->middleware('auth');
 
 // Login social via Google (controller implementado na Task 5 — rotas já registradas aqui).

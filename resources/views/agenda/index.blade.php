@@ -128,7 +128,7 @@
         <div class="border-t border-border-muted pt-8">
             <h2 class="font-display text-lg font-semibold text-primary">Veja também</h2>
             <div class="mt-4 flex flex-wrap gap-3">
-                @foreach ([['Palestras Públicas', route('palestras.index')], ['Calendário de Palestras', route('palestras.calendario')], ['Blog Sementeira de Luz', route('blog.index')]] as [$rotulo, $url])
+                @foreach ([['Palestras Públicas', route('palestras.index')], ['Calendário de Palestras', route('calendario.index')], ['Blog Sementeira de Luz', route('blog.index')]] as [$rotulo, $url])
                     <a href="{{ $url }}" class="inline-flex items-center gap-2 rounded-pill border border-border-muted bg-white px-5 py-2.5 text-sm text-[#3a3553] transition hover:border-primary">
                         <span class="size-2 rounded-full bg-accent" aria-hidden="true"></span>{{ $rotulo }}
                     </a>

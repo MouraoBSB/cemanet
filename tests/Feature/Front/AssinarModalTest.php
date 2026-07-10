@@ -10,7 +10,7 @@ class AssinarModalTest extends TestCase
     {
         $feed = 'http://localhost/palestra_publica/calendario.ics';
 
-        $view = $this->blade('<x-palestras.assinar-modal :feed-url="$feedUrl" />', ['feedUrl' => $feed]);
+        $view = $this->blade('<x-ui.assinar-modal :feeds="$feeds" />', ['feeds' => [['rotulo' => 'Palestras', 'url' => $feed]]]);
 
         // webcal (Apple) — mesmo host/path do feed
         $view->assertSee('webcal://localhost/palestra_publica/calendario.ics', false);

@@ -28,6 +28,12 @@
         <div class="flex flex-1 flex-col gap-2.5 p-4">
             <h3 class="font-display text-[16.5px] font-semibold leading-tight text-text-ink">{{ $evento->titulo }}</h3>
 
+            @auth
+                @if ($evento->visibilidade !== \App\Enums\VisibilidadeEvento::Publico)
+                    <x-ui.selo-visibilidade :rotulo="$evento->visibilidade->rotulo()" :cor="$evento->visibilidade->cor()" />
+                @endif
+            @endauth
+
             <div class="mt-auto flex flex-col gap-1.5 text-[12.5px] text-text-muted">
                 <span class="inline-flex items-center gap-1.5">
                     <svg class="size-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="#89AB98" stroke-width="1.75" aria-hidden="true">

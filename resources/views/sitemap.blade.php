@@ -58,4 +58,11 @@
         <priority>0.7</priority>
     </url>
     @endforeach
+
+    {{-- Calendário unificado (Palestras + Eventos) --}}
+    <url>
+        <loc>{{ url('/calendario') }}</loc>
+        <changefreq>daily</changefreq>
+        <priority>0.8</priority>
+    </url>
 </urlset>

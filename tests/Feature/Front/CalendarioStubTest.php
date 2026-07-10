@@ -13,14 +13,14 @@ class CalendarioStubTest extends TestCase
 
     public function test_pagina_calendario_responde_200(): void
     {
-        $this->get('/palestra_publica/calendario')
+        $this->get('/calendario')
             ->assertOk()
-            ->assertSee('Calendário de Palestras');
+            ->assertSee('Calendário');
     }
 
-    public function test_rota_nomeada_aponta_para_a_pagina(): void
+    public function test_url_antiga_redireciona_para_a_pagina_nova(): void
     {
-        $this->assertSame(url('/palestra_publica/calendario'), route('palestras.calendario'));
+        $this->get('/palestra_publica/calendario')->assertRedirect('/calendario');
     }
 
     public function test_single_ainda_responde_com_slug(): void
@@ -38,6 +38,6 @@ class CalendarioStubTest extends TestCase
             'data_da_palestra' => Carbon::now()->addDays(3),
         ]);
 
-        $this->get('/palestra_publica/calendario')->assertSee('Palestra Futura');
+        $this->get('/calendario')->assertSee('Palestra Futura');
     }
 }

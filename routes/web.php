@@ -50,9 +50,12 @@ Route::get('/auth/google/callback', [GoogleController::class, 'callback'])->name
 
 Route::get('/palestra_publica', [PalestraController::class, 'index'])->name('palestras.index');
 
-// Stub da página Calendário (nome canônico; a fatia do Calendário preenche o corpo depois).
+// Calendário unificado (Palestras + Eventos). Rota de topo, sem colisão de {slug}.
+Route::get('/calendario', [CalendarioController::class, 'index'])->name('calendario.index');
+
+// Página do calendário migrou para /calendario (unificado). 301 preserva SEO/links antigos.
 // DEVE vir ANTES de palestras.show para não ser capturada por {slug}.
-Route::get('/palestra_publica/calendario', [CalendarioController::class, 'index'])->name('palestras.calendario');
+Route::permanentRedirect('/palestra_publica/calendario', '/calendario');
 
 // Feed .ics agregado das próximas palestras. DEVE vir ANTES de palestras.show.
 Route::get('/palestra_publica/calendario.ics', [CalendarioController::class, 'feed'])->name('palestras.calendario-ics');

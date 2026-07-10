@@ -24,13 +24,19 @@ class CalendarioRotaTest extends TestCase
         $this->assertStringContainsString('text/calendar', $resp->headers->get('content-type'));
     }
 
-    public function test_pagina_calendario_segue_respondendo_200(): void
+    public function test_pagina_calendario_antiga_redireciona_301(): void
+    {
+        $this->get('/palestra_publica/calendario')->assertRedirect('/calendario');
+        $this->get('/palestra_publica/calendario')->assertStatus(301);
+    }
+
+    public function test_pagina_calendario_nova_responde_200(): void
     {
         Palestra::factory()->create([
             'status' => Palestra::STATUS_PUBLICADO,
             'data_da_palestra' => now()->addDays(3),
         ]);
 
-        $this->get('/palestra_publica/calendario')->assertOk();
+        $this->get('/calendario')->assertOk();
     }
 }

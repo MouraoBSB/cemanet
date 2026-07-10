@@ -1,0 +1,17 @@
+/* Calendário unificado — mini-grid multi-dia. Thiago Mourão — https://github.com/MouraoBSB — 2026-07-09 */
+
+/* Pontinhos de tipo (até 2) sobrepostos à base do dia — o botão recebe `relative` via utilitário na view. */
+.cema-cal-dots {
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    display: flex;
+    gap: 2px;
+    transform: translateX(-50%);
+}
+.cema-cal-dot {
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    border-radius: 9999px;
+}

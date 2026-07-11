@@ -52,6 +52,11 @@ class User extends Authenticatable implements FilamentUser
         return $this->belongsToMany(Cargo::class, 'cargo_usuario')->withTimestamps();
     }
 
+    public function departamentos(): BelongsToMany
+    {
+        return $this->belongsToMany(Departamento::class, 'departamento_usuario');
+    }
+
     public function atributos(): BelongsToMany
     {
         return $this->belongsToMany(Atributo::class, 'atributo_usuario')

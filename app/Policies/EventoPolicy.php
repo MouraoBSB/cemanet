@@ -6,16 +6,21 @@ namespace App\Policies;
 
 use App\Models\Evento;
 use App\Models\User;
+use App\Policies\Concerns\AutorizaPorDepartamento;
 
 /**
- * Policy parcial (só view/viewAny) — segura porque o Filament NÃO usa strict authorization
- * (isAuthorizationStrict = false por padrão; o projeto não altera), então create/update/delete
- * no /admin seguem permitidos. ⚠️ Se um dia ligarem strictAuthorization, esta policy parcial
- * passará a lançar LogicException nos métodos ausentes — adicione-os então.
+ * Policy de Evento nos DOIS eixos:
+ * - VISIBILIDADE (quem vê o publicado): view/viewAny, delegadas a podeSerVistoPor / scopeVisiveisPara.
+ *   $user é null-safe (visitante anônimo passa por Gate::forUser(null)).
+ * - CAPACIDADE (quem edita): ver/criar/editar/excluir — permissão (hasPermissionTo, NUNCA can()) +
+ *   escopo de departamento. User NÃO-nulável: o Gate pula o método p/ visitante ⇒ deny limpo.
+ * O admin nunca chega às capacidades (passa antes no Gate::before). Filament não usa strict
+ * authorization, então a policy parcial de visibilidade segue segura no /admin.
  */
 class EventoPolicy
 {
-    /** Delegada à regra única do model; $user é null-safe (visitante anônimo passa por Gate::forUser(null)). */
+    use AutorizaPorDepartamento;
+
     public function view(?User $user, Evento $evento): bool
     {
         return $evento->podeSerVistoPor($user);
@@ -24,5 +29,25 @@ class EventoPolicy
     public function viewAny(?User $user): bool
     {
         return true; // a listagem filtra por scopeVisiveisPara; não há bloqueio geral
+    }
+
+    public function ver(User $user, Evento $evento): bool
+    {
+        return $user->hasPermissionTo('evento.ver') && $this->objetoNoDepartamentoDoUsuario($user, $evento);
+    }
+
+    public function criar(User $user): bool
+    {
+        return $user->hasPermissionTo('evento.criar') && $user->departamentos()->exists();
+    }
+
+    public function editar(User $user, Evento $evento): bool
+    {
+        return $user->hasPermissionTo('evento.editar') && $this->objetoNoDepartamentoDoUsuario($user, $evento);
+    }
+
+    public function excluir(User $user, Evento $evento): bool
+    {
+        return $user->hasPermissionTo('evento.excluir') && $this->objetoNoDepartamentoDoUsuario($user, $evento);
     }
 }

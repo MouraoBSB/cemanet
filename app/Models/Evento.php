@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Enums\VisibilidadeEvento;
 use App\Models\Concerns\RegistraImagensPadrao;
+use App\Models\Contracts\TemDepartamento;
 use App\Support\Eventos\PeriodoEvento;
 use App\Support\Eventos\StatusEvento;
 use Illuminate\Database\Eloquent\Builder;
@@ -18,7 +19,7 @@ use Illuminate\Support\Carbon;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Evento extends Model implements HasMedia
+class Evento extends Model implements HasMedia, TemDepartamento
 {
     use HasFactory, InteractsWithMedia, RegistraImagensPadrao;
 

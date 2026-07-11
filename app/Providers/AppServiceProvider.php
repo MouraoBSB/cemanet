@@ -15,10 +15,12 @@ use App\Importacao\LeitorUsuarios;
 use App\Importacao\LeitorUsuariosMysql;
 use App\Listeners\CalcularHashMidia;
 use App\Listeners\CaparOriginalDaMidia;
+use App\Models\User;
 use App\Support\Blog\FonteReflexao;
 use App\Support\Blog\ReflexaoConfig;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\ServiceProvider;
 use Spatie\MediaLibrary\MediaCollections\Events\MediaHasBeenAddedEvent;
@@ -51,5 +53,9 @@ class AppServiceProvider extends ServiceProvider
         Hash::extend('cema', function ($app) {
             return new HasherLegadoCema($app['config']['hashing.bcrypt'] ?? []);
         });
+
+        // Portão do admin: administrador passa em qualquer ability; os demais caem nas policies.
+        // (register_permission_check_method está OFF, então este é o único Gate::before do sistema.)
+        Gate::before(fn (User $usuario) => $usuario->hasRole('administrador') ? true : null);
     }
 }

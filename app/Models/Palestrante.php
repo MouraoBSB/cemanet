@@ -6,6 +6,7 @@ namespace App\Models;
 
 use App\Models\Concerns\RegistraImagensPadrao;
 use App\Models\Concerns\TemIniciais;
+use App\Models\Contracts\TemDepartamento;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -14,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Palestrante extends Model implements HasMedia
+class Palestrante extends Model implements HasMedia, TemDepartamento
 {
     use HasFactory, InteractsWithMedia, RegistraImagensPadrao, TemIniciais;
 
@@ -49,6 +50,11 @@ class Palestrante extends Model implements HasMedia
     public function palestrasMinistradas(): BelongsToMany
     {
         return $this->palestras()->wherePivot('papel', Palestra::PAPEL_PALESTRANTE);
+    }
+
+    public function departamentos(): BelongsToMany
+    {
+        return $this->belongsToMany(Departamento::class, 'departamento_palestrante', 'palestrante_id', 'departamento_id');
     }
 
     public function registerMediaCollections(): void

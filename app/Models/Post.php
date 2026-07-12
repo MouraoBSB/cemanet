@@ -5,6 +5,7 @@
 namespace App\Models;
 
 use App\Filament\RichContent\ProviderImagemCorpo;
+use App\Models\Contracts\TemDepartamento;
 use Filament\Forms\Components\RichEditor\Models\Concerns\InteractsWithRichContent;
 use Filament\Forms\Components\RichEditor\Models\Contracts\HasRichContent;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,7 +20,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
-class Post extends Model implements HasMedia, HasRichContent
+class Post extends Model implements HasMedia, HasRichContent, TemDepartamento
 {
     use HasFactory, InteractsWithMedia, InteractsWithRichContent;
 
@@ -199,6 +200,11 @@ class Post extends Model implements HasMedia, HasRichContent
     public function faqs(): HasMany
     {
         return $this->hasMany(PostFaq::class)->orderBy('ordem');
+    }
+
+    public function departamentos(): BelongsToMany
+    {
+        return $this->belongsToMany(Departamento::class, 'departamento_post', 'post_id', 'departamento_id');
     }
 
     public function getUrlPublicaAttribute(): string

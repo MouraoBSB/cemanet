@@ -4,14 +4,16 @@
 
 namespace App\Models;
 
+use App\Models\Contracts\TemDepartamento;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
 
-class AgendaDia extends Model
+class AgendaDia extends Model implements TemDepartamento
 {
     use HasFactory;
 
@@ -40,6 +42,11 @@ class AgendaDia extends Model
     public function scopePublicado(Builder $query): Builder
     {
         return $query->where('status', self::STATUS_PUBLICADO);
+    }
+
+    public function departamentos(): BelongsToMany
+    {
+        return $this->belongsToMany(Departamento::class, 'departamento_agenda_dia', 'agenda_dia_id', 'departamento_id');
     }
 
     /**

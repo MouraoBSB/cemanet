@@ -4,6 +4,7 @@
 
 namespace App\Models;
 
+use App\Models\Contracts\TemDepartamento;
 use App\Support\Palestras\LinkDrive;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class Palestra extends Model
+class Palestra extends Model implements TemDepartamento
 {
     use HasFactory;
 
@@ -63,6 +64,11 @@ class Palestra extends Model
     public function assuntos(): BelongsToMany
     {
         return $this->belongsToMany(Assunto::class, 'assunto_palestra', 'palestra_id', 'assunto_id');
+    }
+
+    public function departamentos(): BelongsToMany
+    {
+        return $this->belongsToMany(Departamento::class, 'departamento_palestra', 'palestra_id', 'departamento_id');
     }
 
     public function getDiretorAttribute(): ?Palestrante

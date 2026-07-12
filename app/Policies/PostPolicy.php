@@ -6,30 +6,33 @@ namespace App\Policies;
 
 use App\Models\Post;
 use App\Models\User;
+use App\Policies\Concerns\AutorizaPorDepartamento;
 
 /**
- * Fail-closed: Post ainda não tem departamento (Fase B). Nega toda capacidade a não-admin;
- * o admin passa antes no Gate::before. Não usa AutorizaPorDepartamento (Post não é TemDepartamento).
+ * Capacidade (quem edita) de Post: permissão post.* (hasPermissionTo, NUNCA can()) + escopo de
+ * departamento (trait). User NÃO-nulável. O admin passa antes no Gate::before. Fase B: saiu do fail-closed.
  */
 class PostPolicy
 {
+    use AutorizaPorDepartamento;
+
     public function ver(User $user, Post $post): bool
     {
-        return false;
+        return $user->hasPermissionTo('post.ver') && $this->objetoNoDepartamentoDoUsuario($user, $post);
     }
 
     public function criar(User $user): bool
     {
-        return false;
+        return $user->hasPermissionTo('post.criar') && $user->departamentos()->exists();
     }
 
     public function editar(User $user, Post $post): bool
     {
-        return false;
+        return $user->hasPermissionTo('post.editar') && $this->objetoNoDepartamentoDoUsuario($user, $post);
     }
 
     public function excluir(User $user, Post $post): bool
     {
-        return false;
+        return $user->hasPermissionTo('post.excluir') && $this->objetoNoDepartamentoDoUsuario($user, $post);
     }
 }

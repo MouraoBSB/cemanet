@@ -71,6 +71,14 @@ class AgendaDiaResource extends Resource
             RichEditor::make('prece')
                 ->label('Sugestão de Prece')
                 ->columnSpanFull(),
+            Select::make('departamentos')
+                ->label('Departamentos')
+                ->relationship('departamentos', 'nome')
+                ->multiple()
+                ->searchable()
+                ->preload()
+                ->required()
+                ->columnSpanFull(),
         ]);
     }
 

@@ -14,6 +14,9 @@ class GlossarioUsuarios
         'administrador' => 100,
     ];
 
+    /** Papéis que aparecem como colunas editáveis na matriz de capacidades (Fase C). */
+    public const PAPEIS_EDITAVEIS = ['trabalhador', 'diretor'];
+
     /** Departamentos (sigla => nome). */
     public const DEPARTAMENTOS = [
         'DAS' => 'Assistência Social',

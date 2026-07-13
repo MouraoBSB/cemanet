@@ -5,6 +5,7 @@
 namespace Tests\Feature\Usuarios;
 
 use App\Filament\Resources\Users\Pages\CreateUser;
+use App\Models\Departamento;
 use App\Models\User;
 use Database\Seeders\EstruturaCemaSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -45,5 +46,26 @@ class UsuarioResourceTest extends TestCase
         $user = User::where('email', 'fulano@teste.com')->first();
         $this->assertNotNull($user);
         $this->assertTrue($user->hasRole('trabalhador'));
+    }
+
+    public function test_form_do_admin_salva_departamentos(): void
+    {
+        $trabalhador = Role::findByName('trabalhador', 'web');
+        $decom = Departamento::where('sigla', 'DECOM')->first();
+
+        Livewire::test(CreateUser::class)
+            ->fillForm([
+                'name' => 'Diretor do DECOM',
+                'email' => 'decom@teste.com',
+                'password' => 'senha-super-forte-2026',
+                'roles' => [$trabalhador->id],
+                'departamentos' => [$decom->id],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $user = User::where('email', 'decom@teste.com')->first();
+        $this->assertNotNull($user);
+        $this->assertTrue($user->departamentos->contains($decom));
     }
 }

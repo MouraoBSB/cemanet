@@ -5,6 +5,7 @@ namespace Tests\Feature\Filament;
 use App\Filament\Resources\Palestras\Pages\CreatePalestra;
 use App\Filament\Resources\Palestras\Pages\EditPalestra;
 use App\Models\Assunto;
+use App\Models\Departamento;
 use App\Models\Palestra;
 use App\Models\Palestrante;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -15,10 +16,13 @@ class PalestraResourceTest extends TestCase
 {
     use RefreshDatabase;
 
+    private Departamento $departamento;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->actingAsAdmin();
+        $this->departamento = Departamento::create(['sigla' => 'DED', 'nome' => 'DED', 'slug' => 'ded']);
     }
 
     public function test_cria_palestra_com_assuntos_destaques_e_um_palestrante(): void
@@ -33,6 +37,7 @@ class PalestraResourceTest extends TestCase
                 'status' => Palestra::STATUS_PUBLICADO,
                 'ids_palestrantes' => [$p1->id],
                 'assuntos' => [$assunto->id],
+                'departamentos' => [$this->departamento->id],
                 'destaques' => [
                     ['destaque' => 'A fé raciocinada', 'texto' => 'Estudo sério.'],
                 ],
@@ -65,6 +70,7 @@ class PalestraResourceTest extends TestCase
                 'status' => Palestra::STATUS_PUBLICADO,
                 'ids_palestrantes' => [$pal->id],
                 'id_diretor' => $dir->id,
+                'departamentos' => [$this->departamento->id],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -88,6 +94,7 @@ class PalestraResourceTest extends TestCase
                 'slug' => 'sem-palestrante',
                 'status' => Palestra::STATUS_PUBLICADO,
                 'ids_palestrantes' => [],
+                'departamentos' => [$this->departamento->id],
             ])
             ->call('create')
             ->assertHasFormErrors(['ids_palestrantes']);
@@ -105,6 +112,7 @@ class PalestraResourceTest extends TestCase
                 'slug' => 'tres-palestrantes',
                 'status' => Palestra::STATUS_PUBLICADO,
                 'ids_palestrantes' => $tres,
+                'departamentos' => [$this->departamento->id],
             ])
             ->call('create')
             ->assertHasFormErrors(['ids_palestrantes']);
@@ -136,7 +144,7 @@ class PalestraResourceTest extends TestCase
         $palestra->palestrantes()->attach($antigo, ['papel' => Palestra::PAPEL_PALESTRANTE]);
 
         Livewire::test(EditPalestra::class, ['record' => $palestra->getRouteKey()])
-            ->fillForm(['ids_palestrantes' => [$novo->id]])
+            ->fillForm(['ids_palestrantes' => [$novo->id], 'departamentos' => [$this->departamento->id]])
             ->call('save')
             ->assertHasNoFormErrors();
 
@@ -161,6 +169,7 @@ class PalestraResourceTest extends TestCase
                 'status' => Palestra::STATUS_PUBLICADO,
                 'ids_palestrantes' => [$x->id],
                 'id_diretor' => $x->id,
+                'departamentos' => [$this->departamento->id],
             ])
             ->call('create')
             ->assertHasFormErrors(['id_diretor']);
@@ -179,6 +188,7 @@ class PalestraResourceTest extends TestCase
                 'status' => Palestra::STATUS_PUBLICADO,
                 'ids_palestrantes' => [$palestrante->id],
                 'cor_fundo' => 'vermelho',
+                'departamentos' => [$this->departamento->id],
             ])
             ->call('create')
             ->assertHasFormErrors(['cor_fundo']);
@@ -197,6 +207,7 @@ class PalestraResourceTest extends TestCase
                 'status' => Palestra::STATUS_PUBLICADO,
                 'ids_palestrantes' => [$palestrante->id],
                 'cor_fundo' => '#4e4483',
+                'departamentos' => [$this->departamento->id],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -217,6 +228,7 @@ class PalestraResourceTest extends TestCase
                 'slug' => 'com-slide',
                 'status' => Palestra::STATUS_PUBLICADO,
                 'ids_palestrantes' => [$p1->id],
+                'departamentos' => [$this->departamento->id],
                 'slide' => 'https://drive.google.com/file/d/1ABCdefg_hij/view',
                 'duracao' => '≈1h10',
                 'referencias_evangelicas' => 'João 14.',
@@ -232,5 +244,39 @@ class PalestraResourceTest extends TestCase
         $this->assertSame('https://drive.google.com/uc?export=download&id=1ABCdefg_hij', $palestra->slide_download_url);
         $this->assertCount(1, $palestra->referencias);
         $this->assertSame('O Livro dos Espíritos', $palestra->referencias->first()->obra);
+    }
+
+    public function test_salva_departamento(): void
+    {
+        $p1 = Palestrante::factory()->ativo()->create();
+
+        Livewire::test(CreatePalestra::class)
+            ->fillForm([
+                'titulo' => 'Com Departamento',
+                'slug' => 'com-departamento',
+                'status' => Palestra::STATUS_PUBLICADO,
+                'ids_palestrantes' => [$p1->id],
+                'departamentos' => [$this->departamento->id],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $palestra = Palestra::where('slug', 'com-departamento')->first();
+        $this->assertTrue($palestra->departamentos->contains($this->departamento));
+    }
+
+    public function test_exige_departamento(): void
+    {
+        $p1 = Palestrante::factory()->ativo()->create();
+
+        Livewire::test(CreatePalestra::class)
+            ->fillForm([
+                'titulo' => 'Sem Departamento',
+                'slug' => 'sem-departamento',
+                'status' => Palestra::STATUS_PUBLICADO,
+                'ids_palestrantes' => [$p1->id],
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['departamentos']);
     }
 }

@@ -17,6 +17,22 @@ class EventosFonteTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function setUp(): void
+    {
+        parent::setUp();
+        // Fixa "hoje" no dia 5 do mês corrente. Os cenários usam datas relativas
+        // (now()->addDays(10), now()->subDay(), etc.); sem isso, o teste multidia
+        // falhava quando o dia real do mês tornava um evento "futuro" já passado.
+        // Determinístico quanto ao dia-do-mês, sem prender ano/mês.
+        Carbon::setTestNow(Carbon::now()->startOfMonth()->addDays(4));
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
+    }
+
     private function evento(array $o = []): Evento
     {
         return Evento::create(array_merge([

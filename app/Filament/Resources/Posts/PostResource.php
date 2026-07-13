@@ -226,6 +226,13 @@ class PostResource extends Resource
                                 ->required()
                                 ->maxLength(255),
                         ]),
+                    Select::make('departamentos')
+                        ->label('Departamentos')
+                        ->relationship('departamentos', 'nome')
+                        ->multiple()
+                        ->searchable()
+                        ->preload()
+                        ->required(),
                     Grid::make(3)->schema([
                         Toggle::make('destaque')
                             ->label('Destaque'),

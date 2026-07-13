@@ -103,6 +103,12 @@ class UserResource extends Resource
                             ->relationship('cargos', 'nome')
                             ->multiple()
                             ->preload(),
+
+                        Select::make('departamentos')
+                            ->label('Departamentos')
+                            ->relationship('departamentos', 'nome')
+                            ->multiple()
+                            ->preload(),
                     ]),
 
                 Section::make('Perfil')

@@ -10,6 +10,7 @@ use App\Filament\Resources\Posts\Pages\EditPost;
 use App\Filament\Resources\Posts\Pages\ListPosts;
 use App\Models\Categoria;
 use App\Models\Configuracao;
+use App\Models\Departamento;
 use App\Models\Post;
 use App\Models\Tag;
 use Filament\Forms\Components\RichEditor;
@@ -23,10 +24,13 @@ class PostResourceTest extends TestCase
 {
     use RefreshDatabase;
 
+    private Departamento $departamento;
+
     protected function setUp(): void
     {
         parent::setUp();
         $this->actingAsAdmin();
+        $this->departamento = Departamento::create(['sigla' => 'DED', 'nome' => 'DED', 'slug' => 'ded']);
     }
 
     public function test_lista_renderiza(): void
@@ -49,6 +53,7 @@ class PostResourceTest extends TestCase
                 'slug' => 'sementeira-de-luz',
                 'status' => Post::STATUS_PUBLICADO,
                 'data_publicacao' => now()->format('Y-m-d H:i'),
+                'departamentos' => [$this->departamento->id],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -65,6 +70,7 @@ class PostResourceTest extends TestCase
                 'slug' => 'rascunho-sem-data',
                 'status' => Post::STATUS_RASCUNHO,
                 'data_publicacao' => null,
+                'departamentos' => [$this->departamento->id],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -81,6 +87,7 @@ class PostResourceTest extends TestCase
                 'slug' => 'publicado-sem-data',
                 'status' => Post::STATUS_PUBLICADO,
                 'data_publicacao' => null,
+                'departamentos' => [$this->departamento->id],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -100,6 +107,7 @@ class PostResourceTest extends TestCase
                 'slug' => 'agendado-sem-data',
                 'status' => Post::STATUS_AGENDADO,
                 'data_publicacao' => null,
+                'departamentos' => [$this->departamento->id],
             ])
             ->call('create')
             ->assertHasFormErrors(['data_publicacao']);
@@ -119,6 +127,7 @@ class PostResourceTest extends TestCase
                 'data_publicacao' => now()->format('Y-m-d H:i'),
                 'categorias' => [$categoria->id],
                 'categoria_principal_id' => $categoria->id,
+                'departamentos' => [$this->departamento->id],
                 'faqs' => [
                     ['pergunta' => 'O que é a Sementeira?', 'resposta' => 'É um blog espírita.'],
                 ],
@@ -144,6 +153,7 @@ class PostResourceTest extends TestCase
                 'status' => Post::STATUS_RASCUNHO,
                 'data_publicacao' => now()->format('Y-m-d H:i'),
                 'tags' => [$tag->id],
+                'departamentos' => [$this->departamento->id],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -160,6 +170,7 @@ class PostResourceTest extends TestCase
                 'titulo' => 'Sem Slug',
                 'slug' => '',
                 'status' => Post::STATUS_RASCUNHO,
+                'departamentos' => [$this->departamento->id],
             ])
             ->call('create')
             ->assertHasFormErrors(['slug']);
@@ -264,6 +275,7 @@ class PostResourceTest extends TestCase
                 'slug' => 'post-com-imagem-destacada',
                 'status' => Post::STATUS_RASCUNHO,
                 'data_publicacao' => now()->format('Y-m-d H:i'),
+                'departamentos' => [$this->departamento->id],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -337,5 +349,35 @@ class PostResourceTest extends TestCase
 
                 return true;
             });
+    }
+
+    public function test_salva_departamento(): void
+    {
+        Livewire::test(CreatePost::class)
+            ->fillForm([
+                'titulo' => 'Post com Departamento',
+                'slug' => 'post-com-departamento',
+                'status' => Post::STATUS_PUBLICADO,
+                'data_publicacao' => now()->format('Y-m-d H:i'),
+                'departamentos' => [$this->departamento->id],
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $post = Post::where('slug', 'post-com-departamento')->first();
+        $this->assertTrue($post->departamentos->contains($this->departamento));
+    }
+
+    public function test_exige_departamento(): void
+    {
+        Livewire::test(CreatePost::class)
+            ->fillForm([
+                'titulo' => 'Post sem Departamento',
+                'slug' => 'post-sem-departamento',
+                'status' => Post::STATUS_RASCUNHO,
+                'data_publicacao' => null,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['departamentos']);
     }
 }

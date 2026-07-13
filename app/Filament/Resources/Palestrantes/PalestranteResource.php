@@ -15,6 +15,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
@@ -120,6 +121,17 @@ class PalestranteResource extends Resource
                         Toggle::make('ativo')
                             ->label('Palestrante ativo')
                             ->default(true),
+                    ]),
+
+                Section::make('Departamentos')
+                    ->schema([
+                        Select::make('departamentos')
+                            ->label('Departamentos')
+                            ->relationship('departamentos', 'nome')
+                            ->multiple()
+                            ->searchable()
+                            ->preload()
+                            ->required(),
                     ]),
             ]);
     }

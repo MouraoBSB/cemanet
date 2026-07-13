@@ -49,6 +49,12 @@ class AuditoriaMatrizTest extends TestCase
         $this->assertSame('admin', $props['porta']);
         $this->assertArrayHasKey('ip', $props);
         $this->assertArrayHasKey('user_agent', $props);
+
+        $trabalhador = Role::findByName('trabalhador', 'web');
+        $this->assertSame(0, DB::table('activity_log')
+            ->where('log_name', 'autorizacao')
+            ->where('subject_id', $trabalhador->id)
+            ->count());
     }
 
     public function test_salvar_desmarcando_loga_remocao(): void

@@ -11,9 +11,9 @@ class EditUser extends EditRecord
 {
     protected static string $resource = UserResource::class;
 
-    public array $papelAntes = [];
+    protected array $papelAntes = [];
 
-    public array $deptosAntes = [];
+    protected array $deptosAntes = [];
 
     protected function getHeaderActions(): array
     {

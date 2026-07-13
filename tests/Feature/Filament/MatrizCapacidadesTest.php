@@ -33,6 +33,14 @@ class MatrizCapacidadesTest extends TestCase
         $this->get('/admin/matriz-capacidades')->assertOk();
     }
 
+    public function test_nao_admin_nao_acessa_a_pagina(): void
+    {
+        $diretor = User::factory()->create();
+        $diretor->assignRole('diretor');
+
+        $this->actingAs($diretor)->get('/admin/matriz-capacidades')->assertForbidden();
+    }
+
     public function test_salvar_atribui_e_remove_permissao_do_papel(): void
     {
         Livewire::test(MatrizCapacidades::class)
@@ -64,8 +72,15 @@ class MatrizCapacidadesTest extends TestCase
 
     public function test_salvar_nao_toca_admin_nem_frequentador(): void
     {
+        // mesmo que o state do form contenha chaves de papéis fora de PAPEIS_EDITAVEIS
+        // (fillForm seta pela chave, sem exigir campo no schema), salvar() as ignora.
         Livewire::test(MatrizCapacidades::class)
-            ->fillForm(['diretor.palestra.editar' => true, 'trabalhador.post.criar' => true])
+            ->fillForm([
+                'diretor.palestra.editar' => true,
+                'trabalhador.post.criar' => true,
+                'frequentador.palestra.editar' => true,
+                'administrador.post.criar' => true,
+            ])
             ->call('salvar')
             ->assertHasNoFormErrors();
 

@@ -5,6 +5,7 @@
 namespace App\Filament\Pages;
 
 use App\Importacao\GlossarioUsuarios;
+use App\Support\Autorizacao\AuditoriaAutorizacao;
 use App\Support\Autorizacao\GlossarioCapacidades;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Toggle;
@@ -120,7 +121,10 @@ class MatrizCapacidades extends Page
 
             // findByName + syncPermissions (nunca recriar o papel: zeraria 'nivel').
             // syncPermissions já limpa o cache do spatie — não chamar forget (F10).
-            Role::findByName($papel, 'web')->syncPermissions($marcados);
+            $role = Role::findByName($papel, 'web');
+            $antes = $role->permissions()->pluck('name')->all();   // ANTES (relê do banco)
+            $role->syncPermissions($marcados);
+            AuditoriaAutorizacao::registrarPapelCapacidades($role, $antes, $marcados);
         }
 
         Notification::make()

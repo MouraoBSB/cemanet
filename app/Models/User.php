@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Concerns\TemIniciais;
+use App\Support\Autorizacao\AuditoriaAutorizacao;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Panel;
@@ -15,6 +16,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Spatie\Activitylog\Contracts\Activity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 
 #[Fillable(['name', 'email', 'password', 'origem_legado_id', 'socio', 'ativo', 'email_verified_at', 'google_id'])]
@@ -22,7 +26,7 @@ use Spatie\Permission\Traits\HasRoles;
 class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<UserFactory> */
-    use HasFactory, HasRoles, Notifiable, TemIniciais;
+    use HasFactory, HasRoles, LogsActivity, Notifiable, TemIniciais;
 
     public function canAccessPanel(Panel $panel): bool
     {
@@ -89,5 +93,26 @@ class User extends Authenticatable implements FilamentUser
     public function nivelMaximo(): int
     {
         return (int) $this->roles->max('nivel');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('usuario')
+            ->logOnly(['name', 'email', 'google_id', 'socio', 'ativo'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $evento): string => match ($evento) {
+                'created' => 'usuário criado',
+                'updated' => 'usuário atualizado',
+                'deleted' => 'usuário excluído',
+                default => "usuário {$evento}",
+            });
+    }
+
+    /** IP + user-agent + porta em toda entrada automática (fonte única: o helper). */
+    public function tapActivity(Activity $activity, string $eventName): void
+    {
+        $activity->properties = $activity->properties->merge(AuditoriaAutorizacao::contexto());
     }
 }

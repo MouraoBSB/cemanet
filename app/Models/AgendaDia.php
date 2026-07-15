@@ -44,6 +44,21 @@ class AgendaDia extends Model implements TemDepartamento
         return $query->where('status', self::STATUS_PUBLICADO);
     }
 
+    /**
+     * AgendaDia cujos departamentos intersectam os do usuário (filtro de objeto A/B).
+     * Fail-closed: usuário sem departamento ⇒ nenhum registro.
+     */
+    public function scopeNoEscopoDe(Builder $query, User $user): Builder
+    {
+        $ids = $user->departamentos()->pluck('departamentos.id')->all();
+
+        if ($ids === []) {
+            return $query->whereRaw('1 = 0');
+        }
+
+        return $query->whereHas('departamentos', fn (Builder $q) => $q->whereIn('departamentos.id', $ids));
+    }
+
     public function departamentos(): BelongsToMany
     {
         return $this->belongsToMany(Departamento::class, 'departamento_agenda_dia', 'agenda_dia_id', 'departamento_id');

@@ -1,0 +1,30 @@
+/* Tema Filament ENXUTO e ESCOPADO para os formulários do site (/minha-conta).
+   Diferente do tema do painel (resources/css/filament/admin/theme.css): SEM preflight
+   (o site já tem o seu reset) e SEM a fonte Inter (o site usa a própria tipografia).
+   Carregado só na página da agenda, via slot headTop, ANTES do app.css.
+   Thiago Mourão — https://github.com/MouraoBSB — 2026-07-15 */
+
+/* Ordem das camadas fixada explicitamente (receita v4): sem esta linha, a 1ª aparição definiria
+   a ordem (theme, utilities antes de base/components do index.css), pondo components acima de
+   utilities e sobrepondo utilitários da marcação. */
+@layer theme, base, components, utilities;
+
+/* Tailwind v4 SEM preflight: importa tokens (@theme) e utilitários, mas NÃO o preflight
+   (que resetaria header/footer do site). source(none): sem varredura automática — as
+   classes vêm do @source restrito abaixo. */
+@import 'tailwindcss/theme.css' layer(theme) source(none);
+@import 'tailwindcss/utilities.css' layer(utilities) source(none);
+
+/* Estilos dos componentes Filament (fi-*). É o índice do tema-base do painel, sem o
+   `@import 'tailwindcss'` (que traria o preflight). */
+@import '../../../../vendor/filament/filament/resources/css/index.css';
+
+/* @source restrito: só os arquivos que emitem classes fi-* usadas no site. */
+@source '../../../../app/Filament/Schemas/AgendaDiaForm.php';
+@source '../../../../resources/views/livewire/conta/**/*';
+
+/* Fonte do site (NÃO Inter). O Filament injeta inline `:root { --font-family: 'Inter...' }`
+   html:root (especificidade 0,1,1) vence esse :root (0,1,0) por especificidade. */
+html:root {
+    --font-family: 'Poppins';
+}

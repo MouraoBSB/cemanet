@@ -7,18 +7,14 @@ namespace App\Filament\Resources\Agenda;
 use App\Filament\Resources\Agenda\Pages\CreateAgendaDia;
 use App\Filament\Resources\Agenda\Pages\EditAgendaDia;
 use App\Filament\Resources\Agenda\Pages\ListAgendaDias;
+use App\Filament\Schemas\AgendaDiaForm;
 use App\Models\AgendaDia;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
-use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
@@ -37,49 +33,9 @@ class AgendaDiaResource extends Resource
 
     public static function form(Schema $schema): Schema
     {
-        return $schema->components([
-            Grid::make(2)->schema([
-                DatePicker::make('data')
-                    ->label('Data')
-                    ->required()
-                    ->native(false)
-                    ->displayFormat('d/m/Y')
-                    ->unique(table: 'agenda_dias', column: 'data', ignoreRecord: true),
-                Select::make('status')
-                    ->label('Status')
-                    ->required()
-                    ->options([
-                        AgendaDia::STATUS_PUBLICADO => 'Publicado',
-                        AgendaDia::STATUS_RASCUNHO => 'Rascunho',
-                    ])
-                    ->default(AgendaDia::STATUS_PUBLICADO),
-            ]),
-            // HTML cru; a sanitização (clean $v,'conteudo') vem do mutator do model.
-            RichEditor::make('reflexao')
-                ->label('Reflexão e Vivência (Evangelho)')
-                ->columnSpanFull(),
-            RichEditor::make('meta_mes_texto')
-                ->label('Meta do Mês — citação do dia')
-                ->columnSpanFull(),
-            TextInput::make('meta_dia_titulo')
-                ->label('Meta do Dia — título')
-                ->maxLength(255)
-                ->columnSpanFull(),
-            RichEditor::make('meta_dia_texto')
-                ->label('Meta do Dia — texto')
-                ->columnSpanFull(),
-            RichEditor::make('prece')
-                ->label('Sugestão de Prece')
-                ->columnSpanFull(),
-            Select::make('departamentos')
-                ->label('Departamentos')
-                ->relationship('departamentos', 'nome')
-                ->multiple()
-                ->searchable()
-                ->preload()
-                ->required()
-                ->columnSpanFull(),
-        ]);
+        // Schema vindo da fonte única (App\Filament\Schemas\AgendaDiaForm), reaproveitada
+        // pelo componente de edição embutido no site (/minha-conta).
+        return $schema->components(AgendaDiaForm::schema());
     }
 
     public static function table(Table $table): Table

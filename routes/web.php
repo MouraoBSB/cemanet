@@ -40,6 +40,7 @@ Route::middleware('guest')->group(function () {
 Route::middleware('auth')->prefix('minha-conta')->name('conta.')->group(function () {
     Route::get('/', [ContaController::class, 'painel'])->name('painel');
     Route::get('/perfil', [ContaController::class, 'perfil'])->name('perfil');
+    Route::get('/agenda', [ContaController::class, 'agenda'])->name('agenda');
 });
 
 Route::post('/sair', [AuthenticatedSessionController::class, 'destroy'])->name('logout')->middleware('auth');

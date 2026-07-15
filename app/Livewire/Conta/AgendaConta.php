@@ -83,7 +83,7 @@ class AgendaConta extends Component implements HasForms
         // Campo privilegiado STATUS: enum reasserido no servidor + quem não tem agenda.editar não
         // publica na criação (D-F9).
         $dados['status'] = $this->statusValido($dados['status']);
-        if (! $user->hasPermissionTo('agenda.editar')) {
+        if (! $user->checkPermissionTo('agenda.editar')) {
             $dados['status'] = AgendaDia::STATUS_RASCUNHO;
         }
 

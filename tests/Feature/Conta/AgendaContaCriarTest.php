@@ -69,6 +69,25 @@ class AgendaContaCriarTest extends TestCase
         $this->assertTrue(Gate::forUser($diretorDed)->check('editar', $novo));
     }
 
+    public function test_departamentos_forjado_no_post_e_ignorado(): void
+    {
+        $user = $this->editorDecom(['agenda.ver', 'agenda.criar', 'agenda.editar']);
+        $das = Departamento::where('sigla', 'DAS')->value('id'); // depto alheio, fora dos mantenedores
+        $mantenedores = Departamento::whereIn('sigla', ['DED', 'DECOM'])->pluck('id')->sort()->values()->all();
+
+        Livewire::actingAs($user)->test(AgendaConta::class)
+            ->call('novo')
+            ->fillForm(['data' => '2027-08-08', 'status' => AgendaDia::STATUS_PUBLICADO, 'reflexao' => '<p>x</p>'])
+            ->set('data.departamentos', [$das]) // injeta o campo privilegiado direto no estado (bypass da UI)
+            ->call('salvar')
+            ->assertHasNoFormErrors();
+
+        $novo = AgendaDia::whereDate('data', '2027-08-08')->firstOrFail();
+        $ids = $novo->departamentos()->pluck('departamentos.id')->sort()->values()->all();
+        $this->assertSame($mantenedores, $ids);              // nasceu DED+DECOM
+        $this->assertNotContains($das, $ids);                // o depto forjado NÃO entrou
+    }
+
     public function test_status_fora_do_enum_e_rejeitado(): void
     {
         $user = $this->editorDecom(['agenda.ver', 'agenda.criar', 'agenda.editar']);

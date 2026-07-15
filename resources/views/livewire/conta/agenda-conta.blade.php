@@ -2,10 +2,12 @@
 <div class="space-y-6">
     <div class="flex items-center justify-between">
         <h2 class="font-display text-xl font-semibold text-primary">Agenda da Reforma Íntima</h2>
-        <button type="button" wire:click="novo"
-                class="rounded-pill bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90">
-            Novo dia
-        </button>
+        @can('criar', \App\Models\AgendaDia::class)
+            <button type="button" wire:click="novo"
+                    class="rounded-pill bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90">
+                Novo dia
+            </button>
+        @endcan
     </div>
 
     @if ($mostrandoForm)

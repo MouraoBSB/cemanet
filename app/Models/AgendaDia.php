@@ -5,6 +5,7 @@
 namespace App\Models;
 
 use App\Models\Contracts\TemDepartamento;
+use App\Support\Autorizacao\AuditoriaAutorizacao;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,10 +13,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Str;
+use Spatie\Activitylog\Contracts\Activity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class AgendaDia extends Model implements TemDepartamento
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
 
     public const STATUS_PUBLICADO = 'publicado';
 
@@ -132,5 +136,26 @@ class AgendaDia extends Model implements TemDepartamento
     public function descricaoSeo(): string
     {
         return Str::limit(trim(strip_tags((string) $this->reflexao)), 155);
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('agenda')
+            ->logOnly(['data', 'status', 'reflexao', 'meta_mes_texto', 'meta_dia_titulo', 'meta_dia_texto', 'prece'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $evento): string => match ($evento) {
+                'created' => 'dia da agenda criado',
+                'updated' => 'dia da agenda atualizado',
+                'deleted' => 'dia da agenda excluído',
+                default => "dia da agenda {$evento}",
+            });
+    }
+
+    /** IP + user-agent + porta em toda entrada automática (fonte única: o helper). */
+    public function tapActivity(Activity $activity, string $eventName): void
+    {
+        $activity->properties = $activity->properties->merge(AuditoriaAutorizacao::contexto());
     }
 }

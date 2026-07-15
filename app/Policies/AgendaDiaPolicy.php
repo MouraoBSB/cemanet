@@ -23,7 +23,7 @@ class AgendaDiaPolicy
 
     public function criar(User $user): bool
     {
-        return $user->checkPermissionTo('agenda.criar') && $user->departamentos()->exists();
+        return $user->hasPermissionTo('agenda.criar') && $user->departamentos()->exists();
     }
 
     public function editar(User $user, AgendaDia $agendaDia): bool

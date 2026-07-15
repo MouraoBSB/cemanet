@@ -50,6 +50,12 @@ class AgendaConta extends Component implements HasForms
             ->operation($this->editandoId ? 'edit' : 'create');
     }
 
+    /** Só para a UI decidir mostrar o botão "Novo dia" (fail-closed; a autorização real é no novo()/salvar()). */
+    public function podeCriar(): bool
+    {
+        return auth()->user()->checkPermissionTo('agenda.criar');
+    }
+
     public function novo(): void
     {
         $this->authorize('criar', AgendaDia::class);

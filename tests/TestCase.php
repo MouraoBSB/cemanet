@@ -3,6 +3,7 @@
 namespace Tests;
 
 use App\Models\User;
+use App\Support\Autorizacao\AuditoriaAutorizacao;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Spatie\Permission\Models\Role;
 
@@ -17,5 +18,17 @@ abstract class TestCase extends BaseTestCase
         $this->actingAs($user);
 
         return $user;
+    }
+
+    /**
+     * Reseta a porta estática de AuditoriaAutorizacao entre testes: o boot() do AgendaConta
+     * marca 'perfil' e o estático não some sozinho — sem este reset, vaza para o próximo teste
+     * (bomba por ordem de execução). 1 lugar blinda a suíte inteira.
+     */
+    protected function tearDown(): void
+    {
+        AuditoriaAutorizacao::usarPorta(null);
+
+        parent::tearDown();
     }
 }

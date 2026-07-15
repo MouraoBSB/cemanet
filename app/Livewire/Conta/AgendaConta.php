@@ -6,7 +6,9 @@ namespace App\Livewire\Conta;
 
 use App\Filament\Schemas\AgendaDiaForm;
 use App\Models\AgendaDia;
+use App\Models\Departamento;
 use App\Support\Agenda\AgendaMantenedores;
+use App\Support\Autorizacao\AuditoriaAutorizacao;
 use App\Support\Conta\AbaAgenda;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -41,6 +43,13 @@ class AgendaConta extends Component implements HasForms
     public function mount(): void
     {
         abort_unless(AbaAgenda::visivelPara(auth()->user()), 403);
+    }
+
+    public function boot(): void
+    {
+        // /minha-conta não é painel Filament → porta cairia em 'sistema'. Marcar 'perfil'
+        // explicitamente, em toda requisição do componente (inclui o /livewire/update do save).
+        AuditoriaAutorizacao::usarPorta('perfil');
     }
 
     public function form(Schema $schema): Schema
@@ -158,7 +167,12 @@ class AgendaConta extends Component implements HasForms
             $registro = AgendaDia::create($dados);
 
             // Campo privilegiado DEPARTAMENTOS forçado: todo novo AgendaDia nasce DED+DECOM (O1).
-            $registro->departamentos()->sync(AgendaMantenedores::ids());
+            $idsMantenedores = AgendaMantenedores::ids();
+            $registro->departamentos()->sync($idsMantenedores);
+
+            // Log manual do vínculo depto↔conteúdo (o trait não captura N:N), log_name 'agenda'.
+            $depois = Departamento::whereIn('id', $idsMantenedores)->pluck('nome', 'id')->all();
+            AuditoriaAutorizacao::registrarDepartamentosConteudo($registro, antes: [], depois: $depois);
         } catch (QueryException $e) {
             // O belt dataJaUsada acima cobre o caso comum; este catch fecha a janela TOCTOU
             // entre o SELECT do belt e o INSERT sob concorrência (unique de agenda_dias.data).

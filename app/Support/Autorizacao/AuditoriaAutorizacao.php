@@ -14,10 +14,19 @@ class AuditoriaAutorizacao
     /** log_name das entradas manuais dos 3 pivôs de autorização. */
     public const LOG = 'autorizacao';
 
-    /** Painel corrente: 'admin' | 'sistema' ('perfil' na Fase D). Nunca cai no default. */
+    /** Porta forçada pelo contexto (ex.: 'perfil' no /minha-conta, que não é painel Filament). */
+    private static ?string $portaForcada = null;
+
+    /** Marca a porta corrente (setado no boot() do componente do site). Reset com null. */
+    public static function usarPorta(?string $porta): void
+    {
+        self::$portaForcada = $porta;
+    }
+
+    /** Painel corrente: override > painel Filament > 'sistema'. Nunca cai no default por acidente. */
     public static function porta(): string
     {
-        return Filament::getCurrentPanel()?->getId() ?? 'sistema';
+        return self::$portaForcada ?? Filament::getCurrentPanel()?->getId() ?? 'sistema';
     }
 
     /** Contexto comum a toda entrada: porta + IP + user-agent (null fora de request HTTP). */
@@ -78,14 +87,34 @@ class AuditoriaAutorizacao
         self::registrar($usuario, 'departamentos do usuário alterados', $diff);
     }
 
-    /** Escreve 1 entrada 'autorizacao'; no-op se o diff for vazio. */
-    private static function registrar(Model $subject, string $descricao, array $diff): void
+    /**
+     * Vínculo depto↔conteúdo: subject = o conteúdo; log_name = 'agenda' (mesma trilha do trait,
+     * §8.3 do spec). Diff por id, itens {id, nome} (estável a rename).
+     *
+     * @param  array<int, string>  $antes  [id => nome] antes do sync
+     * @param  array<int, string>  $depois  [id => nome] depois do sync
+     */
+    public static function registrarDepartamentosConteudo(Model $conteudo, array $antes, array $depois): void
+    {
+        $idsAdicionados = array_diff(array_keys($depois), array_keys($antes));
+        $idsRemovidos = array_diff(array_keys($antes), array_keys($depois));
+
+        $diff = [
+            'adicionados' => array_values(array_map(fn (int $id): array => ['id' => $id, 'nome' => $depois[$id]], $idsAdicionados)),
+            'removidos' => array_values(array_map(fn (int $id): array => ['id' => $id, 'nome' => $antes[$id]], $idsRemovidos)),
+        ];
+
+        self::registrar($conteudo, 'departamentos do conteúdo alterados', $diff, logName: 'agenda');
+    }
+
+    /** Escreve 1 entrada; no-op se o diff for vazio. */
+    private static function registrar(Model $subject, string $descricao, array $diff, string $logName = self::LOG): void
     {
         if (empty($diff['adicionados']) && empty($diff['removidos'])) {
             return;
         }
 
-        activity(self::LOG)
+        activity($logName)
             ->performedOn($subject)
             ->causedBy(auth()->user())
             ->withProperties(['diff' => $diff] + self::contexto())

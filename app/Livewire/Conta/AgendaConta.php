@@ -67,6 +67,18 @@ class AgendaConta extends Component implements HasForms
         return auth()->user()->checkPermissionTo('agenda.criar');
     }
 
+    /** Só para a UI mostrar o botão Editar (fail-closed; a autorização real é no editar()). */
+    public function podeEditar(): bool
+    {
+        return auth()->user()->checkPermissionTo('agenda.editar');
+    }
+
+    /** Só para a UI mostrar o botão Excluir (fail-closed; a autorização real é no excluir()). */
+    public function podeExcluir(): bool
+    {
+        return auth()->user()->checkPermissionTo('agenda.excluir');
+    }
+
     public function novo(): void
     {
         $this->authorize('criar', AgendaDia::class);

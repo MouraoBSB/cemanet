@@ -35,8 +35,12 @@
                         'bg-accent/15 text-success' => $item->status === \App\Models\AgendaDia::STATUS_PUBLICADO,
                         'bg-border-muted text-text-secondary' => $item->status !== \App\Models\AgendaDia::STATUS_PUBLICADO,
                     ])>{{ $item->status }}</span>
-                    <button type="button" wire:click="editar({{ $item->id }})" class="text-sm text-primary hover:underline">Editar</button>
-                    <button type="button" wire:click="excluir({{ $item->id }})" wire:confirm="Excluir este dia da agenda?" class="text-sm text-danger hover:underline">Excluir</button>
+                    @if ($this->podeEditar())
+                        <button type="button" wire:click="editar({{ $item->id }})" class="text-sm text-primary hover:underline">Editar</button>
+                    @endif
+                    @if ($this->podeExcluir())
+                        <button type="button" wire:click="excluir({{ $item->id }})" wire:confirm="Excluir este dia da agenda?" class="text-sm text-danger hover:underline">Excluir</button>
+                    @endif
                 </div>
             </article>
         @empty

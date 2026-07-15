@@ -11,6 +11,7 @@ export default defineConfig({
                 'resources/js/app.js',
                 'resources/js/cropper-perfil.js',
                 'resources/css/filament/admin/theme.css',
+                'resources/css/filament/site/theme.css',
             ],
             refresh: true,
             fonts: [

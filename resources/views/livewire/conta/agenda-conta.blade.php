@@ -29,11 +29,19 @@
                     <p class="font-medium text-text">{{ $item->data?->format('d/m/Y') }}</p>
                     <p class="text-sm text-text-muted">{{ $item->meta_dia_titulo ?: '—' }}</p>
                 </div>
-                <span @class([
-                    'rounded-pill px-2.5 py-0.5 text-xs font-medium capitalize',
-                    'bg-accent/15 text-success' => $item->status === \App\Models\AgendaDia::STATUS_PUBLICADO,
-                    'bg-border-muted text-text-secondary' => $item->status !== \App\Models\AgendaDia::STATUS_PUBLICADO,
-                ])>{{ $item->status }}</span>
+                <div class="flex items-center gap-3">
+                    <span @class([
+                        'rounded-pill px-2.5 py-0.5 text-xs font-medium capitalize',
+                        'bg-accent/15 text-success' => $item->status === \App\Models\AgendaDia::STATUS_PUBLICADO,
+                        'bg-border-muted text-text-secondary' => $item->status !== \App\Models\AgendaDia::STATUS_PUBLICADO,
+                    ])>{{ $item->status }}</span>
+                    @if ($this->podeEditar())
+                        <button type="button" wire:click="editar({{ $item->id }})" class="text-sm text-primary hover:underline">Editar</button>
+                    @endif
+                    @if ($this->podeExcluir())
+                        <button type="button" wire:click="excluir({{ $item->id }})" wire:confirm="Excluir este dia da agenda?" class="text-sm text-danger hover:underline">Excluir</button>
+                    @endif
+                </div>
             </article>
         @empty
             <p class="text-sm text-text-muted">Nenhum dia de agenda no seu departamento ainda.</p>

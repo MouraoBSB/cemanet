@@ -1488,6 +1488,7 @@ git commit -m "feat(agenda): trait LogsActivity no AgendaDia (7 campos, log_name
 **Files:**
 - Modify: `app/Support/Autorizacao/AuditoriaAutorizacao.php` (override de porta + `registrar()` com `$logName` + `registrarDepartamentosConteudo`)
 - Modify: `app/Livewire/Conta/AgendaConta.php` (`boot()` seta a porta; `salvar()` create loga o depto)
+- Modify: `tests/TestCase.php` (tearDown reseta a porta estática — blinda a suíte contra vazamento entre testes)
 - Test: `tests/Feature/Autorizacao/AuditoriaAgendaPortaTest.php`
 
 **Interfaces:**
@@ -1719,10 +1720,30 @@ No ramo de **criação** do `salvar()`, após o `sync` dos mantenedores, registr
 
 Adicionar `use App\Support\Autorizacao\AuditoriaAutorizacao;` no topo.
 
+- [ ] **Step 4b: Blindar a suíte — resetar a porta estática no `tearDown()` base**
+
+A porta é estado **estático** (`$portaForcada`); a recriação da app entre testes **não** limpa estático, e o
+`boot()` do `AgendaConta` seta `'perfil'` — que vazaria para testes seguintes (bomba por ordem: quebra com
+`executionOrder=random`/paratest). Resetar no `tearDown()` da **base** cobre a suíte inteira (1 lugar; não
+confiar na ordem de descoberta).
+
+Modify `tests/TestCase.php` — adicionar/ajustar `tearDown()` para resetar **antes** do `parent::tearDown()`:
+
+```php
+    protected function tearDown(): void
+    {
+        \App\Support\Autorizacao\AuditoriaAutorizacao::usarPorta(null);
+
+        parent::tearDown();
+    }
+```
+
+(Se `tests/TestCase.php` já tem `tearDown`, inserir a linha de reset no início; senão, adicionar o método.)
+
 - [ ] **Step 5: Rodar e ver passar**
 
 Run: `docker compose exec -T app php artisan test --filter=AuditoriaAgendaPortaTest`
-Expected: PASS (3 testes).
+Expected: PASS (3 testes de porta/log + os 2 acrescidos = 5 no total desta classe).
 
 Rodar a regressão do helper e do trait: `docker compose exec -T app php artisan test --filter=AuditoriaHelperTest --filter=AuditoriaAgendaDiaTest`
 Expected: PASS (o `$logName` default preserva os callers de usuário).

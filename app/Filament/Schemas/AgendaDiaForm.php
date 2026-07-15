@@ -19,8 +19,6 @@ use Filament\Schemas\Components\Grid;
  * O campo `departamentos` é PRIVILEGIADO (§5/§7 do spec): no site ele é AUSENTE do schema
  * (comDepartamentos: false) e o servidor força o valor (DED+DECOM na criação; preservado na edição).
  * A sanitização de HTML dos textos já vive no model (mutators clean()), não aqui.
- *
- * @return array<Component>
  */
 class AgendaDiaForm
 {

@@ -6,7 +6,6 @@ namespace App\Support\Conta;
 
 use App\Models\AgendaDia;
 use App\Models\User;
-use Spatie\Permission\Exceptions\PermissionDoesNotExist;
 use WeakMap;
 
 /**
@@ -35,11 +34,7 @@ class AbaAgenda
 
     private static function calcular(User $user): bool
     {
-        try {
-            if (! $user->hasPermissionTo('agenda.ver')) {
-                return false;
-            }
-        } catch (PermissionDoesNotExist) {
+        if (! $user->checkPermissionTo('agenda.ver')) {
             return false;
         }
 

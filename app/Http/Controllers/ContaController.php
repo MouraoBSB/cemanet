@@ -5,6 +5,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Palestra;
+use App\Support\Conta\AbaAgenda;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 
@@ -32,5 +33,12 @@ class ContaController extends Controller
         $user->load(['setores', 'cargos', 'roles']);
 
         return view('conta.perfil', compact('user', 'perfil'));
+    }
+
+    public function agenda(): View
+    {
+        abort_unless(AbaAgenda::visivelPara(auth()->user()), 403);
+
+        return view('conta.agenda');
     }
 }

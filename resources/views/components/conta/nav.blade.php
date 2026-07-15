@@ -5,6 +5,9 @@
         ['chave' => 'painel', 'rotulo' => 'Painel', 'rota' => 'conta.painel'],
         ['chave' => 'perfil', 'rotulo' => 'Meu Perfil', 'rota' => 'conta.perfil'],
     ];
+    if (\App\Support\Conta\AbaAgenda::visivelPara(auth()->user())) {
+        $itens[] = ['chave' => 'agenda', 'rotulo' => 'Agenda', 'rota' => 'conta.agenda'];
+    }
 @endphp
 <nav aria-label="Navegação da conta"
      class="flex gap-2 overflow-x-auto pb-1 desktop-sm:flex-col desktop-sm:gap-1 desktop-sm:overflow-visible">

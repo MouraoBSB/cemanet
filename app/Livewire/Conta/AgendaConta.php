@@ -11,6 +11,7 @@ use App\Support\Conta\AbaAgenda;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Schema;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Carbon;
 use Illuminate\View\View;
@@ -18,12 +19,13 @@ use Livewire\Component;
 
 /**
  * Superfície pública da Agenda da Reforma Íntima em /minha-conta: lista escopada ao
- * departamento do usuário + criação. Edição/exclusão chegam na Task 7.
+ * departamento do usuário + criar/editar/excluir.
  *
  * Campos privilegiados NUNCA confiam no POST: `departamentos` é ausente do schema do site
  * (AgendaDiaForm::schema(comDepartamentos: false)) e é forçado no servidor para os
- * mantenedores (DED+DECOM); `status` é reasserido contra o enum e travado em rascunho para
- * quem tem agenda.criar mas não agenda.editar (D-F9).
+ * mantenedores (DED+DECOM) na criação — a edição PRESERVA os departamentos existentes
+ * (não sincroniza); `status` é reasserido contra o enum e travado em rascunho para quem
+ * tem agenda.criar mas não agenda.editar (D-F9).
  */
 class AgendaConta extends Component implements HasForms
 {
@@ -71,9 +73,68 @@ class AgendaConta extends Component implements HasForms
         $this->form->fill();
     }
 
+    public function editar(int $id): void
+    {
+        $registro = AgendaDia::findOrFail($id);
+        $this->authorize('editar', $registro); // agenda.editar + interseção de departamento
+
+        $this->editandoId = $registro->id;
+        $this->form->fill($registro->attributesToArray());
+        $this->mostrandoForm = true;
+    }
+
+    public function excluir(int $id): void
+    {
+        $registro = AgendaDia::findOrFail($id);
+        $this->authorize('excluir', $registro); // agenda.excluir + interseção de departamento
+
+        $registro->delete();
+
+        session()->flash('status', 'Dia da agenda excluído.');
+        $this->redirect(route('conta.agenda'), navigate: true);
+    }
+
     public function salvar(): void
     {
         $user = auth()->user();
+
+        if ($this->editandoId) {
+            $registro = AgendaDia::findOrFail($this->editandoId);
+            $this->authorize('editar', $registro);
+
+            $dados = $this->form->getState(); // valida required + unique('data') do schema
+
+            // Belt server-side do unique('data') TAMBÉM na edição, ignorando o próprio registro.
+            $dataYmd = Carbon::parse($dados['data'])->format('Y-m-d');
+            if ($this->dataJaUsada($dataYmd, $registro->id)) {
+                $this->addError('data', 'Já existe um dia de agenda nessa data.');
+
+                return;
+            }
+
+            $dados['status'] = $this->statusValido($dados['status']); // enum reasserido no servidor
+
+            try {
+                $registro->update($dados); // departamentos PRESERVADOS (não sincroniza)
+            } catch (QueryException $e) {
+                // O belt dataJaUsada acima cobre o caso comum; este catch fecha a janela
+                // TOCTOU entre o SELECT do belt e o UPDATE sob concorrência (unique de agenda_dias.data).
+                if ($e->getCode() === '23000') {
+                    $this->addError('data', 'Já existe um dia de agenda nessa data.');
+
+                    return;
+                }
+
+                throw $e;
+            }
+
+            session()->flash('status', 'Dia da agenda atualizado.');
+            $this->redirect(route('conta.agenda'), navigate: true);
+
+            return;
+        }
+
+        // --- Criação (idem Task 5, via os mesmos belts privados) ---
         $this->authorize('criar', AgendaDia::class); // agenda.criar + departamentos()->exists()
 
         $dados = $this->form->getState(); // valida required + unique('data') do schema
@@ -93,10 +154,22 @@ class AgendaConta extends Component implements HasForms
             $dados['status'] = AgendaDia::STATUS_RASCUNHO;
         }
 
-        $registro = AgendaDia::create($dados);
+        try {
+            $registro = AgendaDia::create($dados);
 
-        // Campo privilegiado DEPARTAMENTOS forçado: todo novo AgendaDia nasce DED+DECOM (O1).
-        $registro->departamentos()->sync(AgendaMantenedores::ids());
+            // Campo privilegiado DEPARTAMENTOS forçado: todo novo AgendaDia nasce DED+DECOM (O1).
+            $registro->departamentos()->sync(AgendaMantenedores::ids());
+        } catch (QueryException $e) {
+            // O belt dataJaUsada acima cobre o caso comum; este catch fecha a janela TOCTOU
+            // entre o SELECT do belt e o INSERT sob concorrência (unique de agenda_dias.data).
+            if ($e->getCode() === '23000') {
+                $this->addError('data', 'Já existe um dia de agenda nessa data.');
+
+                return;
+            }
+
+            throw $e;
+        }
 
         session()->flash('status', 'Dia da agenda criado.');
         $this->redirect(route('conta.agenda'), navigate: true);

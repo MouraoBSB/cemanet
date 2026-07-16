@@ -7,7 +7,6 @@ namespace Tests\Feature\Filament;
 use App\Filament\Resources\Palestrantes\Pages\CreatePalestrante;
 use App\Filament\Resources\Palestrantes\Pages\EditPalestrante;
 use App\Filament\Resources\Palestrantes\Pages\ListPalestrantes;
-use App\Models\Departamento;
 use App\Models\Palestrante;
 use App\Models\User;
 use Filament\Forms\Components\RichEditor;
@@ -23,14 +22,11 @@ class PalestranteResourceTest extends TestCase
 
     private User $admin;
 
-    private Departamento $departamento;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->admin = $this->actingAsAdmin();
-        $this->departamento = Departamento::create(['sigla' => 'DED', 'nome' => 'DED', 'slug' => 'ded']);
     }
 
     public function test_pagina_listagem_renderiza(): void
@@ -76,7 +72,6 @@ class PalestranteResourceTest extends TestCase
                 'mostrar_email' => false,
                 'mostrar_telefone' => false,
                 'ativo' => true,
-                'departamentos' => [$this->departamento->id],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -89,7 +84,7 @@ class PalestranteResourceTest extends TestCase
         $palestrante = Palestrante::factory()->create(['nome' => 'Nome Antigo', 'slug' => 'nome-antigo']);
 
         Livewire::test(EditPalestrante::class, ['record' => $palestrante->getRouteKey()])
-            ->fillForm(['nome' => 'Nome Atualizado', 'departamentos' => [$this->departamento->id]])
+            ->fillForm(['nome' => 'Nome Atualizado'])
             ->call('save')
             ->assertHasNoFormErrors();
 
@@ -104,7 +99,6 @@ class PalestranteResourceTest extends TestCase
                 'slug' => 'maria-das-dores',
                 'ativo' => true,
                 'bio' => '<p>Bio</p><script>alert(1)</script>',
-                'departamentos' => [$this->departamento->id],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -135,7 +129,6 @@ class PalestranteResourceTest extends TestCase
                 'slug' => 'com-chamada',
                 'chamada' => 'Servindo desde a infância.',
                 'ativo' => true,
-                'departamentos' => [$this->departamento->id],
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -143,33 +136,5 @@ class PalestranteResourceTest extends TestCase
         $this->assertDatabaseHas('palestrantes', [
             'slug' => 'com-chamada', 'chamada' => 'Servindo desde a infância.',
         ]);
-    }
-
-    public function test_salva_departamento(): void
-    {
-        Livewire::test(CreatePalestrante::class)
-            ->fillForm([
-                'nome' => 'Com Departamento',
-                'slug' => 'com-departamento',
-                'ativo' => true,
-                'departamentos' => [$this->departamento->id],
-            ])
-            ->call('create')
-            ->assertHasNoFormErrors();
-
-        $pessoa = Palestrante::where('slug', 'com-departamento')->first();
-        $this->assertTrue($pessoa->departamentos->contains($this->departamento));
-    }
-
-    public function test_exige_departamento(): void
-    {
-        Livewire::test(CreatePalestrante::class)
-            ->fillForm([
-                'nome' => 'Sem Departamento',
-                'slug' => 'sem-departamento',
-                'ativo' => true,
-            ])
-            ->call('create')
-            ->assertHasFormErrors(['departamentos']);
     }
 }

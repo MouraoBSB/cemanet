@@ -18,14 +18,14 @@ use Illuminate\View\View;
 use Livewire\Component;
 
 /**
- * Superfície pública da Agenda da Reforma Íntima em /minha-conta: lista escopada ao
- * departamento do usuário + criar/editar/excluir.
+ * Superfície pública da Agenda da Reforma Íntima em /minha-conta: a lista de quem responde
+ * pelo tipo (tudo-ou-nada, §6.3) + criar/editar/excluir.
  *
- * Campos privilegiados NUNCA confiam no POST: `departamentos` é ausente do schema do site
- * (AgendaDiaForm::schema(comDepartamentos: false)) e é forçado no servidor para os
- * mantenedores (DED+DECOM) na criação — a edição PRESERVA os departamentos existentes
- * (não sincroniza); `status` é reasserido contra o enum e travado em rascunho para quem
- * tem agenda.criar mas não agenda.editar (D-F9).
+ * O campo `departamentos` não existe mais no schema (Camada 1) e o registro nasce sem pivô:
+ * a Agenda está no regime "do tipo", em que o pivô não é lido nem gravado (§6.4) — a edição
+ * segue PRESERVANDO o que existir (não sincroniza). O `status` continua sendo campo
+ * privilegiado que NUNCA confia no POST: é reasserido contra o enum e travado em rascunho
+ * para quem tem agenda.criar mas não agenda.editar (D-F9).
  */
 class AgendaConta extends Component implements HasForms
 {
@@ -53,7 +53,7 @@ class AgendaConta extends Component implements HasForms
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->components(AgendaDiaForm::schema(comDepartamentos: false))
+            ->components(AgendaDiaForm::schema())
             ->model($this->editandoId ? AgendaDia::find($this->editandoId) : AgendaDia::class)
             ->statePath('data')
             ->operation($this->editandoId ? 'edit' : 'create');

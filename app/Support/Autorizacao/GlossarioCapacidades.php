@@ -4,6 +4,12 @@
 
 namespace App\Support\Autorizacao;
 
+use App\Models\AgendaDia;
+use App\Models\Evento;
+use App\Models\Palestra;
+use App\Models\Palestrante;
+use App\Models\Post;
+
 /**
  * Fonte única do vocabulário de CAPACIDADE (quem edita). Mesmo padrão declarativo de
  * App\Importacao\GlossarioUsuarios, em local próprio. Biblioteca fica FORA (singleton admin-only).
@@ -21,6 +27,15 @@ class GlossarioCapacidades
         'post' => 'Post',
         'agenda' => 'Agenda do Dia',
         'palestrante' => 'Palestrante',
+    ];
+
+    /** Mapa canônico recurso => model (fonte única). Slug ≠ model em 'agenda' e 'palestrante' — ver :17. */
+    public const RECURSOS_MODELS = [
+        'evento' => Evento::class,
+        'palestra' => Palestra::class,
+        'post' => Post::class,
+        'agenda' => AgendaDia::class,
+        'palestrante' => Palestrante::class,
     ];
 
     /** Rótulos legíveis das ações. */
@@ -52,5 +67,11 @@ class GlossarioCapacidades
     public static function rotuloAcao(string $acao): string
     {
         return self::ACOES_ROTULOS[$acao] ?? ucfirst($acao);
+    }
+
+    /** Model do recurso, ou null se o slug não está no catálogo. */
+    public static function modelDe(string $recurso): ?string
+    {
+        return self::RECURSOS_MODELS[$recurso] ?? null;
     }
 }

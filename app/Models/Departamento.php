@@ -31,4 +31,15 @@ class Departamento extends Model
     {
         return $this->belongsToMany(Evento::class, 'departamento_evento', 'departamento_id', 'evento_id');
     }
+
+    /** Tipos de conteúdo pelos quais este departamento responde (inversa da config de acesso). */
+    public function tiposConteudo(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            TipoConteudo::class,
+            'departamento_tipo_conteudo',
+            'departamento_id',
+            'tipo_conteudo_id',
+        );
+    }
 }

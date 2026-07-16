@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call(CategoriaSeeder::class);
         $this->call(EstruturaCemaSeeder::class);
         $this->call(CapacidadesSeeder::class);
+        $this->call(TiposConteudoSeeder::class);   // config de acesso por tipo (insert-only)
 
         // Admin DURÁVEL e idempotente (sobrevive a db:seed; sem usuário aleatório), já com
         // o papel administrador — fonte única do admin do site novo (ver AdminSeeder).

@@ -9,6 +9,7 @@ use App\Models\AgendaDia;
 use App\Models\Departamento;
 use App\Models\User;
 use Database\Seeders\EstruturaCemaSeeder;
+use Database\Seeders\TiposConteudoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Livewire;
@@ -24,6 +25,7 @@ class AgendaContaCriarTest extends TestCase
     {
         parent::setUp();
         $this->seed(EstruturaCemaSeeder::class);
+        $this->seed(TiposConteudoSeeder::class);   // config de acesso por tipo (agenda => DED+DECOM)
         foreach (['agenda.ver', 'agenda.criar', 'agenda.editar', 'agenda.excluir'] as $p) {
             Permission::findOrCreate($p, 'web');
         }

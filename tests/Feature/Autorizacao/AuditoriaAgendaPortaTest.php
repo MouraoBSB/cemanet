@@ -10,6 +10,7 @@ use App\Models\Departamento;
 use App\Models\User;
 use App\Support\Autorizacao\AuditoriaAutorizacao;
 use Database\Seeders\EstruturaCemaSeeder;
+use Database\Seeders\TiposConteudoSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -26,6 +27,7 @@ class AuditoriaAgendaPortaTest extends TestCase
     {
         parent::setUp();
         $this->seed(EstruturaCemaSeeder::class);
+        $this->seed(TiposConteudoSeeder::class);   // config de acesso por tipo (agenda => DED+DECOM)
         foreach (['agenda.ver', 'agenda.criar', 'agenda.editar'] as $p) {
             Permission::findOrCreate($p, 'web');
         }

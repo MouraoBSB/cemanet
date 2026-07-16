@@ -92,7 +92,8 @@ class MatrizCapacidadesTest extends TestCase
 
     public function test_salvar_concede_capacidade_que_a_policy_consome(): void
     {
-        $decom = Departamento::where('sigla', 'DECOM')->first();
+        // DED é o responsável por 'palestra' na semente da config (TiposConteudoSeeder).
+        $ded = Departamento::where('sigla', 'DED')->first();
 
         Livewire::test(MatrizCapacidades::class)
             ->fillForm(['diretor.palestra.editar' => true])
@@ -101,10 +102,10 @@ class MatrizCapacidadesTest extends TestCase
 
         $diretor = User::factory()->create();
         $diretor->assignRole('diretor');
-        $diretor->departamentos()->sync([$decom->id]);
+        $diretor->departamentos()->sync([$ded->id]);
 
         $palestra = Palestra::factory()->create();
-        $palestra->departamentos()->sync([$decom->id]);
+        $palestra->departamentos()->sync([$ded->id]);
 
         $this->assertTrue(Gate::forUser($diretor)->check('editar', $palestra));
     }

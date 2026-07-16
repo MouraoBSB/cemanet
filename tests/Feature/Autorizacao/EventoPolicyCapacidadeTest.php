@@ -9,6 +9,7 @@ use App\Models\Departamento;
 use App\Models\Evento;
 use App\Models\User;
 use Database\Seeders\CapacidadesSeeder;
+use Database\Seeders\TiposConteudoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Role;
@@ -23,6 +24,7 @@ class EventoPolicyCapacidadeTest extends TestCase
         parent::setUp();
         Role::findOrCreate('administrador', 'web');
         $this->seed(CapacidadesSeeder::class);
+        $this->seed(TiposConteudoSeeder::class);
     }
 
     private function usuario(array $permissoes = [], array $departamentoIds = []): User

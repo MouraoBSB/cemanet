@@ -8,6 +8,7 @@ use App\Models\AgendaDia;
 use App\Models\Departamento;
 use App\Models\User;
 use Database\Seeders\EstruturaCemaSeeder;
+use Database\Seeders\TiposConteudoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -21,6 +22,7 @@ class AcessoAgendaContaTest extends TestCase
     {
         parent::setUp();
         $this->seed(EstruturaCemaSeeder::class);
+        $this->seed(TiposConteudoSeeder::class);   // config de acesso por tipo (agenda => DED+DECOM)
         Permission::findOrCreate('agenda.ver', 'web');
         Role::findByName('diretor', 'web')->syncPermissions(['agenda.ver']);
     }

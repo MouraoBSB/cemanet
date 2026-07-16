@@ -10,6 +10,7 @@ use App\Models\Palestra;
 use App\Models\User;
 use Database\Seeders\CapacidadesSeeder;
 use Database\Seeders\EstruturaCemaSeeder;
+use Database\Seeders\TiposConteudoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Role;
@@ -24,6 +25,7 @@ class CapacidadeViaPapelTest extends TestCase
         parent::setUp();
         (new EstruturaCemaSeeder)->run();   // papéis + 8 departamentos
         $this->seed(CapacidadesSeeder::class); // 20 permissions
+        $this->seed(TiposConteudoSeeder::class); // config de acesso por tipo (palestra ⇒ DED)
     }
 
     private function diretorNos(array $siglas): User
@@ -47,8 +49,10 @@ class CapacidadeViaPapelTest extends TestCase
 
     public function test_usuario_do_papel_ganha_e_perde_capacidade(): void
     {
-        $diretor = $this->diretorNos(['DECOM']);
-        $palestra = $this->palestraNos(['DECOM']);
+        // DED nos dois lados: é o responsável por 'palestra' na semente (e intersecta o objeto,
+        // então o caso é neutro tanto no filtro por registro quanto no regime "do tipo").
+        $diretor = $this->diretorNos(['DED']);
+        $palestra = $this->palestraNos(['DED']);
 
         // sem permission no papel ⇒ negado
         $this->assertFalse(Gate::forUser($diretor->fresh())->check('editar', $palestra));

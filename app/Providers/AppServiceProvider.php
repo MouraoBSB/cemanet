@@ -16,6 +16,7 @@ use App\Importacao\LeitorUsuariosMysql;
 use App\Listeners\CalcularHashMidia;
 use App\Listeners\CaparOriginalDaMidia;
 use App\Models\User;
+use App\Support\Autorizacao\AcessoPorTipo;
 use App\Support\Blog\FonteReflexao;
 use App\Support\Blog\ReflexaoConfig;
 use Illuminate\Support\Carbon;
@@ -38,6 +39,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(LeitorEventos::class, LeitorEventosMysql::class);
         $this->app->bind(LeitorUsuarios::class, LeitorUsuariosMysql::class);
         $this->app->bind(FonteReflexao::class, ReflexaoConfig::class);
+
+        // SCOPED, nunca singleton: o worker (queue:work) não reconstrói o container entre jobs —
+        // só chama forgetScopedInstances (QueueServiceProvider:263), que preserva singletons. Um
+        // memo de config de ACESSO em singleton viraria cache persistente dentro do worker.
+        $this->app->scoped(AcessoPorTipo::class, fn (): AcessoPorTipo => new AcessoPorTipo);
     }
 
     /**

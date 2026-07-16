@@ -7,6 +7,7 @@ namespace Tests\Feature\Autorizacao;
 use App\Filament\Pages\MatrizCapacidades;
 use Database\Seeders\CapacidadesSeeder;
 use Database\Seeders\EstruturaCemaSeeder;
+use Database\Seeders\TiposConteudoSeeder;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +25,7 @@ class AuditoriaMatrizTest extends TestCase
         parent::setUp();
         (new EstruturaCemaSeeder)->run();
         $this->seed(CapacidadesSeeder::class);
+        $this->seed(TiposConteudoSeeder::class);   // o Select de regime é required (Camada 1/E1)
         $this->actingAsAdmin();
         Filament::setCurrentPanel(Filament::getPanel('admin')); // porta = admin
     }

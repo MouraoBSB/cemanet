@@ -10,6 +10,7 @@ use App\Models\Palestra;
 use App\Models\User;
 use Database\Seeders\CapacidadesSeeder;
 use Database\Seeders\EstruturaCemaSeeder;
+use Database\Seeders\TiposConteudoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Livewire;
@@ -25,6 +26,7 @@ class MatrizCapacidadesTest extends TestCase
         parent::setUp();
         (new EstruturaCemaSeeder)->run();   // 4 papéis (web) + 8 departamentos + cargos
         $this->seed(CapacidadesSeeder::class); // as 20 permissions (web)
+        $this->seed(TiposConteudoSeeder::class);   // o Select de regime é required (Camada 1/E1)
         $this->actingAsAdmin();
     }
 

@@ -75,7 +75,8 @@ class GlossarioCapacidadesMapaTest extends TestCase
 {
     public function test_mapa_cobre_exatamente_os_recursos_do_glossario(): void
     {
-        $this->assertSame(
+        // Canonicalizing: cobertura sem amarrar a ORDEM — reordenar RECURSOS não é defeito.
+        $this->assertEqualsCanonicalizing(
             GlossarioCapacidades::RECURSOS,
             array_keys(GlossarioCapacidades::RECURSOS_MODELS),
         );
@@ -200,7 +201,7 @@ E o acessor, junto dos outros helpers:
     }
 ```
 
-⚠️ A ordem das chaves de `RECURSOS_MODELS` **deve** ser a mesma de `RECURSOS` (`['evento','palestra','post','agenda','palestrante']`) — o primeiro teste compara `array_keys` posicionalmente.
+A ordem das chaves segue a de `RECURSOS` por legibilidade, mas o teste usa `assertEqualsCanonicalizing` — cobrança de **cobertura**, não de ordem.
 
 - [ ] **Passo 5: Rodar o teste e ver passar**
 
@@ -452,7 +453,11 @@ docker compose exec -T app php artisan test --filter=TipoConteudoTest
 
 Esperado: `migrate` cria as 2 tabelas (**nunca** `migrate:fresh`); teste **PASS** (5 testes).
 
-⚠️ Se `test_excluir_departamento_responsavel_e_barrado_pela_fk` falhar, confirmar que o SQLite dos testes tem FK ligada — `phpunit.xml` deve ter o driver com `foreign_keys=true` (padrão do Laravel 13). Se estiver desligada, o teste do `restrict` é vacuoso; reportar antes de seguir.
+> A FK do SQLite **está ligada** nos testes — `config/database.php:40`
+> (`'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true)`) e o `phpunit.xml` não sobrescreve (só
+> define `DB_CONNECTION=sqlite`, `:26`). O teste do `restrict` é válido e auto-verificável: se a FK
+> estivesse desligada, ele ficaria **vermelho** (o `expectException` não seria satisfeito), nunca
+> falso-verde.
 
 - [ ] **Passo 6: Pint + commit**
 
@@ -1247,6 +1252,7 @@ git commit -m "feat(camada-1): auditoria da config por tipo (regime e responsáv
 2. **`->disabled()` + `->dehydrated(true)`, nunca `->visible()`**: componente oculto **não desidrata** (`schemas/src/Components/Concerns/HasState.php:774-783`) ⇒ o `salvar()` receberia `[]` e apagaria os responsáveis. E `disabled()` sozinho também não desidrata (`CanBeDisabled.php:25`).
 3. **O cinto server-side é obrigatório**: com `dehydrated(true)` o valor **vem do cliente** — o próprio vendor avisa (`CanBeDisabled.php:20-24`). O `if ($regime === DoTipo)` no `salvar()` é o que preserva os responsáveis **por construção**.
 4. **Os 2 `setUp` existentes ganham a semente**: o `required()` do Select entra no schema que `salvar()` valida (`MatrizCapacidades.php:109` → `schemas/src/Concerns/HasState.php:450`); sem linha, `regime => null` reprova e caem `MatrizCapacidadesTest:49,57,85,98` e `AuditoriaMatrizTest:36,67,79`. 🚫 **Proibido remover o `required()`** para restaurar o verde.
+5. **O `$get` com dot-notation aninhado é o 1º do projeto.** `$get("{$recurso}.regime")` depende de a `Section` não ter statePath próprio ⇒ herda `data` ⇒ resolve `data.agenda.regime`. **Deve** funcionar — é o mesmo princípio do `Toggle::make("papel.recurso.acao")`, provado em produção no PR #27. Se não resolver, o multiselect fica sempre habilitado ou sempre cinza: **isso é UX, não segurança** — graças ao cinto do `salvar()` a config continua íntegra. 🚫 **Não "consertar" mexendo no cinto.** Quem fecha essa verificação é o Passo 6 (navegador).
 
 - [ ] **Passo 1: Escrever o teste que falha**
 
@@ -1656,6 +1662,10 @@ git commit -m "feat(camada-1): matriz vira Configuração de acesso por tipo (re
 
 **Contexto:** a FK é `restrictOnDelete` (Task 2) ⇒ sem guarda, o DELETE estoura como **erro 500**. **`Notification` sozinha NÃO aborta** — é preciso `$action->cancel()` (`vendor/filament/actions/src/Action.php:677`), e **não** `halt()` (`:682`, que manteria o modal aberto). ⚠️ `DeleteAction::before()` recebe **`$record`**; `DeleteBulkAction::before()` recebe **`$records`** (Collection) — assinaturas diferentes.
 
+> 🚨 **O bulk exige `->accessSelectedRecords()`, senão o `before()` lança `LogicException` antes de olhar um único registro.** A cadeia: `Action.php:564` resolve `'records'` via `getIndividuallyAuthorizedSelectedRecords()` → `InteractsWithSelectedRecords.php:72-75` → `getSelectedRecords()` (`:47-51`), que faz `if (! $this->canAccessSelectedRecords()) throw new LogicException(...)`. O default é **`false`** (`:15`) e o `DeleteBulkAction` **não** opta (`grep -c accessSelectedRecords` = 0). É opt-in de propósito — buscar os selecionados custa query. A API é `accessSelectedRecords()` (`:35`).
+>
+> O `DeleteAction` **singular não precisa de nada**: `'record' => [$this->getRecord()]` (`Action.php:563`), sem guarda de opt-in.
+
 - [ ] **Passo 1: Escrever o teste que falha**
 
 Criar `tests/Feature/Filament/ExcluirDepartamentoResponsavelTest.php`:
@@ -1701,33 +1711,31 @@ class ExcluirDepartamentoResponsavelTest extends TestCase
 
     public function test_exclui_departamento_que_nao_responde_por_nenhum_tipo(): void
     {
-        // DIJ não está na semente de nenhum tipo
-        $dij = Departamento::where('sigla', 'DIJ')->first();
-        $dij->setores()->delete();
-        $dij->cargos()->delete();
+        // Departamento novo e SEM vínculos: os do EstruturaCemaSeeder arrastam setores/cargos,
+        // cujas FKs fariam o teste falhar por motivo alheio ao guarda.
+        $avulso = Departamento::create(['sigla' => 'DTESTE', 'nome' => 'Departamento de Teste', 'slug' => 'dteste']);
 
         Livewire::test(ListDepartamentos::class)
-            ->callTableAction('delete', $dij);
+            ->callTableAction('delete', $avulso);
 
-        $this->assertDatabaseMissing('departamentos', ['id' => $dij->id]);
+        $this->assertDatabaseMissing('departamentos', ['id' => $avulso->id]);
     }
 
     public function test_bulk_nao_exclui_se_algum_responde_por_tipo(): void
     {
-        $ded = Departamento::where('sigla', 'DED')->first();
-        $dij = Departamento::where('sigla', 'DIJ')->first();
+        $ded = Departamento::where('sigla', 'DED')->first();   // responde por agenda/palestra/palestrante
+        $avulso = Departamento::create(['sigla' => 'DTESTE', 'nome' => 'Departamento de Teste', 'slug' => 'dteste']);
 
         Livewire::test(ListDepartamentos::class)
-            ->callTableBulkAction('delete', [$ded->id, $dij->id]);
+            ->callTableBulkAction('delete', [$ded->id, $avulso->id]);
 
         $this->assertDatabaseHas('departamentos', ['id' => $ded->id]);
-        $this->assertDatabaseHas('departamentos', ['id' => $dij->id]);
+        $this->assertDatabaseHas('departamentos', ['id' => $avulso->id], 'o guarda deixou passar o resto do lote');
     }
 }
 ```
 
-⚠️ Se o nome da página de listagem não for `ListDepartamentos`, ajustar o import — confirmar com
-`ls app/Filament/Resources/Departamentos/Pages/`. Se `test_exclui_departamento_que_nao_responde_por_nenhum_tipo` falhar por FK de `setores`/`cargos`/`departamento_usuario`, é limitação do fixture, **não** do guarda: simplificar criando um `Departamento::create([...])` novo e sem vínculos em vez de usar o DIJ.
+⚠️ Se o nome da página de listagem não for `ListDepartamentos`, ajustar o import — confirmar com `ls app/Filament/Resources/Departamentos/Pages/` (verificado em 16/07: existe).
 
 - [ ] **Passo 2: Rodar o teste e ver falhar**
 
@@ -1735,7 +1743,11 @@ class ExcluirDepartamentoResponsavelTest extends TestCase
 docker compose exec -T app php artisan test --filter=ExcluirDepartamentoResponsavelTest
 ```
 
-Esperado: **FAIL** em `test_nao_exclui_departamento_que_responde_por_um_tipo` — `QueryException` (FK) ou o registro sumindo.
+Esperado: **FAIL** — em `test_nao_exclui_departamento_que_responde_por_um_tipo` e `test_bulk_nao_exclui_se_algum_responde_por_tipo`, por `QueryException` (a FK `restrict` barrando) ou pelo registro sumindo.
+
+> ⚠️ **Depois** de aplicar o `->accessSelectedRecords()` do Passo 3, se o teste do bulk falhar com
+> `LogicException: The action [delete] is attempting to access the selected records...`, o opt-in não
+> entrou — **não** é bug do guarda. Esse sintoma tem uma causa só.
 
 - [ ] **Passo 3: Somar o guarda ao Resource**
 
@@ -1764,6 +1776,10 @@ E trocar as duas ações (`:143-149`):
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
                         ->label('Excluir selecionados')
+                        // OBRIGATÓRIO: sem o opt-in, injetar $records lança LogicException
+                        // (InteractsWithSelectedRecords:47-51; o default de
+                        // canAccessSelectedRecords é false, :15, e o DeleteBulkAction não opta).
+                        ->accessSelectedRecords()
                         // ATENÇÃO: o bulk recebe $records (Collection), não $record.
                         ->before(function (Collection $records, DeleteBulkAction $action): void {
                             foreach ($records as $record) {
@@ -1927,6 +1943,8 @@ gh pr checks --watch
 ---
 
 ## Notas para o executor
+
+**Dependências entre tasks.** Caminho crítico: **1 → 2 → 3**. Depois da Task 2, as Tasks **4 e 5 são independentes** (podem ir em paralelo). A **Task 6** consome os helpers da Task 5; a **Task 7** consome a inversa da Task 2 **e** o seeder da Task 3. A Task 8 é o fechamento.
 
 **O que E1 NÃO faz** (é E2, e vazar aqui reprova o PR): ler a config em policy/trait/scope/aba; tirar o campo `departamentos` dos forms; deletar o `AgendaMantenedores`; mexer no `AgendaConta`.
 

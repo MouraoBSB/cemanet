@@ -4,6 +4,7 @@
 
 namespace App\Support\Autorizacao;
 
+use App\Models\TipoConteudo;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Model;
@@ -105,6 +106,42 @@ class AuditoriaAutorizacao
         ];
 
         self::registrar($conteudo, 'departamentos do conteúdo alterados', $diff, logName: 'agenda');
+    }
+
+    /**
+     * Regime do tipo: subject = TipoConteudo; diff de nomes. Método SEPARADO do de responsáveis de
+     * propósito — o registrar() privado é no-op se {adicionados, removidos} vierem vazios, então um
+     * diff de outro formato (ex.: ['regime' => ..., 'departamentos' => ...]) viraria no-op
+     * silencioso: auditaria sem gravar.
+     *
+     * @param  ?string  $antes  value do regime antes (null se a linha acabou de nascer)
+     */
+    public static function registrarRegimeTipo(TipoConteudo $tipo, ?string $antes, string $depois): void
+    {
+        self::registrar(
+            $tipo,
+            "regime do tipo {$tipo->recurso} alterado",
+            self::diff($antes === null ? [] : [$antes], [$depois]),
+        );
+    }
+
+    /**
+     * Responsáveis do tipo: subject = TipoConteudo. Diff por id, itens {id, nome} (estável a rename).
+     *
+     * @param  array<int, string>  $antes  [id => nome] antes do sync
+     * @param  array<int, string>  $depois  [id => nome] depois do sync
+     */
+    public static function registrarDepartamentosTipo(TipoConteudo $tipo, array $antes, array $depois): void
+    {
+        $idsAdicionados = array_diff(array_keys($depois), array_keys($antes));
+        $idsRemovidos = array_diff(array_keys($antes), array_keys($depois));
+
+        $diff = [
+            'adicionados' => array_values(array_map(fn (int $id): array => ['id' => $id, 'nome' => $depois[$id]], $idsAdicionados)),
+            'removidos' => array_values(array_map(fn (int $id): array => ['id' => $id, 'nome' => $antes[$id]], $idsRemovidos)),
+        ];
+
+        self::registrar($tipo, "departamentos responsáveis do tipo {$tipo->recurso} alterados", $diff);
     }
 
     /** Escreve 1 entrada; no-op se o diff for vazio. */

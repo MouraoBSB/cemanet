@@ -4,14 +4,15 @@
 
 namespace Tests\Feature\Conta;
 
+use App\Livewire\Conta\AgendaConta;
 use App\Models\AgendaDia;
 use App\Models\Departamento;
 use App\Models\User;
-use App\Support\Agenda\AgendaMantenedores;
 use App\Support\Conta\AbaAgenda;
 use Database\Seeders\EstruturaCemaSeeder;
 use Database\Seeders\TiposConteudoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -39,30 +40,6 @@ class AbaAgendaTest extends TestCase
         return $user;
     }
 
-    public function test_mantenedores_sao_ded_e_decom(): void
-    {
-        $esperado = Departamento::whereIn('sigla', ['DED', 'DECOM'])->pluck('id')->sort()->values()->all();
-
-        $this->assertSame($esperado, collect(AgendaMantenedores::ids())->sort()->values()->all());
-    }
-
-    public function test_scope_no_escopo_filtra_por_departamento(): void
-    {
-        $decom = Departamento::where('sigla', 'DECOM')->value('id');
-        $ded = Departamento::where('sigla', 'DED')->value('id');
-
-        $noEscopo = AgendaDia::factory()->create();
-        $noEscopo->departamentos()->sync([$decom]);
-        $foraEscopo = AgendaDia::factory()->create();
-        $foraEscopo->departamentos()->sync([$ded]);
-
-        $user = $this->editorDe('DECOM');
-        $ids = AgendaDia::noEscopoDe($user)->pluck('id');
-
-        $this->assertTrue($ids->contains($noEscopo->id));
-        $this->assertFalse($ids->contains($foraEscopo->id));
-    }
-
     public function test_scope_fail_closed_para_usuario_sem_departamento(): void
     {
         AgendaDia::factory()->create()->departamentos()->sync([Departamento::where('sigla', 'DECOM')->value('id')]);
@@ -72,19 +49,13 @@ class AbaAgendaTest extends TestCase
         $this->assertSame(0, AgendaDia::noEscopoDe($semDepto)->count());
     }
 
-    public function test_aba_visivel_com_capacidade_e_registro_no_escopo(): void
+    /** Era ..._com_capacidade_e_registro_no_escopo: "registro no escopo" deixou de ser fator (§6.3). */
+    public function test_aba_visivel_para_o_responsavel_com_capacidade(): void
     {
         $user = $this->editorDe('DECOM');
         AgendaDia::factory()->create()->departamentos()->sync([Departamento::where('sigla', 'DECOM')->value('id')]);
 
         $this->assertTrue(AbaAgenda::visivelPara($user));
-    }
-
-    public function test_aba_oculta_sem_registro_no_escopo(): void
-    {
-        $user = $this->editorDe('DECOM'); // tem agenda.ver, mas nenhum AgendaDia no DECOM
-
-        $this->assertFalse(AbaAgenda::visivelPara($user));
     }
 
     public function test_aba_oculta_sem_capacidade(): void
@@ -108,5 +79,42 @@ class AbaAgendaTest extends TestCase
         $user->assignRole('frequentador');
 
         $this->assertFalse(AbaAgenda::visivelPara($user));
+    }
+
+    /** §6.3: a aba não consulta registro — responsável vê a aba mesmo com a Agenda VAZIA. */
+    public function test_responsavel_ve_a_aba_com_a_agenda_vazia(): void
+    {
+        $this->assertSame(0, AgendaDia::count(), 'este caso exige a Agenda vazia');
+
+        $this->assertTrue(AbaAgenda::visivelPara($this->editorDe('DED')));
+    }
+
+    /** Não-responsável não vê a aba, mesmo com registros existindo. */
+    public function test_nao_responsavel_nao_ve_a_aba_mesmo_com_registros(): void
+    {
+        AgendaDia::factory()->count(3)->create();
+
+        $this->assertFalse(AbaAgenda::visivelPara($this->editorDe('DEPRO')));
+    }
+
+    /** Tudo-ou-nada: o responsável enxerga TODOS os registros, inclusive os de pivô disjunto. */
+    public function test_scope_do_tipo_e_tudo_ou_nada(): void
+    {
+        $depro = Departamento::where('sigla', 'DEPRO')->value('id');
+        AgendaDia::factory()->count(2)->create()->each(fn ($a) => $a->departamentos()->sync([$depro]));
+        AgendaDia::factory()->create();   // pivô vazio
+
+        $this->assertSame(3, AgendaDia::noEscopoDe($this->editorDe('DED'))->count(), 'responsável vê tudo');
+        $this->assertSame(0, AgendaDia::noEscopoDe($this->editorDe('DEPRO'))->count(), 'não-responsável vê nada');
+    }
+
+    /** §10.3 ("Aba"), 2º portão: o mount do componente aborta 403 para o não-responsável. */
+    public function test_nao_responsavel_nao_monta_o_componente(): void
+    {
+        AgendaDia::factory()->count(3)->create();
+
+        Livewire::actingAs($this->editorDe('DEPRO'))
+            ->test(AgendaConta::class)
+            ->assertForbidden();
     }
 }

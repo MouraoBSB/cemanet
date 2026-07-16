@@ -56,12 +56,31 @@ class AcessoAgendaContaTest extends TestCase
         $this->actingAs($user)->get(route('conta.agenda'))->assertForbidden();
     }
 
-    public function test_editor_sem_registro_no_escopo_recebe_403(): void
+    /**
+     * Era test_editor_sem_registro_no_escopo_recebe_403: a premissa ("a aba exige registro no
+     * escopo") é a decisão 1 da Fase D, REVOGADA pelo §6.3. Mesmo arranjo, asserção invertida.
+     */
+    public function test_responsavel_sem_registro_acessa_a_rota(): void
     {
         $user = User::factory()->create();
         $user->assignRole('diretor');
         $user->departamentos()->sync([Departamento::where('sigla', 'DECOM')->value('id')]);
-        // nenhum AgendaDia criado
+        // nenhum AgendaDia criado — e a aba abre assim mesmo: o DECOM responde pela Agenda
+
+        $this->actingAs($user)->get(route('conta.agenda'))->assertOk();
+    }
+
+    /** O outro eixo do 403 (§10.3, 1º portão): não-responsável, COM registros existindo. */
+    public function test_nao_responsavel_recebe_403_mesmo_com_registros(): void
+    {
+        $depro = Departamento::where('sigla', 'DEPRO')->value('id');
+        $user = User::factory()->create();
+        $user->assignRole('diretor');
+        $user->departamentos()->sync([$depro]);
+        // Pivô EXPLÍCITO e coincidente com o usuário: os registros existem e o pivô intersecta o
+        // DEPRO — e ainda assim nega, porque DEPRO não responde pela Agenda (DED+DECOM). Este
+        // arranjo reprova também a variante permissiva (||) na porta da rota.
+        AgendaDia::factory()->count(3)->create()->each(fn ($a) => $a->departamentos()->sync([$depro]));
 
         $this->actingAs($user)->get(route('conta.agenda'))->assertForbidden();
     }

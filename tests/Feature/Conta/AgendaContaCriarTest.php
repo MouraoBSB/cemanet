@@ -139,7 +139,14 @@ class AgendaContaCriarTest extends TestCase
             ->assertHasFormErrors(['data']);
     }
 
-    public function test_lista_mostra_so_o_escopo_do_usuario(): void
+    /**
+     * Sob o regime "do tipo" a lista é TUDO-OU-NADA: o responsável (DECOM, da semente
+     * agenda ⇒ DED+DECOM) enxerga todos os dias, inclusive os de pivô disjunto. Era
+     * test_lista_mostra_so_o_escopo_do_usuario, cuja premissa (interseção por objeto) a
+     * decisão 4 do §5 matou. O deny do não-responsável continua coberto por
+     * AbaAgendaTest::test_scope_do_tipo_e_tudo_ou_nada (assertSame(0, ...) para o DEPRO).
+     */
+    public function test_lista_mostra_tudo_ao_responsavel(): void
     {
         $user = $this->editorDecom(['agenda.ver', 'agenda.criar']);
         $decom = Departamento::where('sigla', 'DECOM')->value('id');
@@ -152,6 +159,6 @@ class AgendaContaCriarTest extends TestCase
 
         Livewire::actingAs($user)->test(AgendaConta::class)
             ->assertSee('MeuDoDecom')
-            ->assertDontSee('AlheioDoDed');
+            ->assertSee('AlheioDoDed');   // era assertDontSee: o pivô não restringe mais
     }
 }

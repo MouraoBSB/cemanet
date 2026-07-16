@@ -8,7 +8,9 @@ use App\Filament\Resources\Departamentos\Pages\CreateDepartamento;
 use App\Filament\Resources\Departamentos\Pages\EditDepartamento;
 use App\Filament\Resources\Departamentos\Pages\ListDepartamentos;
 use App\Models\Departamento;
+use App\Support\Autorizacao\GlossarioCapacidades;
 use BackedEnum;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -17,6 +19,7 @@ use Filament\Forms\Components\ColorPicker;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -24,6 +27,7 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Str;
 
 class DepartamentoResource extends Resource
@@ -141,13 +145,50 @@ class DepartamentoResource extends Resource
             ])
             ->recordActions([
                 EditAction::make()->label('Editar'),
-                DeleteAction::make()->label('Excluir'),
+                DeleteAction::make()
+                    ->label('Excluir')
+                    // A FK de departamento_tipo_conteudo é restrictOnDelete: sem este guarda o
+                    // DELETE estoura como 500. Notification NÃO aborta — quem aborta é cancel().
+                    ->before(function (Departamento $record, DeleteAction $action): void {
+                        self::barrarSeResponsavel($record, $action);
+                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->label('Excluir selecionados'),
+                    DeleteBulkAction::make()
+                        ->label('Excluir selecionados')
+                        // OBRIGATÓRIO: sem o opt-in, injetar $records lança LogicException
+                        // (InteractsWithSelectedRecords:47-51; o default de
+                        // canAccessSelectedRecords é false, :15, e o DeleteBulkAction não opta).
+                        ->accessSelectedRecords()
+                        // ATENÇÃO: o bulk recebe $records (Collection), não $record.
+                        ->before(function (Collection $records, DeleteBulkAction $action): void {
+                            foreach ($records as $record) {
+                                self::barrarSeResponsavel($record, $action);
+                            }
+                        }),
                 ]),
             ]);
+    }
+
+    /** Aborta a exclusão se o departamento responde por algum tipo (a config é dona; I8). Public: o EditDepartamento consome. */
+    public static function barrarSeResponsavel(Departamento $departamento, Action $acao): void
+    {
+        $recursos = $departamento->tiposConteudo()->pluck('recurso');
+
+        if ($recursos->isEmpty()) {
+            return;
+        }
+
+        $rotulos = $recursos->map(fn (string $r): string => GlossarioCapacidades::rotuloRecurso($r))->implode(', ');
+
+        Notification::make()
+            ->title('Departamento em uso na configuração de acesso')
+            ->body("O departamento {$departamento->sigla} responde por: {$rotulos}. Remova-o em Configuração de acesso por tipo antes de excluir.")
+            ->danger()
+            ->send();
+
+        $acao->cancel();
     }
 
     public static function getRelations(): array

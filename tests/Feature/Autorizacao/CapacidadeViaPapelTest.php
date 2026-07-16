@@ -66,30 +66,41 @@ class CapacidadeViaPapelTest extends TestCase
         $this->assertFalse(Gate::forUser($diretor->fresh())->check('editar', $palestra));
     }
 
-    public function test_presidente_diretor_com_8_deptos_edita_qualquer_departamento(): void
+    /**
+     * O presidente (8 vínculos) inclui o DED, responsável por palestra ⇒ edita.
+     * Antes varria 3 siglas do pivô do objeto; sob o regime "do tipo" isso seria tautologia
+     * (o objeto não é consultado — ver test_regime_do_tipo_ignora_o_pivo_do_objeto).
+     */
+    public function test_presidente_diretor_edita_palestra_por_estar_no_departamento_responsavel(): void
     {
         Role::findByName('diretor', 'web')->givePermissionTo('palestra.editar');
 
         $presidente = $this->diretorNos(array_keys(GlossarioUsuarios::DEPARTAMENTOS)); // 8 vínculos
 
-        foreach (['DED', 'DECOM', 'DEPRO'] as $sigla) {
-            $palestra = $this->palestraNos([$sigla]);
-            $this->assertTrue(Gate::forUser($presidente)->check('editar', $palestra), $sigla);
-        }
+        $this->assertTrue(Gate::forUser($presidente)->check('editar', $this->palestraNos(['DED'])));
     }
 
-    public function test_decom_edita_palestra_com_dois_departamentos_por_intersecao(): void
+    /**
+     * O caso canônico do congelamento (§6.4 + I9). Substitui o antigo
+     * test_decom_edita_palestra_com_dois_departamentos_por_intersecao, cuja premissa (a exceção
+     * por objeto da Fase C) a decisão 4 do §5 matou. Guardião do item 5 do §11: se algum caminho
+     * voltar a ler o pivô para autorizar, alguma destas 3 fases fica vermelha.
+     */
+    public function test_regime_do_tipo_ignora_o_pivo_do_objeto(): void
     {
         Role::findByName('diretor', 'web')->givePermissionTo('palestra.editar');
+        // A semente dá palestra ⇒ "do tipo", responsável = DED (TiposConteudoSeeder).
 
-        $diretorDecom = $this->diretorNos(['DECOM']);
+        $ded = $this->diretorNos(['DED']);
 
-        // caso DECOM: palestra pertence a DOIS departamentos (DED + DECOM)
-        $doisDeptos = $this->palestraNos(['DED', 'DECOM']);
-        $this->assertTrue(Gate::forUser($diretorDecom)->check('editar', $doisDeptos));
+        // 1) pivô do objeto DED+DECOM ⇒ permite (o objeto não é consultado)
+        $this->assertTrue(Gate::forUser($ded)->check('editar', $this->palestraNos(['DED', 'DECOM'])));
 
-        // disjunto: palestra só em DED ⇒ diretor do DECOM é negado
-        $soDed = $this->palestraNos(['DED']);
-        $this->assertFalse(Gate::forUser($diretorDecom)->check('editar', $soDed));
+        // 2) pivô do objeto SÓ DECOM (disjunto do usuário) ⇒ permite mesmo assim — o congelamento
+        $this->assertTrue(Gate::forUser($ded)->check('editar', $this->palestraNos(['DECOM'])));
+
+        // 3) usuário no DECOM (NÃO responsável), pivô coincidente ⇒ nega — o pivô não abre nada
+        $decom = $this->diretorNos(['DECOM']);
+        $this->assertFalse(Gate::forUser($decom)->check('editar', $this->palestraNos(['DECOM'])));
     }
 }

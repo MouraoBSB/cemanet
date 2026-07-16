@@ -21,6 +21,12 @@ class EventoPolicy
 {
     use AutorizaPorDepartamento;
 
+    /** O mesmo literal já hardcodado em 'evento.ver' — zero divergência nova (§9.2). */
+    protected function recurso(): string
+    {
+        return 'evento';
+    }
+
     public function view(?User $user, Evento $evento): bool
     {
         return $evento->podeSerVistoPor($user);
@@ -33,21 +39,21 @@ class EventoPolicy
 
     public function ver(User $user, Evento $evento): bool
     {
-        return $user->hasPermissionTo('evento.ver') && $this->objetoNoDepartamentoDoUsuario($user, $evento);
+        return $user->hasPermissionTo('evento.ver') && $this->noEscopo($user, $evento);
     }
 
     public function criar(User $user): bool
     {
-        return $user->hasPermissionTo('evento.criar') && $user->departamentos()->exists();
+        return $user->hasPermissionTo('evento.criar') && $this->podeCriarNoEscopo($user);
     }
 
     public function editar(User $user, Evento $evento): bool
     {
-        return $user->hasPermissionTo('evento.editar') && $this->objetoNoDepartamentoDoUsuario($user, $evento);
+        return $user->hasPermissionTo('evento.editar') && $this->noEscopo($user, $evento);
     }
 
     public function excluir(User $user, Evento $evento): bool
     {
-        return $user->hasPermissionTo('evento.excluir') && $this->objetoNoDepartamentoDoUsuario($user, $evento);
+        return $user->hasPermissionTo('evento.excluir') && $this->noEscopo($user, $evento);
     }
 }

@@ -18,23 +18,29 @@ class PalestrantePolicy
 {
     use AutorizaPorDepartamento;
 
+    /** O mesmo literal já hardcodado em 'palestrante.ver' — zero divergência nova (§9.2). */
+    protected function recurso(): string
+    {
+        return 'palestrante';
+    }
+
     public function ver(User $user, Palestrante $palestrante): bool
     {
-        return $user->hasPermissionTo('palestrante.ver') && $this->objetoNoDepartamentoDoUsuario($user, $palestrante);
+        return $user->hasPermissionTo('palestrante.ver') && $this->noEscopo($user, $palestrante);
     }
 
     public function criar(User $user): bool
     {
-        return $user->hasPermissionTo('palestrante.criar') && $user->departamentos()->exists();
+        return $user->hasPermissionTo('palestrante.criar') && $this->podeCriarNoEscopo($user);
     }
 
     public function editar(User $user, Palestrante $palestrante): bool
     {
-        return $user->hasPermissionTo('palestrante.editar') && $this->objetoNoDepartamentoDoUsuario($user, $palestrante);
+        return $user->hasPermissionTo('palestrante.editar') && $this->noEscopo($user, $palestrante);
     }
 
     public function excluir(User $user, Palestrante $palestrante): bool
     {
-        return $user->hasPermissionTo('palestrante.excluir') && $this->objetoNoDepartamentoDoUsuario($user, $palestrante);
+        return $user->hasPermissionTo('palestrante.excluir') && $this->noEscopo($user, $palestrante);
     }
 }

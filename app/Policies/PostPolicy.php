@@ -16,23 +16,29 @@ class PostPolicy
 {
     use AutorizaPorDepartamento;
 
+    /** O mesmo literal já hardcodado em 'post.ver' — zero divergência nova (§9.2). */
+    protected function recurso(): string
+    {
+        return 'post';
+    }
+
     public function ver(User $user, Post $post): bool
     {
-        return $user->hasPermissionTo('post.ver') && $this->objetoNoDepartamentoDoUsuario($user, $post);
+        return $user->hasPermissionTo('post.ver') && $this->noEscopo($user, $post);
     }
 
     public function criar(User $user): bool
     {
-        return $user->hasPermissionTo('post.criar') && $user->departamentos()->exists();
+        return $user->hasPermissionTo('post.criar') && $this->podeCriarNoEscopo($user);
     }
 
     public function editar(User $user, Post $post): bool
     {
-        return $user->hasPermissionTo('post.editar') && $this->objetoNoDepartamentoDoUsuario($user, $post);
+        return $user->hasPermissionTo('post.editar') && $this->noEscopo($user, $post);
     }
 
     public function excluir(User $user, Post $post): bool
     {
-        return $user->hasPermissionTo('post.excluir') && $this->objetoNoDepartamentoDoUsuario($user, $post);
+        return $user->hasPermissionTo('post.excluir') && $this->noEscopo($user, $post);
     }
 }

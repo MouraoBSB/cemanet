@@ -95,8 +95,9 @@ class CapacidadeConteudosTest extends TestCase
         $this->assertInstanceOf(PalestrantePolicy::class, Gate::getPolicyFor(Palestrante::class));
     }
 
+    /** Era ..._com_intersecao: sob o "do tipo" o que permite é ser responsável, não intersectar. */
     #[DataProvider('recursos')]
-    public function test_permite_ver_editar_excluir_com_intersecao(string $model, string $recurso, string $sigla): void
+    public function test_permite_ver_editar_excluir_ao_responsavel(string $model, string $recurso, string $sigla): void
     {
         $ded = $this->depto($sigla);
         $u = $this->usuario(["{$recurso}.ver", "{$recurso}.editar", "{$recurso}.excluir"], [$ded->id]);
@@ -107,16 +108,20 @@ class CapacidadeConteudosTest extends TestCase
         }
     }
 
+    /**
+     * Era test_nega_caso_disjunto: o pivô disjunto negava. Sob o regime "do tipo" o objeto não é
+     * consultado ⇒ o responsável edita mesmo objeto de outro departamento. É o §6.4/I9, escrito.
+     */
     #[DataProvider('recursos')]
-    public function test_nega_caso_disjunto(string $model, string $recurso, string $sigla): void
+    public function test_pivo_disjunto_do_objeto_nao_impede_o_responsavel(string $model, string $recurso, string $sigla): void
     {
-        $ded = $this->depto($sigla);
+        $responsavel = $this->depto($sigla);
         $depro = $this->depto('DEPRO');
-        $u = $this->usuario(["{$recurso}.ver", "{$recurso}.editar", "{$recurso}.excluir"], [$ded->id]); // usuário no depto responsável
-        $obj = $this->objeto($model, [$depro->id]);               // objeto no DEPRO
+        $u = $this->usuario(["{$recurso}.ver", "{$recurso}.editar", "{$recurso}.excluir"], [$responsavel->id]);
+        $obj = $this->objeto($model, [$depro->id]);               // objeto em OUTRO departamento
 
         foreach (['ver', 'editar', 'excluir'] as $acao) {
-            $this->assertFalse(Gate::forUser($u)->check($acao, $obj), "{$recurso}.{$acao}");
+            $this->assertTrue(Gate::forUser($u)->check($acao, $obj), "{$recurso}.{$acao}");
         }
     }
 
@@ -133,15 +138,18 @@ class CapacidadeConteudosTest extends TestCase
         $this->assertFalse(Gate::forUser($u)->check('criar', $model), "{$recurso}.criar"); // sem vínculo ⇒ não cria
     }
 
+    /**
+     * Era test_objeto_sem_departamento_so_admin. I9 (§7): no "do tipo" o objeto não tem escopo
+     * próprio ⇒ o responsável edita. Alargamento CONSCIENTE — alarga 0 registros hoje (§4.1).
+     */
     #[DataProvider('recursos')]
-    public function test_objeto_sem_departamento_so_admin(string $model, string $recurso, string $sigla): void
+    public function test_i9_objeto_sem_departamento_e_do_responsavel(string $model, string $recurso, string $sigla): void
     {
-        $ded = $this->depto($sigla);
-        $u = $this->usuario(["{$recurso}.ver", "{$recurso}.editar", "{$recurso}.excluir"], [$ded->id]);
+        $u = $this->usuario(["{$recurso}.ver", "{$recurso}.editar", "{$recurso}.excluir"], [$this->depto($sigla)->id]);
         $obj = $this->objeto($model, []);
 
         foreach (['ver', 'editar', 'excluir'] as $acao) {
-            $this->assertFalse(Gate::forUser($u)->check($acao, $obj), "{$recurso}.{$acao}");
+            $this->assertTrue(Gate::forUser($u)->check($acao, $obj), "{$recurso}.{$acao}");
             $this->assertTrue(Gate::forUser($this->admin())->check($acao, $obj), "admin {$recurso}.{$acao}");
         }
     }

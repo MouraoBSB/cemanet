@@ -22,6 +22,7 @@
 - **Dev:** depois de editar PHP/Blade, `docker compose restart app worker` (OPcache `validate_timestamps=0`).
 - **Autoria** em arquivo novo relevante: `// Thiago Mourão — https://github.com/MouraoBSB — 2026-07-16`.
 - **Qualificar `pluck`** em `BelongsToMany`: `pluck('departamentos.id')`, nunca `pluck('id')` sobre a *query* — os pivôs têm `id` próprio e o SQL fica ambíguo (SQLite **e** MySQL). Sobre uma **coleção já carregada** (`$tipo->departamentos->pluck('id')`) é seguro.
+- **A suíte roda em SQLite; o dev e a prod são MySQL.** Verde na suíte **não** prova que a migration roda. Depois de qualquer `Schema::create`, rodar `php artisan migrate` no dev **é obrigatório** — foi assim que o limite de 64 caracteres do nome de índice apareceu (Task 2). Se o `migrate` falhar no meio, o MySQL **não** faz rollback (DDL não é transacional): limpar executando o `down()` da própria migration, **jamais** `migrate:fresh`.
 - **`scoped`, nunca `singleton`** para serviço memoizado (§6.5 do spec).
 
 ---
@@ -38,7 +39,7 @@ git branch --show-current
 git log --oneline origin/main..HEAD
 ```
 
-Esperado: `camada-1-e1-fundacao`, com exatamente 4 commits de docs (`752973c`, `db8478c`, `858095d`, `5266fe7`) sobre `995f54e`.
+Esperado: `camada-1-e1-fundacao`, com os commits de docs sobre `995f54e` — `5266fe7` (SPEC), `858095d` (passe adversarial), `db8478c` (plano), `752973c` (B1) e `7c90f95` (este ajuste da Task 0).
 
 ---
 
@@ -373,7 +374,13 @@ return new class extends Migration
             // config — sem passar pela tela e sem trilha de auditoria (fura I7/I8 do spec).
             $table->foreignId('departamento_id')->constrained('departamentos')->restrictOnDelete();
 
-            $table->unique(['tipo_conteudo_id', 'departamento_id']);
+            // Nome do índice EXPLÍCITO (1º do projeto): o automático do Laravel seria
+            // 'departamento_tipo_conteudo_tipo_conteudo_id_departamento_id_unique' = 66 caracteres,
+            // e o MySQL limita identificadores a 64 (erro 1059). Estoura porque 'tipo_conteudo'
+            // entra duas vezes (tabela + coluna) — os 6 pivôs existentes escapam por pouco
+            // (departamento_agenda_dia: 60, departamento_palestrante: 62). O SQLite dos testes não
+            // tem esse limite, então a suíte NÃO pega: só o migrate no MySQL pega.
+            $table->unique(['tipo_conteudo_id', 'departamento_id'], 'departamento_tipo_conteudo_unique');
         });
     }
 
@@ -383,6 +390,13 @@ return new class extends Migration
     }
 };
 ```
+
+> 🚨 **O nome do índice não é opcional — descoberto na execução (16/07).** A primeira versão deste plano
+> omitia o nome e o `migrate` **falhou no MySQL** com `SQLSTATE[42000]: 1059 Identifier name ... is too long`,
+> **com a suíte verde** (o SQLite não tem o limite de 64). É o falso-verde SQLite×MySQL, o mesmo padrão da
+> lição "verificar o SQL real contra o banco real". Como DDL no MySQL não é transacional, a tabela ficou
+> **órfã** (criada, migration `Pending`) e o retry passa a falhar com "table already exists": a saída é
+> executar o **`down()` da própria migration** (`Schema::dropIfExists`) — nunca `migrate:fresh`.
 
 - [ ] **Passo 4: Criar o model e a inversa**
 

@@ -111,9 +111,18 @@ class MatrizCapacidades extends Page
                     // o valor vem do CLIENTE.
                     ->disabled(fn (Get $get): bool => $get("{$recurso}.regime") !== RegimeAcesso::DoTipo->value)
                     ->dehydrated(true)
-                    ->helperText(fn (Get $get): string => $get("{$recurso}.regime") === RegimeAcesso::DoTipo->value
-                        ? 'Quem responde por este tipo. A responsabilidade só chega ao usuário pelo vínculo com o departamento, em Usuários.'
-                        : 'Regime "em cada registro": estes responsáveis ficam guardados, mas não são lidos. Voltar ao "do tipo" os restaura.')
+                    // O texto do "em cada registro" depende de HAVER responsáveis guardados: prometer
+                    // "restaurar" a quem nunca teve nenhum (o Evento nasce com a lista vazia) seria a
+                    // UI mentindo.
+                    ->helperText(function (Get $get) use ($recurso): string {
+                        if ($get("{$recurso}.regime") === RegimeAcesso::DoTipo->value) {
+                            return 'Quem responde por este tipo. A responsabilidade só chega ao usuário pelo vínculo com o departamento, em Usuários.';
+                        }
+
+                        return filled($get("{$recurso}.departamentos"))
+                            ? 'Regime "em cada registro": estes responsáveis ficam guardados, mas não são lidos. Voltar ao "do tipo" os restaura.'
+                            : 'Regime "em cada registro": o escopo vem do campo "Departamentos" do próprio registro.';
+                    })
                     ->columnSpanFull(),
             ];
 
@@ -175,7 +184,7 @@ class MatrizCapacidades extends Page
         $this->salvarConfigPorTipo($estado);
 
         Notification::make()
-            ->title('Matriz de capacidades salva com sucesso.')
+            ->title('Configuração de acesso salva com sucesso.')
             ->success()
             ->send();
     }

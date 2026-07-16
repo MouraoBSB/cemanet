@@ -1646,7 +1646,7 @@ Esperado: **PASS**. Se `MatrizCapacidadesTest`/`AuditoriaMatrizTest` falharem em
 docker compose restart app worker
 ```
 
-Abrir `http://localhost/admin/matriz-capacidades` como admin e confirmar:
+Abrir `http://localhost:8000/admin/matriz-capacidades` (a porta é **8000**, não 80) como admin e confirmar:
 - o título e o item de menu dizem **"Configuração de acesso por tipo"**;
 - cada Section (Evento, Palestra, Post, Agenda do Dia, Palestrante) tem **Regime** + **Departamentos responsáveis** acima dos toggles;
 - Agenda abre com **DED + DECOM**, Palestra com **DED**, Post com **DECOM**, Palestrante com **DED**;

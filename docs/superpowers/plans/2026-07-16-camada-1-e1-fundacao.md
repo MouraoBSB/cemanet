@@ -28,16 +28,17 @@
 
 ### Task 0: Branch
 
-- [ ] **Passo 1: Criar a branch a partir de `origin/main`**
+A branch **já existe** e carrega os 4 commits de docs (SPEC + passe + plano + B1) sobre `origin/main` — o PR de E1 leva código **e** docs juntos, como fizeram a Fase C (`6bbe6df`) e a Auditoria (`8083a37`). 🚫 **Não squashar** os 4: o SPEC referencia `5266fe7` + `858095d`, e o documento de estado-atual cita `5266fe7`.
+
+- [x] **Passo 1: Confirmar a branch e a base**
 
 ```bash
 cd "d:/Claude Code - Projetos/Cemanet - Novo Site"
-git fetch origin
-git checkout -b camada-1-e1-fundacao origin/main
 git branch --show-current
+git log --oneline origin/main..HEAD
 ```
 
-Esperado: `camada-1-e1-fundacao`.
+Esperado: `camada-1-e1-fundacao`, com exatamente 4 commits de docs (`752973c`, `db8478c`, `858095d`, `5266fe7`) sobre `995f54e`.
 
 ---
 

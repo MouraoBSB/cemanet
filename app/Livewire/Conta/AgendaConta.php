@@ -6,8 +6,6 @@ namespace App\Livewire\Conta;
 
 use App\Filament\Schemas\AgendaDiaForm;
 use App\Models\AgendaDia;
-use App\Models\Departamento;
-use App\Support\Agenda\AgendaMantenedores;
 use App\Support\Autorizacao\AuditoriaAutorizacao;
 use App\Support\Conta\AbaAgenda;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -176,15 +174,9 @@ class AgendaConta extends Component implements HasForms
         }
 
         try {
-            $registro = AgendaDia::create($dados);
-
-            // Campo privilegiado DEPARTAMENTOS forçado: todo novo AgendaDia nasce DED+DECOM (O1).
-            $idsMantenedores = AgendaMantenedores::ids();
-            $registro->departamentos()->sync($idsMantenedores);
-
-            // Log manual do vínculo depto↔conteúdo (o trait não captura N:N), log_name 'agenda'.
-            $depois = Departamento::whereIn('id', $idsMantenedores)->pluck('nome', 'id')->all();
-            AuditoriaAutorizacao::registrarDepartamentosConteudo($registro, antes: [], depois: $depois);
+            // O AgendaDia nasce SEM pivô de departamento: no regime "do tipo" o objeto não tem
+            // escopo próprio (§6.4/I9) — quem responde pela Agenda vem da config, não do registro.
+            AgendaDia::create($dados);
         } catch (QueryException $e) {
             // O belt dataJaUsada acima cobre o caso comum; este catch fecha a janela TOCTOU
             // entre o SELECT do belt e o INSERT sob concorrência (unique de agenda_dias.data).

@@ -212,8 +212,8 @@ comum (pivô `departamento_<conteudo>`). O admin passa antes, no `Gate::before`.
       site"): `AgendaDiaForm::schema()` como **fonte única** (painel + site), **tema
       Filament escopado** ao site (sem preflight/Inter), rota irmã `conta.agenda` + aba
       condicional, componente `AgendaConta` (lista escopada ao depto + criar/editar/
-      excluir) com os **2 campos privilegiados forçados no servidor** (`departamentos`
-      = DED+DECOM; `status` — quem não tem `agenda.editar` só cria rascunho), trait
+      excluir) com o **campo privilegiado forçado no servidor** (`status` — quem não tem
+      `agenda.editar` só cria rascunho; `departamentos` deixou de ser forçado no E2), trait
       `LogsActivity` no `AgendaDia` (7 campos, `log_name='agenda'`) e **porta `'perfil'`**
       marcada no `boot()` do componente. *(D1: PR #29, merge `515ff74`; D2: PR #30,
       merge `80af57d`)*

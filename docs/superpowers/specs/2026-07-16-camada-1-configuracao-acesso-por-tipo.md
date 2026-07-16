@@ -217,7 +217,7 @@ diff por id com itens `{id,nome}`**, estável a rename); `registrarDepartamentos
 (`updateOrCreate` sobre o glossário). `DatabaseSeeder::run()` chama, nesta ordem: `CategoriaSeeder`,
 `EstruturaCemaSeeder` (papéis + departamentos), `CapacidadesSeeder`, `AdminSeeder`, `CategoriaEventoSeeder`.
 Nos testes: `EstruturaCemaSeeder` em 39 pontos, `CapacidadesSeeder` em 19. **Não existe factory de
-departamento** — os testes usam o seeder ou `Departamento::create` (`EventoPolicyCapacidadeTest.php:48`).
+departamento** — os testes usam o seeder ou `Departamento::create` (`EventoPolicyCapacidadeTest.php:49`).
 
 **Colisão verificada — 52 tabelas no dev.** Ocupados: `configuracoes` ([Configuracao](../../../app/Models/Configuracao.php),
 chave/valor, `valor()`/`definir()`), `agenda_configuracoes` ([ConfiguracaoAgenda](../../../app/Models/ConfiguracaoAgenda.php),
@@ -382,6 +382,12 @@ registro (com a tabela vazia a aba some e ninguém entra para criar o primeiro d
 Custo aceito: um responsável com só `agenda.ver` vê aba vazia — mas só se a Agenda **inteira** estiver
 vazia (há 123 registros, e a listagem no "do tipo" é tudo-ou-nada). Estado vazio honesto resolve.
 
+> **Ciência — a Fórmula 1 morre também no "por registro".** No ramo `PorRegistro`,
+> `usuarioHabilitadoNoTipo` resolve para `$user->departamentos()->exists()` (§9.3) — **qualquer**
+> departamento. Se um dia a Agenda for trocada para "por registro" **pela tela** (o regime é configurável,
+> §5.3), a aba volta a aparecer para todo diretor vinculado, possivelmente **vazia** — exatamente o que a
+> Fórmula 1 evitava. Hoje é inócuo (`agenda` = "do tipo"). **Registrado; não muda o desenho.**
+
 ### 6.4 Pivô congelado, dado intacto
 
 Nos 4 tipos "do tipo", `departamento_<x>` deixa de ser **lido** e de ser **gravado**.
@@ -473,7 +479,8 @@ ao `setUp` dos **dois testes da própria tela** (§10.2) — mudança de *setup*
 mudança em teste existente ⇒ o E1 está errado.**
 
 > ⚠️ Por que os dois: o `Select` de regime é `required()` (§9.5) e entra no schema que `salvar()` valida
-> via `$this->form->getState()` (`MatrizCapacidades.php:109` → `HasState.php:450`, `$state = $this->validate()`).
+> via `$this->form->getState()` (`MatrizCapacidades.php:109` → `schemas/src/Concerns/HasState.php:450`,
+> `$state = $this->validate()`).
 > Com `tipos_conteudo` vazia, `mount()` preenche `regime => null` ⇒ o `required` reprova o submit ⇒ caem os
 > `assertHasNoFormErrors()` existentes. Isso é **descoberta do passe adversarial**, não escolha: sem essa
 > ressalva, o critério "798 verde" seria falso e mandaria o executor procurar um bug que não existe.
@@ -506,19 +513,32 @@ Schema::create('tipos_conteudo', function (Blueprint $table) {
 Schema::create('departamento_tipo_conteudo', function (Blueprint $table) {
     $table->id();
     $table->foreignId('tipo_conteudo_id')->constrained('tipos_conteudo')->cascadeOnDelete();
-    // NÃO é cascade (diverge do molde de propósito): esta é tabela de AUTORIZAÇÃO. Cascade faria do
-    // DELETE do DepartamentoResource um SEGUNDO escritor da config — sem passar pela tela e sem
-    // auditoria, furando I7 e I8.
+    // NÃO é cascade (diverge do molde dos 6 pivôs, de propósito): esta é tabela de AUTORIZAÇÃO.
+    // Cascade faria do DELETE do DepartamentoResource um SEGUNDO escritor da config — sem passar
+    // pela tela e sem trilha, furando I7 e I8.
     $table->foreignId('departamento_id')->constrained('departamentos')->restrictOnDelete();
     $table->unique(['tipo_conteudo_id', 'departamento_id']);
 });
 ```
 
-**O lado da UX do `restrict`** (E1, para a FK não virar erro 500): no `DepartamentoResource` (`:144`,
-`:148`) e no `EditDepartamento` (`:16`), a `DeleteAction`/`DeleteBulkAction` ganha `->before()` que checa
-a relação inversa (`$record->tiposConteudo()->exists()`) e, havendo, aborta com `Notification` de erro em
-pt-BR: *"O departamento {sigla} responde pelo tipo {recurso}. Remova-o em Configuração de acesso por tipo
-antes de excluir."*
+> ⚠️ **Não superestimar o `restrict`.** O efeito do cascade seria **fail-closed** — o tipo ficaria sem
+> responsáveis e I1 negaria tudo (indisponibilidade), **não** acesso indevido. O `restrict` protege a
+> **trilha de auditoria** e contra **lockout silencioso**; **não** é barreira contra furo de acesso. Sem
+> ele o sistema **não abre** — trava. A divergência do molde está justificada por isso, e custa as três
+> peças abaixo.
+
+**O lado da UX do `restrict`** (E1, para a FK não virar erro 500): no `DepartamentoResource` — `:144`
+(`DeleteAction`) e `:148` (`DeleteBulkAction`) — e no `EditDepartamento` (`:16`), a ação ganha `->before()`
+que checa a inversa e **cancela**:
+
+- **`$action->cancel()`** (`vendor/filament/actions/src/Action.php:677`, lança `Cancel`) — **não**
+  `halt()` (`:682`), que manteria o modal de confirmação aberto. **`Notification` sozinha NÃO aborta**: o
+  delete prosseguiria e estouraria a FK como 500 — exatamente o que o `->before()` existe para evitar.
+- ⚠️ **Assinaturas diferentes:** `DeleteAction::before()` recebe **`$record`** (Model);
+  `DeleteBulkAction::before()` recebe **`$records`** (Collection) e precisa **varrer a coleção**. Não
+  copiar o mesmo closure para os dois.
+- Mensagem em pt-BR: *"O departamento {sigla} responde pelo tipo {recurso}. Remova-o em Configuração de
+  acesso por tipo antes de excluir."*
 
 > **Ciência:** `departamento_usuario` segue com `cascadeOnDelete` e a mesma lacuna — está em §14 (fora de
 > escopo) e continua. A divergência de FK entre os dois pivôs é **consciente**.
@@ -526,6 +546,17 @@ antes de excluir."*
 `App\Models\TipoConteudo`: `$fillable = ['recurso', 'regime']`, `$casts = ['regime' => RegimeAcesso::class]`,
 `departamentos(): BelongsToMany` (`'departamento_tipo_conteudo', 'tipo_conteudo_id', 'departamento_id'`).
 **Não** implementa `TemDepartamento` — não é conteúdo, e o contrato existe para o trait de policy.
+
+**A inversa, em `App\Models\Departamento`** (peça obrigatória — hoje o model só tem `setores()` (`:20`),
+`cargos()` (`:25`) e `eventos()` (`:30`); **sem ela o `->before()` abaixo é erro fatal**):
+
+```php
+public function tiposConteudo(): BelongsToMany
+{
+    return $this->belongsToMany(TipoConteudo::class, 'departamento_tipo_conteudo',
+        'departamento_id', 'tipo_conteudo_id');
+}
+```
 
 `App\Enums\RegimeAcesso` (molde: `VisibilidadeEvento`):
 
@@ -802,14 +833,20 @@ private static function calcular(User $user): bool
 Cada `Section` de `secoesPorRecurso()` (`:68-89`) ganha, **acima** dos toggles:
 
 - `Select::make("{$recurso}.regime")` — `->options(RegimeAcesso::opcoes())`, `->required()`, `->live()`;
-- `Select::make("{$recurso}.departamentos")` — `->multiple()`, `->options(Departamento::pluck('nome','id'))`,
+- `Select::make("{$recurso}.departamentos")` — `->multiple()`, `->options(...)`,
   `->label('Departamentos responsáveis')`, **`->disabled()` quando o regime não é "do tipo" — nunca
   `->visible()`/`->hidden()` puro**:
 
+> As opções são **hoistadas para fora do laço** de `secoesPorRecurso()` (uma variável antes do `foreach`,
+> ou closure memoizada). `->options(Departamento::pluck('nome','id'))` dentro do laço é avaliado na
+> construção do schema ⇒ **5 queries idênticas por render**, uma por Section.
+
 ```php
+$departamentos = Departamento::pluck('nome', 'id');   // hoistado: 1 query, não 5
+
 Select::make("{$recurso}.departamentos")
     ->multiple()
-    ->options(Departamento::pluck('nome', 'id'))
+    ->options($departamentos)
     ->label('Departamentos responsáveis')
     ->disabled(fn (Get $get) => $get("{$recurso}.regime") !== RegimeAcesso::DoTipo->value)
     ->dehydrated(true)   // obrigatório: disabled não desidrata por padrão
@@ -819,15 +856,47 @@ Select::make("{$recurso}.departamentos")
 ```
 
 > ⚠️ **`->visible()` apagaria os responsáveis.** O Filament **não desidrata componente oculto**
-> (`vendor/filament/schemas/src/Components/Concerns/HasState.php:774-782`): com `->visible(...)`, trocar o
+> (`vendor/filament/schemas/src/Components/Concerns/HasState.php:774-783`): com `->visible(...)`, trocar o
 > regime para "por registro" e salvar entregaria `[]` a `salvar()` ⇒ `sync([])` ⇒ **os responsáveis são
 > apagados do banco**, e a auditoria atribuiria ao admin uma remoção que ele não fez. Voltar ao "do tipo"
 > traria o tipo **sem responsáveis** — que por I1 **nega tudo**. Se preferir ocultar de fato,
-> `->hidden(...)` **exige** `->dehydratedWhenHidden()`; `->dehydrated(true)` sozinho **não** basta.
+> `->hidden(...)` **exige** `->dehydratedWhenHidden()`; `->dehydrated(true)` sozinho **não** basta (o
+> `:782` só é alcançado depois do early-return).
 >
-> **Cravado:** os responsáveis são **preservados** no regime "por registro" — deixam de ser **lidos**, não
-> de existir. Simétrico ao §13.3, que preserva o pivô de registro. A UI nunca pode entregar `[]` por
-> ocultação.
+> **Por que o `->dehydrated(true)` é obrigatório junto do `disabled()`:**
+> `vendor/filament/schemas/src/Components/Concerns/CanBeDisabled.php:25` — `disabled()` chama
+> `$this->saved(fn (Component $c): bool => ! $c->evaluate($condition))`; em `isDehydrated()`,
+> `$this->isDehydrated` é `null` ⇒ cai em `isSaved()` ⇒ `false`.
+
+**🔒 O cinto server-side do `salvar()` (obrigatório).** A preservação **não pode** depender da hidratação:
+com `disabled()` + `dehydrated(true)`, o valor **vem do cliente**. O próprio vendor avisa, no arquivo que
+sustenta este desenho (`CanBeDisabled.php:20-24`, comentário literal):
+
+> *"Security: Disabling a field prevents it from being saved, but skilled users can manipulate Livewire's
+> JavaScript to bypass the disabled state on the client. Always enforce authorization on the backend (...)
+> for sensitive fields."*
+
+Um POST forjado com `data.agenda.departamentos = []` no regime `por_registro` faria `sync([])` — o mesmo
+estrago do `->visible()`, entrando por outra porta. Logo, **o servidor decide, não o estado do form**:
+
+```php
+// salvar(), por recurso:
+if ($regime === RegimeAcesso::DoTipo) {
+    $tipo->departamentos()->sync($ids);   // + auditoria (I7)
+}
+// por_registro: NÃO sincroniza — os responsáveis são preservados POR CONSTRUÇÃO, não por hidratação.
+```
+
+Com o `if`, `disabled()` + `dehydrated(true)` volta a ser o que deve ser — **UX**, não mecanismo de
+integridade. **É a regra que o projeto já tem** e que este SPEC seria o único lugar a não seguir: *"campos
+privilegiados NUNCA confiam no POST"* (`AgendaConta.php:26-30`, e os belts de `:171-176`, `:213-219`).
+
+> **Não é escalonamento de privilégio** — a tela é admin-only (`canAccessPanel` + `Gate::before`), e quem
+> forja o POST já pode fazer o mesmo pela tela. É integridade e trilha: sem o `if`, o admin ganharia uma
+> entrada de auditoria com uma remoção que ele não fez.
+
+**Cravado:** os responsáveis são **preservados** no regime "por registro" — deixam de ser **lidos**, não de
+existir. Simétrico ao §13.3, que preserva o pivô de registro.
 
 O `$estado` de `mount()` ganha `$estado[$recurso]['regime']` e `$estado[$recurso]['departamentos']` —
 **namespace separado** dos toggles, que são `$estado[$papel][$recurso][$acao]`. Os papéis são
@@ -873,7 +942,17 @@ Título e navegação da página passam a **"Configuração de acesso por tipo"*
 
 Sem factory de departamento (§3.11): usar `EstruturaCemaSeeder` (molde de 39 pontos; busca por sigla —
 `Departamento::where('sigla','DECOM')->value('id')`) ou `Departamento::create` (molde de
-`EventoPolicyCapacidadeTest.php:48`). **Não criar factory só para isto.**
+`EventoPolicyCapacidadeTest.php:49`). **Não criar factory só para isto.**
+
+> ⚠️ **A `AgendaDiaFactory` NÃO anexa departamento.** Todo caso do §10.3 que observe o filtro precisa de
+> `->departamentos()->attach(...)` explícito no arrange — senão o pivô fica vazio e o teste não distingue
+> "o objeto é ignorado" de "o objeto está vazio".
+>
+> ⚠️ **`AbaAgenda::$cache` é `static WeakMap` (`:26-33`), chaveado pelo objeto `User`, e sobrevive dentro
+> do mesmo teste.** Um caso que consulte a aba, mude a config/vínculo e **reconsulte com o mesmo `$user`**
+> recebe o memo velho — e **fica verde por memo, não por regra**. Usar **`$user->fresh()`** (objeto novo ⇒
+> chave nova ⇒ recalcula); o projeto já faz isso nos testes de Gate (`CapacidadeViaPapelTest:58,62`). O
+> `scoped` de §6.5 resolve o memo do `AcessoPorTipo`, mas esse `static` **já existe e fica**.
 
 ### 10.2 E1 (nenhum teste existente muda de cor)
 
@@ -902,6 +981,10 @@ Sem factory de departamento (§3.11): usar `EstruturaCemaSeeder` (molde de 39 po
   **+ Round-trip preserva (§9.5):** trocar `do_tipo`→`por_registro`→`do_tipo` pela tela **preserva os
   responsáveis** (`departamento_tipo_conteudo` intacto); salvar no "por registro" **não zera** o pivô da
   config. *Reprova o `->visible()`.*
+  **+ Forja do POST (o cinto do §9.5):** regime `por_registro` + state forjado com
+  `data.<recurso>.departamentos = []` ⇒ **pivô da config intacto** e **nenhuma entrada de auditoria**.
+  *Reprova o `sync()` incondicional — é o teste que prova que a preservação é do servidor, não da
+  hidratação.*
   **+ `salvar()` com `regime` vazio ⇒ erro de validação e nenhuma linha gravada/alterada** (o `required()`
   é o guarda do NOT NULL da §9.1).
 - **`AuditoriaTipoConteudoTest`** (I7) — **pela página, sempre** (molde: `AuditoriaMatrizTest:33-51` —
@@ -919,7 +1002,8 @@ Sem factory de departamento (§3.11): usar `EstruturaCemaSeeder` (molde de 39 po
   > não auditando nada.
 
 **Testes existentes que E1 TOCA (só o `setUp`, nenhuma asserção).** O `->required()` do Select de regime
-entra no schema que `salvar()` valida (`MatrizCapacidades.php:109` → `HasState.php:450`). Sem linha em
+entra no schema que `salvar()` valida (`MatrizCapacidades.php:109` →
+`schemas/src/Concerns/HasState.php:450`). Sem linha em
 `tipos_conteudo`, `mount()` põe `regime => null` ⇒ 5 erros de `required` ⇒ caem os `assertHasNoFormErrors()`
 de **`MatrizCapacidadesTest:49,57,85,98`** e **`AuditoriaMatrizTest:36,67,79`** (e as asserções seguintes,
 por cascata). **Correção: somar `$this->seed(TiposConteudoSeeder::class)` ao `setUp` dos dois** —
@@ -1073,9 +1157,18 @@ ser required — o primeiro é o Evento (permanece), o segundo é o vínculo do 
    **ABRIR**, destrói I1/I2 e **reabre o pivô congelado** (354 registros de eco do backfill, §13.3) como
    fonte de autorização — e o teste de I2, se escrito só sobre `agenda`, continuaria **verde**, escondendo
    o furo. Daí o I2 cobrir os 5 recursos (§10.3).
-9. **Filament não desidrata componente oculto** (`HasState.php:774-782`): `->visible()`/`->hidden()` num
-   campo que `salvar()` sincroniza **apaga o dado**. Ver §9.5.
+9. **Filament não desidrata componente oculto**
+   (`schemas/src/Components/Concerns/HasState.php:774-783`): `->visible()`/`->hidden()` num campo que
+   `salvar()` sincroniza **apaga o dado**. E `disabled()` também não desidrata sozinho
+   (`CanBeDisabled.php:25`). Ver §9.5 — e **nunca** deixar a integridade por conta da hidratação: o
+   servidor decide (o `if` do regime no `salvar()`).
 10. **`scoped`, não `singleton`**, para qualquer serviço memoizado que o `worker` toque (§6.5).
+11. ⚠️ **Dois `HasState.php` no Filament** — ao conferir citação, olhar o caminho:
+    `schemas/src/Concerns/HasState.php` (`getState()`/`validate()`, `:450`) ≠
+    `schemas/src/Components/Concerns/HasState.php` (`isDehydrated()`, `:774-783`).
+12. **Memo `static` sobrevive dentro do mesmo teste** — `AbaAgenda::$cache` é `WeakMap` chaveado por
+    `User`: reconsultar com o mesmo objeto devolve o memo velho e o teste fica verde por memo, não por
+    regra. Usar `$user->fresh()` (§10.1).
 
 ---
 
@@ -1108,6 +1201,13 @@ Espíritas", e duas "Reunião") — todos **publicados**, todos com **zero depar
 O Evento fica "por registro" e o filtro dele não muda: esses 7 são **só-admin hoje e continuam só-admin**.
 São uma **bomba adiada** — quando o Evento ganhar superfície de edição no site, são 7 registros publicados
 que ninguém além do admin edita. **Registrar; não consertar nesta fatia.**
+
+> **E o 8º pode nascer.** O furo do `criar` (§3.2) é fechado **só no "do tipo"** (I3): no "por registro",
+> `podeCriarNoEscopo` resolve para `$user->departamentos()->exists()` — **qualquer departamento serve**, e
+> o furo **permanece no Evento**. É consequência correta de I4 ("não mexer"), e hoje só não morde porque o
+> Evento não tem superfície de criação fora do `/admin` (admin-only). Pior: como `EventoForm:107-112`
+> **não** é `required`, um evento criado assim nasce **órfão** — o 8º desta lista. **Registrar; não
+> consertar.**
 
 ### 13.3 O que o congelamento deixa para trás
 

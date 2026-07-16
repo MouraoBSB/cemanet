@@ -3,20 +3,26 @@
 Construção incremental, local-first. Cada fase é entregue ponta a ponta e
 verificada antes da seguinte. Marque o estado ao concluir.
 
-## Estado atual (2026-07-04)
+## Estado atual (2026-07-16)
 
 Módulos entregues ponta a ponta até aqui: **Fundação** (Fase 0), **Palestras**
 (banco + admin + importação + público), **Palestrantes** (listagem e perfil
 single), **Calendário de Palestras**, **Agenda Reforma Íntima** (banco + admin +
 importação + público + SEO), **Blog "Sementeira de Luz"** (Posts + editor
-RichEditor + Biblioteca de mídia), **Usuários** (RBAC + departamentos/setores/
-cargos + importação do legado), **Autenticação pública** (Fortify + Google),
-**Minha Conta**, **E-mail transacional** e o **tema do painel `/admin`** na
-identidade CEMA. Detalhe de cada fatia nas seções abaixo.
+RichEditor + Biblioteca de mídia), **Eventos** (banco + admin + importação +
+front + feed `.ics` + calendário unificado), **Usuários** (RBAC + departamentos/
+setores/cargos + importação do legado), **Autenticação pública** (Fortify +
+Google), **Minha Conta**, **E-mail transacional**, o **tema do painel `/admin`**
+na identidade CEMA e o **modelo de capacidades** — autorização de escrita ponta a
+ponta: matriz papel×capacidade, departamento como filtro de objeto, auditoria
+append-only e a **edição de conteúdo pelo site** (`/minha-conta`), com a Agenda
+como piloto (Fases A→D). Detalhe de cada fatia nas seções abaixo.
 
-Próximo foco pendente: **Comentários** do blog, **gate de conteúdo por nível de
-acesso** (auth + roles/policies), os demais CPTs (Evangelho da semana/Capítulos,
-Eventos, Mensagens mediúnicas/Autores espirituais) e o **deploy** (Docker no VPS).
+Próximo foco pendente: **Fase E** (replicar a edição no `/minha-conta` para
+Blog/Eventos/Palestras, no padrão do piloto da Agenda), **Comentários** do blog,
+**gate de conteúdo por nível de acesso** nos módulos que ainda não têm (Eventos
+já tem `visibilidade` própria), os demais CPTs (Evangelho da semana/Capítulos,
+Mensagens mediúnicas/Autores espirituais) e o **deploy** (Docker no VPS).
 
 ## Fase 0 — Fundação  ✅ concluída
 
@@ -115,7 +121,14 @@ Ordem sugerida (cada um como nova fatia vertical):
       geradas pelo trait reutilizável `App\Models\Concerns\RegistraImagensPadrao`.
       *(commits `1203cbd`, `00f57ba`, `958f84e`, `6c028e2`)*
 - [ ] Evangelho da semana + Capítulos do Evangelho
-- [ ] Eventos
+- [x] **Eventos** — models `Evento`/`CategoriaEvento` (+ `departamento_evento`),
+      importação idempotente do legado (`cema:importar-eventos`), admin Filament
+      (form em fonte única `App\Filament\Schemas\EventoForm`), front SSR
+      (listagem + single), **feed `.ics`/webcal** e **calendário unificado**
+      (palestras + eventos + agenda). Visibilidade própria por enum
+      `VisibilidadeEvento` (`publico`/`logados`/`trabalhadores`/`diretoria`).
+      *(PRs #19 importador, #20 front, #21/#22 `.ics`, #23 calendário unificado,
+      #24 `EventoForm` — merge `cb2fd48`)*
 - [x] **Agenda Reforma Íntima (com calendário)** — models `AgendaMetaMes`/`AgendaDia`/
       `AgendaSlugLegado`, importação idempotente do legado, admin Filament (dias/metas
       do mês/configurações), front SSR (`/agenda-reforma-intima` +
@@ -154,10 +167,64 @@ Ordem sugerida (cada um como nova fatia vertical):
       e-mail transacional PR #9, merge `4cc57fc`)*
 - [x] **Minha Conta** (área self-service: Painel, Meu Perfil com edição/foto+cropper,
       header auth-aware). *(PR #10, merge `1a7a2ab`)*
-- [ ] Gate de conteúdo por **nível de acesso** (roles/policies restringindo
-      páginas/palestras por taxonomia `nivel-de-acesso`) — ainda pendente.
+- [ ] Gate de conteúdo por **nível de acesso** (restringir páginas/palestras por
+      taxonomia `nivel-de-acesso`) — pendente **nesses módulos**. Eventos já tem
+      visibilidade própria (enum `VisibilidadeEvento`). É o eixo **VISIBILIDADE**
+      ("quem vê"), distinto do eixo **CAPACIDADE** ("quem edita"), este resolvido
+      pelas Fases A→D (seção abaixo).
 - [x] **Tema do painel Filament** — identidade CEMA (paleta primária explícita,
       fontes Fontsource, dark mode off), polish de contraste do CTA.
       *(PR #12, merge `db942fe`; PR #13, merge `86cfa01`)*
 - [ ] Busca, formulários (contato/newsletter via Mailpit→SMTP), SEO/sitemap
 - [ ] Deploy Docker no VPS (pipeline, backups do MySQL, observabilidade)
+
+## Modelo de capacidades — quem EDITA o conteúdo (Fases A→D)  ✅ concluído
+
+Dois eixos ortogonais: **VISIBILIDADE** ("quem vê" — audiência/nível de acesso) ×
+**CAPACIDADE** ("quem edita"). Este arco resolveu a **CAPACIDADE** e abriu a edição
+a não-admin **pelo site**, mantendo o `/admin` **exclusivo de administrador**
+(`User::canAccessPanel` → `hasRole('administrador')` é o único portão do painel).
+
+Três condições, **todas** exigidas para um não-admin editar um objeto (fail-closed):
+**capacidade** (papel→permissão, via matriz) **+ vínculo** do usuário a um
+departamento (`departamento_usuario`) **+ objeto** pertencer a um departamento em
+comum (pivô `departamento_<conteudo>`). O admin passa antes, no `Gate::before`.
+
+- [x] **Fase A — modelo de capacidades**: 20 permissions `recurso.acao` (guard `web`;
+      `evento`/`palestra`/`post`/`agenda`/`palestrante` × `ver`/`criar`/`editar`/`excluir`),
+      `GlossarioCapacidades` + `CapacidadesSeeder`, pivô `departamento_usuario`, contrato
+      `TemDepartamento`, trait `AutorizaPorDepartamento` (interseção, fail-closed) e as 5
+      policies (`hasPermissionTo`, **nunca** `can()`). *(PR #25, merge `08472c3`)*
+- [x] **Fase B — departamento nos conteúdos**: pivôs `departamento_{palestra,post,
+      palestrante,agenda_dia}` (Evento já tinha) + backfill idempotente
+      (`cema:departamentalizar-conteudos`, `cema:vincular-diretores-departamento`).
+      *(PR #26, merge `d7696b8`)*
+- [x] **Fase C — matriz papel×capacidade**: página Filament **`/admin/matriz-capacidades`**
+      (grade 20 capacidades × papéis `trabalhador`/`diretor`), **único escritor** de
+      `role_has_permissions` (`Role::syncPermissions`); `Select` de departamentos no
+      `UserResource` e nos 4 conteúdos. *(PR #27, merge `77000e8`)*
+- [x] **Fase de Auditoria (activitylog)**: `spatie/laravel-activitylog`, tabela
+      `activity_log`, helper `AuditoriaAutorizacao` (porta/contexto/diff), trait
+      `LogsActivity` no `User` + log manual dos 3 pivôs de autorização. Toda entrada
+      carrega **porta** (`admin` | `sistema` | `perfil`) + IP + user-agent.
+      *(PR #28, merge `c316527`)*
+- [x] **Fase D — edição da Agenda no `/minha-conta`** (piloto do "não-admin edita pelo
+      site"): `AgendaDiaForm::schema()` como **fonte única** (painel + site), **tema
+      Filament escopado** ao site (sem preflight/Inter), rota irmã `conta.agenda` + aba
+      condicional, componente `AgendaConta` (lista escopada ao depto + criar/editar/
+      excluir) com os **2 campos privilegiados forçados no servidor** (`departamentos`
+      = DED+DECOM; `status` — quem não tem `agenda.editar` só cria rascunho), trait
+      `LogsActivity` no `AgendaDia` (7 campos, `log_name='agenda'`) e **porta `'perfil'`**
+      marcada no `boot()` do componente. *(D1: PR #29, merge `515ff74`; D2: PR #30,
+      merge `80af57d`)*
+      - **Correções de dados** (idempotentes, já aplicadas no dev): `cema:corrigir-papel-diretores`,
+        `cema:somar-ded-agenda` (soma DED aos 123 dias, preserva DECOM),
+        `cema:vincular-presidentes-departamentos` (presidentes → 8 deptos).
+      - ⚠️ **Cutover (por ambiente)**: rodar os 3 comandos **+ ligar `agenda.*` para
+        `diretor`/`trabalhador` na matriz pela UI**. Sem esse passo o modelo não "morde"
+        (não há comando que escreva `role_has_permissions` — é invariante da Fase C).
+- [ ] **Fase E** — replicar o padrão da Fase D para **Blog / Eventos / Palestras**
+      (fonte única do form + superfície no `/minha-conta` + campos privilegiados forçados
+      + auditoria). Backlog técnico herdado de D: teste do catch `QueryException` 23000;
+      extrair `diffPorId` no helper; nota de Octane no docblock de `$portaForcada`;
+      `DB::transaction` no `create()+sync()+log`.

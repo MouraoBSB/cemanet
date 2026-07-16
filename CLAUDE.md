@@ -12,9 +12,11 @@ Reconstrução do site **cemanet.org.br** (CEMA – Centro Espírita Maria Madal
 localhost**, fatia vertical por fatia vertical (banco → admin → páginas
 públicas → migração de dados). A fatia inicial (**Palestras**) provou a
 arquitetura; hoje o projeto já cobre também Agenda, Blog "Sementeira de Luz",
-Biblioteca de Mídia, Usuários, autenticação pública (senha + Google), Minha
-Conta, e-mail transacional e o tema do painel `/admin` — estado atual sempre
-em [ROADMAP.md](ROADMAP.md).
+Biblioteca de Mídia, **Eventos** (+ calendário unificado e feed `.ics`), Usuários,
+autenticação pública (senha + Google), Minha Conta, e-mail transacional, o tema do
+painel `/admin` e o **modelo de capacidades** (quem edita o conteúdo: matriz
+papel×capacidade + departamento + auditoria + edição pelo site) — estado atual
+sempre em [ROADMAP.md](ROADMAP.md).
 
 O site atual roda em WordPress + Elementor + Jet Engine; este projeto o
 substitui por uma base moderna, leve, administrável e mantível.
@@ -28,7 +30,9 @@ substitui por uma base moderna, leve, administrável e mantível.
   `worker` (queue), `db` (MySQL), `mailpit` e `adminer`, via
   `docker-compose.yml`; produção em **VPS Linux + Docker** (local == produção)
 - **Autenticação/RBAC**: Laravel Fortify (headless) + Socialite (Google OAuth)
-  + spatie/laravel-permission (papéis/roles)
+  + spatie/laravel-permission (papéis/roles + as 20 capacidades `recurso.acao`)
+- **Auditoria**: spatie/laravel-activitylog — trilha append-only (`activity_log`),
+  com **porta** (`admin`/`sistema`/`perfil`) + IP + user-agent em toda entrada
 - **Mídia**: spatie/laravel-medialibrary — original preservado (capado a
   ≤2000px; ≤1200px na coleção `og`) + conversões WebP `web`/`thumb` geradas
   pelo trait `App\Models\Concerns\RegistraImagensPadrao`; a Biblioteca do blog
@@ -83,6 +87,33 @@ Três insumos já existem; use-os, não recrie:
 - Importação **idempotente** (upsert por slug), resolvendo palestrantes/diretores
   e taxonomia por slug, **a partir do banco `legado`** (fonte preferida — conteúdo
   mais rico). Ver mapeamento em [DATA-MODEL.md](DATA-MODEL.md) e [DB-LEGADO.md](DB-LEGADO.md).
+
+## Autorização — quem EDITA o conteúdo (modelo de capacidades)
+
+Dois eixos ortogonais: **VISIBILIDADE** ("quem vê") × **CAPACIDADE** ("quem edita").
+Detalhe do schema em [DATA-MODEL.md](DATA-MODEL.md); fases em [ROADMAP.md](ROADMAP.md).
+
+- 🚫 **O `/admin` é EXCLUSIVO de administrador.** `User::canAccessPanel()` →
+  `hasRole('administrador')` é o **único** portão do painel. Diretor **não** entra no
+  `/admin`: o não-admin edita pelo **site** (`/minha-conta`).
+- **Três condições, todas exigidas** para um não-admin editar um objeto (**fail-closed**):
+  **capacidade** (`hasPermissionTo('recurso.acao')`, via papel) **+ vínculo** do usuário a
+  um departamento (`departamento_usuario`) **+ objeto** num departamento em comum
+  (`departamento_<conteudo>`). O admin passa antes, no `Gate::before`.
+- **Policies**: abilities em **pt-BR** (`ver`/`criar`/`editar`/`excluir`), sempre
+  `hasPermissionTo` — **nunca** `can('recurso.acao')` (o nome cru não é ability de Gate:
+  `register_permission_check_method => false`). O escopo vem do trait
+  `AutorizaPorDepartamento`. **Não tocar** policies/trait/pivôs/contrato sem necessidade.
+- **A matriz é o único escritor de `role_has_permissions`** (página
+  `/admin/matriz-capacidades`). Não crie comando/seeder que escreva essa tabela — ligar
+  capacidade é **cutover manual, por ambiente**.
+- **Fora do `/admin`, nada do POST é confiável**: campos privilegiados (ex.:
+  `departamentos`, `status`) são **forçados/reasseridos no servidor**. O form vem de uma
+  **fonte única** (`App\Filament\Schemas\*Form::schema()`), consumida pelo painel **e**
+  pelo site — o consumidor **não** herda a validação de página do Resource (reaplicar à mão).
+- **Auditoria**: mudanças de autorização e de conteúdo auditado passam pelo helper
+  `App\Support\Autorizacao\AuditoriaAutorizacao` (porta/contexto/diff). Em `/minha-conta`
+  a porta `'perfil'` é marcada **explicitamente** (não há painel Filament ali).
 
 ## Como trabalhar (workflow)
 

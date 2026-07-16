@@ -43,12 +43,22 @@ admin → páginas públicas → dados migrados) antes de seguir para o próximo
 | Mídia/imagens | **Spatie Media Library**: guarda o **original preservado** no disco (capado a ≤2000px no lado maior; ≤1200px na coleção `og`) + conversões **WebP** (`web` e `thumb`, síncronas) geradas pelo trait `App\Models\Concerns\RegistraImagensPadrao`; upload múltiplo e reordenável no Filament | Mantém o arquivo de origem como fallback/reprocessamento; o site consome só as conversões WebP otimizadas; padrão Laravel, reutilizável por qualquer model `HasMedia` |
 | Biblioteca de mídia | **Sobre a Media Library (Opção B):** pool central, imagens **referenciadas por URL** (não posse do post); dedup por hash; tool "Inserir da biblioteca" no editor | Um só sistema de mídia; reusa cap+conversões; **generaliza o fix do corpo** (referência → some a classe de bug do editor); Curator traria 2º sistema sem ganho turnkey no editor |
 | Referência de mídia portável | Mídia usada **no conteúdo** é servida por **rota estável do app** (resolve o storage atual), não por caminho cru `/storage/...` | Permite migrar o storage (S3/CDN) no futuro **sem quebrar** as imagens já dentro dos posts |
+| Autorização — 2 eixos | **VISIBILIDADE** ("quem vê") × **CAPACIDADE** ("quem edita") são mecanismos **distintos** | Achatá-los num "papel" só (como o WP fazia) foi a origem da confusão; separados, cada um evolui sozinho |
+| Painel × site | O **`/admin` é exclusivo de administrador**; o não-admin (diretor/colaborador) edita **pelo site**, em `/minha-conta` | Painel é ferramenta de governança; a casa não precisa treinar diretor em wp-admin. O site já é o ambiente deles |
+| Capacidade de escrita | **3 condições, fail-closed**: capacidade (papel→permissão) **+** vínculo do usuário a um departamento **+** o objeto pertencer a um departamento em comum | Delegação real por departamento sem inventar hierarquia; faltando qualquer uma, nega |
+| Matriz papel×capacidade | Tela dedicada (`/admin/matriz-capacidades`) é o **único escritor** de `role_has_permissions`; ligar capacidade é **cutover manual por ambiente** | Uma fonte de verdade auditável; nenhum seeder/comando liga permissão pelas costas |
+| Fonte única do formulário | O schema do form (`App\Filament\Schemas\*Form::schema()`) é **um só**, consumido pelo painel **e** pelo site | O mesmo campo/regra não pode divergir entre as duas superfícies |
+| Campos privilegiados | Fora do `/admin`, `departamentos`/`status` são **forçados/reasseridos no servidor** — nunca vindos do POST | Impede escalonamento de privilégio por payload forjado |
+| Auditoria | `spatie/laravel-activitylog`, trilha **append-only**, com **porta** (`admin`/`sistema`/`perfil`) + IP + user-agent | Saber **quem** mudou **o quê**, **de onde** — sem depender de log de aplicação |
 
 Desde o 1º ciclo (Palestras), o projeto já entregou ponta a ponta os módulos
 Palestrantes, Calendário de Palestras, Agenda Reforma Íntima, Blog "Sementeira
-de Luz" + Biblioteca de Mídia, Usuários (estrutura organizacional e papéis),
-Autenticação, Minha Conta, e-mail transacional e o tema do painel `/admin`. O
-estado fase a fase vive em [ROADMAP.md](ROADMAP.md).
+de Luz" + Biblioteca de Mídia, **Eventos** (+ calendário unificado e feed `.ics`),
+Usuários (estrutura organizacional e papéis), Autenticação, Minha Conta, e-mail
+transacional, o tema do painel `/admin` e o **modelo de capacidades** — a
+autorização de escrita ponta a ponta (matriz papel×capacidade, departamento como
+filtro de objeto, auditoria append-only e a edição de conteúdo pelo próprio site,
+com a Agenda como piloto). O estado fase a fase vive em [ROADMAP.md](ROADMAP.md).
 
 ## Inventário de conteúdo (do site atual, via REST)
 

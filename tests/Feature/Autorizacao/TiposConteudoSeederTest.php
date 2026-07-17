@@ -101,4 +101,57 @@ class TiposConteudoSeederTest extends TestCase
 
         $seeder->run();
     }
+
+    /**
+     * A guarda (A1). Sem ela, semear com `departamentos` vazia devolveria [] em silêncio ⇒
+     * sync([]) ⇒ tipo com ZERO responsáveis ⇒ e o insert-only congelaria: resemear não repara.
+     * Em prod (§13.1 manda rodar o seeder no cutover) o sintoma seria "ninguém edita nada", sem
+     * erro no log. O lugar de explodir é o SEEDER, não a autorização.
+     */
+    public function test_semente_com_departamentos_ausentes_falha_explicitamente(): void
+    {
+        Departamento::query()->delete();   // o cutover rodado antes de os departamentos existirem
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('DED');
+
+        $this->seed(TiposConteudoSeeder::class);
+    }
+
+    /** O vetor realista: alguém RENOMEIA uma sigla no /admin e o seeder passa a não resolvê-la. */
+    public function test_sigla_ausente_e_nomeada_na_mensagem_sem_citar_as_presentes(): void
+    {
+        Departamento::where('sigla', 'DECOM')->delete();   // só o DECOM some; o DED continua lá
+
+        // A captura guarda só a mensagem: $this->fail() dentro do catch seria engolido por ele —
+        // AssertionFailedError do PHPUnit ESTENDE RuntimeException, e o teste ficaria falso-verde.
+        $mensagem = null;
+        try {
+            $this->seed(TiposConteudoSeeder::class);
+        } catch (\RuntimeException $e) {
+            $mensagem = $e->getMessage();
+        }
+
+        $this->assertNotNull($mensagem, 'esperava RuntimeException: a semente pede DECOM, que não existe');
+        $this->assertStringContainsString('DECOM', $mensagem, 'a sigla ausente tem de ser nomeada');
+        $this->assertStringNotContainsString('DED,', $mensagem, 'o DED existe — não pode ser acusado');
+    }
+
+    /** A guarda NÃO pode alcançar o Evento: siglas [] sai antes de consultar Departamento. */
+    public function test_evento_sem_responsaveis_nao_dispara_a_guarda(): void
+    {
+        Departamento::query()->delete();
+
+        $seeder = new class extends TiposConteudoSeeder
+        {
+            protected function recursos(): array
+            {
+                return ['evento'];
+            }
+        };
+        $seeder->run();
+
+        $this->assertSame(RegimeAcesso::PorRegistro, TipoConteudo::where('recurso', 'evento')->first()->regime);
+        $this->assertSame([], $this->siglasDe('evento'));
+    }
 }

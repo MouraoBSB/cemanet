@@ -9,6 +9,7 @@ use App\Models\Departamento;
 use App\Models\Evento;
 use App\Models\User;
 use Database\Seeders\CapacidadesSeeder;
+use Database\Seeders\EstruturaCemaSeeder;
 use Database\Seeders\TiposConteudoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
@@ -24,6 +25,9 @@ class EventoPolicyCapacidadeTest extends TestCase
         parent::setUp();
         Role::findOrCreate('administrador', 'web');
         $this->seed(CapacidadesSeeder::class);
+        // Os 8 departamentos ANTES da semente da config: o TiposConteudoSeeder resolve os
+        // responsáveis por sigla e falha explicitamente se alguma não existir (A1).
+        (new EstruturaCemaSeeder)->run();
         $this->seed(TiposConteudoSeeder::class);
     }
 
@@ -46,9 +50,10 @@ class EventoPolicyCapacidadeTest extends TestCase
         return $u;
     }
 
+    /** Resolve o departamento semeado pelo EstruturaCemaSeeder (não cria: violaria o unique de sigla/slug). */
     private function depto(string $sigla): Departamento
     {
-        return Departamento::create(['sigla' => $sigla, 'nome' => $sigla, 'slug' => strtolower($sigla)]);
+        return Departamento::where('sigla', $sigla)->firstOrFail();
     }
 
     private function evento(string $slug, array $departamentoIds = []): Evento

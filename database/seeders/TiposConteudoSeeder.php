@@ -54,10 +54,32 @@ class TiposConteudoSeeder extends Seeder
         return GlossarioCapacidades::RECURSOS;
     }
 
+    /**
+     * Resolve as siglas da semente. Sigla que não existe é BUG DE AMBIENTE e explode aqui — o
+     * lugar de explodir é o seeder, não a autorização (mesmo princípio do "recurso sem semente").
+     *
+     * Sem esta guarda o whereIn devolveria [] em silêncio ⇒ sync([]) ⇒ tipo com zero responsáveis
+     * ⇒ e o insert-only CONGELA esse estado (resemear não repara; só a tela). Como o cutover de
+     * prod roda este seeder, rodá-lo antes de os departamentos existirem — ou depois de alguém
+     * renomear uma sigla no /admin — gravaria fail-closed sem um erro no log: "ninguém edita
+     * nada", irreparável por reseed.
+     */
     private function idsPorSigla(array $siglas): array
     {
         if ($siglas === []) {
             return [];
+        }
+
+        $encontrados = Departamento::whereIn('sigla', $siglas)->pluck('sigla')->all();
+
+        if (count($encontrados) !== count($siglas)) {
+            $ausentes = implode(', ', array_diff($siglas, $encontrados));
+
+            throw new RuntimeException(
+                "Sigla(s) da semente ausente(s) em departamentos: {$ausentes}. ".
+                'Rode o EstruturaCemaSeeder antes — semear assim gravaria o tipo sem responsáveis, '.
+                'e o insert-only impediria o reparo por reseed.'
+            );
         }
 
         return Departamento::whereIn('sigla', $siglas)->pluck('departamentos.id')->all();

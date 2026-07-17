@@ -9,6 +9,7 @@ use App\Models\AgendaDia;
 use App\Models\Departamento;
 use App\Models\User;
 use Database\Seeders\EstruturaCemaSeeder;
+use Database\Seeders\TiposConteudoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Spatie\Permission\Models\Permission;
@@ -23,6 +24,7 @@ class AgendaContaEditarExcluirTest extends TestCase
     {
         parent::setUp();
         $this->seed(EstruturaCemaSeeder::class);
+        $this->seed(TiposConteudoSeeder::class);   // config de acesso por tipo (agenda => DED+DECOM)
         foreach (['agenda.ver', 'agenda.criar', 'agenda.editar', 'agenda.excluir'] as $p) {
             Permission::findOrCreate($p, 'web');
         }
@@ -64,15 +66,20 @@ class AgendaContaEditarExcluirTest extends TestCase
         $this->assertSame($deptosAntes, $ag->departamentos()->pluck('departamentos.id')->sort()->values()->all());
     }
 
-    public function test_editar_registro_de_outro_departamento_e_negado(): void
+    /**
+     * Era test_editar_registro_de_outro_departamento_e_negado. Sob o regime "do tipo" o pivô do
+     * objeto não é consultado ⇒ o responsável (DECOM) edita o dia de pivô DED. §10.3 "Pivô ignorado".
+     */
+    public function test_editar_registro_de_pivo_disjunto_e_permitido_ao_responsavel(): void
     {
         $user = $this->editorDe('DECOM');
-        $this->agendaEm(['DECOM']); // registro no próprio escopo → mount() passa; o 403 vem do authorize() da AÇÃO
-        $alheio = $this->agendaEm(['DED']); // sem interseção com DECOM
+        $this->agendaEm(['DECOM']); // mantém o mount() passando: a aba só deixa de consultar registro na Task 3
+        $alheio = $this->agendaEm(['DED']); // pivô disjunto do usuário — e irrelevante no "do tipo"
 
         Livewire::actingAs($user)->test(AgendaConta::class)
             ->call('editar', $alheio->id)
-            ->assertForbidden();
+            ->assertSet('editandoId', $alheio->id)
+            ->assertSet('mostrandoForm', true);
     }
 
     public function test_excluir_remove_registro_do_escopo(): void
@@ -87,16 +94,17 @@ class AgendaContaEditarExcluirTest extends TestCase
         $this->assertDatabaseMissing('agenda_dias', ['id' => $ag->id]);
     }
 
-    public function test_excluir_registro_de_outro_departamento_e_negado(): void
+    /** Era test_excluir_registro_de_outro_departamento_e_negado. Idem: o pivô não fecha nada. */
+    public function test_excluir_registro_de_pivo_disjunto_e_permitido_ao_responsavel(): void
     {
         $user = $this->editorDe('DECOM');
-        $this->agendaEm(['DECOM']); // registro no próprio escopo → mount() passa; o 403 vem do authorize() da AÇÃO
+        $this->agendaEm(['DECOM']); // mantém o mount() passando: a aba só deixa de consultar registro na Task 3
         $alheio = $this->agendaEm(['DED']);
 
         Livewire::actingAs($user)->test(AgendaConta::class)
             ->call('excluir', $alheio->id)
-            ->assertForbidden();
+            ->assertHasNoErrors();
 
-        $this->assertDatabaseHas('agenda_dias', ['id' => $alheio->id]);
+        $this->assertDatabaseMissing('agenda_dias', ['id' => $alheio->id]);
     }
 }

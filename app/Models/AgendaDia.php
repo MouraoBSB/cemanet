@@ -4,7 +4,9 @@
 
 namespace App\Models;
 
+use App\Enums\RegimeAcesso;
 use App\Models\Contracts\TemDepartamento;
+use App\Support\Autorizacao\AcessoPorTipo;
 use App\Support\Autorizacao\AuditoriaAutorizacao;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -49,10 +51,26 @@ class AgendaDia extends Model implements TemDepartamento
     }
 
     /**
-     * AgendaDia cujos departamentos intersectam os do usuário (filtro de objeto A/B).
-     * Fail-closed: usuário sem departamento ⇒ nenhum registro.
+     * AgendaDia no escopo do usuário, por REGIME (Camada 1):
+     * - "do tipo": TUDO-OU-NADA — responsável vê todos os registros (o pivô não é consultado);
+     * - "por registro": o filtro de objeto de sempre (interseção de departamentos).
+     * Fail-closed: recurso sem linha em tipos_conteudo ⇒ nenhum registro (I1/I2).
      */
     public function scopeNoEscopoDe(Builder $query, User $user): Builder
+    {
+        $acesso = app(AcessoPorTipo::class);
+
+        return match ($acesso->regime('agenda')) {
+            RegimeAcesso::DoTipo => $acesso->usuarioHabilitadoNoTipo($user, 'agenda')
+                ? $query
+                : $query->whereRaw('1 = 0'),
+            RegimeAcesso::PorRegistro => $this->escopoPorRegistro($query, $user),
+            null => $query->whereRaw('1 = 0'),
+        };
+    }
+
+    /** Regime "por registro": o corpo de sempre, intacto. */
+    private function escopoPorRegistro(Builder $query, User $user): Builder
     {
         $ids = $user->departamentos()->pluck('departamentos.id')->all();
 

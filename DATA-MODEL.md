@@ -463,17 +463,18 @@ Tabela padrão do pacote (migrations `2026_07_13_191455/56/57`): `log_name`, `de
 ### Edição pelo site (`/minha-conta`) — piloto da Agenda (Fase D)
 
 Rota `conta.agenda` (`/minha-conta/agenda`); aba condicional (capacidade `agenda.ver`
-**+** existir registro no escopo). O form vem da **fonte única**
-`App\Filament\Schemas\AgendaDiaForm::schema(bool $comDepartamentos = true)` — o painel usa
-o default; **o site chama com `false`** (o campo privilegiado fica **ausente** do schema).
+**+** o usuário ser **responsável pelo tipo** — a Camada 1 revogou, no §6.3, a "decisão 1"
+da Fase D, que exigia existir registro no escopo). O form vem da **fonte única**
+`App\Filament\Schemas\AgendaDiaForm::schema()` — **sem parâmetro**: o campo
+`departamentos` não existe mais no schema, nem no painel nem no site.
 
-**2 campos privilegiados, forçados no servidor** (nunca do POST):
-- **`departamentos`** — na **criação**, todo `AgendaDia` nasce nos **mantenedores da
-  Agenda** (`App\Support\Agenda\AgendaMantenedores` = **DED + DECOM**, por sigla),
-  independente do autor (senão o conteúdo criado por um seria invisível ao outro); na
-  **edição**, **preservados** (o não-admin não reassocia).
+**1 campo privilegiado, forçado no servidor** (nunca do POST):
 - **`status`** — reasserido contra o enum; quem tem `agenda.criar` mas **não**
   `agenda.editar` só cria **rascunho**.
+
+O `departamentos` **deixou de ser gravado**: o pivô `departamento_agenda_dia` está
+**congelado** (§6.4 da Camada 1) — nem lido, nem gravado, nada apagado. Quem responde pela
+Agenda vem da **Configuração de acesso por tipo**, não do registro.
 
 ## Agenda
 

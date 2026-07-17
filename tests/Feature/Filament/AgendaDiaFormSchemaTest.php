@@ -18,18 +18,13 @@ class AgendaDiaFormSchemaTest extends TestCase
         );
     }
 
-    public function test_schema_padrao_inclui_departamentos(): void
+    /**
+     * Trava anti-regressão: 'departamentos' é campo privilegiado e NÃO pode voltar ao form.
+     * A Agenda está no regime "do tipo" — o pivô do registro não é lido nem gravado (§6.4), e
+     * o schema é o MESMO no painel e no site (o parâmetro do toggle deixou de existir).
+     */
+    public function test_schema_nao_expoe_departamentos(): void
     {
-        $this->assertTrue($this->temSelectDepartamentos(AgendaDiaForm::schema()));
-    }
-
-    public function test_schema_do_site_omite_departamentos(): void
-    {
-        $comDeptos = AgendaDiaForm::schema(comDepartamentos: true);
-        $semDeptos = AgendaDiaForm::schema(comDepartamentos: false);
-
-        // O site tem exatamente 1 componente a menos (o Select departamentos) e não o contém.
-        $this->assertCount(count($comDeptos) - 1, $semDeptos);
-        $this->assertFalse($this->temSelectDepartamentos($semDeptos), 'O schema do site NÃO deve incluir departamentos.');
+        $this->assertFalse($this->temSelectDepartamentos(AgendaDiaForm::schema()));
     }
 }

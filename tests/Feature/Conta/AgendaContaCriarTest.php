@@ -9,6 +9,7 @@ use App\Models\AgendaDia;
 use App\Models\Departamento;
 use App\Models\User;
 use Database\Seeders\EstruturaCemaSeeder;
+use Database\Seeders\TiposConteudoSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Livewire;
@@ -24,6 +25,7 @@ class AgendaContaCriarTest extends TestCase
     {
         parent::setUp();
         $this->seed(EstruturaCemaSeeder::class);
+        $this->seed(TiposConteudoSeeder::class);   // config de acesso por tipo (agenda => DED+DECOM)
         foreach (['agenda.ver', 'agenda.criar', 'agenda.editar', 'agenda.excluir'] as $p) {
             Permission::findOrCreate($p, 'web');
         }
@@ -42,10 +44,15 @@ class AgendaContaCriarTest extends TestCase
         return $user;
     }
 
-    public function test_criar_forca_departamentos_ded_e_decom(): void
+    /**
+     * Era test_criar_forca_departamentos_ded_e_decom. Sob o regime "do tipo" o AgendaDia criado
+     * pelo site nasce SEM pivô (§6.4/decisão 7) e o responsável o edita assim mesmo (I9) — o
+     * objeto não tem escopo próprio. Complementa test_i9_... (CamadaUmFiltroPorTipoTest), que
+     * parte da factory: aqui o registro nasce pela UI.
+     */
+    public function test_criar_nasce_sem_pivo_e_o_responsavel_edita(): void
     {
         $user = $this->editorDecom(['agenda.ver', 'agenda.criar', 'agenda.editar']);
-        $mantenedores = Departamento::whereIn('sigla', ['DED', 'DECOM'])->pluck('id')->sort()->values()->all();
 
         Livewire::actingAs($user)->test(AgendaConta::class)
             ->call('novo')
@@ -59,9 +66,9 @@ class AgendaContaCriarTest extends TestCase
             ->assertHasNoFormErrors();
 
         $novo = AgendaDia::whereDate('data', '2027-03-15')->firstOrFail();
-        $this->assertSame($mantenedores, $novo->departamentos()->pluck('departamentos.id')->sort()->values()->all());
+        $this->assertSame([], $novo->departamentos()->pluck('departamentos.id')->all(), 'nasce sem pivô');
 
-        // §10.7: como nasce DED+DECOM, um diretor de DED edita o registro criado pelo editor de DECOM.
+        // I9: o pivô vazio não impede — um diretor do DED (responsável pela Agenda) edita.
         Role::findByName('diretor', 'web')->syncPermissions(['agenda.ver', 'agenda.criar', 'agenda.editar']);
         $diretorDed = User::factory()->create();
         $diretorDed->assignRole('diretor');
@@ -69,11 +76,14 @@ class AgendaContaCriarTest extends TestCase
         $this->assertTrue(Gate::forUser($diretorDed)->check('editar', $novo));
     }
 
+    /**
+     * O POST continua sem mandar no pivô — só o resultado mudou: antes o servidor forçava
+     * DED+DECOM, agora não grava pivô nenhum (§6.4). O campo forjado segue ignorado.
+     */
     public function test_departamentos_forjado_no_post_e_ignorado(): void
     {
         $user = $this->editorDecom(['agenda.ver', 'agenda.criar', 'agenda.editar']);
-        $das = Departamento::where('sigla', 'DAS')->value('id'); // depto alheio, fora dos mantenedores
-        $mantenedores = Departamento::whereIn('sigla', ['DED', 'DECOM'])->pluck('id')->sort()->values()->all();
+        $das = Departamento::where('sigla', 'DAS')->value('id'); // depto alheio
 
         Livewire::actingAs($user)->test(AgendaConta::class)
             ->call('novo')
@@ -83,8 +93,8 @@ class AgendaContaCriarTest extends TestCase
             ->assertHasNoFormErrors();
 
         $novo = AgendaDia::whereDate('data', '2027-08-08')->firstOrFail();
-        $ids = $novo->departamentos()->pluck('departamentos.id')->sort()->values()->all();
-        $this->assertSame($mantenedores, $ids);              // nasceu DED+DECOM
+        $ids = $novo->departamentos()->pluck('departamentos.id')->all();
+        $this->assertSame([], $ids);                         // o pivô não é gravado
         $this->assertNotContains($das, $ids);                // o depto forjado NÃO entrou
     }
 
@@ -137,7 +147,14 @@ class AgendaContaCriarTest extends TestCase
             ->assertHasFormErrors(['data']);
     }
 
-    public function test_lista_mostra_so_o_escopo_do_usuario(): void
+    /**
+     * Sob o regime "do tipo" a lista é TUDO-OU-NADA: o responsável (DECOM, da semente
+     * agenda ⇒ DED+DECOM) enxerga todos os dias, inclusive os de pivô disjunto. Era
+     * test_lista_mostra_so_o_escopo_do_usuario, cuja premissa (interseção por objeto) a
+     * decisão 4 do §5 matou. O deny do não-responsável continua coberto por
+     * AbaAgendaTest::test_scope_do_tipo_e_tudo_ou_nada (assertSame(0, ...) para o DEPRO).
+     */
+    public function test_lista_mostra_tudo_ao_responsavel(): void
     {
         $user = $this->editorDecom(['agenda.ver', 'agenda.criar']);
         $decom = Departamento::where('sigla', 'DECOM')->value('id');
@@ -150,6 +167,6 @@ class AgendaContaCriarTest extends TestCase
 
         Livewire::actingAs($user)->test(AgendaConta::class)
             ->assertSee('MeuDoDecom')
-            ->assertDontSee('AlheioDoDed');
+            ->assertSee('AlheioDoDed');   // era assertDontSee: o pivô não restringe mais
     }
 }

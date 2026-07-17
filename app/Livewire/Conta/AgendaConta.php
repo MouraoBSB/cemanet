@@ -6,8 +6,6 @@ namespace App\Livewire\Conta;
 
 use App\Filament\Schemas\AgendaDiaForm;
 use App\Models\AgendaDia;
-use App\Models\Departamento;
-use App\Support\Agenda\AgendaMantenedores;
 use App\Support\Autorizacao\AuditoriaAutorizacao;
 use App\Support\Conta\AbaAgenda;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -20,14 +18,14 @@ use Illuminate\View\View;
 use Livewire\Component;
 
 /**
- * Superfície pública da Agenda da Reforma Íntima em /minha-conta: lista escopada ao
- * departamento do usuário + criar/editar/excluir.
+ * Superfície pública da Agenda da Reforma Íntima em /minha-conta: a lista de quem responde
+ * pelo tipo (tudo-ou-nada, §6.3) + criar/editar/excluir.
  *
- * Campos privilegiados NUNCA confiam no POST: `departamentos` é ausente do schema do site
- * (AgendaDiaForm::schema(comDepartamentos: false)) e é forçado no servidor para os
- * mantenedores (DED+DECOM) na criação — a edição PRESERVA os departamentos existentes
- * (não sincroniza); `status` é reasserido contra o enum e travado em rascunho para quem
- * tem agenda.criar mas não agenda.editar (D-F9).
+ * O campo `departamentos` não existe mais no schema (Camada 1) e o registro nasce sem pivô:
+ * a Agenda está no regime "do tipo", em que o pivô não é lido nem gravado (§6.4) — a edição
+ * segue PRESERVANDO o que existir (não sincroniza). O `status` continua sendo campo
+ * privilegiado que NUNCA confia no POST: é reasserido contra o enum e travado em rascunho
+ * para quem tem agenda.criar mas não agenda.editar (D-F9).
  */
 class AgendaConta extends Component implements HasForms
 {
@@ -55,7 +53,7 @@ class AgendaConta extends Component implements HasForms
     public function form(Schema $schema): Schema
     {
         return $schema
-            ->components(AgendaDiaForm::schema(comDepartamentos: false))
+            ->components(AgendaDiaForm::schema())
             ->model($this->editandoId ? AgendaDia::find($this->editandoId) : AgendaDia::class)
             ->statePath('data')
             ->operation($this->editandoId ? 'edit' : 'create');
@@ -176,15 +174,9 @@ class AgendaConta extends Component implements HasForms
         }
 
         try {
-            $registro = AgendaDia::create($dados);
-
-            // Campo privilegiado DEPARTAMENTOS forçado: todo novo AgendaDia nasce DED+DECOM (O1).
-            $idsMantenedores = AgendaMantenedores::ids();
-            $registro->departamentos()->sync($idsMantenedores);
-
-            // Log manual do vínculo depto↔conteúdo (o trait não captura N:N), log_name 'agenda'.
-            $depois = Departamento::whereIn('id', $idsMantenedores)->pluck('nome', 'id')->all();
-            AuditoriaAutorizacao::registrarDepartamentosConteudo($registro, antes: [], depois: $depois);
+            // O AgendaDia nasce SEM pivô de departamento: no regime "do tipo" o objeto não tem
+            // escopo próprio (§6.4/I9) — quem responde pela Agenda vem da config, não do registro.
+            AgendaDia::create($dados);
         } catch (QueryException $e) {
             // O belt dataJaUsada acima cobre o caso comum; este catch fecha a janela TOCTOU
             // entre o SELECT do belt e o INSERT sob concorrência (unique de agenda_dias.data).

@@ -155,13 +155,6 @@ class PalestraResource extends Resource
                         ->multiple()
                         ->searchable()
                         ->preload(),
-                    Select::make('departamentos')
-                        ->label('Departamentos')
-                        ->relationship('departamentos', 'nome')
-                        ->multiple()
-                        ->searchable()
-                        ->preload()
-                        ->required(),
                     Repeater::make('destaques')
                         ->label('Destaques')
                         ->relationship('destaques')

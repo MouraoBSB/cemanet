@@ -16,14 +16,15 @@ use Filament\Schemas\Components\Grid;
  * Fonte única dos CAMPOS do formulário de AgendaDia: rótulos, componentes e regras de campo.
  * Consumido pelo painel (AgendaDiaResource) e pelo componente do site (App\Livewire\Conta\AgendaConta).
  *
- * O campo `departamentos` é PRIVILEGIADO (§5/§7 do spec): no site ele é AUSENTE do schema
- * (comDepartamentos: false) e o servidor força o valor (DED+DECOM na criação; preservado na edição).
+ * O campo `departamentos` NÃO existe mais aqui (Camada 1): a Agenda está no regime "do tipo",
+ * em que o pivô do registro não é lido nem gravado (§6.4) — quem responde pelo tipo vem da
+ * Configuração de acesso por tipo. Por isso o schema é o MESMO no painel e no site.
  * A sanitização de HTML dos textos já vive no model (mutators clean()), não aqui.
  */
 class AgendaDiaForm
 {
     /** @return array<Component> */
-    public static function schema(bool $comDepartamentos = true): array
+    public static function schema(): array
     {
         $campos = [
             Grid::make(2)->schema([
@@ -60,17 +61,6 @@ class AgendaDiaForm
                 ->label('Sugestão de Prece')
                 ->columnSpanFull(),
         ];
-
-        if ($comDepartamentos) {
-            $campos[] = Select::make('departamentos')
-                ->label('Departamentos')
-                ->relationship('departamentos', 'nome')
-                ->multiple()
-                ->searchable()
-                ->preload()
-                ->required()
-                ->columnSpanFull();
-        }
 
         return $campos;
     }

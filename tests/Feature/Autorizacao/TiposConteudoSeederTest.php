@@ -48,13 +48,14 @@ class TiposConteudoSeederTest extends TestCase
         $this->assertSame(['DED'], $this->siglasDe('palestrante'));
         $this->assertSame(['DECOM'], $this->siglasDe('post'));
         $this->assertSame([], $this->siglasDe('evento'));
+        $this->assertSame(['DECOM', 'DEPAE'], $this->siglasDe('autor_espiritual'));
     }
 
     public function test_regimes_da_semente(): void
     {
         $this->seed(TiposConteudoSeeder::class);
 
-        foreach (['agenda', 'palestra', 'palestrante', 'post'] as $recurso) {
+        foreach (['agenda', 'palestra', 'palestrante', 'post', 'autor_espiritual'] as $recurso) {
             $this->assertSame(RegimeAcesso::DoTipo, TipoConteudo::where('recurso', $recurso)->first()->regime);
         }
 

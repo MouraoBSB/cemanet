@@ -24,7 +24,7 @@ class CapacidadeViaPapelTest extends TestCase
     {
         parent::setUp();
         (new EstruturaCemaSeeder)->run();   // papéis + 8 departamentos
-        $this->seed(CapacidadesSeeder::class); // 20 permissions
+        $this->seed(CapacidadesSeeder::class); // permissions do glossário
         $this->seed(TiposConteudoSeeder::class); // config de acesso por tipo (palestra ⇒ DED)
     }
 

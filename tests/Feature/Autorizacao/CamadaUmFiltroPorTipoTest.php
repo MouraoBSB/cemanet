@@ -36,7 +36,7 @@ class CamadaUmFiltroPorTipoTest extends TestCase
     {
         parent::setUp();
         (new EstruturaCemaSeeder)->run();      // 8 departamentos + papéis
-        $this->seed(CapacidadesSeeder::class); // as 20 permissions
+        $this->seed(CapacidadesSeeder::class); // as permissions do glossário
     }
 
     private function idDe(string $sigla): int

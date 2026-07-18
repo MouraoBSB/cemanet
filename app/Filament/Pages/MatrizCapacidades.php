@@ -27,7 +27,7 @@ use Spatie\Permission\Models\Role;
 
 /**
  * Configuração de acesso por tipo (Camada 1) — evolução da matriz papel×capacidade (Fase C).
- * Por tipo: as 20 capacidades × papel (toggles) + o REGIME + os DEPARTAMENTOS RESPONSÁVEIS.
+ * Por tipo: as capacidades do glossário × papel (toggles) + o REGIME + os DEPARTAMENTOS RESPONSÁVEIS.
  * Única escritora de role_has_permissions E da config de acesso (tipos_conteudo) — I8.
  * Admin-only pelo portão do painel. syncPermissions já limpa o cache do spatie (não chamar forget).
  *

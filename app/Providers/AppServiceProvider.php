@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Auth\HasherLegadoCema;
 use App\Importacao\LeitorAgenda;
 use App\Importacao\LeitorAgendaMysql;
+use App\Importacao\LeitorAutoresEspirituais;
+use App\Importacao\LeitorAutoresEspirituaisMysql;
 use App\Importacao\LeitorBlog;
 use App\Importacao\LeitorBlogMysql;
 use App\Importacao\LeitorEventos;
@@ -38,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(LeitorAgenda::class, LeitorAgendaMysql::class);
         $this->app->bind(LeitorEventos::class, LeitorEventosMysql::class);
         $this->app->bind(LeitorUsuarios::class, LeitorUsuariosMysql::class);
+        $this->app->bind(LeitorAutoresEspirituais::class, LeitorAutoresEspirituaisMysql::class);
         $this->app->bind(FonteReflexao::class, ReflexaoConfig::class);
 
         // SCOPED, nunca singleton: o worker (queue:work) não reconstrói o container entre jobs —

@@ -25,7 +25,7 @@ class MatrizCapacidadesTest extends TestCase
     {
         parent::setUp();
         (new EstruturaCemaSeeder)->run();   // 4 papéis (web) + 8 departamentos + cargos
-        $this->seed(CapacidadesSeeder::class); // as 20 permissions (web)
+        $this->seed(CapacidadesSeeder::class); // as permissions do glossário (web)
         $this->seed(TiposConteudoSeeder::class);   // o Select de regime é required (Camada 1/E1)
         $this->actingAsAdmin();
     }

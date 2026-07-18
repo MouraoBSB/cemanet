@@ -32,7 +32,7 @@ class CapacidadeConteudosTest extends TestCase
     {
         parent::setUp();
         Role::findOrCreate('administrador', 'web');
-        $this->seed(CapacidadesSeeder::class); // as 20 permissions (inclui palestrante.*)
+        $this->seed(CapacidadesSeeder::class); // as permissions do glossário (inclui palestrante.*)
         // Os 8 departamentos PRECISAM existir antes da semente da config: o TiposConteudoSeeder
         // resolve responsável por sigla e, com a tabela vazia, gravaria zero responsáveis SEM
         // erro — e o insert-only congelaria esse estado (resemear não repara).

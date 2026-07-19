@@ -16,6 +16,11 @@
         color: #fff;
     }
 
+    /* Avatar do card de autor (sem foto): consome o gradiente de cema-grad-{n}. */
+    .cema-autor-avatar {
+        background: var(--grad, linear-gradient(140deg, var(--color-primary), var(--color-footer-bg)));
+    }
+
     /* Trecho com número de linhas configurável por variante (--linhas). */
     .cema-msg-trecho {
         display: -webkit-box;

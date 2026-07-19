@@ -25,13 +25,18 @@
         overflow: hidden;
     }
 
-    /* ===== Prosa de leitura dos corpos (single) — Roboto Slab 300, respiro alto ===== */
+    /* ===== Prosa de leitura dos corpos (single) — Roboto Slab 300, respiro alto =====
+       O tamanho responde ao controle A−/A+ (Alpine grava --tamanho-prosa no container). */
     .cema-msg-prose {
         font-family: var(--font-serif);
         font-weight: 300;
-        font-size: 17px;
+        font-size: var(--tamanho-prosa, 17px);
         line-height: 1.95;
         color: #3a3553;
+        transition: font-size .18s ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .cema-msg-prose { transition: none; }
     }
     .cema-msg-prose p { margin-bottom: 1.2em; }
     .cema-msg-prose p:last-child { margin-bottom: 0; }
@@ -47,6 +52,13 @@
         border-left: 3px solid var(--color-gold);
         color: #4a4663;
         font-style: italic;
+    }
+
+    /* ===== Galeria da pictografia (single) — grid fluido de digitalizações ===== */
+    .cema-pictografia-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 20px;
     }
 
     /* ===== Envelope dourado animado do hero (x-mensagem.envelope-hero) ===== */

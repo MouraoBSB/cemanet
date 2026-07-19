@@ -1,12 +1,14 @@
 @props(['autor'])
 
-{{-- Card de autor (grade inteira clicável). Foto 3:4 ou iniciais + gradiente cema-grad-{id%8}
+{{-- Requer: $autor com mensagens_publicas_count e a relação mensagens já pré-filtrada
+     por publica() (senão vaza formatos de restritas).
+     Card de autor (grade inteira clicável). Foto 3:4 ou iniciais + gradiente cema-grad-{id%8}
      (O4). Contagem SÓ das públicas (B1 — nunca Str::plural) + pontinhos de formatos distintos
      das públicas (mensagens já vem eager-load filtrado por publica() no controller — sem N+1).
      Sem curtir/coluna curtidas (F5). --}}
 @php
     $contagem = $autor->mensagens_publicas_count ?? 0;
-    $formatos = $autor->mensagens->pluck('formato')->unique();
+    $formatos = $autor->mensagens->pluck('formato')->filter()->unique();
     $corPonto = fn (\App\Enums\FormatoMensagem $formato): string => match ($formato) {
         \App\Enums\FormatoMensagem::Psicografia => '#8f83d6',
         \App\Enums\FormatoMensagem::Psicofonia => '#6E9FCB',

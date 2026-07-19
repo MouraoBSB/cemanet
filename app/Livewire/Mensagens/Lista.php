@@ -46,7 +46,7 @@ class Lista extends Component
 
     public function removerFiltro(string $chave): void
     {
-        $mapa = ['de' => 'dataDe', 'ate' => 'dataAte', 'autor' => 'autor', 'ordenar' => 'ordenar'];
+        $mapa = ['de' => 'dataDe', 'ate' => 'dataAte', 'autor' => 'autor'];
         if (isset($mapa[$chave])) {
             $this->reset($mapa[$chave]);
             $this->resetPage();

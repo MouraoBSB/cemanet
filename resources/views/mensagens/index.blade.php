@@ -1,7 +1,6 @@
 <x-layout.app title="Mensagens Mediúnicas"
               description="Mensagens psicografadas, psicofônicas e pictográficas recebidas na mediunidade do CEMA.">
     @php
-        $totalPublicas = \App\Models\Mensagem::publica()->count();
         $breadcrumbJsonLd = [
             '@context' => 'https://schema.org',
             '@type' => 'BreadcrumbList',

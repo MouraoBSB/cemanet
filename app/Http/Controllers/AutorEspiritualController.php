@@ -43,7 +43,8 @@ class AutorEspiritualController extends Controller
         $autor = AutorEspiritual::query()->ativo()->where('slug', $slug)->firstOrFail();
 
         // Só as PÚBLICAS; ordem "recentes" (data desc, nulos por último) em PHP (portável).
-        $publicas = $autor->mensagens()->publica()->with('media')->get()
+        // with('autores'): o card variante=perfil renderiza iniciais/nomes dos autores (evita N+1).
+        $publicas = $autor->mensagens()->publica()->with(['media', 'autores'])->get()
             ->sortByDesc(fn (Mensagem $m) => $m->data_recebimento?->getTimestamp() ?? PHP_INT_MIN)
             ->values();
 

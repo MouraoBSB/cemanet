@@ -50,6 +50,7 @@ class ResumoAutor
     public function porFormato(): Collection
     {
         return $this->mensagens
+            ->filter(fn (Mensagem $m) => $m->formato !== null)
             ->groupBy(fn (Mensagem $m) => $m->formato->value)
             ->map(function (Collection $grupo, string $valor) {
                 $formato = FormatoMensagem::from($valor);

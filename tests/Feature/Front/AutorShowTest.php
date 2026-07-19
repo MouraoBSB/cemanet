@@ -38,6 +38,14 @@ class AutorShowTest extends TestCase
         $res->assertDontSee('Restrita do Autor');
     }
 
+    public function test_mensagem_com_formato_null_nao_causa_500(): void
+    {
+        $a = AutorEspiritual::factory()->create(['ativo' => true, 'slug' => 'sem-formato-autor']);
+        Mensagem::factory()->publica()->create(['formato' => null])->autores()->sync([$a->id]);
+
+        $this->get(route('autores.show', 'sem-formato-autor'))->assertOk();
+    }
+
     public function test_sem_curtir_e_com_link_login(): void
     {
         $a = AutorEspiritual::factory()->create(['ativo' => true, 'slug' => 'x']);

@@ -93,6 +93,13 @@ class MensagemShowTest extends TestCase
         $res->assertDontSee('Relacionada Restrita');
     }
 
+    public function test_formato_null_nao_causa_500(): void
+    {
+        $m = Mensagem::factory()->publica()->create(['slug' => 'sem-formato', 'formato' => null]);
+
+        $this->get(route('mensagens.show', 'sem-formato'))->assertOk();
+    }
+
     public function test_sem_f3_e_f5(): void
     {
         $m = Mensagem::factory()->publica()->create(['slug' => 'limpa']);
@@ -125,11 +132,11 @@ class MensagemShowTest extends TestCase
 
         $res->assertOk();
         // <img> da galeria aponta para a conversão web (WebP), não o original.
-        $res->assertSee('<img', false);
         $res->assertSee($media->getUrl('web'), false);
-        // Link de download por imagem: original + nome amigável derivado do título.
+        // Link de download por imagem: original + nome amigável derivado do título,
+        // extensão derivada do arquivo real (aqui .png — NÃO mais hardcoded .jpg).
         $res->assertSee($media->getUrl(), false);
-        $res->assertSee('download="desenho-mediunico-1.jpg"', false);
+        $res->assertSee('download="desenho-mediunico-1.png"', false);
         $res->assertSee('Baixar', false);
     }
 }

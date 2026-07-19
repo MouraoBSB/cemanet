@@ -41,7 +41,7 @@
                 </nav>
 
                 <div class="mt-7 flex flex-wrap items-center gap-3">
-                    <p class="font-mono text-[11.5px] uppercase tracking-[0.16em] text-[#9db8e0]">Mensagem Mediúnica · {{ $mensagem->formato->rotulo() }}</p>
+                    <p class="font-mono text-[11.5px] uppercase tracking-[0.16em] text-[#9db8e0]">Mensagem Mediúnica · {{ $mensagem->formato?->rotulo() }}</p>
                     <span class="inline-flex items-center gap-1.5 rounded-pill bg-white/12 px-3 py-1 font-mono text-[10.5px] font-medium uppercase tracking-[0.08em] text-white/85">
                         <span class="size-[7px] rounded-full bg-[#8fb4dc]" aria-hidden="true"></span>Pública
                     </span>
@@ -71,7 +71,7 @@
                         </span>
                     @endif
 
-                    <span class="inline-flex items-center rounded-pill border border-white/18 bg-white/10 px-4 py-2 font-mono text-[10.5px] uppercase tracking-[0.08em] text-white/80">{{ $mensagem->formato->rotulo() }}</span>
+                    <span class="inline-flex items-center rounded-pill border border-white/18 bg-white/10 px-4 py-2 font-mono text-[10.5px] uppercase tracking-[0.08em] text-white/80">{{ $mensagem->formato?->rotulo() }}</span>
                     <span class="font-mono text-[11px] uppercase tracking-[0.14em] text-white/55">CEMA</span>
                 </div>
             </div>
@@ -180,7 +180,7 @@
                                             <span class="mt-1 size-2 shrink-0 rounded-full bg-[#8fb4dc]" aria-hidden="true"></span>
                                             <span class="min-w-0">
                                                 <span class="block truncate text-[13.5px] font-medium text-text-ink group-hover:text-primary">{{ $item->titulo }}</span>
-                                                <span class="mt-0.5 block font-mono text-[10.5px] uppercase tracking-[0.05em] text-text-muted">{{ $item->formato->rotulo() }}</span>
+                                                <span class="mt-0.5 block font-mono text-[10.5px] uppercase tracking-[0.05em] text-text-muted">{{ $item->formato?->rotulo() }}</span>
                                             </span>
                                         </a>
                                     </li>

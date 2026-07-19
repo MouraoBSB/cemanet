@@ -63,7 +63,7 @@ class MensagemSeoTest extends TestCase
         $resp->assertSee('content="'.$urlWeb.'"', false);
     }
 
-    public function test_og_image_ausente_quando_psicografia_sem_midia(): void
+    public function test_og_image_ausente_sem_pictografia(): void
     {
         $m = Mensagem::factory()->publica()->create(['slug' => 'psico-sem-midia', 'formato' => 'psicografia']);
 

@@ -43,6 +43,11 @@ class AutorEspiritual extends Model implements HasMedia, TemDepartamento
         return $this->belongsToMany(Departamento::class, 'departamento_autor_espiritual', 'autor_espiritual_id', 'departamento_id');
     }
 
+    public function mensagens(): BelongsToMany
+    {
+        return $this->belongsToMany(Mensagem::class, 'mensagem_autor_espiritual', 'autor_espiritual_id', 'mensagem_id');
+    }
+
     public function registerMediaCollections(): void
     {
         // Tratamento padrão de imagem (trait RegistraImagensPadrao): disco public, WebP web + miniatura.

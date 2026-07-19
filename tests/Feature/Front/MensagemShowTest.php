@@ -7,11 +7,15 @@ namespace Tests\Feature\Front;
 use App\Models\AutorEspiritual;
 use App\Models\Mensagem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class MensagemShowTest extends TestCase
 {
     use RefreshDatabase;
+
+    /** PNG 1x1 mínimo (evita GD real sob carga — flaky conhecido do blog). */
+    private const PNG_1X1 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAC0lEQVQImWNgAAIAAAUAAWJVMogAAAAASUVORK5CYII=';
 
     public function test_publica_renderiza_200(): void
     {
@@ -97,5 +101,35 @@ class MensagemShowTest extends TestCase
         foreach (['Nível de acesso', 'Mensagem direcionada', 'Favoritar', 'Curtir'] as $proibido) {
             $res->assertDontSee($proibido);
         }
+    }
+
+    // -----------------------------------------------------------------------
+    // I8: galeria de pictografia (com mídia) + download por imagem
+    // -----------------------------------------------------------------------
+
+    public function test_pictografia_renderiza_galeria_e_download(): void
+    {
+        Storage::fake('public');
+        $m = Mensagem::factory()->publica()->create([
+            'slug' => 'pict-galeria',
+            'titulo' => 'Desenho Mediúnico',
+            'formato' => 'pictografia',
+        ]);
+        $m->addMediaFromString(base64_decode(self::PNG_1X1))
+            ->usingFileName('desenho.png')
+            ->toMediaCollection(Mensagem::COLECAO_PICTOGRAFIA);
+
+        $media = $m->fresh()->getMedia(Mensagem::COLECAO_PICTOGRAFIA)->first();
+
+        $res = $this->get(route('mensagens.show', 'pict-galeria'));
+
+        $res->assertOk();
+        // <img> da galeria aponta para a conversão web (WebP), não o original.
+        $res->assertSee('<img', false);
+        $res->assertSee($media->getUrl('web'), false);
+        // Link de download por imagem: original + nome amigável derivado do título.
+        $res->assertSee($media->getUrl(), false);
+        $res->assertSee('download="desenho-mediunico-1.jpg"', false);
+        $res->assertSee('Baixar', false);
     }
 }

@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\AgendaController;
 use App\Http\Controllers\Auth\GoogleController;
+use App\Http\Controllers\AutorEspiritualController;
 use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CalendarioController;
 use App\Http\Controllers\ContaController;
 use App\Http\Controllers\EventoController;
+use App\Http\Controllers\MensagemController;
 use App\Http\Controllers\MidiaController;
 use App\Http\Controllers\PalestraController;
 use App\Http\Controllers\PalestranteController;
@@ -94,6 +96,21 @@ Route::get('/eventos/{slug}/calendario.ics', [EventoController::class, 'calendar
 Route::permanentRedirect('/_evento', '/eventos');
 Route::get('/_evento/{slug}', fn (string $slug) => redirect()->route('eventos.show', ['slug' => $slug], 301))
     ->where('slug', '[a-z0-9-]+');
+
+// Mensagens Mediúnicas (front público — só Públicas). Estáticas antes de {slug}.
+Route::get('/mensagens-mediunicas', [MensagemController::class, 'index'])->name('mensagens.index');
+Route::get('/mensagens-mediunicas/{slug}', [MensagemController::class, 'show'])
+    ->name('mensagens.show')->where('slug', '[a-z0-9-]+');
+
+// Compat 301 do CPT WP 'mensagem-mediunicas' (singular) → base nova (plural).
+Route::permanentRedirect('/mensagem-mediunicas', '/mensagens-mediunicas');
+Route::get('/mensagem-mediunicas/{slug}', fn (string $slug) => redirect()->route('mensagens.show', ['slug' => $slug], 301))
+    ->where('slug', '[a-z0-9-]+');
+
+// Autores Espirituais (perfil por slug, sem .ics).
+Route::get('/autores-espirituais', [AutorEspiritualController::class, 'index'])->name('autores.index');
+Route::get('/autores-espirituais/{slug}', [AutorEspiritualController::class, 'show'])
+    ->name('autores.show')->where('slug', '[a-z0-9-]+');
 
 // Agenda Reforma Íntima (devocional diário). Estáticas antes de {data}.
 Route::get('/agenda-reforma-intima', [AgendaController::class, 'index'])->name('agenda.index');

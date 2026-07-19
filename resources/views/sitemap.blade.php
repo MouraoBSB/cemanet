@@ -65,4 +65,38 @@
         <changefreq>daily</changefreq>
         <priority>0.8</priority>
     </url>
+
+    {{-- Mensagens Mediúnicas — listagem principal --}}
+    <url>
+        <loc>{{ route('mensagens.index') }}</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    {{-- Mensagens públicas --}}
+    @foreach ($mensagens as $m)
+    <url>
+        <loc>{{ route('mensagens.show', $m->slug) }}</loc>
+        <lastmod>{{ $m->updated_at->toAtomString() }}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    @endforeach
+
+    {{-- Autores Espirituais — listagem principal --}}
+    <url>
+        <loc>{{ route('autores.index') }}</loc>
+        <changefreq>weekly</changefreq>
+        <priority>0.8</priority>
+    </url>
+
+    {{-- Autores ativos com ao menos uma mensagem pública --}}
+    @foreach ($autores as $a)
+    <url>
+        <loc>{{ route('autores.show', $a->slug) }}</loc>
+        <lastmod>{{ $a->updated_at->toAtomString() }}</lastmod>
+        <changefreq>monthly</changefreq>
+        <priority>0.7</priority>
+    </url>
+    @endforeach
 </urlset>

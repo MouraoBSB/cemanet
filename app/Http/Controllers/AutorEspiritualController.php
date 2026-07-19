@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\AutorEspiritual;
 use App\Models\Mensagem;
+use App\Support\AutoresEspirituais\ResumoAutor;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -37,6 +38,31 @@ class AutorEspiritualController extends Controller
 
     public function show(string $slug): View
     {
-        abort(501);   // corpo real na Task 6
+        // O5a: 404 só para autor inativo/inexistente. Autor ativo SEM nenhuma pública
+        // segue acessível por URL direta — 200, grade vazia, stats zerados.
+        $autor = AutorEspiritual::query()->ativo()->where('slug', $slug)->firstOrFail();
+
+        // Só as PÚBLICAS; ordem "recentes" (data desc, nulos por último) em PHP (portável).
+        $publicas = $autor->mensagens()->publica()->with('media')->get()
+            ->sortByDesc(fn (Mensagem $m) => $m->data_recebimento?->getTimestamp() ?? PHP_INT_MIN)
+            ->values();
+
+        $resumo = new ResumoAutor($publicas);
+
+        // Payload enxuto para o Alpine (filtro por formato + ordenação client-side).
+        $itensFiltro = $publicas->map(fn (Mensagem $m) => [
+            'id' => $m->id,
+            'titulo' => $m->titulo,
+            'ts' => $m->data_recebimento?->getTimestamp(),
+            'formato' => $m->formato?->value,
+        ])->values();
+
+        return view('autores.show', [
+            'autor' => $autor,
+            'mensagens' => $publicas,
+            'resumo' => $resumo,
+            'destaque' => $publicas->first(),   // mais recente pública (ou null)
+            'itensFiltro' => $itensFiltro,
+        ]);
     }
 }

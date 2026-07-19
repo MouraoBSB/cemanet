@@ -29,6 +29,47 @@ document.addEventListener('alpine:init', () => {
     }));
 });
 
+// Componente Alpine do perfil de autor: filtro por formato (chips) + ordenação da grade das
+// mensagens públicas, client-side (sem round-trip Livewire). Estende o padrão do
+// `palestranteDetalhe` (que só ordena) somando o filtro por `formato` via x-show.
+document.addEventListener('alpine:init', () => {
+    window.Alpine.data('autorMensagens', (config) => ({
+        formato: 'todos',
+        ordenar: 'recente',
+        itens: config.itens ?? [],
+
+        visivel(id) {
+            if (this.formato === 'todos') {
+                return true;
+            }
+            const item = this.itens.find((i) => i.id === id);
+
+            return item ? item.formato === this.formato : true;
+        },
+
+        get ordemPorId() {
+            const visiveis = this.itens.filter((i) => this.formato === 'todos' || i.formato === this.formato);
+            if (this.ordenar === 'recente') {
+                visiveis.sort((a, b) => (b.ts ?? -Infinity) - (a.ts ?? -Infinity));
+            } else if (this.ordenar === 'antiga') {
+                visiveis.sort((a, b) => (a.ts ?? Infinity) - (b.ts ?? Infinity));
+            } else {
+                visiveis.sort((a, b) => a.titulo.localeCompare(b.titulo, 'pt'));
+            }
+            const mapa = {};
+            visiveis.forEach((i, idx) => {
+                mapa[i.id] = idx;
+            });
+
+            return mapa;
+        },
+
+        ordem(id) {
+            return this.ordemPorId[id] ?? 0;
+        },
+    }));
+});
+
 // Componente Alpine do single de mensagem: barra de progresso de leitura, tamanho do texto
 // (A−/A+ persistido em localStorage), copiar, compartilhar e toast. Client-side puro, sem
 // round-trip Livewire. Respeita prefers-reduced-motion na barra de progresso.

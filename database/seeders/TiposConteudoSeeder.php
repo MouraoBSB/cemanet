@@ -28,6 +28,7 @@ class TiposConteudoSeeder extends Seeder
         'post' => ['regime' => RegimeAcesso::DoTipo, 'siglas' => ['DECOM']],
         'evento' => ['regime' => RegimeAcesso::PorRegistro, 'siglas' => []],
         'autor_espiritual' => ['regime' => RegimeAcesso::DoTipo, 'siglas' => ['DEPAE', 'DECOM']],
+        'mensagem' => ['regime' => RegimeAcesso::DoTipo, 'siglas' => ['DEPAE']],
     ];
 
     public function run(): void

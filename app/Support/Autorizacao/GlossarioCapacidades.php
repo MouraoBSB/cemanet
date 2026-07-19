@@ -7,6 +7,7 @@ namespace App\Support\Autorizacao;
 use App\Models\AgendaDia;
 use App\Models\AutorEspiritual;
 use App\Models\Evento;
+use App\Models\Mensagem;
 use App\Models\Palestra;
 use App\Models\Palestrante;
 use App\Models\Post;
@@ -17,7 +18,7 @@ use App\Models\Post;
  */
 class GlossarioCapacidades
 {
-    public const RECURSOS = ['evento', 'palestra', 'post', 'agenda', 'palestrante', 'autor_espiritual'];
+    public const RECURSOS = ['evento', 'palestra', 'post', 'agenda', 'palestrante', 'autor_espiritual', 'mensagem'];
 
     public const ACOES = ['ver', 'criar', 'editar', 'excluir'];
 
@@ -29,6 +30,7 @@ class GlossarioCapacidades
         'agenda' => 'Agenda do Dia',
         'palestrante' => 'Palestrante',
         'autor_espiritual' => 'Autor Espiritual',
+        'mensagem' => 'Mensagem',
     ];
 
     /** Mapa canônico recurso => model (fonte única). Slug ≠ model em 'agenda' e 'palestrante' — ver :17. */
@@ -39,6 +41,7 @@ class GlossarioCapacidades
         'agenda' => AgendaDia::class,
         'palestrante' => Palestrante::class,
         'autor_espiritual' => AutorEspiritual::class,
+        'mensagem' => Mensagem::class,
     ];
 
     /** Rótulos legíveis das ações. */
@@ -49,7 +52,7 @@ class GlossarioCapacidades
         'excluir' => 'Excluir',
     ];
 
-    /** @return list<string> os 24 nomes "recurso.acao". */
+    /** @return list<string> os 28 nomes "recurso.acao". */
     public static function permissions(): array
     {
         $nomes = [];

@@ -56,9 +56,11 @@ class MensagemSeoTest extends TestCase
             ->toMediaCollection(Mensagem::COLECAO_PICTOGRAFIA);
 
         $resp = $this->get(route('mensagens.show', 'pict-com-midia'));
+        $urlWeb = $m->fresh()->getFirstMediaUrl(Mensagem::COLECAO_PICTOGRAFIA, 'web');
 
         $resp->assertOk();
         $resp->assertSee('property="og:image"', false);
+        $resp->assertSee('content="'.$urlWeb.'"', false);
     }
 
     public function test_og_image_ausente_quando_psicografia_sem_midia(): void

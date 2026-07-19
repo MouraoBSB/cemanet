@@ -56,9 +56,11 @@ class AutorSeoTest extends TestCase
             ->toMediaCollection(AutorEspiritual::COLECAO_FOTO);
 
         $resp = $this->get(route('autores.show', 'com-foto'));
+        $urlWeb = $a->fresh()->foto_url;
 
         $resp->assertOk();
         $resp->assertSee('property="og:image"', false);
+        $resp->assertSee('content="'.$urlWeb.'"', false);
     }
 
     public function test_og_image_ausente_quando_autor_sem_foto(): void

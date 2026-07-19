@@ -1,0 +1,106 @@
+/* Mensagens Mediúnicas — front público (lista/single/perfil).
+   Thiago Mourão — https://github.com/MouraoBSB — 2026-07-19 */
+
+@layer components {
+    /* ===== Card de mensagem (grade e lista): hover eleva + CTA vira roxo ===== */
+    .cema-msg-card {
+        transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    .cema-msg-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 40px rgba(46, 41, 82, .18);
+        border-color: #e2d9c2;
+    }
+    .cema-msg-card:hover .cema-msg-cta {
+        background-color: var(--color-primary);
+        color: #fff;
+    }
+
+    /* Trecho com número de linhas configurável por variante (--linhas). */
+    .cema-msg-trecho {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: var(--linhas, 2);
+        line-clamp: var(--linhas, 2);
+        overflow: hidden;
+    }
+
+    /* ===== Prosa de leitura dos corpos (single) — Roboto Slab 300, respiro alto ===== */
+    .cema-msg-prose {
+        font-family: var(--font-serif);
+        font-weight: 300;
+        font-size: 17px;
+        line-height: 1.95;
+        color: #3a3553;
+    }
+    .cema-msg-prose p { margin-bottom: 1.2em; }
+    .cema-msg-prose p:last-child { margin-bottom: 0; }
+    .cema-msg-prose h3 {
+        margin: 1.4em 0 .6em;
+        font-family: var(--font-display);
+        font-weight: 600;
+        color: var(--color-primary);
+    }
+    .cema-msg-prose blockquote {
+        margin: 1.2em 0;
+        padding: .4em 1.2em;
+        border-left: 3px solid var(--color-gold);
+        color: #4a4663;
+        font-style: italic;
+    }
+
+    /* ===== Envelope dourado animado do hero (x-mensagem.envelope-hero) ===== */
+    .cema-env-wrap {
+        position: absolute;
+        right: 2%;
+        top: 8px;
+        z-index: 1;
+        width: 200px;
+        height: 200px;
+        pointer-events: none;
+        opacity: .8;
+    }
+    .cema-env-draw {
+        stroke-dasharray: 620;
+        stroke-dashoffset: 620;
+        animation: cemaEnvDraw 2.2s ease-out forwards;
+    }
+    @keyframes cemaEnvDraw { to { stroke-dashoffset: 0; } }
+
+    /* A aba desenha (traço) e depois abre (scaleY). */
+    .cema-env-flap {
+        transform-origin: 100px 88px;
+        stroke-dasharray: 620;
+        stroke-dashoffset: 620;
+        animation: cemaEnvDraw 2.2s ease-out .8s forwards, cemaEnvOpen 1s cubic-bezier(.6, 0, .3, 1) 2.5s forwards;
+    }
+    @keyframes cemaEnvOpen { to { transform: scaleY(-1); } }
+
+    .cema-env-float { animation: cemaEnvFloat 7s ease-in-out 3.4s infinite; }
+    @keyframes cemaEnvFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+
+    .cema-env-ray { opacity: 0; animation: cemaEnvRay 3.8s ease-in-out infinite; }
+    @keyframes cemaEnvRay { 0%, 100% { opacity: 0; } 45% { opacity: .7; } }
+
+    .cema-env-glow { opacity: 0; animation: cemaEnvGlow 3.8s ease-in-out 3.4s infinite; }
+    @keyframes cemaEnvGlow { 0%, 100% { opacity: 0; } 50% { opacity: .55; } }
+
+    /* O envelope é decoração pesada: some abaixo de 1280px. */
+    @media (max-width: 1280px) {
+        .cema-env-wrap { display: none !important; }
+    }
+
+    /* Movimento reduzido: sem transições/animações; card e envelope ficam estáticos. */
+    @media (prefers-reduced-motion: reduce) {
+        .cema-msg-card { transition: none; }
+        .cema-msg-card:hover { transform: none; }
+        .cema-env-draw,
+        .cema-env-flap,
+        .cema-env-float,
+        .cema-env-ray,
+        .cema-env-glow { animation: none; }
+        .cema-env-draw,
+        .cema-env-flap { stroke-dashoffset: 0; }
+        .cema-env-glow { opacity: .4; }
+    }
+}

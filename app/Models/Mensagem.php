@@ -5,6 +5,7 @@
 namespace App\Models;
 
 use App\Enums\FormatoMensagem;
+use App\Enums\VisibilidadeMensagem;
 use App\Models\Concerns\RegistraImagensPadrao;
 use App\Models\Contracts\TemDepartamento;
 use App\Support\Palestras\LinkDrive;
@@ -65,6 +66,15 @@ class Mensagem extends Model implements HasMedia, TemDepartamento
         return $query
             ->where('status', self::STATUS_PUBLICADO)
             ->where('nivel', self::NIVEL_PUBLICO);
+    }
+
+    /**
+     * Visibilidade tipada derivada do slug BRUTO em `nivel` (não é cast — `->nivel` segue string,
+     * preservando a suíte 2A). `tryFrom` devolve null para null E para slug desconhecido ⇒ fail-closed.
+     */
+    public function visibilidade(): ?VisibilidadeMensagem
+    {
+        return $this->nivel !== null ? VisibilidadeMensagem::tryFrom($this->nivel) : null;
     }
 
     public function departamentos(): BelongsToMany

@@ -42,17 +42,49 @@ enum VisibilidadeMensagem: string
         };
     }
 
-    /** Cor placeholder (AA). A paleta final da badge é da Fatia 3B (SPEC §13-O6). */
+    /** Hue do nível (ponto/barra/legenda — decorativos, ao lado de rótulo textual ⇒ isentos de contraste). */
     public function cor(): string
     {
         return match ($this) {
-            self::Publico => '#89AB98',
-            self::Trabalhadores => '#6E9FCB',
-            self::Mediuns => '#7C6FB0',
-            self::Diretores => '#E79048',
-            self::DiretorDepae => '#C9803B',
-            self::Direcionada => '#C33A36',
+            self::Publico => '#6E9FCB',
+            self::Trabalhadores => '#A34E5C',
+            self::Mediuns => '#5E8770',
+            self::Diretores => '#3A4585',
+            self::DiretorDepae => '#7C4D8F',
+            self::Direcionada => '#26242E',
         };
+    }
+
+    /** Fundo translúcido do badge (rgba do hue) — base clara sobre a qual corTexto() atinge AA. */
+    public function corFundo(): string
+    {
+        return match ($this) {
+            self::Publico => 'rgba(110,159,203,0.16)',
+            self::Trabalhadores => 'rgba(163,78,92,0.14)',
+            self::Mediuns => 'rgba(94,135,112,0.18)',
+            self::Diretores => 'rgba(58,69,133,0.14)',
+            self::DiretorDepae => 'rgba(124,77,143,0.14)',
+            self::Direcionada => 'rgba(38,36,46,0.10)',
+        };
+    }
+
+    /** Cor de TEXTO do badge — escurecida do hue, ≥4,5:1 sobre corFundo() (AA). Validada na implementação. */
+    public function corTexto(): string
+    {
+        return match ($this) {
+            self::Publico => '#35618F',
+            self::Trabalhadores => '#8F3F4D',
+            self::Mediuns => '#356249',
+            self::Diretores => '#3A4585',
+            self::DiretorDepae => '#6A3E7C',
+            self::Direcionada => '#26242E',
+        };
+    }
+
+    /** Restrito = qualquer nível diferente de Público (inclui Trabalhadores/Diretores). NÃO é ehRecorte() (R3). */
+    public function ehRestrito(): bool
+    {
+        return $this !== self::Publico;
     }
 
     /** Mapa value => rótulo, para o Select do Filament (Fatias 3B/F4). */

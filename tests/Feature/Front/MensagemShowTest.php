@@ -24,15 +24,13 @@ class MensagemShowTest extends TestCase
         $this->get(route('mensagens.show', $m->slug))->assertOk()->assertSee('Paz e Luz');
     }
 
-    public function test_pendente_e_restrita_dao_404_nunca_403(): void
+    public function test_pendente_e_inexistente_dao_404(): void
     {
-        $pendente = Mensagem::factory()->pendente()->create(['slug' => 'pendente-x']);
-        $restrita = Mensagem::factory()->create(['status' => 'publicado', 'nivel' => 'diretores', 'slug' => 'restrita-x', 'titulo' => 'Segredo dos Diretores']);
+        Mensagem::factory()->pendente()->create(['slug' => 'pendente-x']);
 
         $this->get(route('mensagens.show', 'pendente-x'))->assertNotFound();
-        $r = $this->get(route('mensagens.show', 'restrita-x'));
-        $r->assertNotFound();
-        $r->assertDontSee('Segredo dos Diretores');   // não vaza existência
+        $this->get(route('mensagens.show', 'nao-existe'))->assertNotFound();
+        // A mensagem RESTRITA publicada deixou de dar 404: vira barreira-200 cega (ver MensagemBarreiraTest).
     }
 
     public function test_contexto_e_escapado(): void

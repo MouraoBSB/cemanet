@@ -120,4 +120,9 @@
         .cema-env-flap { stroke-dashoffset: 0; }
         .cema-env-glow { opacity: .4; }
     }
+
+    /* Badges de nível (Fatia 3B): a cor/fundo/texto vêm de App\Enums\VisibilidadeMensagem
+       (cor/corFundo/corTexto), aplicados via style= inline nos componentes x-mensagem.selo-nivel
+       e x-mensagem.legenda-niveis. A barra 4px/faixa 5px do card/linha usa visibilidade()?->cor()
+       (null-safe). Nada de cor hardcoded aqui — fonte única no enum. */
 }

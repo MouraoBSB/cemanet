@@ -3,7 +3,7 @@
 {{-- Card de mensagem (grade). :variante controla a coerência entre as duas superfícies:
      'lista'  = SEM miniatura, trecho 2 linhas, data simples (SPEC §4.1 / C-A);
      'perfil' = COM miniatura de pictografia, trecho 3 linhas, data mono dourada (SPEC §4.4).
-     Sem F3/F5: nenhum badge de nível, cadeado, legenda ou ícone lida/não-lida (I14). --}}
+     Badge/faixa de nível só @auth (I9); null-safe (I14/B1). Sem F5: sem ícone lida/não-lida. --}}
 @php
     $perfil = $variante === 'perfil';
     $autores = $mensagem->autores;
@@ -15,8 +15,12 @@
 @endphp
 <article {{ $attributes->class(['cema-msg-card group flex flex-col overflow-hidden rounded-2xl border border-border-muted bg-white shadow-card']) }}>
     <a href="{{ route('mensagens.show', $mensagem->slug) }}" class="flex h-full flex-col rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-gold">
-        {{-- Faixa superior decorativa (marca, NÃO nível). --}}
-        <span class="block h-1 bg-gradient-to-r from-gold to-primary" aria-hidden="true"></span>
+        {{-- Faixa superior: cor do NÍVEL a logado (null-safe); marca para anônimo (look 2B). --}}
+        @auth
+            <span class="block h-1" style="background:{{ $mensagem->visibilidade()?->cor() ?? '#cbb26a' }}" aria-hidden="true"></span>
+        @else
+            <span class="block h-1 bg-gradient-to-r from-gold to-primary" aria-hidden="true"></span>
+        @endauth
 
         @if ($miniatura)
             <div class="aspect-[16/9] overflow-hidden bg-cream">
@@ -27,6 +31,7 @@
         <div class="flex flex-1 flex-col gap-3 px-5 pb-3 pt-[18px]">
             <div class="flex items-center justify-between gap-2">
                 <x-mensagem.selo-formato :formato="$mensagem->formato" />
+                @auth <x-mensagem.selo-nivel :visibilidade="$mensagem->visibilidade()" /> @endauth
             </div>
 
             <h3 class="font-display text-[17.5px] font-semibold leading-snug text-text-ink text-balance">{{ $mensagem->titulo }}</h3>

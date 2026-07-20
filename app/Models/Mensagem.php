@@ -68,6 +68,12 @@ class Mensagem extends Model implements HasMedia, TemDepartamento
             ->where('nivel', self::NIVEL_PUBLICO);
     }
 
+    /** Só o status publicado (ortogonal ao nível) — compõe com visiveisPara(): publicado()->visiveisPara($u). */
+    public function scopePublicado(Builder $query): Builder
+    {
+        return $query->where('status', self::STATUS_PUBLICADO);
+    }
+
     /**
      * Visibilidade tipada derivada do slug BRUTO em `nivel` (não é cast — `->nivel` segue string,
      * preservando a suíte 2A). `tryFrom` devolve null para null E para slug desconhecido ⇒ fail-closed.

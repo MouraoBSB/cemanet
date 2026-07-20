@@ -7,15 +7,20 @@
               :description="\Illuminate\Support\Str::limit(strip_tags($mensagem->contexto ?: $mensagem->corpo), 155)">
     <x-slot:head>
         <link rel="canonical" href="{{ $url }}">
-        @if ($ogImg)<meta property="og:image" content="{{ $ogImg }}">@endif
-        <script type="application/ld+json">
-        @php echo json_encode(array_filter([
-            '@context' => 'https://schema.org', '@type' => 'CreativeWork',
-            'name' => $mensagem->titulo, 'url' => $url,
-            'datePublished' => $mensagem->data_recebimento?->toDateString(),
-            'author' => $mensagem->autores->pluck('nome')->all() ?: null,
-        ], fn ($v) => $v !== null && $v !== []), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG); @endphp
-        </script>
+        @if ($mensagem->visibilidade() === \App\Enums\VisibilidadeMensagem::Publico)
+            @if ($ogImg)<meta property="og:image" content="{{ $ogImg }}">@endif
+            <script type="application/ld+json">
+            @php echo json_encode(array_filter([
+                '@context' => 'https://schema.org', '@type' => 'CreativeWork',
+                'name' => $mensagem->titulo, 'url' => $url,
+                'datePublished' => $mensagem->data_recebimento?->toDateString(),
+                'author' => $mensagem->autores->pluck('nome')->all() ?: null,
+            ], fn ($v) => $v !== null && $v !== []), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG); @endphp
+            </script>
+        @else
+            {{-- Restrito (ou nivel=null): fora do índice; sem preview social do conteúdo reservado. --}}
+            <meta name="robots" content="noindex, nofollow">
+        @endif
     </x-slot:head>
 
     <div x-data="mensagemLeitura({ titulo: @js($mensagem->titulo), textoCopia: @js($textoCopia), url: @js($url) })"
@@ -42,9 +47,9 @@
 
                 <div class="mt-7 flex flex-wrap items-center gap-3">
                     <p class="font-mono text-[11.5px] uppercase tracking-[0.16em] text-[#9db8e0]">Mensagem Mediúnica · {{ $mensagem->formato?->rotulo() }}</p>
-                    <span class="inline-flex items-center gap-1.5 rounded-pill bg-white/12 px-3 py-1 font-mono text-[10.5px] font-medium uppercase tracking-[0.08em] text-white/85">
-                        <span class="size-[7px] rounded-full bg-[#8fb4dc]" aria-hidden="true"></span>Pública
-                    </span>
+                    @auth
+                        <x-mensagem.selo-nivel :visibilidade="$mensagem->visibilidade()" :escuro="true" />
+                    @endauth
                 </div>
 
                 <h1 class="mt-3.5 max-w-3xl font-display text-4xl font-semibold leading-[1.1] text-balance sm:text-5xl">{{ $mensagem->titulo }}</h1>
@@ -83,6 +88,16 @@
                 <div class="mx-auto flex max-w-[1100px] items-start gap-3.5 px-6 py-5">
                     <span class="mt-2.5 h-[3px] w-[22px] shrink-0 rounded-full bg-gold" aria-hidden="true"></span>
                     <p class="text-[14.5px] leading-relaxed text-text-secondary"><strong class="font-semibold text-primary">Contexto</strong> — {{ $mensagem->contexto }}</p>
+                </div>
+            </section>
+        @endif
+
+        {{-- Nota "Direcionada a você": só ao destinatário (calculado no controller); SEM lista de destinatários (F2). --}}
+        @if ($ehDestinatario ?? false)
+            <section class="border-b border-[#ECE6D6] bg-[#FAF8F2]">
+                <div class="mx-auto flex max-w-[1100px] items-start gap-3.5 px-6 py-5">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#c19532" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-0.5 shrink-0" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    <p class="text-[14.5px] leading-relaxed text-text-secondary"><strong class="font-semibold text-primary">Direcionada a você</strong> — esta mensagem foi endereçada pessoalmente a você nas reuniões mediúnicas da Casa.</p>
                 </div>
             </section>
         @endif

@@ -4,8 +4,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\VisibilidadeMensagem;
 use App\Models\Palestra;
 use App\Support\Conta\AbaAgenda;
+use App\Support\Conta\AbaDirecionadas;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 
@@ -40,5 +42,20 @@ class ContaController extends Controller
         abort_unless(AbaAgenda::visivelPara(auth()->user()), 403);
 
         return view('conta.agenda');
+    }
+
+    public function direcionadas(): View
+    {
+        $user = auth()->user();
+        abort_unless(AbaDirecionadas::visivelPara($user), 403);
+
+        $direcionadas = $user->mensagensDirecionadas()
+            ->publicado()
+            ->where('nivel', VisibilidadeMensagem::Direcionada->value)   // blindagem O5 (I7): só direcionadas
+            ->with('autores', 'media')          // eager-load: autor (card) + media (miniatura pictografia) — sem N+1
+            ->orderByDesc('data_recebimento')
+            ->get();
+
+        return view('conta.direcionadas', compact('direcionadas'));
     }
 }

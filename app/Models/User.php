@@ -67,6 +67,12 @@ class User extends Authenticatable implements FilamentUser
             ->withPivot('desde', 'ate')->withTimestamps();
     }
 
+    /** Mensagens direcionadas a este usuário (N:N, PII). Lado inverso de Mensagem::destinatarios(). */
+    public function mensagensDirecionadas(): BelongsToMany
+    {
+        return $this->belongsToMany(Mensagem::class, 'mensagem_destinatario', 'user_id', 'mensagem_id');
+    }
+
     /**
      * Get the attributes that should be cast.
      *

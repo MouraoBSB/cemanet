@@ -82,6 +82,12 @@ class Mensagem extends Model implements HasMedia, TemDepartamento
         return $this->belongsToMany(self::class, 'mensagem_relacionada', 'mensagem_id', 'relacionada_id');
     }
 
+    /** Destinatários de uma mensagem DIRECIONADA (N:N, PII). Só o resolvedor de visibilidade o lê. */
+    public function destinatarios(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'mensagem_destinatario', 'mensagem_id', 'user_id');
+    }
+
     /**
      * Sincroniza as mensagens relacionadas de forma SIMÉTRICA (A↔B): grava os dois sentidos
      * numa transação e nunca cria auto-relação. Substitui completamente o conjunto de vínculos

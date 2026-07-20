@@ -4,10 +4,12 @@
 
 namespace App\Livewire\Mensagens;
 
+use App\Enums\VisibilidadeMensagem;
 use App\Models\AutorEspiritual;
 use App\Models\Mensagem;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -80,8 +82,10 @@ class Lista extends Component
 
     public function render()
     {
+        $usuario = Auth::user();
+
         $mensagens = Mensagem::query()
-            ->publica()
+            ->publicado()->visiveisPara($usuario)   // 3B: troca o publica() fixo (I1); anônimo = paridade 2B
             ->with('autores')
             ->when($this->dataDe !== '' && Carbon::hasFormat($this->dataDe, 'Y-m-d'),
                 fn (Builder $q) => $q->whereDate('data_recebimento', '>=', $this->dataDe))
@@ -95,9 +99,18 @@ class Lista extends Component
                 fn (Builder $q) => $q->orderByRaw('data_recebimento IS NULL, data_recebimento '.($this->ordenar === 'antiga' ? 'asc' : 'desc')))
             ->paginate(9);
 
+        // Níveis presentes no resultado (para a legenda; a view só a exibe @auth). null é descartado (B1).
+        $niveis = $mensagens->getCollection()
+            ->map(fn (Mensagem $m) => $m->visibilidade())
+            ->filter()
+            ->unique()
+            ->sortBy(fn (VisibilidadeMensagem $v) => $v->nivelMinimo() ?? 99)
+            ->values();
+
         return view('livewire.mensagens.lista', [
             'mensagens' => $mensagens,
-            'autores' => AutorEspiritual::whereHas('mensagens', fn (Builder $q) => $q->publica())->orderBy('nome')->get(['nome', 'slug']),
+            'niveis' => $niveis,
+            'autores' => AutorEspiritual::whereHas('mensagens', fn (Builder $q) => $q->publicado()->visiveisPara($usuario))->orderBy('nome')->get(['nome', 'slug']),
             'filtrosAtivos' => $this->filtrosAtivos(),
         ]);
     }

@@ -33,8 +33,14 @@
                     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                 </span>
                 <span>
-                    <span class="block font-display text-[22px] font-bold leading-tight">{{ $totalPublicas }}</span>
-                    <span class="block max-w-[160px] text-[12.5px] text-[#c7d0ea]">{{ $totalPublicas === 1 ? 'mensagem pública' : 'mensagens públicas' }}</span>
+                    <span class="block font-display text-[22px] font-bold leading-tight">{{ $total }}</span>
+                    <span class="block max-w-[180px] text-[12.5px] text-[#c7d0ea]">
+                        @if ($logado)
+                            {{ $total === 1 ? 'mensagem disponível a você' : 'mensagens disponíveis a você' }}
+                        @else
+                            {{ $total === 1 ? 'mensagem pública' : 'mensagens públicas' }}
+                        @endif
+                    </span>
                 </span>
             </div>
         </div>

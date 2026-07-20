@@ -733,3 +733,31 @@ accessor+resolvedor → policy → import → command+bind; a matriz de 8 person
 não-vazamento — **não relaxar o count por persona**). O Consultor fará o passe do plano antes da execução.
 
 ---
+
+### Passe do PLANO — CONSULTOR (19/jul) — ✅ APROVADO (zero bloqueador)
+
+Plano em [`../plans/2026-07-19-camada-4-fatia-3a-backend-visibilidade-mensagens.md`](../plans/2026-07-19-camada-4-fatia-3a-backend-visibilidade-mensagens.md).
+TDD real, ordem do §9.0, código completo. O Consultor verificou célula a célula a matriz 8×6 e os counts do
+scope-não-vaza (1/1/2/3/3/4/2/8), a guarda C7 (conexão lazy), a policy (dois eixos, capacidade intacta), o SQL da
+rel 38 e a neutralidade — **tudo confere**. **Elevou o O5 (constantes de slug em `Setor`/`Cargo`) a OBRIGATÓRIO**
+(código de acesso a PII, não string mágica). **Ciência p/ a 3B:** o presidente (bypass) vê as Direcionadas de todas
+as pessoas — exibir a LISTA de destinatários (PII) a ele é decisão de UX/PII da 3B. Ajuste cosmético aplicado
+(int-map no `assertEqualsCanonicalizing`).
+
+---
+
+### Execução (subagente-driven, TDD) — ✅ COMPLETA NO DEV (aguarda passe do PR)
+
+Branch `camada-4-fatia-3a-visibilidade` (de `b7f9402`). 6 tasks TDD, cada uma implementer → review por-task
+(**0 findings** em T1–T6): T1 enum+constantes · T2 pivô `mensagem_destinatario` · T3 predicados+accessor · T4
+resolvedor+matriz de personas · T5 policy · T6 cadeia de import+bind (guarda C7). **CP-1 ✅ 1026 · CP-2 ✅ 1032 ·
+CP-3 ✅ 1032** (3112 assertions); **Pint** sem drift. **Review final da branch (opus): Ready to merge** — 0
+Critical/Important, 1 Minor **corrigido** (`sync` de destinatários em `DB::transaction`, aderência ao §6.6).
+**R3 ao vivo confirmado** (túnel ativo, `cema:importar-direcionadas`): **15 direcionadas · 73 vínculos · 17
+destinatários · 0 não-resolvidos** — o cutover de DEV está feito (o pivô do dev tem os destinatários reais; PII
+**local**, jamais commitada). Comportamento-neutro provado (a suíte 2A/2B não mudou de cor; o resolvedor nasce
+inerte — **zero** consumidor no front, que segue `Mensagem::publica()`). **Cutover de PROD = do dono no deploy**
+(§8: `migrate` → `cema:importar-direcionadas`). Front rico = **3B**. **Parado no PR para o passe do PR do Consultor
+(CI verde no último commit) + go do dono.**
+
+---

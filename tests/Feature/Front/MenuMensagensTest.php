@@ -25,8 +25,12 @@ class MenuMensagensTest extends TestCase
     {
         Mensagem::factory()->publica()->create(); // garante a página renderizar o layout/header
 
+        // "Mensagens Públicas" só existe no rótulo do submenu do header (ativo => true
+        // em config/navegacao.php); não aparece em nenhum outro trecho da página
+        // (o corpo usa "Autores Espirituais"/"Palestras Públicas"/etc. no bloco "Veja
+        // também", o H1 usa "Mensagens Mediúnicas"). Isso garante que o teste falhe de
+        // verdade se o item do menu for desativado, ao contrário de checar só a rota.
         $res = $this->get(route('mensagens.index'));
-        $res->assertSee(route('mensagens.index'), false);
-        $res->assertSee(route('autores.index'), false);
+        $res->assertSee('Mensagens Públicas');
     }
 }

@@ -298,7 +298,7 @@ class SeloNivelTest extends TestCase
 - [ ] **Passo 2: Rodar e ver falhar**
 
 Run: `docker compose exec -T app php artisan test --filter=SeloNivelTest`
-Esperado: FAIL (componentes inexistentes).
+Esperado: FAIL (componentes inexistentes). **Prova do guard (B1):** ao criar o componente (Passo 3), confirme **na prática** que, **sem** o `@if ($visibilidade)`, o `test_null_nao_renderiza_nada` **explode** (`null->rotulo()`), e só passa a verde **com** o `@if` — é a regressão que ancora o null-guard (não só afirmá-lo).
 
 - [ ] **Passo 3: Criar `x-mensagem.selo-nivel`**
 
@@ -439,6 +439,16 @@ class MensagemListaVisibilidadeTest extends TestCase
             ->assertSee('Pub')->assertSee('Trab')->assertDontSee('Med'); // recorte médium não vaza
     }
 
+    public function test_medium_ve_mediuns_trabalhadores(): void
+    {
+        // Caso POSITIVO do recorte (paridade no front com o resolvedor da 3A): médium vê 'mediuns-trabalhadores'.
+        $medium = $this->comPapel('trabalhador');
+        $medium->setores()->attach(\App\Models\Setor::where('slug', \App\Models\Setor::SLUG_MEDIUM)->value('id'), ['funcao' => 'membro']);
+        Mensagem::factory()->create(['status' => 'publicado', 'nivel' => 'mediuns-trabalhadores', 'titulo' => 'Doc Medium']);
+
+        Livewire::actingAs($medium->fresh())->test(Lista::class)->assertSee('Doc Medium');
+    }
+
     public function test_select_de_autor_so_com_mensagem_visivel(): void
     {
         $trab = $this->comPapel('trabalhador');
@@ -476,9 +486,9 @@ class MensagemIndexContadorTest extends TestCase
 
     public function test_rotulo_dinamico_e_cache_privado(): void
     {
-        Mensagem::factory()->publica()->create();
+        Mensagem::factory()->count(2)->publica()->create();   // 2 => PLURAL nos dois cenários (total !== 1)
 
-        $this->get(route('mensagens.index'))->assertOk()->assertSee('mensagens públicas'); // anônimo
+        $this->get(route('mensagens.index'))->assertOk()->assertSee('mensagens públicas'); // anônimo (plural)
 
         $this->seed(EstruturaCemaSeeder::class);
         $u = User::factory()->create();
@@ -1080,7 +1090,7 @@ Substituir `resources/views/auth/login.blade.php` inteiro por (a tela cheia pass
 Run: `docker compose exec -T app php artisan test --filter="MensagemBarreiraTest|MensagemShowTest"`
 Esperado: PASS (barreira cega; 404 real; destinatário vê; a atualização I-chg do 2B verde).
 
-- [ ] **Passo 9: Pint + commit**
+- [ ] **Passo 9: Pint + commit** (com `index`/`show` retornando `Response`, o `use Illuminate\Contracts\View\View;` fica **órfão** — o `Pint` `no_unused_imports` o remove; conferir que sumiu)
 
 ```bash
 docker compose exec -T app ./vendor/bin/pint app/Http/Controllers/MensagemController.php tests/Feature/Front/MensagemBarreiraTest.php tests/Feature/Front/MensagemShowTest.php

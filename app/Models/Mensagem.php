@@ -77,6 +77,73 @@ class Mensagem extends Model implements HasMedia, TemDepartamento
         return $this->nivel !== null ? VisibilidadeMensagem::tryFrom($this->nivel) : null;
     }
 
+    /** Bypass total de visibilidade: admin (papel nível 100) OU presidente (cargo). */
+    private static function veTudo(?User $usuario): bool
+    {
+        return $usuario !== null && ($usuario->hasRole('administrador') || $usuario->ehPresidente());
+    }
+
+    /**
+     * Regra de visibilidade por papel + pertencimento (fonte única). Escada (Público/Trabalhadores/
+     * Diretores) + 3 recortes (Médiuns/Diretor-DEPAE/Direcionada). null = fail-closed; admin/presidente = bypass.
+     */
+    public function podeSerVistoPor(?User $usuario): bool
+    {
+        if (self::veTudo($usuario)) {
+            return true;
+        }
+
+        $visibilidade = $this->visibilidade();
+        if ($visibilidade === null) {
+            return false; // nível null/desconhecido = fail-closed
+        }
+
+        $nivel = $usuario?->nivelMaximo() ?? 0;
+
+        return match ($visibilidade) {
+            VisibilidadeMensagem::Publico => true,
+            VisibilidadeMensagem::Trabalhadores => $nivel >= VisibilidadeMensagem::Trabalhadores->nivelMinimo(),
+            VisibilidadeMensagem::Diretores => $nivel >= VisibilidadeMensagem::Diretores->nivelMinimo(),
+            VisibilidadeMensagem::Mediuns => $usuario !== null && $usuario->ehMedium(),
+            VisibilidadeMensagem::DiretorDepae => $usuario !== null && $usuario->ehDiretorDepae(),
+            VisibilidadeMensagem::Direcionada => $usuario !== null
+                && $this->destinatarios()->whereKey($usuario->id)->exists(),
+        };
+    }
+
+    /** Filtra no banco as mensagens que o usuário (ou anônimo) pode ver — não vaza título restrito. */
+    public function scopeVisiveisPara(Builder $query, ?User $usuario): Builder
+    {
+        if (self::veTudo($usuario)) {
+            return $query; // bypass: sem filtro (vê tudo, inclusive nível null)
+        }
+
+        $nivel = $usuario?->nivelMaximo() ?? 0;
+
+        return $query->where(function (Builder $q) use ($usuario, $nivel) {
+            $q->where('nivel', VisibilidadeMensagem::Publico->value); // sempre
+
+            if ($usuario !== null) {
+                if ($nivel >= VisibilidadeMensagem::Trabalhadores->nivelMinimo()) {
+                    $q->orWhere('nivel', VisibilidadeMensagem::Trabalhadores->value);
+                }
+                if ($nivel >= VisibilidadeMensagem::Diretores->nivelMinimo()) {
+                    $q->orWhere('nivel', VisibilidadeMensagem::Diretores->value);
+                }
+                if ($usuario->ehMedium()) {
+                    $q->orWhere('nivel', VisibilidadeMensagem::Mediuns->value);
+                }
+                if ($usuario->ehDiretorDepae()) {
+                    $q->orWhere('nivel', VisibilidadeMensagem::DiretorDepae->value);
+                }
+                // Direcionada: só as mensagens em que ESTE usuário é destinatário (não vaza as dos outros).
+                $q->orWhere(fn (Builder $d) => $d
+                    ->where('nivel', VisibilidadeMensagem::Direcionada->value)
+                    ->whereHas('destinatarios', fn (Builder $u) => $u->whereKey($usuario->id)));
+            }
+        });
+    }
+
     public function departamentos(): BelongsToMany
     {
         return $this->belongsToMany(Departamento::class, 'departamento_mensagem', 'mensagem_id', 'departamento_id');

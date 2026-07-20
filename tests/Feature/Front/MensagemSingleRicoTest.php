@@ -30,7 +30,7 @@ class MensagemSingleRicoTest extends TestCase
         $res = $this->get(route('mensagens.show', 'pub'));
         $res->assertOk()->assertSee('Luz');
         $res->assertDontSee('name="robots"', false);   // Público indexável (I11)
-        $res->assertDontSee('Nível de acesso');         // sem badge ao anônimo (I9)
+        $res->assertDontSee('Público');                 // sem badge ao anônimo (I9): pílula do hero (@auth) não renderiza
     }
 
     public function test_restrito_autorizado_badge_e_noindex(): void

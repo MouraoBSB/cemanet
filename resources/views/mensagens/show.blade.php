@@ -48,7 +48,7 @@
                 <div class="mt-7 flex flex-wrap items-center gap-3">
                     <p class="font-mono text-[11.5px] uppercase tracking-[0.16em] text-[#9db8e0]">Mensagem Mediúnica · {{ $mensagem->formato?->rotulo() }}</p>
                     @auth
-                        <x-mensagem.selo-nivel :visibilidade="$mensagem->visibilidade()" />
+                        <x-mensagem.selo-nivel :visibilidade="$mensagem->visibilidade()" :escuro="true" />
                     @endauth
                 </div>
 

@@ -74,7 +74,7 @@ enum VisibilidadeMensagem: string
         return match ($this) {
             self::Publico => '#35618F',
             self::Trabalhadores => '#8F3F4D',
-            self::Mediuns => '#3F7256',
+            self::Mediuns => '#356249',
             self::Diretores => '#3A4585',
             self::DiretorDepae => '#6A3E7C',
             self::Direcionada => '#26242E',

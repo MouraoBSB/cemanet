@@ -36,6 +36,17 @@ class SeloNivelTest extends TestCase
         $this->assertStringContainsString('#3A4585', $html);            // corTexto do nível
     }
 
+    public function test_variante_escura_texto_branco(): void
+    {
+        // Hero navy do single: pílula translúcida BRANCA (texto branco), não a pílula clara do card/lista.
+        $html = Blade::render('<x-mensagem.selo-nivel :visibilidade="$v" :escuro="true" />', [
+            'v' => VisibilidadeMensagem::Diretores,
+        ]);
+        $this->assertStringContainsString('text-white/90', $html);
+        $this->assertStringContainsString('Diretores', $html);
+        $this->assertStringNotContainsString('#3A4585', $html); // NÃO usa o corTexto() escuro (seria ilegível no navy)
+    }
+
     public function test_legenda_lista_niveis_presentes(): void
     {
         $html = Blade::render('<x-mensagem.legenda-niveis :niveis="$n" />', [

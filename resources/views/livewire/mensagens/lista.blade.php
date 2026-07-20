@@ -66,9 +66,14 @@
     </div>
 
     @if ($mensagens->total() > 0)
-        <p class="mb-5 mt-6 text-[13.5px] text-text-muted">
-            Mostrando {{ $mensagens->firstItem() }}–{{ $mensagens->lastItem() }} de {{ $mensagens->total() }} {{ $mensagens->total() === 1 ? 'mensagem' : 'mensagens' }}
-        </p>
+        <div class="mb-5 mt-6 flex flex-wrap items-center justify-between gap-3">
+            <p class="text-[13.5px] text-text-muted">
+                Mostrando {{ $mensagens->firstItem() }}–{{ $mensagens->lastItem() }} de {{ $mensagens->total() }} {{ $mensagens->total() === 1 ? 'mensagem' : 'mensagens' }}
+            </p>
+            @auth
+                <x-mensagem.legenda-niveis :niveis="$niveis" />
+            @endauth
+        </div>
     @endif
 
     @if ($mensagens->isEmpty())

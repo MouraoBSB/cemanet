@@ -6,6 +6,7 @@ namespace App\Importacao;
 
 use App\Models\Mensagem;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class ImportadorDirecionadasMensagens
 {
@@ -46,7 +47,7 @@ class ImportadorDirecionadasMensagens
                 $distintos[$user->id] = true;
             }
 
-            $mensagem->destinatarios()->sync($ids);
+            DB::transaction(fn () => $mensagem->destinatarios()->sync($ids));
             $vinculos += count($ids);
             $direcionadas++;
             $log("Direcionada wp_id {$item['wp_id']}: ".count($ids).' destinatário(s).');

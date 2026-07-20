@@ -21,7 +21,15 @@ return [
                 ['rotulo' => 'Palestrantes', 'rota' => 'palestrantes.index', 'ativo' => true],
             ],
         ],
-        ['rotulo' => 'Mensagens Mediúnicas', 'ativo' => false, 'itens' => []],
+        [
+            'rotulo' => 'Mensagens Mediúnicas',
+            'rota' => 'mensagens.index',
+            'ativo' => true,
+            'itens' => [
+                ['rotulo' => 'Mensagens Públicas', 'rota' => 'mensagens.index', 'ativo' => true],
+                ['rotulo' => 'Autores Espirituais', 'rota' => 'autores.index', 'ativo' => true],
+            ],
+        ],
         ['rotulo' => 'Eventos', 'rota' => 'eventos.index', 'ativo' => true, 'itens' => []],
         ['rotulo' => 'Vibração', 'ativo' => false, 'itens' => []],
         ['rotulo' => 'Agenda', 'rota' => 'agenda.index', 'ativo' => true, 'itens' => []],

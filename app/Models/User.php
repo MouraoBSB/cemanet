@@ -67,6 +67,12 @@ class User extends Authenticatable implements FilamentUser
             ->withPivot('desde', 'ate')->withTimestamps();
     }
 
+    /** Mensagens direcionadas a este usuário (N:N, PII). Lado inverso de Mensagem::destinatarios(). */
+    public function mensagensDirecionadas(): BelongsToMany
+    {
+        return $this->belongsToMany(Mensagem::class, 'mensagem_destinatario', 'user_id', 'mensagem_id');
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -93,6 +99,24 @@ class User extends Authenticatable implements FilamentUser
     public function nivelMaximo(): int
     {
         return (int) $this->roles->max('nivel');
+    }
+
+    /** Recorte "Médiuns": pertence ao setor Médium (fonte única: Setor::SLUG_MEDIUM). */
+    public function ehMedium(): bool
+    {
+        return $this->setores()->where('setores.slug', Setor::SLUG_MEDIUM)->exists();
+    }
+
+    /** Recorte "Diretor-DEPAE": ocupa o cargo Diretor do DEPAE. */
+    public function ehDiretorDepae(): bool
+    {
+        return $this->cargos()->where('cargos.slug', Cargo::SLUG_DIRETOR_DEPAE)->exists();
+    }
+
+    /** Bypass "Presidente": ocupa o cargo institucional Presidente (vê tudo, como o admin). */
+    public function ehPresidente(): bool
+    {
+        return $this->cargos()->where('cargos.slug', Cargo::SLUG_PRESIDENTE)->exists();
     }
 
     public function getActivitylogOptions(): LogOptions

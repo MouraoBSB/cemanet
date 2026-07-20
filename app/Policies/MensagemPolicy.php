@@ -9,11 +9,12 @@ use App\Models\User;
 use App\Policies\Concerns\AutorizaPorDepartamento;
 
 /**
- * Capacidade (quem edita) de Mensagem: permissão mensagem.* (hasPermissionTo, NUNCA can())
- * + escopo por regime (trait). Regime DoTipo (semente DEPAE): o responsável é quem está num depto
- * responsável pelo TIPO; o objeto NÃO é consultado. O admin passa antes no Gate::before.
- * Nasce INERTE (só admin edita via /admin nesta fatia). O eixo de autoria do médium
- * (mensagem.publicar / definir-nivel) é outro eixo — Fatia 4.
+ * Policy de Mensagem nos DOIS eixos:
+ * - VISIBILIDADE (quem vê): view/viewAny, delegadas a podeSerVistoPor / scopeVisiveisPara.
+ *   $user é null-safe (visitante anônimo passa por Gate::forUser(null)).
+ * - CAPACIDADE (quem edita): ver/criar/editar/excluir — permissão mensagem.* (hasPermissionTo, NUNCA can())
+ *   + escopo por regime DoTipo (trait). Nasce INERTE (só admin edita via /admin). O eixo de autoria do
+ *   médium (mensagem.publicar / definir-nivel) é outro eixo — Fatia 4. O admin passa antes no Gate::before.
  */
 class MensagemPolicy
 {
@@ -22,6 +23,16 @@ class MensagemPolicy
     protected function recurso(): string
     {
         return 'mensagem';
+    }
+
+    public function view(?User $user, Mensagem $mensagem): bool
+    {
+        return $mensagem->podeSerVistoPor($user);
+    }
+
+    public function viewAny(?User $user): bool
+    {
+        return true; // a listagem filtra por scopeVisiveisPara; não há bloqueio geral
     }
 
     public function ver(User $user, Mensagem $mensagem): bool

@@ -12,6 +12,9 @@ class Setor extends Model
 {
     protected $table = 'setores';
 
+    /** Slug do setor Médium (Str::slug('Médium') no EstruturaCemaSeeder) — recorte de visibilidade. */
+    public const SLUG_MEDIUM = 'medium';
+
     protected $fillable = ['departamento_id', 'nome', 'slug', 'provisorio', 'ativo'];
 
     protected function casts(): array

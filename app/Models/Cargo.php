@@ -10,6 +10,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Cargo extends Model
 {
+    /** Slugs de cargo usados como RECORTE/BYPASS de visibilidade (Str::slug do nome no EstruturaCemaSeeder). */
+    public const SLUG_DIRETOR_DEPAE = 'diretor-do-depae';
+
+    public const SLUG_PRESIDENTE = 'presidente';
+
     protected $fillable = ['departamento_id', 'nome', 'slug', 'institucional', 'ativo'];
 
     protected function casts(): array

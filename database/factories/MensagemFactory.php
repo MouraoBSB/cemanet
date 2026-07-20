@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\VisibilidadeMensagem;
 use App\Models\Mensagem;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -44,5 +45,13 @@ class MensagemFactory extends Factory
     public function publica(): static
     {
         return $this->state(fn () => ['status' => Mensagem::STATUS_PUBLICADO, 'nivel' => Mensagem::NIVEL_PUBLICO]);
+    }
+
+    /** Fixa o nível BRUTO (aceita o enum ou o slug cru) — para os testes de visibilidade. */
+    public function comNivel(VisibilidadeMensagem|string $nivel): static
+    {
+        return $this->state(fn () => [
+            'nivel' => $nivel instanceof VisibilidadeMensagem ? $nivel->value : $nivel,
+        ]);
     }
 }

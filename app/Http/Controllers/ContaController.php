@@ -8,6 +8,7 @@ use App\Enums\VisibilidadeMensagem;
 use App\Models\Palestra;
 use App\Support\Conta\AbaAgenda;
 use App\Support\Conta\AbaDirecionadas;
+use App\Support\Conta\AbaMensagens;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Carbon;
 
@@ -42,6 +43,13 @@ class ContaController extends Controller
         abort_unless(AbaAgenda::visivelPara(auth()->user()), 403);
 
         return view('conta.agenda');
+    }
+
+    public function mensagens(): View
+    {
+        abort_unless(AbaMensagens::visivelPara(auth()->user()), 403);
+
+        return view('conta.mensagens');
     }
 
     public function direcionadas(): View

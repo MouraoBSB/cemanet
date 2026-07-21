@@ -8,6 +8,9 @@
     if (\App\Support\Conta\AbaAgenda::visivelPara(auth()->user())) {
         $itens[] = ['chave' => 'agenda', 'rotulo' => 'Agenda', 'rota' => 'conta.agenda'];
     }
+    if (\App\Support\Conta\AbaMensagens::visivelPara(auth()->user())) {
+        $itens[] = ['chave' => 'mensagens', 'rotulo' => 'Minhas Mensagens', 'rota' => 'conta.mensagens'];
+    }
     if (\App\Support\Conta\AbaDirecionadas::visivelPara(auth()->user())) {
         $itens[] = ['chave' => 'direcionadas', 'rotulo' => 'Minhas Direcionadas', 'rota' => 'conta.direcionadas'];
     }

@@ -3,7 +3,7 @@
 Construção incremental, local-first. Cada fase é entregue ponta a ponta e
 verificada antes da seguinte. Marque o estado ao concluir.
 
-## Estado atual (2026-07-16)
+## Estado atual (2026-07-21)
 
 Módulos entregues ponta a ponta até aqui: **Fundação** (Fase 0), **Palestras**
 (banco + admin + importação + público), **Palestrantes** (listagem e perfil
@@ -13,16 +13,19 @@ RichEditor + Biblioteca de mídia), **Eventos** (banco + admin + importação +
 front + feed `.ics` + calendário unificado), **Usuários** (RBAC + departamentos/
 setores/cargos + importação do legado), **Autenticação pública** (Fortify +
 Google), **Minha Conta**, **E-mail transacional**, o **tema do painel `/admin`**
-na identidade CEMA e o **modelo de capacidades** — autorização de escrita ponta a
+na identidade CEMA, o **modelo de capacidades** — autorização de escrita ponta a
 ponta: matriz papel×capacidade, departamento como filtro de objeto, auditoria
 append-only e a **edição de conteúdo pelo site** (`/minha-conta`), com a Agenda
-como piloto (Fases A→D). Detalhe de cada fatia nas seções abaixo.
+como piloto (Fases A→D) — e **Mensagens mediúnicas + Autores espirituais**
+(Camada 4: banco + admin + importação + front público + visibilidade rica +
+"Minhas Direcionadas" + curadoria e lançamento pelo site, Fatia F4b). Detalhe de
+cada fatia nas seções abaixo.
 
 Próximo foco pendente: **Fase E** (replicar a edição no `/minha-conta` para
 Blog/Eventos/Palestras, no padrão do piloto da Agenda), **Comentários** do blog,
-**gate de conteúdo por nível de acesso** nos módulos que ainda não têm (Eventos
-já tem `visibilidade` própria), os demais CPTs (Evangelho da semana/Capítulos,
-Mensagens mediúnicas/Autores espirituais) e o **deploy** (Docker no VPS).
+**gate de conteúdo por nível de acesso** nos módulos que ainda não têm (Eventos e
+Mensagens já têm visibilidade própria), os demais CPTs (Evangelho da semana/
+Capítulos) e o **deploy** (Docker no VPS).
 
 ## Fase 0 — Fundação  ✅ concluída
 
@@ -134,7 +137,25 @@ Ordem sugerida (cada um como nova fatia vertical):
       do mês/configurações), front SSR (`/agenda-reforma-intima` +
       `/agenda-reforma-intima/{data}`, redirect 301 do legado), calendário navegável,
       SEO (sitemap, JSON-LD, canonical), capa via Media Library. *(PR #5, merge `80d6ece`)*
-- [ ] Mensagens mediúnicas + Autores espirituais
+- [x] **Mensagens mediúnicas + Autores espirituais** (Camada 4) — models `Mensagem`/
+      `AutorEspiritual` + pivôs (autores, relacionadas, destinatários, departamento),
+      importação idempotente do legado (`cema:importar-mensagens`, `-autores-espirituais`,
+      `-direcionadas`), admin Filament (`MensagemResource`/`AutorEspiritualResource`, DoTipo,
+      campo de destinatários), front SSR (listas + single de Mensagem e de Autor Espiritual,
+      SEO/sitemap), **visibilidade rica** por enum `VisibilidadeMensagem` (6 níveis —
+      Público/Trabalhadores/Médiuns/Diretores/Diretor-DEPAE/Direcionada: escada de papel +
+      recortes por pertencimento + barreira de login no single), aba **"Minhas Direcionadas"**
+      (read-only, `/minha-conta/direcionadas`) e, agora (**Fatia F4b**), a **produção no
+      próprio site**: o médium lança em `/minha-conta/mensagens` (nasce sempre pendente, com
+      `medium_id` e `nivel = null`) e o diretor do DEPAE (ou o presidente) cura em
+      `/minha-conta/curadoria` — fila de pendentes, histórico do item e o martelo **Publicar**,
+      que arbitra o nível de acesso. Eixo de autoria por **pertencimento a setor/cargo**
+      (`MensagemPolicy`), não pela matriz de capacidades (`mensagem.*` inertes); trilha própria
+      em `activity_log` (`log_name='mensagem'`, corpo/contexto redigidos na escrita) e autoria
+      privilegiada (`medium_id`/`publicado_por_id`/`publicado_em`, forçados no servidor).
+      *(Fatias 0→F4a: PR #35 merge `c988f89`, #36 merge `ef8841b`, #37 merge `161b502`,
+      #38 merge `b7f9402`, #39 merge `0fa26c4`, #40 merge `c517b70`, #41 merge `93999e8`,
+      #42 merge `8142883`; F4b nesta branch, PR a abrir.)*
 - [ ] **Blog (Sementeira de Luz)** — módulo **Posts entregue** (admin + front + posts
       importados + editor/mídia abaixo). Pendentes: **Comentários** e **Páginas institucionais**.
   - [x] **Editor + mídia** (RichEditor TipTap): justificado padrão + alinhamento/tamanho de

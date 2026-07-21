@@ -2,9 +2,10 @@
 
 Modelado a partir do conteúdo real do site atual. Tudo via **migrations**;
 nomes em pt-BR para o domínio. Cobre os módulos já implementados (Mídia,
-Palestras, Blog "Sementeira de Luz", Usuários/organização, Agenda, Eventos) e o
-**modelo de capacidades + auditoria** (quem edita o conteúdo, Fases A→D), além dos
-planejados (Comentários); os demais seguem o mesmo padrão.
+Palestras, Blog "Sementeira de Luz", Usuários/organização, Agenda, Eventos,
+Mensagens mediúnicas + Autores espirituais) e o **modelo de capacidades + auditoria**
+(quem edita o conteúdo, Fases A→D), além dos planejados (Comentários); os demais
+seguem o mesmo padrão.
 
 ## Mídia (Spatie Media Library)
 
@@ -362,8 +363,16 @@ usamos Filament Shield. Ver "Modelo de capacidades" abaixo.
 - **Hierarquia de papéis**: **estritamente linear** (frequentador < trabalhador <
   diretor < administrador).
 - **Escopo de escrita do diretor**: só via `cargo_usuario` (correção de segurança).
-- **Médium publica / diretor define nível**: permissões separadas (`mensagens.publicar`
-  via vínculo ao setor "Médium"; `mensagens.definir-nivel` só p/ diretor do depto).
+- **Médium publica / diretor define nível** — ⚠️ **SUPERADA pela Camada 4 / Fatia F4b**
+  (2026-07-21). Valia até aqui: permissões separadas (`mensagens.publicar` via vínculo ao
+  setor "Médium"; `mensagens.definir-nivel` só p/ diretor do depto), i.e. capacidade pela
+  matriz papel×permissão. Passou a valer: a F4b **não** usa a matriz de capacidades para
+  Mensagem — as permissions `mensagem.*` seguem semeadas mas **inertes** (nunca ligadas via
+  `/admin/matriz-capacidades`). O eixo real é **pertencimento por setor/cargo**, resolvido em
+  métodos próprios da `MensagemPolicy` (`lancar`/`editarPendente`/`curar`/
+  `editarNaCuradoria`/`publicar`), que consultam `User::ehMedium()` (setor "Médium"),
+  `User::ehDiretorDepae()` (cargo Diretor do DEPAE) e `User::ehPresidente()` — nunca
+  `hasPermissionTo`. Ver "Edição pelo site — Mensagens mediúnicas" acima.
 
 ### Migração (a partir do banco `legado`)
 
@@ -447,7 +456,15 @@ Tabela padrão do pacote (migrations `2026_07_13_191455/56/57`): `log_name`, `de
 `batch_uuid`, timestamps. Trilha **append-only** (só escrita; não há viewer).
 
 - **`log_name`**: `usuario` (trait no `User`), `autorizacao` (log manual dos 3 pivôs de
-  autorização), `agenda` (trait no `AgendaDia` + o log manual do depto↔conteúdo).
+  autorização), `agenda` (trait no `AgendaDia` + o log manual do depto↔conteúdo), `mensagem`
+  (trait no `Mensagem` — lançamento pelo médium e curadoria pelo diretor do DEPAE/presidente,
+  Fatia F4b).
+- **`mensagem` redige o conteúdo restrito na escrita**: `tapActivity()` substitui os valores
+  de `corpo` e `contexto` (nos blocos `attributes` e `old` da entrada) pelo literal
+  `'[texto não registrado]'`, preservando a **chave** (`array_key_exists`, nunca `isset` — o
+  valor pode ser `null` e é a chave que importa manter). Decisão do dono: a retenção da
+  trilha é indefinida, e sem a redação ela acumularia cópia integral de mensagens de níveis
+  restritos (Trabalhadores/Diretores/Médiuns/Diretor-DEPAE/Direcionada).
 - **Helper `App\Support\Autorizacao\AuditoriaAutorizacao`** — fonte única do contexto:
   `porta()` + `contexto()` (porta + IP + user-agent) + `diff()` + os `registrar*`.
 - **`porta`** (em `properties` de toda entrada): **`admin`** (painel Filament) ·
@@ -475,6 +492,42 @@ da Fase D, que exigia existir registro no escopo). O form vem da **fonte única*
 O `departamentos` **deixou de ser gravado**: o pivô `departamento_agenda_dia` está
 **congelado** (§6.4 da Camada 1) — nem lido, nem gravado, nada apagado. Quem responde pela
 Agenda vem da **Configuração de acesso por tipo**, não do registro.
+
+### Edição pelo site — Mensagens mediúnicas (Camada 4 / Fatia F4b)
+
+Duas superfícies novas em `/minha-conta`, fora do padrão capacidade+departamento acima: o
+eixo aqui é **AUTORIA por pertencimento a setor/cargo**, não a matriz de capacidades (as
+permissions `mensagem.*` continuam **inertes** — ver revogação abaixo). `MensagemPolicy`
+concentra as regras em métodos próprios (`lancar`/`editarPendente`/`curar`/
+`editarNaCuradoria`/`publicar`), que consultam `User::ehMedium()` (setor "Médium"),
+`User::ehDiretorDepae()` (cargo Diretor do DEPAE) e `User::ehPresidente()` — nunca
+`hasPermissionTo`. O admin passa antes, no `Gate::before`, em ambas.
+
+- **`conta.mensagens`** (componente `MensagensConta`) — o **médium** lança e edita as
+  próprias mensagens. Toda mensagem nasce **`status = pendente`**, com `nivel = null` (o
+  médium não escolhe o nível de acesso) e, enquanto pendente, só ele pode editá-la
+  (`editarPendente`: exige `medium_id === auth()->id()` e `status = pendente`). A lista é
+  escopada às próprias (`where('medium_id', auth()->id())`).
+- **`conta.curadoria`** (componente `CuradoriaConta`) — o **diretor do DEPAE** (ou o
+  presidente) vê a fila de todas as pendentes, corrige título/corpo/autores/pictografia
+  (`salvar()` nunca muda o status) e aplica o **martelo** (`publicar()`): arbitra o `nivel`
+  (via `App\Support\Mensagens\RegraPublicacao`), grava `status = publicado`,
+  `publicado_por_id = auth()->id()` e `publicado_em = now()`. Depois de publicada, a posse
+  passa ao curador — o médium deixa de poder editá-la pelo site.
+
+**3 campos privilegiados, sempre forçados no servidor** (nunca do POST — `unset` explícito
+antes de montar o registro em ambos os componentes):
+- **`medium_id`** (FK→`users`, nullable, `nullOnDelete`) — quem lançou; atribuído só em
+  `criarRegistro()`, nunca reasserido depois. **`null` significa "importada do legado"**: as
+  mensagens vindas do WordPress não têm autoria real (lá foram cadastradas por contas
+  técnicas do DECOM) — atribuí-las a um médium seria dado falso.
+- **`publicado_por_id`** (FK→`users`, nullable, `nullOnDelete`) — quem publicou (curador),
+  gravado só em `publicar()`.
+- **`publicado_em`** (timestamp nullable) — quando foi publicada, gravado junto.
+
+(migration `2026_07_21_000001_add_autoria_to_mensagens_table.php`.) Os três **não estão em
+`$fillable`** (atribuição é sempre direta, `$model->campo = valor`) e estão em `$hidden` no
+model `Mensagem` — nunca saem em `toArray()`/`wire:snapshot`.
 
 ## Agenda
 
@@ -561,11 +614,12 @@ chave/valor (model `Configuracao`, helpers estáticos `valor()`/`definir()`).
 
 ## Próximos módulos (resumo)
 
-Mesma abordagem por CPT, para o que **ainda falta**: `evangelho`,
-`mensagem-mediunicas`, `autores-espirituais` e `page` (páginas institucionais).
-Taxonomias adicionais: `capitulos-do-evangelho`, `nivel-de-acesso` (vira o gate de
-**VISIBILIDADE** por papel — hoje só `Evento` tem gate próprio, via
-`VisibilidadeEvento`).
+Mesma abordagem por CPT, para o que **ainda falta**: `evangelho` e `page` (páginas
+institucionais). Taxonomia adicional: `capitulos-do-evangelho`. A taxonomia
+`nivel-de-acesso` do WP foi resolvida, **para Mensagem**, sem importar o termo bruto: o
+enum `VisibilidadeMensagem` (6 níveis — ver "Edição pelo site — Mensagens mediúnicas"
+acima) é o gate de **VISIBILIDADE** por papel/pertencimento do módulo; `Evento` mantém o
+seu próprio, via `VisibilidadeEvento`.
 
-(Já entregues: `palestra_publica`, `palestrantes`, `agenda-reforma`, `_evento` e
-`post`/blog — ver [ROADMAP.md](ROADMAP.md).)
+(Já entregues: `palestra_publica`, `palestrantes`, `agenda-reforma`, `_evento`, `post`/blog,
+`mensagem-mediunicas` e `autores-espirituais` — ver [ROADMAP.md](ROADMAP.md).)

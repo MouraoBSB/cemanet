@@ -8,6 +8,7 @@ use App\Filament\Schemas\MensagemForm;
 use App\Models\Mensagem;
 use App\Support\Autorizacao\AuditoriaAutorizacao;
 use App\Support\Conta\AbaCuradoria;
+use App\Support\Mensagens\HistoricoMensagem;
 use App\Support\Mensagens\RegraPublicacao;
 use App\Support\Mensagens\SincronizadorDestinatarios;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -184,6 +185,15 @@ class CuradoriaConta extends Component implements HasForms
             ->orderByDesc('data_recebimento')
             ->get();
 
-        return view('livewire.conta.curadoria-conta', compact('itens'));
+        // Aviso "editada pelo autor após o lançamento" — Task 11 (HistoricoMensagem), 1 query p/ a fila inteira.
+        $editadasPeloAutor = HistoricoMensagem::editadasPeloAutor($itens);
+
+        $editando = $this->editandoId ? Mensagem::find($this->editandoId) : null;
+
+        return view('livewire.conta.curadoria-conta', [
+            'itens' => $itens,
+            'editadasPeloAutor' => $editadasPeloAutor,
+            'editando' => $editando,
+        ]);
     }
 }

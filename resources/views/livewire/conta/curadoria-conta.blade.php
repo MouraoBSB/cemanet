@@ -24,6 +24,12 @@
                 </div>
             </form>
         </section>
+
+        @if ($editando)
+            <section class="rounded-lg bg-white p-6 shadow-card">
+                <x-conta.historico-mensagem :mensagem="$editando" />
+            </section>
+        @endif
     @else
         {{-- Fila de TODAS as pendentes (não só as do curador) — molde de card próprio, como
              mensagens-conta.blade.php: nunca linka para mensagens.show (item pendente dá 404). --}}
@@ -37,6 +43,10 @@
                             &middot;
                             {{ $item->data_recebimento?->format('d/m/Y') ?: '—' }}
                         </p>
+                        {{-- Task 11: alerta quando o PRÓPRIO médium editou a mensagem após o lançamento. --}}
+                        @if (in_array($item->id, $editadasPeloAutor, true))
+                            <p class="mt-1 text-xs font-medium text-orange">Editada pelo autor após o lançamento</p>
+                        @endif
                     </div>
                     <button type="button" wire:click="editar({{ $item->id }})" class="text-sm text-primary hover:underline">Editar</button>
                 </article>

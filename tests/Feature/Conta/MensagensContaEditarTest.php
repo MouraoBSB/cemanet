@@ -154,4 +154,52 @@ class MensagensContaEditarTest extends TestCase
         $this->assertArrayNotHasKey('publicado_por_id', $c->get('data'));
         $this->assertArrayNotHasKey('publicado_em', $c->get('data'));
     }
+
+    /**
+     * Achado do review final (Important 1): `atualizarRegistro()` reescrevia `nivel = null` sempre
+     * que `direcionar` chegasse `false` — o que é o caso de TODO nível da escada (`trabalhadores`,
+     * `diretores`...), já que `editar()` só hidrata `direcionar = true` para `direcionada`. Cenário
+     * real: o curador classifica a pendente como `trabalhadores` (sem publicar — o `salvar()` da
+     * curadoria permite) e depois o médium corrige só o título ⇒ o nível arbitrado não pode sumir.
+     */
+    public function test_review_editar_so_o_titulo_preserva_nivel_da_escada_arbitrado_pelo_curador(): void
+    {
+        $medium = $this->medium();
+        $m = Mensagem::factory()->pendente()->comNivel(VisibilidadeMensagem::Trabalhadores)->create([
+            'medium_id' => $medium->id,
+            'titulo' => 'Título original',
+        ]);
+
+        Livewire::actingAs($medium)->test(MensagensConta::class)
+            ->call('editar', $m->id)
+            ->fillForm(['titulo' => 'Novo'])
+            ->call('salvar')
+            ->assertHasNoFormErrors();
+
+        $m->refresh();
+        $this->assertSame('Novo', $m->titulo);
+        $this->assertSame(VisibilidadeMensagem::Trabalhadores->value, $m->nivel);
+    }
+
+    /** Caso oposto do achado acima: direcionada + desmarcar o toggle ⇒ nível vira null e o pivô esvazia. */
+    public function test_review_editar_desmarcando_direcionar_limpa_nivel_e_esvazia_pivo(): void
+    {
+        $medium = $this->medium();
+        $u1 = User::factory()->create();
+
+        $m = Mensagem::factory()->pendente()->comNivel(VisibilidadeMensagem::Direcionada)->create([
+            'medium_id' => $medium->id,
+        ]);
+        $m->destinatarios()->sync([$u1->id]);
+
+        Livewire::actingAs($medium)->test(MensagensConta::class)
+            ->call('editar', $m->id)
+            ->fillForm(['direcionar' => false])
+            ->call('salvar')
+            ->assertHasNoFormErrors();
+
+        $m->refresh();
+        $this->assertNull($m->nivel);
+        $this->assertSame(0, $m->destinatarios()->count());
+    }
 }

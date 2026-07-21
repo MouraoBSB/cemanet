@@ -192,7 +192,15 @@ class MensagensConta extends Component implements HasForms
                 $dados['medium_id'], $dados['publicado_por_id'], $dados['publicado_em'],
             );
 
-            $dados['nivel'] = $ehDirecionada ? VisibilidadeMensagem::Direcionada->value : null;
+            // Achado do review final (Important 1): `direcionar` só é hidratado `true` para
+            // nível 'direcionada' (ver editar()) — para qualquer nível da escada
+            // ('trabalhadores', 'diretores'...), `direcionar` chega `false` e reescrever
+            // `nivel = null` sem condição apagaria o que o curador já arbitrou. Desmarcar o
+            // toggle LIMPA (medium só desmarca uma 'direcionada' que ele mesmo marcou); não
+            // mexer no toggle PRESERVA o nível vigente, seja ele qual for.
+            $dados['nivel'] = $ehDirecionada
+                ? VisibilidadeMensagem::Direcionada->value
+                : ($registro->nivel === VisibilidadeMensagem::Direcionada->value ? null : $registro->nivel);
 
             // Ao contrário de criarRegistro(), NÃO repetir saveRelationships() aqui: o
             // getState() acima já chamou (Schema::getState() invocado sem argumentos usa

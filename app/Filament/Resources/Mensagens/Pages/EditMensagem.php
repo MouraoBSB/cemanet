@@ -10,6 +10,7 @@ use Filament\Resources\Pages\EditRecord;
 
 class EditMensagem extends EditRecord
 {
+    use SincronizaDestinatarios;
     use SincronizaRelacionadas;
 
     protected static string $resource = MensagemResource::class;
@@ -24,17 +25,19 @@ class EditMensagem extends EditRecord
     protected function mutateFormDataBeforeFill(array $data): array
     {
         $data['relacionadas'] = $this->record->relacionadas()->pluck('mensagens.id')->all();
+        $data['destinatarios'] = $this->record->destinatarios()->pluck('users.id')->all();
 
         return $data;
     }
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        return $this->capturarRelacionadas($data);
+        return $this->capturarDestinatarios($this->capturarRelacionadas($data));
     }
 
     protected function afterSave(): void
     {
         $this->aplicarRelacionadas($this->record);
+        $this->aplicarDestinatarios($this->record);
     }
 }

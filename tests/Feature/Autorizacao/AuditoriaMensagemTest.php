@@ -71,6 +71,29 @@ class AuditoriaMensagemTest extends TestCase
         $this->assertStringNotContainsString('SENTINELA-NOVA-CTX', $json);
     }
 
+    /**
+     * Achado Important da revisão da Task 1: nenhum teste da suíte exercitava um valor NULL em
+     * corpo/contexto — trocar array_key_exists por isset no laço de redação não reprovaria nenhum
+     * teste, porque isset(string não vazia) é sempre true. Aqui o valor NOVO é null: isset(null) é
+     * false e pularia a redação (o campo ficaria null, em vez de virar '[texto não registrado]'),
+     * enquanto array_key_exists redige do mesmo jeito, porque é a CHAVE — não a verdade do valor —
+     * que decide.
+     */
+    public function test_editar_contexto_para_null_redige_o_campo_mesmo_com_o_valor_novo_nulo(): void
+    {
+        $m = Mensagem::factory()->create(['contexto' => 'SENTINELA-ANTES-DE-NULL']);
+        Activity::query()->delete();
+
+        $m->update(['contexto' => null]);
+
+        $props = Activity::where('log_name', 'mensagem')->latest('id')->first()->properties;
+        $this->assertArrayHasKey('contexto', $props['attributes']); // a CHAVE sobrevive mesmo com valor novo null
+        $this->assertSame('[texto não registrado]', $props['attributes']['contexto']); // isset(null) pularia a redação
+
+        $json = Activity::where('log_name', 'mensagem')->get()->toJson();
+        $this->assertStringNotContainsString('SENTINELA-ANTES-DE-NULL', $json);
+    }
+
     /** A redação é cirúrgica: só corpo/contexto são trocados — titulo continua com o valor real. */
     public function test_editar_titulo_mantem_o_valor_no_properties(): void
     {

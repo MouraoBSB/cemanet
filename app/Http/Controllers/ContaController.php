@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Enums\VisibilidadeMensagem;
 use App\Models\Palestra;
 use App\Support\Conta\AbaAgenda;
+use App\Support\Conta\AbaCuradoria;
 use App\Support\Conta\AbaDirecionadas;
 use App\Support\Conta\AbaMensagens;
 use Illuminate\Contracts\View\View;
@@ -65,5 +66,12 @@ class ContaController extends Controller
             ->get();
 
         return view('conta.direcionadas', compact('direcionadas'));
+    }
+
+    public function curadoria(): View
+    {
+        abort_unless(AbaCuradoria::visivelPara(auth()->user()), 403);
+
+        return view('conta.curadoria');
     }
 }

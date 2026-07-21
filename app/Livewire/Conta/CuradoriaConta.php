@@ -1,0 +1,137 @@
+<?php
+
+// Thiago Mourão — https://github.com/MouraoBSB — 2026-07-21
+
+namespace App\Livewire\Conta;
+
+use App\Filament\Schemas\MensagemForm;
+use App\Models\Mensagem;
+use App\Support\Autorizacao\AuditoriaAutorizacao;
+use App\Support\Conta\AbaCuradoria;
+use App\Support\Mensagens\SincronizadorDestinatarios;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Schemas\Schema;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\DB;
+use Illuminate\View\View;
+use Livewire\Component;
+
+/**
+ * Superfície pública da CURADORIA em /minha-conta/curadoria (Fatia F4b): o diretor do DEPAE (ou
+ * o presidente) vê a fila de TODAS as pendentes e corrige título/corpo/nível/autores/pictografia
+ * antes de publicar. O botão Publicar (o martelo) é da Task 10 — aqui só Salvar, que NUNCA muda
+ * o status: a curadoria pode salvar quantas vezes quiser sem que a mensagem saia de pendente.
+ *
+ * O furo B4 (ver task-9-report.md, Step 2a): autorizar com `curar` (sem objeto) deixaria um
+ * curador abrir/editar uma mensagem JÁ PUBLICADA, porque o id vem do cliente. `editar()`/
+ * `salvar()` autorizam com `editarNaCuradoria` sobre o REGISTRO (exige status pendente) —
+ * `findOrFail()` roda ANTES do `authorize()`, nunca o contrário.
+ */
+class CuradoriaConta extends Component implements HasForms
+{
+    use AuthorizesRequests, InteractsWithForms;
+
+    /** @var array<string, mixed>|null */
+    public ?array $data = [];
+
+    public ?int $editandoId = null;
+
+    public bool $mostrandoForm = false;
+
+    public function mount(): void
+    {
+        abort_unless(AbaCuradoria::visivelPara(auth()->user()), 403);
+    }
+
+    public function boot(): void
+    {
+        // /minha-conta não é painel Filament → porta cairia em 'sistema'. Marcar 'perfil'
+        // explicitamente, em toda requisição do componente (inclui o /livewire/update do save).
+        AuditoriaAutorizacao::usarPorta('perfil');
+    }
+
+    public function form(Schema $schema): Schema
+    {
+        return $schema
+            ->components(MensagemForm::schemaCuradoria())
+            ->model($this->editandoId ? Mensagem::find($this->editandoId) : Mensagem::class)
+            ->statePath('data')
+            ->operation('edit');
+    }
+
+    public function cancelar(): void
+    {
+        $this->mostrandoForm = false;
+        $this->editandoId = null;
+        $this->form->fill();
+    }
+
+    /**
+     * Âncora P1 (molde MensagensConta::editar) — obrigatória: sem `->model()` ANTES do `fill()`,
+     * o Select `autores` (->relationship()) e a pictografia hidratam VAZIOS, sem erro.
+     */
+    public function editar(int $id): void
+    {
+        $registro = Mensagem::findOrFail($id);
+        $this->authorize('editarNaCuradoria', $registro); // NUNCA 'curar' sem objeto — furo B4
+
+        $this->editandoId = $registro->id;
+        $this->form->model($registro); // ANTES do fill: não depende de quando o schema foi cacheado
+
+        // `destinatarios` é VIRTUAL (Select sem ->relationship()): attributesToArray() não o traz.
+        $this->form->fill([
+            ...$registro->attributesToArray(),
+            'destinatarios' => $registro->destinatarios()->pluck('users.id')->all(),
+        ]);
+
+        $this->mostrandoForm = true;
+    }
+
+    public function salvar(): void
+    {
+        $this->atualizarRegistro();
+
+        session()->flash('status', 'Mensagem atualizada.');
+        $this->redirect(route('conta.curadoria'), navigate: true);
+    }
+
+    /**
+     * Mesma mecânica de MensagensConta::atualizarRegistro() (campo virtual capturado antes do
+     * unset, `getState()` já roda saveRelationships() com o schema ancorado no registro pela P1),
+     * mas SEMPRE reasserindo `status = pendente`: salvar NUNCA publica, mesmo que o Select `status`
+     * não exista em schemaCuradoria (getState() já poda uma chave forjada) — a reasserção explícita
+     * documenta a regra e blinda contra uma futura mudança de schema.
+     */
+    private function atualizarRegistro(): Mensagem
+    {
+        return DB::transaction(function (): Mensagem {
+            $registro = Mensagem::findOrFail($this->editandoId);
+            $this->authorize('editarNaCuradoria', $registro); // NUNCA 'curar' sem objeto — furo B4
+
+            $dados = $this->form->getState(); // valida — DENTRO da transação
+
+            $idsDestinatarios = $dados['destinatarios'] ?? []; // Select SEM ->relationship(): desidratado normalmente
+            unset($dados['destinatarios']);
+
+            $dados['status'] = Mensagem::STATUS_PENDENTE; // sempre — salvar nunca publica
+
+            $registro->update($dados);
+
+            SincronizadorDestinatarios::aplicar($registro, $registro->nivel, $idsDestinatarios);
+
+            return $registro;
+        });
+    }
+
+    public function render(): View
+    {
+        $itens = Mensagem::query()
+            ->where('status', Mensagem::STATUS_PENDENTE)
+            ->with('medium:id,name', 'autores')
+            ->orderByDesc('data_recebimento')
+            ->get();
+
+        return view('livewire.conta.curadoria-conta', compact('itens'));
+    }
+}

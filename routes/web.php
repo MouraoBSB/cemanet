@@ -45,6 +45,7 @@ Route::middleware('auth')->prefix('minha-conta')->name('conta.')->group(function
     Route::get('/agenda', [ContaController::class, 'agenda'])->name('agenda');
     Route::get('/mensagens', [ContaController::class, 'mensagens'])->name('mensagens');
     Route::get('/direcionadas', [ContaController::class, 'direcionadas'])->name('direcionadas');
+    Route::get('/curadoria', [ContaController::class, 'curadoria'])->name('curadoria');
 });
 
 Route::post('/sair', [AuthenticatedSessionController::class, 'destroy'])->name('logout')->middleware('auth');

@@ -171,9 +171,9 @@ class MensagensConta extends Component implements HasForms
 
     /**
      * Mesma mecânica de criarRegistro() (campos virtuais capturados antes do unset, privilegiados
-     * reasseridos, saveRelationships() antes do sync do pivô), mas SEM tocar `status`/`medium_id`/
-     * `publicado_por_id`/`publicado_em`: a edição é sempre de uma PENDENTE (o guard da policy já
-     * exige isso) e a posse/autoria não muda ao editar.
+     * reasseridos), mas SEM tocar `status`/`medium_id`/`publicado_por_id`/`publicado_em`: a edição
+     * é sempre de uma PENDENTE (o guard da policy já exige isso) e a posse/autoria não muda ao
+     * editar. Também SEM repetir saveRelationships() — ver comentário abaixo, junto ao update().
      */
     private function atualizarRegistro(): Mensagem
     {
@@ -194,9 +194,15 @@ class MensagensConta extends Component implements HasForms
 
             $dados['nivel'] = $ehDirecionada ? VisibilidadeMensagem::Direcionada->value : null;
 
+            // Ao contrário de criarRegistro(), NÃO repetir saveRelationships() aqui: o
+            // getState() acima já chamou (Schema::getState() invocado sem argumentos usa
+            // $shouldCallHooksBefore=true por padrão — vendor/filament/schemas/src/Concerns/
+            // HasState.php:483) e, na edição, o schema já está ancorado num registro
+            // persistido (a âncora P1 do editar()), então o pivô `autores` e a pictografia
+            // já foram sincronizados ali. Só é necessário repetir em criarRegistro() porque,
+            // no momento do getState() ali, o schema ainda aponta para a class-string
+            // Mensagem::class — getRecord() é null e a sincronização interna não tem onde gravar.
             $registro->update($dados);
-
-            $this->form->model($registro)->saveRelationships();
 
             SincronizadorDestinatarios::aplicar($registro, $registro->nivel, $idsDestinatarios);
 

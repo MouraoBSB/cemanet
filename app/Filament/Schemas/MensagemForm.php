@@ -160,6 +160,13 @@ class MensagemForm
      * é o diretor, na curadoria). NÃO é usado pelo schemaAdmin, que mantém a Section inline (filtra `ativo`
      * e não tem o helperText do painel — compartilhar mudaria o /admin em silêncio).
      *
+     * Achado do review final (Important 2a): as options SEMPRE incluem os já selecionados (`orWhereIn`),
+     * mesmo que tenham deixado de estar `ativo` depois — senão o `Select` injeta `Rule::in(options)` sem o
+     * id hidratado pelo `fill()` (vindo do pivô), e um destinatário desativado DEPOIS de uma direcionada
+     * existir trava até um simples Salvar de título, sem saída (a opção nem aparece pra ser removida). Quem
+     * garante que um inativo nunca É GRAVADO no pivô é o filtro de integridade de sempre, em
+     * `SincronizadorDestinatarios::aplicar()` (I7) — aqui é só sobre a OPÇÃO existir na tela.
+     *
      * @param  Closure(Get): bool  $ehDirecionada
      */
     private static function blocoDestinatarios(Closure $ehDirecionada): Section
@@ -170,7 +177,11 @@ class MensagemForm
             ->schema([
                 Select::make('destinatarios')
                     ->label('Destinatários')
-                    ->options(fn () => User::where('ativo', true)->orderBy('name')->pluck('name', 'id'))
+                    ->options(fn (Get $get) => User::query()
+                        ->where('ativo', true)
+                        ->orWhereIn('id', (array) $get('destinatarios'))
+                        ->orderBy('name')
+                        ->pluck('name', 'id'))
                     ->multiple()
                     ->searchable()
                     ->required($ehDirecionada)

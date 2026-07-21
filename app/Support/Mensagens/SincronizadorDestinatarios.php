@@ -42,6 +42,26 @@ class SincronizadorDestinatarios
     }
 
     /**
+     * Guard de nível + filtro de integridade contra `users` ativos — SEM sincronizar. Extraído do
+     * corpo de aplicar() (achado do review final, Important 2b): quem precisa VALIDAR o conjunto
+     * que de fato vai para o pivô ANTES de gravar (ex.: `RegraPublicacao`, na curadoria) usa este
+     * método; ids inexistentes ou de usuário inativo já saem descartados.
+     *
+     * @param  array<int, int|string>  $ids
+     * @return list<int>
+     */
+    public static function efetivos(?string $nivel, array $ids): array
+    {
+        // Cast + dedup ficam só em sincronizar() (não duplicar aqui): o whereIn tolera
+        // ids crus (numéricos ou string), e o resultado do pluck já é único por ser PK.
+        return User::query()
+            ->whereIn('id', self::filtrarPorNivel($nivel, $ids))
+            ->where('ativo', true)
+            ->pluck('id')
+            ->all();
+    }
+
+    /**
      * Guard de nível + filtro de integridade contra `users` ativos + sync — para uso fora do
      * /admin, onde o POST não é confiável (a options-list de um Select é UI, não integridade).
      * Ids inexistentes ou de usuário inativo são descartados ANTES do sync: nunca envolver em
@@ -51,14 +71,6 @@ class SincronizadorDestinatarios
      */
     public static function aplicar(Mensagem $mensagem, ?string $nivel, array $ids): void
     {
-        // Cast + dedup ficam só em sincronizar() (não duplicar aqui): o whereIn tolera
-        // ids crus (numéricos ou string), e o resultado do pluck já é único por ser PK.
-        $idsAtivos = User::query()
-            ->whereIn('id', self::filtrarPorNivel($nivel, $ids))
-            ->where('ativo', true)
-            ->pluck('id')
-            ->all();
-
-        self::sincronizar($mensagem, $idsAtivos);
+        self::sincronizar($mensagem, self::efetivos($nivel, $ids));
     }
 }

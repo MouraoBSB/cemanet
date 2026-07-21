@@ -225,6 +225,35 @@ class CuradoriaPublicarTest extends TestCase
     }
 
     /**
+     * Achado do review final (Important 2b): `RegraPublicacao::erros()` lia o array CRU de
+     * `destinatarios`, antes do filtro de integridade de `SincronizadorDestinatarios::aplicar()`
+     * (que descarta id de usuário inativo — I7). Uma direcionada cujo ÚNICO destinatário foi
+     * desativado passava pela validação do Select (o id já selecionado continua nas options —
+     * Important 2a) e pela `RegraPublicacao` (array não-vazio), mas o `aplicar()` sincronizaria
+     * um pivô VAZIO — mensagem "direcionada" publicada e invisível para todo mundo. A checagem
+     * agora usa o conjunto EFETIVO (pós-filtro de `ativo`), então é recusada como se não houvesse
+     * destinatário algum.
+     */
+    public function test_review_publicar_direcionada_com_destinatario_inativo_e_conjunto_efetivo_vazio_recusa(): void
+    {
+        $curador = $this->diretorDepae();
+        $inativo = User::factory()->create(['ativo' => false]);
+
+        $pendente = Mensagem::factory()->pendente()->comNivel(VisibilidadeMensagem::Direcionada)->create();
+        $pendente->destinatarios()->sync([$inativo->id]);
+
+        Livewire::actingAs($curador)->test(CuradoriaConta::class)
+            ->call('editar', $pendente->id)
+            ->call('publicar', $pendente->id)
+            ->assertHasFormErrors(['destinatarios']);
+
+        $pendente->refresh();
+        $this->assertSame(Mensagem::STATUS_PENDENTE, $pendente->status);
+        // Recusa DENTRO da transação: nada mudou, nem o pivô pré-existente do fixture (rollback total).
+        $this->assertSame([$inativo->id], $pendente->destinatarios()->pluck('users.id')->all());
+    }
+
+    /**
      * I13 (D3 — conflito de interesse é PERMITIDO): médium E diretor do DEPAE, não-admin,
      * não-presidente, publica a PRÓPRIA mensagem ⇒ permitido; a trilha registra o causer.
      */

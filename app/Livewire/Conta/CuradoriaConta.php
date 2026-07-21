@@ -4,6 +4,7 @@
 
 namespace App\Livewire\Conta;
 
+use App\Enums\VisibilidadeMensagem;
 use App\Filament\Schemas\MensagemForm;
 use App\Models\Mensagem;
 use App\Support\Autorizacao\AuditoriaAutorizacao;
@@ -117,6 +118,14 @@ class CuradoriaConta extends Component implements HasForms
      * schema está ancorado no registro (P1). Se a checagem ficasse fora da transação, uma
      * publicação recusada por nível inválido deixaria essas relações já gravadas — meio save
      * aplicado. Dentro da transação, o `throw` reverte tudo.
+     *
+     * Fix pós-revisão (Important 2b): `RegraPublicacao::erros()` lia o array CRU de
+     * `destinatarios` — um usuário desativado DEPOIS de selecionado ainda passa pela validação
+     * do próprio Select (Important 2a: a opção continua existindo) e chegaria aqui como "≥1
+     * destinatário", só para `SincronizadorDestinatarios::aplicar()` sincronizar um pivô VAZIO
+     * (o filtro de integridade de sempre, I7) — uma "direcionada" publicada e invisível para
+     * todo mundo. A checagem usa o conjunto EFETIVO (pós-filtro de `ativo`), calculado uma vez
+     * e reaproveitado no sync (`sincronizar()`, não `aplicar()` de novo — evita repetir a query).
      */
     public function publicar(int $id): void
     {
@@ -127,13 +136,21 @@ class CuradoriaConta extends Component implements HasForms
         DB::transaction(function () use ($registro): void {
             $dados = $this->form->getState(); // valida + saveRelationships() — DENTRO da transação
 
-            $erros = RegraPublicacao::erros($dados);
+            $idsDestinatarios = $dados['destinatarios'] ?? [];
+            $idsEfetivos = SincronizadorDestinatarios::efetivos($dados['nivel'] ?? null, $idsDestinatarios);
+
+            $erros = RegraPublicacao::erros(['nivel' => $dados['nivel'] ?? null, 'destinatarios' => $idsEfetivos]);
 
             if ($erros !== []) {
-                throw ValidationException::withMessages(['data.nivel' => $erros[0]]);
+                // Com o conjunto EFETIVO já filtrado, só sobra erro de destinatário quando o
+                // nível em si é 'direcionada' (válido) — senão o erro é do nível.
+                $chave = $dados['nivel'] === VisibilidadeMensagem::Direcionada->value
+                    ? 'data.destinatarios'
+                    : 'data.nivel';
+
+                throw ValidationException::withMessages([$chave => $erros[0]]);
             }
 
-            $idsDestinatarios = $dados['destinatarios'] ?? [];
             unset($dados['destinatarios']);
 
             $registro->fill($dados);
@@ -142,7 +159,7 @@ class CuradoriaConta extends Component implements HasForms
             $registro->publicado_em = now();
             $registro->save();
 
-            SincronizadorDestinatarios::aplicar($registro, $registro->nivel, $idsDestinatarios);
+            SincronizadorDestinatarios::sincronizar($registro, $idsEfetivos);
         });
 
         session()->flash('status', 'Mensagem publicada.');

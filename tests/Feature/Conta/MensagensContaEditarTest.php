@@ -202,4 +202,37 @@ class MensagensContaEditarTest extends TestCase
         $this->assertNull($m->nivel);
         $this->assertSame(0, $m->destinatarios()->count());
     }
+
+    /**
+     * Achado do review final (Important 2a): `schemaAdmin` usa `User::orderBy('name')` (todos),
+     * `blocoDestinatarios` usa `User::where('ativo', true)` — duas listas para o MESMO campo. O
+     * `Select` injeta `Rule::in(options)`: um destinatário DESATIVADO DEPOIS de uma direcionada
+     * existir carrega o id no `fill()` (vindo do pivô) mas ele não está mais nas options ⇒ o
+     * médium fica sem saída para salvar até um simples ajuste de título. O ATIVO continua
+     * preservado; o INATIVO é descartado pelo filtro de integridade de sempre (I7) — o que muda
+     * é que o form deixa de EXPLODIR com "The selected destinatários is invalid.".
+     */
+    public function test_review_editar_com_destinatario_desativado_depois_salva_sem_erro(): void
+    {
+        $medium = $this->medium();
+        $ativo = User::factory()->create();
+        $desativadoDepois = User::factory()->create();
+
+        $m = Mensagem::factory()->pendente()->comNivel(VisibilidadeMensagem::Direcionada)->create([
+            'medium_id' => $medium->id,
+            'titulo' => 'Título original',
+        ]);
+        $m->destinatarios()->sync([$ativo->id, $desativadoDepois->id]);
+        $desativadoDepois->update(['ativo' => false]);
+
+        Livewire::actingAs($medium)->test(MensagensConta::class)
+            ->call('editar', $m->id)
+            ->fillForm(['titulo' => 'Novo'])
+            ->call('salvar')
+            ->assertHasNoFormErrors();
+
+        $m->refresh();
+        $this->assertSame('Novo', $m->titulo);
+        $this->assertSame([$ativo->id], $m->destinatarios()->pluck('users.id')->all());
+    }
 }

@@ -21,9 +21,11 @@ use Illuminate\View\View;
 use Livewire\Component;
 
 /**
- * Superfície pública do LANÇAMENTO de Mensagem em /minha-conta (Fatia F4b, D2): o médium cria a
- * mensagem, que nasce SEMPRE pendente, com `medium_id` dele e `nivel = null` — ele não escolhe o
- * nível; quem arbitra é o diretor do DEPAE, ao publicar na curadoria (task própria).
+ * Superfície pública do LANÇAMENTO e da EDIÇÃO de Mensagem em /minha-conta (Fatia F4b, D2/D10): o
+ * médium cria a mensagem, que nasce SEMPRE pendente, com `medium_id` dele e `nivel = null` — ele
+ * não escolhe o nível; quem arbitra é o diretor do DEPAE, ao publicar na curadoria (task própria).
+ * Enquanto PENDENTE, o próprio médium pode editar (policy `editarPendente`); depois de publicada,
+ * a posse passa ao curador — a aba não mostra mais o corpo nem linka para a página pública (D10).
  *
  * A lista mostra só as PRÓPRIAS mensagens (medium_id = auth()->id()) — nunca as dos outros 45.
  */
@@ -33,6 +35,8 @@ class MensagensConta extends Component implements HasForms
 
     /** @var array<string, mixed>|null */
     public ?array $data = [];
+
+    public ?int $editandoId = null;
 
     public bool $mostrandoForm = false;
 
@@ -52,14 +56,15 @@ class MensagensConta extends Component implements HasForms
     {
         return $schema
             ->components(MensagemForm::schemaMedium())
-            ->model(Mensagem::class)
+            ->model($this->editandoId ? Mensagem::find($this->editandoId) : Mensagem::class)
             ->statePath('data')
-            ->operation('create');
+            ->operation($this->editandoId ? 'edit' : 'create');
     }
 
     public function novo(): void
     {
         $this->authorize('lancar', Mensagem::class);
+        $this->editandoId = null;
         $this->form->fill();
         $this->mostrandoForm = true;
     }
@@ -67,11 +72,47 @@ class MensagensConta extends Component implements HasForms
     public function cancelar(): void
     {
         $this->mostrandoForm = false;
+        $this->editandoId = null;
         $this->form->fill();
+    }
+
+    /**
+     * P1 — a âncora explícita é obrigatória: o schema pode já ter sido acessado (e cacheado) ANTES
+     * desta action rodar, com `model(Mensagem::class)` (class-string) preso no cache. Sem esta
+     * linha, `getRecord()` devolve null e o Select `autores` (->relationship()) e a pictografia
+     * (mídia) hidratam VAZIOS, sem erro — o form parece novo, não uma edição.
+     */
+    public function editar(int $id): void
+    {
+        $registro = Mensagem::findOrFail($id);
+        $this->authorize('editarPendente', $registro);
+
+        $this->editandoId = $registro->id;
+        $this->form->model($registro); // ANTES do fill: não depende de quando o schema foi cacheado
+
+        // M2 — `direcionar`/`destinatarios` são VIRTUAIS (não são coluna nem ->relationship()):
+        // attributesToArray() não os traz. Sem isto, `direcionar` chegaria false e `nivel` viraria
+        // null ao salvar — esvaziando o pivô de uma mensagem direcionada mesmo editando só o título.
+        $this->form->fill([
+            ...$registro->attributesToArray(),
+            'direcionar' => $registro->nivel === VisibilidadeMensagem::Direcionada->value,
+            'destinatarios' => $registro->destinatarios()->pluck('users.id')->all(),
+        ]);
+
+        $this->mostrandoForm = true;
     }
 
     public function salvar(): void
     {
+        if ($this->editandoId) {
+            $this->atualizarRegistro();
+
+            session()->flash('status', 'Mensagem atualizada.');
+            $this->redirect(route('conta.mensagens'), navigate: true);
+
+            return;
+        }
+
         $this->authorize('lancar', Mensagem::class);
 
         try {
@@ -125,6 +166,41 @@ class MensagensConta extends Component implements HasForms
             SincronizadorDestinatarios::aplicar($mensagem, $mensagem->nivel, $idsDestinatarios);
 
             return $mensagem;
+        });
+    }
+
+    /**
+     * Mesma mecânica de criarRegistro() (campos virtuais capturados antes do unset, privilegiados
+     * reasseridos, saveRelationships() antes do sync do pivô), mas SEM tocar `status`/`medium_id`/
+     * `publicado_por_id`/`publicado_em`: a edição é sempre de uma PENDENTE (o guard da policy já
+     * exige isso) e a posse/autoria não muda ao editar.
+     */
+    private function atualizarRegistro(): Mensagem
+    {
+        return DB::transaction(function (): Mensagem {
+            $registro = Mensagem::findOrFail($this->editandoId);
+            $this->authorize('editarPendente', $registro);
+
+            $dados = $this->form->getState(); // valida — DENTRO da transação
+
+            $ehDirecionada = (bool) ($dados['direcionar'] ?? false);
+            $idsDestinatarios = $dados['destinatarios'] ?? []; // Select SEM ->relationship(): desidratado normalmente
+
+            // Campos privilegiados: nunca confiar no POST, mesmo que getState() já os pode.
+            unset(
+                $dados['direcionar'], $dados['destinatarios'], $dados['status'], $dados['nivel'],
+                $dados['medium_id'], $dados['publicado_por_id'], $dados['publicado_em'],
+            );
+
+            $dados['nivel'] = $ehDirecionada ? VisibilidadeMensagem::Direcionada->value : null;
+
+            $registro->update($dados);
+
+            $this->form->model($registro)->saveRelationships();
+
+            SincronizadorDestinatarios::aplicar($registro, $registro->nivel, $idsDestinatarios);
+
+            return $registro;
         });
     }
 

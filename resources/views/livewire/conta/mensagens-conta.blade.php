@@ -15,7 +15,9 @@
             <form wire:submit="salvar" class="space-y-4">
                 {{ $this->form }}
                 <div class="flex gap-2">
-                    <button type="submit" class="rounded-pill bg-primary px-4 py-2 text-sm font-medium text-white">Enviar para curadoria</button>
+                    <button type="submit" class="rounded-pill bg-primary px-4 py-2 text-sm font-medium text-white">
+                        {{ $editandoId ? 'Salvar alterações' : 'Enviar para curadoria' }}
+                    </button>
                     <button type="button" wire:click="cancelar" class="rounded-pill bg-surface px-4 py-2 text-sm text-text">Cancelar</button>
                 </div>
             </form>
@@ -40,6 +42,11 @@
                         'bg-accent/15 text-success' => $item->status === \App\Models\Mensagem::STATUS_PUBLICADO,
                         'bg-border-muted text-text-secondary' => $item->status !== \App\Models\Mensagem::STATUS_PUBLICADO,
                     ])>{{ $item->status }}</span>
+                    {{-- Só a PENDENTE é editável pelo médium (policy editarPendente); após publicada,
+                         a posse passa ao curador (D10) — sem link, sem corpo, sem botão aqui. --}}
+                    @if ($item->status === \App\Models\Mensagem::STATUS_PENDENTE)
+                        <button type="button" wire:click="editar({{ $item->id }})" class="text-sm text-primary hover:underline">Editar</button>
+                    @endif
                 </div>
             </article>
         @empty

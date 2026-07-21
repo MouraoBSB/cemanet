@@ -9,17 +9,19 @@ use Filament\Resources\Pages\CreateRecord;
 
 class CreateMensagem extends CreateRecord
 {
+    use SincronizaDestinatarios;
     use SincronizaRelacionadas;
 
     protected static string $resource = MensagemResource::class;
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        return $this->capturarRelacionadas($data);
+        return $this->capturarDestinatarios($this->capturarRelacionadas($data));
     }
 
     protected function afterCreate(): void
     {
         $this->aplicarRelacionadas($this->record);
+        $this->aplicarDestinatarios($this->record);
     }
 }

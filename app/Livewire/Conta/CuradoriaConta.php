@@ -103,6 +103,14 @@ class CuradoriaConta extends Component implements HasForms
      * O martelo: o diretor do DEPAE (ou presidente) arbitra o nível e publica. `findOrFail` +
      * `authorize` ANTES da transação (a policy já exige status pendente, via `editarNaCuradoria`).
      *
+     * Fix pós-revisão (Important, Task 10): `publicar` é um método público Livewire — nada
+     * impede um curador de chamá-lo com um `$id` diferente do `editandoId` corrente, fora da UI
+     * (o botão só emite `publicar({{ $editandoId }})`, mas isso não amarra o servidor). `$registro`
+     * (do `$id` do cliente) seria usado para fill/save, enquanto `$this->form->getState()` — mais
+     * abaixo — opera sobre o modelo ANCORADO em `$this->editandoId` (P1, `editar()`): dois
+     * registros diferentes na mesma operação. O guard trava o `$id` recebido no `$editandoId` do
+     * próprio componente ANTES do `authorize`, fechando a divergência na origem.
+     *
      * `RegraPublicacao::erros()` roda DEPOIS do `getState()` mas AINDA DENTRO da transação: o
      * `getState()` já executa `saveRelationships()` (autores/pictografia) internamente, porque o
      * schema está ancorado no registro (P1). Se a checagem ficasse fora da transação, uma
@@ -112,6 +120,7 @@ class CuradoriaConta extends Component implements HasForms
     public function publicar(int $id): void
     {
         $registro = Mensagem::findOrFail($id);
+        abort_unless($id === $this->editandoId, 403);
         $this->authorize('publicar', $registro);
 
         DB::transaction(function () use ($registro): void {

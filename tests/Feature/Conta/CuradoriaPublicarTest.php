@@ -190,6 +190,41 @@ class CuradoriaPublicarTest extends TestCase
     }
 
     /**
+     * Fix pós-revisão (Important — id ≠ editandoId): `publicar($id)` usava DOIS registros
+     * diferentes — `$registro` (do `$id` do cliente) para fill/save, mas `$this->form->getState()`
+     * (que dispara `saveRelationships()` de autores/pictografia) opera sobre o modelo ANCORADO em
+     * `$this->editandoId` (P1, `editar()`). `publicar` é um método público Livewire: nada impede um
+     * curador autenticado de chamá-lo com um `$id` diferente do `editandoId` corrente, fora da UI.
+     * Prova: abre `editar(A)` (schema ancora em A) e chama `publicar(B)` — sem o guard, B seria
+     * publicada com título/nível de A e o pivô de autores de A seria alterado como efeito colateral.
+     */
+    public function test_publicar_com_id_diferente_do_editandoid_e_recusado_e_nada_muda(): void
+    {
+        $curador = $this->diretorDepae();
+        $autorA = AutorEspiritual::factory()->create();
+
+        $pendenteA = Mensagem::factory()->pendente()->create(['titulo' => 'Título A']);
+        $pendenteA->autores()->sync([$autorA->id]);
+
+        $pendenteB = Mensagem::factory()->pendente()->create(['titulo' => 'Título B']);
+
+        Livewire::actingAs($curador)->test(CuradoriaConta::class)
+            ->call('editar', $pendenteA->id)
+            ->fillForm(['nivel' => VisibilidadeMensagem::Publico->value])
+            ->call('publicar', $pendenteB->id)
+            ->assertForbidden();
+
+        $pendenteA->refresh();
+        $pendenteB->refresh();
+
+        $this->assertSame(Mensagem::STATUS_PENDENTE, $pendenteB->status);
+        $this->assertSame('Título B', $pendenteB->titulo);
+        $this->assertSame(Mensagem::STATUS_PENDENTE, $pendenteA->status);
+        $this->assertSame('Título A', $pendenteA->titulo);
+        $this->assertSame([$autorA->id], $pendenteA->autores->pluck('id')->all());
+    }
+
+    /**
      * I13 (D3 — conflito de interesse é PERMITIDO): médium E diretor do DEPAE, não-admin,
      * não-presidente, publica a PRÓPRIA mensagem ⇒ permitido; a trilha registra o causer.
      */

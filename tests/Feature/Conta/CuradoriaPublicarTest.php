@@ -254,6 +254,76 @@ class CuradoriaPublicarTest extends TestCase
     }
 
     /**
+     * Achado do review final (Important 3): `SlugMensagem` gera o slug UMA vez, na criação, a
+     * partir do título de RASCUNHO do médium — `schemaCuradoria` não tem campo de slug (por
+     * desenho) e nada o regenerava. `publicar()` (o único ponto em que o título de rascunho vira
+     * definitivo) agora regera o slug a partir do título FINAL, já curado, antes do `save()`. Como
+     * a transição é só pendente→publicado, nenhuma URL já publicada muda — não há 301 a criar.
+     */
+    public function test_review_publicar_regenera_slug_a_partir_do_titulo_curado(): void
+    {
+        $curador = $this->diretorDepae();
+        $pendente = Mensagem::factory()->pendente()->create([
+            'titulo' => 'Rascunho sem titulo definitivo',
+            'slug' => 'rascunho-sem-titulo-definitivo',
+        ]);
+
+        Livewire::actingAs($curador)->test(CuradoriaConta::class)
+            ->call('editar', $pendente->id)
+            ->fillForm(['titulo' => 'A Paz Interior', 'nivel' => VisibilidadeMensagem::Publico->value])
+            ->call('publicar', $pendente->id)
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('a-paz-interior', $pendente->fresh()->slug);
+    }
+
+    /**
+     * Prova de que a costura se perdeu: `SlugMensagem::unico()` foi especificado com `$ignorarId`
+     * EXATAMENTE para isto (o `$ignorarId` nunca era usado, na revisão). Sem excluir o próprio
+     * registro da checagem de unicidade, publicar SEM tocar o título faria a mensagem "colidir"
+     * com o próprio slug já gravado e ganhar um sufixo `-2` indevido.
+     */
+    public function test_review_publicar_sem_alterar_titulo_nao_duplica_o_proprio_slug(): void
+    {
+        $curador = $this->diretorDepae();
+        $pendente = Mensagem::factory()->pendente()->create([
+            'titulo' => 'Palavras de Conforto',
+            'slug' => 'palavras-de-conforto',
+        ]);
+
+        Livewire::actingAs($curador)->test(CuradoriaConta::class)
+            ->call('editar', $pendente->id)
+            ->fillForm(['nivel' => VisibilidadeMensagem::Publico->value])
+            ->call('publicar', $pendente->id)
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('palavras-de-conforto', $pendente->fresh()->slug);
+    }
+
+    /** Publicar duas mensagens com o mesmo título curado ⇒ slugs distintos (unicidade preservada). */
+    public function test_review_publicar_duas_mensagens_com_mesmo_titulo_gera_slugs_distintos(): void
+    {
+        $curador = $this->diretorDepae();
+        $a = Mensagem::factory()->pendente()->create(['titulo' => 'Rascunho A']);
+        $b = Mensagem::factory()->pendente()->create(['titulo' => 'Rascunho B']);
+
+        Livewire::actingAs($curador)->test(CuradoriaConta::class)
+            ->call('editar', $a->id)
+            ->fillForm(['titulo' => 'Mensagem Repetida', 'nivel' => VisibilidadeMensagem::Publico->value])
+            ->call('publicar', $a->id)
+            ->assertHasNoFormErrors();
+
+        Livewire::actingAs($curador)->test(CuradoriaConta::class)
+            ->call('editar', $b->id)
+            ->fillForm(['titulo' => 'Mensagem Repetida', 'nivel' => VisibilidadeMensagem::Publico->value])
+            ->call('publicar', $b->id)
+            ->assertHasNoFormErrors();
+
+        $this->assertSame('mensagem-repetida', $a->fresh()->slug);
+        $this->assertSame('mensagem-repetida-2', $b->fresh()->slug);
+    }
+
+    /**
      * I13 (D3 — conflito de interesse é PERMITIDO): médium E diretor do DEPAE, não-admin,
      * não-presidente, publica a PRÓPRIA mensagem ⇒ permitido; a trilha registra o causer.
      */

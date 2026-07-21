@@ -12,6 +12,7 @@ use App\Support\Conta\AbaCuradoria;
 use App\Support\Mensagens\HistoricoMensagem;
 use App\Support\Mensagens\RegraPublicacao;
 use App\Support\Mensagens\SincronizadorDestinatarios;
+use App\Support\Mensagens\SlugMensagem;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Schema;
@@ -126,6 +127,13 @@ class CuradoriaConta extends Component implements HasForms
      * (o filtro de integridade de sempre, I7) — uma "direcionada" publicada e invisível para
      * todo mundo. A checagem usa o conjunto EFETIVO (pós-filtro de `ativo`), calculado uma vez
      * e reaproveitado no sync (`sincronizar()`, não `aplicar()` de novo — evita repetir a query).
+     *
+     * Fix pós-revisão (Important 3): `SlugMensagem` gera o slug UMA vez, na criação, a partir do
+     * título de RASCUNHO do médium — `schemaCuradoria` não tem campo de slug (por desenho) e nada
+     * o regenerava, então a mensagem ia ao ar numa URL presa ao rascunho. `publicar()` é a única
+     * transição pendente→publicado — regera aqui, a partir do título já curado, ANTES do `save()`.
+     * `$ignorarId = $registro->id` é obrigatório: sem ele, o próprio slug já gravado "colidiria"
+     * consigo mesmo sempre que o título não mudasse, ganhando um sufixo `-2` indevido.
      */
     public function publicar(int $id): void
     {
@@ -154,6 +162,7 @@ class CuradoriaConta extends Component implements HasForms
             unset($dados['destinatarios']);
 
             $registro->fill($dados);
+            $registro->slug = SlugMensagem::unico($registro->titulo, $registro->id);
             $registro->status = Mensagem::STATUS_PUBLICADO;
             $registro->publicado_por_id = auth()->id();
             $registro->publicado_em = now();

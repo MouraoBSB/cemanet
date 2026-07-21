@@ -5,11 +5,13 @@
 namespace App\Filament\Resources\Mensagens;
 
 use App\Enums\FormatoMensagem;
+use App\Enums\VisibilidadeMensagem;
 use App\Filament\Resources\Mensagens\Pages\CreateMensagem;
 use App\Filament\Resources\Mensagens\Pages\EditMensagem;
 use App\Filament\Resources\Mensagens\Pages\ListMensagens;
 use App\Filament\Support\ComponentesImagem;
 use App\Models\Mensagem;
+use App\Models\User;
 use BackedEnum;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
@@ -23,6 +25,7 @@ use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
@@ -115,6 +118,7 @@ class MensagemResource extends Resource
                         Select::make('nivel')
                             ->label('Nível de acesso')
                             ->options(self::NIVEIS)
+                            ->live() // pré-requisito do visible da Section Destinatários / required condicional
                             ->helperText('Só as Públicas aparecem no site (por ora). A visibilidade rica virá na próxima fase.'),
 
                         Select::make('status')
@@ -156,6 +160,21 @@ class MensagemResource extends Resource
                                 ->orderBy('titulo')
                                 ->pluck('titulo', 'id'))
                             ->helperText('Relação simétrica: ao relacionar A→B, B também passa a listar A.'),
+                    ]),
+
+                Section::make('Destinatários')
+                    ->description('Usuários a quem esta mensagem direcionada foi endereçada.')
+                    ->visible(fn (Get $get): bool => $get('nivel') === VisibilidadeMensagem::Direcionada->value)
+                    ->schema([
+                        Select::make('destinatarios')
+                            ->label('Destinatários')
+                            ->helperText('Obrigatório para mensagens de nível "Direcionada".')
+                            ->options(fn () => User::orderBy('name')->pluck('name', 'id'))
+                            ->multiple()
+                            ->searchable()
+                            ->required(fn (Get $get): bool => $get('nivel') === VisibilidadeMensagem::Direcionada->value)
+                            ->minItems(1)
+                            ->columnSpanFull(),
                     ]),
 
                 Section::make('Pictografia')

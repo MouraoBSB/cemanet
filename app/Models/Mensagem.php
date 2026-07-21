@@ -8,20 +8,25 @@ use App\Enums\FormatoMensagem;
 use App\Enums\VisibilidadeMensagem;
 use App\Models\Concerns\RegistraImagensPadrao;
 use App\Models\Contracts\TemDepartamento;
+use App\Support\Autorizacao\AuditoriaAutorizacao;
 use App\Support\Palestras\LinkDrive;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Spatie\Activitylog\Contracts\Activity;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Mensagem extends Model implements HasMedia, TemDepartamento
 {
-    use HasFactory, InteractsWithMedia, RegistraImagensPadrao;
+    use HasFactory, InteractsWithMedia, LogsActivity, RegistraImagensPadrao;
 
     // Pluralização pt-BR: o pluralizador do Laravel geraria 'mensagems'.
     protected $table = 'mensagens';
@@ -51,6 +56,9 @@ class Mensagem extends Model implements HasMedia, TemDepartamento
         'status',
         'wp_id',
     ];
+
+    /** Autoria INTERNA (curadoria/admin): nunca sai em toArray()/wire:snapshot. Não é fillable — o servidor atribui. */
+    protected $hidden = ['medium_id', 'publicado_por_id', 'publicado_em'];
 
     protected function casts(): array
     {
@@ -171,6 +179,18 @@ class Mensagem extends Model implements HasMedia, TemDepartamento
         return $this->belongsToMany(User::class, 'mensagem_destinatario', 'mensagem_id', 'user_id');
     }
 
+    /** Médium que lançou a mensagem (autoria). null = importada do legado. */
+    public function medium(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'medium_id');
+    }
+
+    /** Diretor do DEPAE (ou presidente) que publicou a mensagem. */
+    public function publicadoPor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'publicado_por_id');
+    }
+
     /**
      * Sincroniza as mensagens relacionadas de forma SIMÉTRICA (A↔B): grava os dois sentidos
      * numa transação e nunca cria auto-relação. Substitui completamente o conjunto de vínculos
@@ -236,5 +256,53 @@ class Mensagem extends Model implements HasMedia, TemDepartamento
         return Attribute::make(
             set: fn (?string $value) => LinkDrive::paraDownload($value),
         );
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('mensagem')
+            ->logOnly(['titulo', 'slug', 'corpo', 'contexto', 'formato', 'data_recebimento',
+                'casa', 'link_arquivo', 'liberar_download', 'nivel', 'status'])
+            ->useAttributeRawValues(['data_recebimento']) // o accessor devolve Carbon; grava a string Y-m-d
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->setDescriptionForEvent(fn (string $evento): string => match ($evento) {
+                'created' => 'mensagem criada',
+                'updated' => 'mensagem atualizada',
+                'deleted' => 'mensagem excluída',
+                default => "mensagem {$evento}",
+            });
+    }
+
+    /**
+     * IP + user-agent + porta (fonte única: o helper) + D11: registra QUE o texto mudou, sem
+     * guardar o texto. Funciona aqui porque o `ActivityLogger::log()` monta a Activity com
+     * `withProperties($event->changes)` e só DEPOIS chama o tap
+     * (vendor/spatie/laravel-activitylog/src/ActivityLogger.php:172-175), antes do `save()`.
+     * Mover a redação para outro hook seria um no-op silencioso.
+     */
+    public function tapActivity(Activity $activity, string $eventName): void
+    {
+        $props = $activity->properties->merge(AuditoriaAutorizacao::contexto());
+
+        foreach (['attributes', 'old'] as $bloco) {
+            $dados = $props->get($bloco);
+
+            if (! is_array($dados)) {
+                continue;
+            }
+
+            foreach (['corpo', 'contexto'] as $campo) {
+                // array_key_exists, NUNCA isset: o valor pode ser null e é a CHAVE que se preserva.
+                if (array_key_exists($campo, $dados)) {
+                    $dados[$campo] = '[texto não registrado]';
+                }
+            }
+
+            $props = $props->put($bloco, $dados);
+        }
+
+        $activity->properties = $props;
     }
 }

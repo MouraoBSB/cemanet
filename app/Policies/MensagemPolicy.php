@@ -9,12 +9,14 @@ use App\Models\User;
 use App\Policies\Concerns\AutorizaPorDepartamento;
 
 /**
- * Policy de Mensagem nos DOIS eixos:
+ * Policy de Mensagem em TRÊS eixos:
  * - VISIBILIDADE (quem vê): view/viewAny, delegadas a podeSerVistoPor / scopeVisiveisPara.
  *   $user é null-safe (visitante anônimo passa por Gate::forUser(null)).
  * - CAPACIDADE (quem edita): ver/criar/editar/excluir — permissão mensagem.* (hasPermissionTo, NUNCA can())
- *   + escopo por regime DoTipo (trait). Nasce INERTE (só admin edita via /admin). O eixo de autoria do
- *   médium (mensagem.publicar / definir-nivel) é outro eixo — Fatia 4. O admin passa antes no Gate::before.
+ *   + escopo por regime DoTipo (trait). Nasce INERTE (só admin edita via /admin).
+ * - AUTORIA (F4b — médium lança, diretor do DEPAE/presidente cura): lancar/editarPendente/curar/
+ *   editarNaCuradoria/publicar — pertencimento por setor/cargo (ehMedium/ehDiretorDepae/ehPresidente),
+ *   NUNCA hasPermissionTo. O admin passa antes no Gate::before em todos os eixos.
  */
 class MensagemPolicy
 {
@@ -53,5 +55,35 @@ class MensagemPolicy
     public function excluir(User $user, Mensagem $mensagem): bool
     {
         return $user->hasPermissionTo('mensagem.excluir') && $this->noEscopo($user, $mensagem);
+    }
+
+    /** Eixo AUTORIA (F4b) — pertencimento por setor/cargo, NUNCA capacidade/matriz. Admin passa antes no Gate::before. */
+    public function lancar(User $user): bool
+    {
+        return $user->ehMedium();
+    }
+
+    public function editarPendente(User $user, Mensagem $mensagem): bool
+    {
+        return $user->ehMedium()
+            && $mensagem->medium_id === $user->id
+            && $mensagem->status === Mensagem::STATUS_PENDENTE;
+    }
+
+    /** Portão da ABA/rota da curadoria (sem objeto). */
+    public function curar(User $user): bool
+    {
+        return $user->ehDiretorDepae() || $user->ehPresidente();
+    }
+
+    /** Portão de CADA registro na curadoria: só pendente (O7 — publicada é /admin). */
+    public function editarNaCuradoria(User $user, Mensagem $mensagem): bool
+    {
+        return $this->curar($user) && $mensagem->status === Mensagem::STATUS_PENDENTE;
+    }
+
+    public function publicar(User $user, Mensagem $mensagem): bool
+    {
+        return $this->editarNaCuradoria($user, $mensagem);
     }
 }

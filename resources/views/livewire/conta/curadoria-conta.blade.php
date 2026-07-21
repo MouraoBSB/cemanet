@@ -43,9 +43,11 @@
                             &middot;
                             {{ $item->data_recebimento?->format('d/m/Y') ?: '—' }}
                         </p>
-                        {{-- Task 11: alerta quando o PRÓPRIO médium editou a mensagem após o lançamento. --}}
+                        {{-- Task 11: alerta quando o PRÓPRIO médium editou a mensagem após o lançamento.
+                             text-danger (não text-orange, achado Minor 6): ~2,2:1 reprova WCAG AA; o
+                             destaque fica no peso (font-medium), não numa cor fraca. --}}
                         @if (in_array($item->id, $editadasPeloAutor, true))
-                            <p class="mt-1 text-xs font-medium text-orange">Editada pelo autor após o lançamento</p>
+                            <p class="mt-1 text-xs font-medium text-danger">Editada pelo autor após o lançamento</p>
                         @endif
                     </div>
                     <button type="button" wire:click="editar({{ $item->id }})" class="text-sm text-primary hover:underline">Editar</button>

@@ -149,7 +149,13 @@ class CuradoriaPublicarTest extends TestCase
         $this->assertSame([$autorA->id], $pendente->autores->pluck('id')->all());
     }
 
-    /** I9-direcionada: publicar `direcionada` sem nenhum destinatário ⇒ recusa, continua pendente. */
+    /**
+     * I9-direcionada: publicar `direcionada` sem nenhum destinatário ⇒ recusa, continua pendente.
+     * Achado do review final (Minor 5): a chave PRECISA ser explícita (`destinatarios`) — sem ela,
+     * a asserção captura qualquer erro, incluindo o `required` nativo do próprio Select (que
+     * dispara ANTES da `RegraPublicacao` sequer rodar), e o teste passaria mesmo que a regra de
+     * negócio nunca fosse exercitada.
+     */
     public function test_i9_direcionada_sem_destinatario_recusa(): void
     {
         $curador = $this->diretorDepae();
@@ -159,7 +165,7 @@ class CuradoriaPublicarTest extends TestCase
             ->call('editar', $pendente->id)
             ->fillForm(['nivel' => VisibilidadeMensagem::Direcionada->value])
             ->call('publicar', $pendente->id)
-            ->assertHasFormErrors();
+            ->assertHasFormErrors(['destinatarios']);
 
         $this->assertSame(Mensagem::STATUS_PENDENTE, $pendente->fresh()->status);
     }

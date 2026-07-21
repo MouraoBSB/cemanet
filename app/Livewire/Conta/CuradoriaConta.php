@@ -144,6 +144,10 @@ class CuradoriaConta extends Component implements HasForms
         DB::transaction(function () use ($registro): void {
             $dados = $this->form->getState(); // valida + saveRelationships() — DENTRO da transação
 
+            // Minor 4 (alinhamento com DATA-MODEL.md): nunca confiar no POST para os 3 campos
+            // privilegiados — seguro hoje (getState() já poda; não são $fillable), mas explícito.
+            unset($dados['medium_id'], $dados['publicado_por_id'], $dados['publicado_em']);
+
             $idsDestinatarios = $dados['destinatarios'] ?? [];
             $idsEfetivos = SincronizadorDestinatarios::efetivos($dados['nivel'] ?? null, $idsDestinatarios);
 
@@ -190,6 +194,10 @@ class CuradoriaConta extends Component implements HasForms
 
             $dados = $this->form->getState(); // valida — DENTRO da transação
 
+            // Minor 4 (alinhamento com DATA-MODEL.md): nunca confiar no POST para os 3 campos
+            // privilegiados — seguro hoje (getState() já poda; não são $fillable), mas explícito.
+            unset($dados['medium_id'], $dados['publicado_por_id'], $dados['publicado_em']);
+
             $idsDestinatarios = $dados['destinatarios'] ?? []; // Select SEM ->relationship(): desidratado normalmente
             unset($dados['destinatarios']);
 
@@ -203,16 +211,27 @@ class CuradoriaConta extends Component implements HasForms
         });
     }
 
+    /**
+     * Minor 7 (performance, review final): a fila era recomputada a cada `->live()` do form, mesmo
+     * com o form ABERTO — a view esconde a fila inteira atrás de `@if ($mostrandoForm)` (47
+     * pendentes no dev). Com o form aberto a query nem roda; `'autores'` também saiu do eager-load
+     * (a view da fila não usa, só `medium` e o próprio `titulo`/`data_recebimento`).
+     */
     public function render(): View
     {
-        $itens = Mensagem::query()
-            ->where('status', Mensagem::STATUS_PENDENTE)
-            ->with('medium:id,name', 'autores')
-            ->orderByDesc('data_recebimento')
-            ->get();
+        $itens = collect();
+        $editadasPeloAutor = [];
 
-        // Aviso "editada pelo autor após o lançamento" — Task 11 (HistoricoMensagem), 1 query p/ a fila inteira.
-        $editadasPeloAutor = HistoricoMensagem::editadasPeloAutor($itens);
+        if (! $this->mostrandoForm) {
+            $itens = Mensagem::query()
+                ->where('status', Mensagem::STATUS_PENDENTE)
+                ->with('medium:id,name')
+                ->orderByDesc('data_recebimento')
+                ->get();
+
+            // Aviso "editada pelo autor após o lançamento" — Task 11 (HistoricoMensagem), 1 query p/ a fila inteira.
+            $editadasPeloAutor = HistoricoMensagem::editadasPeloAutor($itens);
+        }
 
         $editando = $this->editandoId ? Mensagem::find($this->editandoId) : null;
 

@@ -226,4 +226,94 @@ class CuradoriaContaTest extends TestCase
         $this->assertArrayNotHasKey('publicado_por_id', $c->get('data'));
         $this->assertArrayNotHasKey('publicado_em', $c->get('data'));
     }
+
+    /**
+     * Achado do review final (Minor 4 — defesa em profundidade): `atualizarRegistro()`/`publicar()`
+     * não faziam o `unset()` explícito de `medium_id`/`publicado_por_id`/`publicado_em` que
+     * `MensagensConta` faz — seguro hoje (o `getState()` já poda, e os três não são `$fillable`),
+     * mas o `DATA-MODEL.md` afirma que AMBOS os componentes fazem o `unset`. Trava o invariante:
+     * mesmo que um forjado sobreviva no array algum dia, `salvar()`/`publicar()` nunca gravam.
+     */
+    public function test_review_forjar_campos_privilegiados_no_salvar_nao_tem_efeito(): void
+    {
+        $curador = $this->diretorDepae();
+        $medium = User::factory()->create();
+        $outroCurador = User::factory()->create();
+        $pendente = Mensagem::factory()->pendente()->create(['medium_id' => $medium->id]);
+
+        Livewire::actingAs($curador)->test(CuradoriaConta::class)
+            ->call('editar', $pendente->id)
+            ->set('data.medium_id', $outroCurador->id)
+            ->set('data.publicado_por_id', $outroCurador->id)
+            ->set('data.publicado_em', now()->subYear())
+            ->fillForm(['titulo' => 'Novo título'])
+            ->call('salvar')
+            ->assertHasNoFormErrors();
+
+        $pendente->refresh();
+        $this->assertSame($medium->id, $pendente->medium_id);
+        $this->assertNull($pendente->publicado_por_id);
+        $this->assertNull($pendente->publicado_em);
+    }
+
+    /**
+     * Achado do review final (Minor 6 — A11y): "Editada pelo autor após o lançamento" é o sinal
+     * FUNCIONAL mais importante da fila, mas usava `text-orange` (#e79048) em `text-xs` sobre
+     * branco — ~2,2:1, reprova WCAG AA (mínimo 4,5:1). Troca para um token de texto com contraste
+     * adequado, mantendo o destaque visual (peso), não a cor fraca.
+     */
+    public function test_review_aviso_editada_pelo_autor_usa_token_de_contraste_adequado(): void
+    {
+        $medium = $this->medium();
+        $pendente = Mensagem::factory()->pendente()->create(['medium_id' => $medium->id]);
+
+        $this->actingAs($medium);
+        $pendente->update(['titulo' => 'Editado pelo próprio autor após o lançamento']);
+
+        $html = $this->actingAs($this->diretorDepae())->get(route('conta.curadoria'))->getContent();
+
+        $this->assertStringContainsString('text-danger">Editada pelo autor após o lançamento', $html);
+        $this->assertStringNotContainsString('text-orange', $html);
+    }
+
+    /**
+     * Achado do review final (Minor 7 — performance): `render()` sempre reconsulta a fila inteira
+     * de pendentes (`where status = pendente`), mesmo com a fila ESCONDIDA pelo `@if
+     * ($mostrandoForm)` — recomputada a cada `->live()` do form (47 pendentes no dev). Com o form
+     * aberto, a query da fila não deveria rodar.
+     */
+    public function test_review_render_pula_query_da_fila_quando_mostrando_form(): void
+    {
+        Mensagem::factory()->pendente()->count(2)->create();
+        $pendente = Mensagem::factory()->pendente()->create();
+
+        $consultasFila = 0;
+        DB::listen(function ($query) use (&$consultasFila): void {
+            if (str_contains($query->sql, '`mensagens`')
+                && str_contains($query->sql, '`status`')
+                && str_contains($query->sql, '`data_recebimento`')) {
+                $consultasFila++;
+            }
+        });
+
+        Livewire::actingAs($this->diretorDepae())->test(CuradoriaConta::class)
+            ->call('editar', $pendente->id);
+
+        $this->assertSame(0, $consultasFila, 'a query da fila rodou com o form aberto (mostrandoForm=true)');
+    }
+
+    /**
+     * Achado do review final (Minor 8 — cobertura): o componente `x-conta.historico-mensagem` só
+     * era testado ISOLADO (HistoricoMensagemTest); o ramo `$mostrandoForm = true` da view da
+     * curadoria — que é quem de fato inclui o componente — nunca era exercitado por um teste do
+     * PRÓPRIO componente `CuradoriaConta`.
+     */
+    public function test_review_form_aberto_mostra_a_secao_historico(): void
+    {
+        $pendente = Mensagem::factory()->pendente()->create();
+
+        Livewire::actingAs($this->diretorDepae())->test(CuradoriaConta::class)
+            ->call('editar', $pendente->id)
+            ->assertSee('Histórico');
+    }
 }

@@ -50,10 +50,14 @@ class HistoricoMensagemTest extends TestCase
         $m = Mensagem::factory()->create();
         Activity::query()->delete(); // ignora o 'created' do factory
 
+        // Sentinela em 'titulo' (fora da lista redigida por Mensagem::tapActivity — só
+        // 'corpo'/'contexto' são redigidos): só assim a asserção prova o componente, e não a
+        // redação da Task 1 chegando ao banco já mascarada. 'corpo' fica com valor inócuo,
+        // só para exercitar o rótulo "Corpo da mensagem".
         activity()->useLog('mensagem')->performedOn($m)
             ->withProperties([
-                'attributes' => ['corpo' => 'SENTINELA-VAZAMENTO-XYZ', 'titulo' => 'T'],
-                'old' => ['corpo' => 'SENTINELA-ANTIGO-XYZ'],
+                'attributes' => ['corpo' => 'já editado', 'titulo' => 'SENTINELA-VAZAMENTO-XYZ'],
+                'old' => ['titulo' => 'SENTINELA-ANTIGO-XYZ'],
                 'porta' => 'perfil', 'ip' => '127.0.0.1', 'user_agent' => 'Symfony',
             ])
             ->event('updated')->log('mensagem atualizada');
@@ -61,6 +65,7 @@ class HistoricoMensagemTest extends TestCase
         $view = $this->blade('<x-conta.historico-mensagem :mensagem="$m" />', ['m' => $m]);
 
         $view->assertSee('Corpo da mensagem')
+            ->assertSee('Título')
             ->assertDontSee('SENTINELA-VAZAMENTO-XYZ')->assertDontSee('SENTINELA-ANTIGO-XYZ')
             ->assertDontSee('user_agent', false)->assertDontSee('attributes', false);
     }
@@ -213,6 +218,30 @@ class HistoricoMensagemTest extends TestCase
         ]));
 
         $this->assertSame([$editadaPeloAutor->id], $ids);
+    }
+
+    /**
+     * Achado da revisão da Task 11 (Important): os dois `whereIn()` de candidatas
+     * (`subject_id`/`causer_id`) são independentes — sozinhos, casariam por coincidência de
+     * CONJUNTOS, não de PARES. Aqui o autor A edita a mensagem do autor B: `subject_id` (de B)
+     * e `causer_id` (de A) aparecem cada um em seu próprio `whereIn`, mas o par exato
+     * `subject_id ↔ medium_id` não bate — só o `filter` em PHP evita marcar B (que não editou
+     * nada) como "editada pelo autor".
+     */
+    public function test_i16_editada_pelo_autor_nao_marca_por_pareamento_cruzado_entre_autores(): void
+    {
+        $autorA = User::factory()->create();
+        $autorB = User::factory()->create();
+
+        $mensagemDeA = Mensagem::factory()->create(['medium_id' => $autorA->id]);
+        $mensagemDeB = Mensagem::factory()->create(['medium_id' => $autorB->id]);
+
+        $this->actingAs($autorA);
+        $mensagemDeB->update(['titulo' => 'A mexeu na mensagem de B']);
+
+        $ids = HistoricoMensagem::editadasPeloAutor(collect([$mensagemDeA, $mensagemDeB]));
+
+        $this->assertSame([], $ids);
     }
 
     // ---- I24: PII de destinatários nunca vaza na trilha 'mensagem' ------------------------------

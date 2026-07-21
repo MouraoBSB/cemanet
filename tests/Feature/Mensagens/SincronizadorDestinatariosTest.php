@@ -45,6 +45,22 @@ class SincronizadorDestinatariosTest extends TestCase
         $this->assertSame([$usuario->id], $mensagem->destinatarios()->pluck('users.id')->all());
     }
 
+    /** I7: usuário inativo forjado no payload nunca entra no pivô, mesmo existindo. */
+    public function test_aplicar_filtra_usuario_inativo_contra_users_ativos(): void
+    {
+        $mensagem = Mensagem::factory()->create();
+        $ativo = User::factory()->create(['ativo' => true]);
+        $inativo = User::factory()->create(['ativo' => false]);
+
+        SincronizadorDestinatarios::aplicar(
+            $mensagem,
+            VisibilidadeMensagem::Direcionada->value,
+            [$ativo->id, $inativo->id]
+        );
+
+        $this->assertSame([$ativo->id], $mensagem->destinatarios()->pluck('users.id')->all());
+    }
+
     public function test_aplicar_com_nivel_diferente_de_direcionada_esvazia_o_pivo(): void
     {
         $mensagem = Mensagem::factory()->create();

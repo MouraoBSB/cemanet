@@ -51,13 +51,10 @@ class SincronizadorDestinatarios
      */
     public static function aplicar(Mensagem $mensagem, ?string $nivel, array $ids): void
     {
-        $idsFiltrados = collect(self::filtrarPorNivel($nivel, $ids))
-            ->map(fn ($id) => (int) $id)
-            ->unique()
-            ->values();
-
+        // Cast + dedup ficam só em sincronizar() (não duplicar aqui): o whereIn tolera
+        // ids crus (numéricos ou string), e o resultado do pluck já é único por ser PK.
         $idsAtivos = User::query()
-            ->whereIn('id', $idsFiltrados)
+            ->whereIn('id', self::filtrarPorNivel($nivel, $ids))
             ->where('ativo', true)
             ->pluck('id')
             ->all();

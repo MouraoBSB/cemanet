@@ -11,6 +11,7 @@ use App\Models\AutorEspiritual;
 use App\Models\Mensagem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
+use Spatie\Activitylog\Models\Activity;
 use Tests\TestCase;
 
 class ImportadorMensagensTest extends TestCase
@@ -239,5 +240,32 @@ class ImportadorMensagensTest extends TestCase
         $this->assertSame('despublicada', $m->status, 'status do admin foi sobrescrito');
         $this->assertSame('nota do admin', $m->contexto, 'contexto foi tocado pelo import');
         $this->assertTrue($m->relacionadas->contains('id', $outra->id), 'relacionadas foi tocada pelo import');
+    }
+
+    /**
+     * I17 (Fatia F4b, Task 12): reimportar o MESMO lote não pode inflar a trilha (`activity_log`,
+     * `log_name = 'mensagem'`) — o `LogsActivity` do model usa `logOnlyDirty()`, então um segundo
+     * import só é silencioso se os mutators forem determinísticos sobre o MESMO dado bruto do
+     * legado. Fixture que MORDE (molde do `link_arquivo` em test_download_drive_vira_link_direto,
+     * acima): `link_arquivo` com `&amp;` cru (LinkDrive::paraDownload decodifica+normaliza), um
+     * `corpo` com `<script>` que o `clean()` reescreve (HTMLPurifier remove a tag fora da allow-list
+     * do perfil 'conteudo') e `data_recebimento` em unix (TransformadorLegado::unixParaData +
+     * mutator Carbon↔string). Se qualquer um desses três não for idempotente, o segundo import
+     * marcaria o atributo como dirty e geraria uma entrada espúria — é isso que este teste prova.
+     */
+    public function test_i17_reimport_do_mesmo_lote_nao_gera_entradas_na_trilha(): void
+    {
+        $dados = $this->mensagemLegado([
+            'corpo' => '<p>Servi <script>alert(1)</script>sempre.</p>',
+            'link_arquivo' => 'https://drive.google.com/uc?export=download&amp;id=1tcPovMIenZvogAU48gugNZKDVQ1S4Bp7',
+            'liberar_download' => 'true',
+        ]);
+
+        $this->importar([$dados]);
+        Activity::query()->delete(); // ignora a(s) entrada(s) 'created' do primeiro import
+
+        $this->importar([$dados]); // MESMO lote, mesmo dado bruto
+
+        $this->assertSame(0, Activity::where('log_name', 'mensagem')->count());
     }
 }

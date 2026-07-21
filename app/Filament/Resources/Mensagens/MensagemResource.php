@@ -31,8 +31,10 @@ use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 
 class MensagemResource extends Resource
@@ -229,6 +231,12 @@ class MensagemResource extends Resource
                     ->collection(Mensagem::COLECAO_PICTOGRAFIA)
                     ->conversion('thumb')
                     ->toggleable(),
+
+                TextColumn::make('destinatarios_count')
+                    ->label('Destinatários')
+                    ->counts('destinatarios')
+                    ->badge()
+                    ->toggleable(),
             ])
             ->defaultSort('data_recebimento', 'desc')
             ->filters([
@@ -238,6 +246,9 @@ class MensagemResource extends Resource
                     Mensagem::STATUS_DESPUBLICADA => 'Despublicada',
                 ]),
                 SelectFilter::make('formato')->options(FormatoMensagem::opcoes()),
+                Filter::make('com_destinatarios')
+                    ->label('Tem destinatário')
+                    ->query(fn (Builder $query): Builder => $query->has('destinatarios')),
             ])
             ->recordActions([
                 EditAction::make()->label('Editar'),

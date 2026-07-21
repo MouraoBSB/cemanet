@@ -6,7 +6,6 @@ namespace App\Filament\Schemas;
 
 use App\Enums\FormatoMensagem;
 use App\Enums\VisibilidadeMensagem;
-use App\Filament\Resources\Mensagens\MensagemResource;
 use App\Filament\Support\ComponentesImagem;
 use App\Models\Mensagem;
 use App\Models\User;
@@ -87,9 +86,9 @@ class MensagemForm
 
                     Select::make('nivel')
                         ->label('Nível de acesso')
-                        ->options(MensagemResource::NIVEIS)
+                        ->options(VisibilidadeMensagem::opcoes())
                         ->live() // pré-requisito do visible da Section Destinatários / required condicional
-                        ->helperText('Só as Públicas aparecem no site (por ora). A visibilidade rica virá na próxima fase.'),
+                        ->helperText('Define quem pode acessar esta mensagem no site.'),
 
                     Select::make('status')
                         ->label('Status')
@@ -307,7 +306,7 @@ class MensagemForm
                         ->label('Nível de acesso')
                         ->options(VisibilidadeMensagem::opcoes())
                         ->live() // pré-requisito do visible/required do bloco de Destinatários
-                        ->helperText('Só as Públicas aparecem no site (por ora). A visibilidade rica virá na próxima fase.'),
+                        ->helperText('Define quem pode acessar esta mensagem no site.'),
 
                     Toggle::make('liberar_download')
                         ->label('Liberar download do arquivo'),

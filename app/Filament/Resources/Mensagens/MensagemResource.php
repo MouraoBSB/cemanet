@@ -5,6 +5,7 @@
 namespace App\Filament\Resources\Mensagens;
 
 use App\Enums\FormatoMensagem;
+use App\Enums\VisibilidadeMensagem;
 use App\Filament\Resources\Mensagens\Pages\CreateMensagem;
 use App\Filament\Resources\Mensagens\Pages\EditMensagem;
 use App\Filament\Resources\Mensagens\Pages\ListMensagens;
@@ -43,15 +44,6 @@ class MensagemResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'titulo';
 
-    /** Níveis de acesso BRUTOS (slugs da taxonomia legada). A semântica rica é da Fatia 3. */
-    public const NIVEIS = [
-        'publico' => 'Público',
-        'trabalhadores' => 'Trabalhadores',
-        'mediuns-trabalhadores' => 'Médiuns',
-        'direcionada' => 'Direcionada',
-        'diretores' => 'Diretores',
-    ];
-
     public static function form(Schema $schema): Schema
     {
         // Schema vindo da fonte única (App\Filament\Schemas\MensagemForm) — extração literal (I20).
@@ -80,8 +72,16 @@ class MensagemResource extends Resource
 
                 TextColumn::make('nivel')
                     ->label('Nível')
-                    ->formatStateUsing(fn (?string $state): string => self::NIVEIS[$state] ?? '—')
+                    ->formatStateUsing(fn (?string $state): string => VisibilidadeMensagem::tryFrom((string) $state)?->rotulo() ?? '— (sem nível)')
+                    // nivel=null é state "blank": o TextColumn pula formatStateUsing e cai direto no placeholder.
+                    ->placeholder('— (sem nível)')
                     ->toggleable(),
+
+                TextColumn::make('medium.name')
+                    ->label('Lançada por')
+                    ->placeholder('Importada do legado')
+                    ->toggleable()
+                    ->searchable(),
 
                 TextColumn::make('status')
                     ->label('Status')
@@ -109,6 +109,7 @@ class MensagemResource extends Resource
                     ->badge()
                     ->toggleable(),
             ])
+            ->modifyQueryUsing(fn (Builder $query): Builder => $query->with('medium:id,name'))
             ->defaultSort('data_recebimento', 'desc')
             ->filters([
                 SelectFilter::make('status')->options([

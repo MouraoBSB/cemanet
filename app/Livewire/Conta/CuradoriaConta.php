@@ -8,25 +8,28 @@ use App\Filament\Schemas\MensagemForm;
 use App\Models\Mensagem;
 use App\Support\Autorizacao\AuditoriaAutorizacao;
 use App\Support\Conta\AbaCuradoria;
+use App\Support\Mensagens\RegraPublicacao;
 use App\Support\Mensagens\SincronizadorDestinatarios;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Schemas\Schema;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 use Livewire\Component;
 
 /**
  * Superfície pública da CURADORIA em /minha-conta/curadoria (Fatia F4b): o diretor do DEPAE (ou
- * o presidente) vê a fila de TODAS as pendentes e corrige título/corpo/nível/autores/pictografia
- * antes de publicar. O botão Publicar (o martelo) é da Task 10 — aqui só Salvar, que NUNCA muda
- * o status: a curadoria pode salvar quantas vezes quiser sem que a mensagem saia de pendente.
+ * o presidente) vê a fila de TODAS as pendentes e corrige título/corpo/nível/autores/pictografia.
+ * `salvar()` NUNCA muda o status — a curadoria pode salvar quantas vezes quiser sem que a
+ * mensagem saia de pendente. `publicar()` (Task 10) é o martelo: arbitra o nível de acesso via
+ * `RegraPublicacao` e põe a mensagem no ar.
  *
  * O furo B4 (ver task-9-report.md, Step 2a): autorizar com `curar` (sem objeto) deixaria um
- * curador abrir/editar uma mensagem JÁ PUBLICADA, porque o id vem do cliente. `editar()`/
- * `salvar()` autorizam com `editarNaCuradoria` sobre o REGISTRO (exige status pendente) —
- * `findOrFail()` roda ANTES do `authorize()`, nunca o contrário.
+ * curador abrir/editar/publicar uma mensagem JÁ PUBLICADA, porque o id vem do cliente.
+ * `editar()`/`salvar()`/`publicar()` autorizam com `editarNaCuradoria`/`publicar` sobre o
+ * REGISTRO (exige status pendente) — `findOrFail()` roda ANTES do `authorize()`, nunca o contrário.
  */
 class CuradoriaConta extends Component implements HasForms
 {
@@ -93,6 +96,46 @@ class CuradoriaConta extends Component implements HasForms
         $this->atualizarRegistro();
 
         session()->flash('status', 'Mensagem atualizada.');
+        $this->redirect(route('conta.curadoria'), navigate: true);
+    }
+
+    /**
+     * O martelo: o diretor do DEPAE (ou presidente) arbitra o nível e publica. `findOrFail` +
+     * `authorize` ANTES da transação (a policy já exige status pendente, via `editarNaCuradoria`).
+     *
+     * `RegraPublicacao::erros()` roda DEPOIS do `getState()` mas AINDA DENTRO da transação: o
+     * `getState()` já executa `saveRelationships()` (autores/pictografia) internamente, porque o
+     * schema está ancorado no registro (P1). Se a checagem ficasse fora da transação, uma
+     * publicação recusada por nível inválido deixaria essas relações já gravadas — meio save
+     * aplicado. Dentro da transação, o `throw` reverte tudo.
+     */
+    public function publicar(int $id): void
+    {
+        $registro = Mensagem::findOrFail($id);
+        $this->authorize('publicar', $registro);
+
+        DB::transaction(function () use ($registro): void {
+            $dados = $this->form->getState(); // valida + saveRelationships() — DENTRO da transação
+
+            $erros = RegraPublicacao::erros($dados);
+
+            if ($erros !== []) {
+                throw ValidationException::withMessages(['data.nivel' => $erros[0]]);
+            }
+
+            $idsDestinatarios = $dados['destinatarios'] ?? [];
+            unset($dados['destinatarios']);
+
+            $registro->fill($dados);
+            $registro->status = Mensagem::STATUS_PUBLICADO;
+            $registro->publicado_por_id = auth()->id();
+            $registro->publicado_em = now();
+            $registro->save();
+
+            SincronizadorDestinatarios::aplicar($registro, $registro->nivel, $idsDestinatarios);
+        });
+
+        session()->flash('status', 'Mensagem publicada.');
         $this->redirect(route('conta.curadoria'), navigate: true);
     }
 

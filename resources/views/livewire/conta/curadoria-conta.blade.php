@@ -12,6 +12,14 @@
                     <button type="submit" class="rounded-pill bg-primary px-4 py-2 text-sm font-medium text-white">
                         Salvar
                     </button>
+                    <button
+                        type="button"
+                        wire:click="publicar({{ $editandoId }})"
+                        wire:confirm="Publicar esta mensagem? O nível de acesso definido passa a valer imediatamente no site."
+                        class="rounded-pill bg-primary px-4 py-2 text-sm font-medium text-white"
+                    >
+                        Publicar
+                    </button>
                     <button type="button" wire:click="cancelar" class="rounded-pill bg-surface px-4 py-2 text-sm text-text">Cancelar</button>
                 </div>
             </form>

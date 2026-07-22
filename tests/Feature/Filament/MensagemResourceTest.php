@@ -85,6 +85,27 @@ class MensagemResourceTest extends TestCase
             ->assertFormFieldExists('nivel', fn (Select $f): bool => $f->isRequired());
     }
 
+    /**
+     * I25, a contraprova: rascunho continua salvável SEM nível. Sem este teste, um falso-positivo
+     * (rascunho impossível de salvar, se a reasserção do Passo 4/5 exigisse nível incondicionalmente)
+     * passaria despercebido.
+     */
+    public function test_rascunho_pendente_sem_nivel_salva(): void
+    {
+        Livewire::test(CreateMensagem::class)
+            ->fillForm([
+                'titulo' => 'Rascunho sem nível',
+                'slug' => 'rascunho-sem-nivel',
+                'formato' => 'psicografia',
+                'status' => Mensagem::STATUS_PENDENTE,
+                'nivel' => null,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('mensagens', ['slug' => 'rascunho-sem-nivel', 'status' => Mensagem::STATUS_PENDENTE]);
+    }
+
     public function test_form_tem_selects_de_relacao(): void
     {
         Livewire::test(CreateMensagem::class)

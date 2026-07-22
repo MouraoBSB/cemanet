@@ -205,6 +205,7 @@ class CuradoriaContaTest extends TestCase
 
         Livewire::actingAs($this->diretorDepae())->test(CuradoriaConta::class)
             ->call('editar', $pendente->id)
+            ->set('data.status', Mensagem::STATUS_PUBLICADO)
             ->assertFormFieldExists('nivel', fn (Select $f): bool => ! $f->isRequired());
     }
 

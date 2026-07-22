@@ -62,8 +62,10 @@ class MensagemDestinatariosFormTest extends TestCase
 
     /**
      * I5: qualquer nível NÃO-direcionado sem destinatário salva (required é condicional).
-     * Cobre 'publico' e 'trabalhadores' (§9.2); o caso nivel=null já é coberto pela regressão
-     * do MensagemResourceTest (os creates existentes nascem com nivel default null).
+     * Cobre 'publico' e 'trabalhadores' (§9.2); o caso nivel=null NÃO é coberto aqui — a Task 11
+     * tornou `nivel` required quando `status = publicado`, então null só é aceito com
+     * `status = pendente` (I25, ver MensagemResourceTest::test_rascunho_pendente_sem_nivel_salva);
+     * `publicado` + `nivel = null` é recusado (MensagemPublicarActionTest::test_salvar_publicado_sem_nivel_e_recusado).
      */
     public function test_nao_direcionada_sem_destinatario_salva(): void
     {

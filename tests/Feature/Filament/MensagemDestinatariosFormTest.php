@@ -4,8 +4,11 @@
 
 namespace Tests\Feature\Filament;
 
+use App\Enums\VisibilidadeMensagem;
 use App\Filament\Resources\Mensagens\Pages\CreateMensagem;
+use App\Filament\Resources\Mensagens\Pages\EditMensagem;
 use App\Models\Mensagem;
+use App\Models\User;
 use Filament\Forms\Components\Select;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -78,5 +81,36 @@ class MensagemDestinatariosFormTest extends TestCase
 
             $this->assertDatabaseHas('mensagens', ['slug' => "sem-destino-{$nivel}", 'nivel' => $nivel]);
         }
+    }
+
+    /** I31: o Select não pode oferecer quem a regra vai descartar. */
+    public function test_select_de_destinatarios_nao_oferece_usuario_inativo(): void
+    {
+        $ativo = User::factory()->create(['name' => 'Ana Ativa']);
+        $inativo = User::factory()->create(['name' => 'Ivo Inativo', 'ativo' => false]);
+
+        Livewire::test(CreateMensagem::class)
+            ->fillForm(['nivel' => 'direcionada'])
+            ->assertFormFieldExists('destinatarios', function (Select $f) use ($ativo, $inativo): bool {
+                $opcoes = $f->getOptions();
+
+                return array_key_exists($ativo->id, $opcoes) && ! array_key_exists($inativo->id, $opcoes);
+            });
+    }
+
+    /**
+     * I31 (a outra metade): quem JÁ está selecionado continua na lista mesmo tendo sido
+     * desativado depois — senão o Select injeta Rule::in(options) sem o id hidratado pelo
+     * fill() e trava até um simples Salvar de título, sem a opção aparecer para ser removida.
+     */
+    public function test_select_mantem_o_destinatario_ja_selecionado_que_ficou_inativo(): void
+    {
+        $u = User::factory()->create(['name' => 'Ivo Desativado Depois']);
+        $m = Mensagem::factory()->comNivel(VisibilidadeMensagem::Direcionada)->create();
+        $m->destinatarios()->sync([$u->id]);
+        $u->update(['ativo' => false]);
+
+        Livewire::test(EditMensagem::class, ['record' => $m->getRouteKey()])
+            ->assertFormFieldExists('destinatarios', fn (Select $f): bool => array_key_exists($u->id, $f->getOptions()));
     }
 }

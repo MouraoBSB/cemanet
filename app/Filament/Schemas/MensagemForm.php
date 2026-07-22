@@ -145,7 +145,15 @@ class MensagemForm
                     Select::make('destinatarios')
                         ->label('Destinatários')
                         ->helperText('Obrigatório para mensagens de nível "Direcionada".')
-                        ->options(fn () => User::orderBy('name')->pluck('name', 'id'))
+                        // As options SEMPRE incluem os já selecionados (orWhereIn), mesmo que
+                        // tenham deixado de estar `ativo` depois — senão o Select injeta
+                        // Rule::in(options) sem o id hidratado pelo fill() e trava até um
+                        // simples Salvar de título, sem a opção aparecer para ser removida.
+                        ->options(fn (Get $get) => User::query()
+                            ->where('ativo', true)
+                            ->orWhereIn('id', (array) $get('destinatarios'))
+                            ->orderBy('name')
+                            ->pluck('name', 'id'))
                         ->multiple()
                         ->searchable()
                         ->required(fn (Get $get): bool => $get('nivel') === VisibilidadeMensagem::Direcionada->value)
@@ -164,8 +172,9 @@ class MensagemForm
     /**
      * Bloco de destinatários compartilhado por schemaMedium/schemaCuradoria — PARAMETRIZADO pelo predicado
      * de visibilidade/obrigatoriedade, porque o form do médium não tem o campo `nivel` (quem arbitra o nível
-     * é o diretor, na curadoria). NÃO é usado pelo schemaAdmin, que mantém a Section inline (filtra `ativo`
-     * e não tem o helperText do painel — compartilhar mudaria o /admin em silêncio).
+     * é o diretor, na curadoria). NÃO é usado pelo schemaAdmin, que mantém a Section inline por
+     * causa do helperText próprio do painel — o filtro de `ativo` + orWhereIn é o MESMO nos dois
+     * desde a F4c (antes desta fatia o docblock afirmava que o admin filtrava, e ele não filtrava).
      *
      * Achado do review final (Important 2a): as options SEMPRE incluem os já selecionados (`orWhereIn`),
      * mesmo que tenham deixado de estar `ativo` depois — senão o `Select` injeta `Rule::in(options)` sem o

@@ -168,6 +168,7 @@ class MensagemPublicarActionTest extends TestCase
         $this->assertSame(Mensagem::STATUS_PUBLICADO, $f->status);
         $this->assertNotNull($f->publicado_em);
         $this->assertSame(auth()->id(), $f->publicado_por_id);
+        $this->assertSame('publico', $f->nivel);
     }
 
     /**

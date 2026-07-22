@@ -207,12 +207,12 @@ class MensagensContaEditarTest extends TestCase
      * Achado do review final da F4b (Important 2a): à época, `schemaAdmin` usava
      * `User::orderBy('name')` (todos) e `blocoDestinatarios` usava `User::where('ativo', true)`
      * — duas listas para o MESMO campo. Desde a F4c os dois filtram igual; o que este teste
-     * fixa é o `orWhereIn` (sem ele, o `Select` injeta `Rule::in(options)` …). O
-     * `Select` injeta `Rule::in(options)`: um destinatário DESATIVADO DEPOIS de uma direcionada
-     * existir carrega o id no `fill()` (vindo do pivô) mas ele não está mais nas options ⇒ o
-     * médium fica sem saída para salvar até um simples ajuste de título. O ATIVO continua
-     * preservado; o INATIVO é descartado pelo filtro de integridade de sempre (I7) — o que muda
-     * é que o form deixa de EXPLODIR com "The selected destinatários is invalid.".
+     * fixa é o `orWhereIn`. O `Select` injeta `Rule::in(options)`: um destinatário DESATIVADO
+     * DEPOIS de uma direcionada existir carrega o id no `fill()` (vindo do pivô) mas ele não
+     * está mais nas options ⇒ o médium fica sem saída para salvar até um simples ajuste de
+     * título. O ATIVO continua preservado; o INATIVO é descartado pelo filtro de integridade
+     * de sempre (I7) — o que muda é que o form deixa de EXPLODIR com "The selected
+     * destinatários is invalid.".
      */
     public function test_review_editar_com_destinatario_desativado_depois_salva_sem_erro(): void
     {

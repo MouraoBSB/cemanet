@@ -30,6 +30,14 @@ use Illuminate\Support\Str;
  */
 class MensagemForm
 {
+    /**
+     * Frase única do /admin para "publicada precisa de nível" — consumida pelo
+     * validationMessages() do Select E pela Action Publicar. A RegraPublicacao NÃO muda: ela é
+     * compartilhada com a curadoria do site, onde o texto genérico é adequado, e tem teste
+     * unitário próprio.
+     */
+    public const MSG_NIVEL_OBRIGATORIO = 'Selecione o nível de acesso para manter esta mensagem publicada.';
+
     /** @return array<Component> */
     public static function schemaAdmin(): array
     {
@@ -95,6 +103,8 @@ class MensagemForm
                         ->label('Nível de acesso')
                         ->options(VisibilidadeMensagem::opcoes())
                         ->live() // pré-requisito do visible da Section Destinatários / required condicional
+                        ->required(fn (Get $get): bool => $get('status') === Mensagem::STATUS_PUBLICADO)
+                        ->validationMessages(['required' => self::MSG_NIVEL_OBRIGATORIO])
                         ->helperText('Define quem pode acessar esta mensagem no site.'),
 
                     Select::make('status')
@@ -105,6 +115,7 @@ class MensagemForm
                             Mensagem::STATUS_DESPUBLICADA => 'Despublicada',
                         ])
                         ->default(Mensagem::STATUS_PUBLICADO)
+                        ->live() // o required condicional do `nivel` depende deste estado
                         ->required(),
 
                     Toggle::make('liberar_download')

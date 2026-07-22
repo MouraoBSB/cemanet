@@ -69,10 +69,20 @@ class MensagemResourceTest extends TestCase
             ->assertFormFieldExists('imagens', fn (SpatieMediaLibraryFileUpload $c): bool => $c->getCollection() === Mensagem::COLECAO_IMAGENS);
     }
 
-    public function test_form_tem_select_nivel_com_publico_e_aceita_null(): void
+    /**
+     * I25: o required é CONDICIONAL. Com status pendente o nível continua opcional (o /admin
+     * cadastra rascunho); com status publicado ele é exigido, e é isso que fecha o buraco de
+     * publicar sem nível — que já produziu 2 mensagens publicadas invisíveis no acervo.
+     */
+    public function test_form_tem_select_nivel_com_publico_e_required_so_quando_publicado(): void
     {
         Livewire::test(CreateMensagem::class)
+            ->fillForm(['status' => Mensagem::STATUS_PENDENTE])
             ->assertFormFieldExists('nivel', fn (Select $f): bool => array_key_exists('publico', $f->getOptions()) && ! $f->isRequired());
+
+        Livewire::test(CreateMensagem::class)
+            ->fillForm(['status' => Mensagem::STATUS_PUBLICADO])
+            ->assertFormFieldExists('nivel', fn (Select $f): bool => $f->isRequired());
     }
 
     public function test_form_tem_selects_de_relacao(): void
@@ -99,6 +109,7 @@ class MensagemResourceTest extends TestCase
                 'corpo' => '<p>Sede bons.</p><script>alert(1)</script>',
                 'formato' => 'psicografia',
                 'status' => Mensagem::STATUS_PUBLICADO,
+                'nivel' => 'publico',
             ])
             ->call('create')
             ->assertHasNoFormErrors();
@@ -113,7 +124,7 @@ class MensagemResourceTest extends TestCase
         $m = Mensagem::factory()->create(['titulo' => 'Título Antigo', 'slug' => 'titulo-antigo']);
 
         Livewire::test(EditMensagem::class, ['record' => $m->getRouteKey()])
-            ->fillForm(['titulo' => 'Título Novo'])
+            ->fillForm(['titulo' => 'Título Novo', 'nivel' => 'publico'])
             ->call('save')
             ->assertHasNoFormErrors();
 
@@ -130,6 +141,7 @@ class MensagemResourceTest extends TestCase
                 'slug' => 'mensagem-a',
                 'formato' => 'psicografia',
                 'status' => Mensagem::STATUS_PUBLICADO,
+                'nivel' => 'publico',
                 'relacionadas' => [$b->id],
             ])
             ->call('create')

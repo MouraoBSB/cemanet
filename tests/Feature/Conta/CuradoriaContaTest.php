@@ -198,6 +198,16 @@ class CuradoriaContaTest extends TestCase
         $this->assertEmpty($metodos->diff(['GET', 'HEAD']));
     }
 
+    /** I25/§8-32: o required condicional do /admin não pode vazar para a curadoria. */
+    public function test_i25_nivel_da_curadoria_continua_nao_required(): void
+    {
+        $pendente = Mensagem::factory()->pendente()->create();
+
+        Livewire::actingAs($this->diretorDepae())->test(CuradoriaConta::class)
+            ->call('editar', $pendente->id)
+            ->assertFormFieldExists('nivel', fn (Select $f): bool => ! $f->isRequired());
+    }
+
     /** I23: o Select `nivel` da curadoria tem as 6 opções do enum, incluindo 'diretor-depae'. */
     public function test_i23_select_nivel_tem_as_6_opcoes_incluindo_diretor_depae(): void
     {

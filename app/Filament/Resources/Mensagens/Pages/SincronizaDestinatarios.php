@@ -29,9 +29,10 @@ trait SincronizaDestinatarios
 
     protected function capturarDestinatarios(array $data): array
     {
-        // CORPO INALTERADO: o MensagemDestinatariosGuardTest exercita este método por classe
-        // anônima SEM banco, com ids inexistentes. Trazer efetivos() para cá quebraria o teste
-        // e o tornaria dependente de banco — o filtro de integridade mora em aplicarDestinatarios().
+        // CÁLCULO DOS IDS INALTERADO: o MensagemDestinatariosGuardTest exercita este método por
+        // classe anônima SEM banco, com ids inexistentes. Trazer efetivos() para cá quebraria o
+        // teste e o tornaria dependente de banco — o filtro de integridade mora em
+        // aplicarDestinatarios().
         $this->nivelDestinatarios = $data['nivel'] ?? null;
         $this->idsDestinatarios = SincronizadorDestinatarios::filtrarPorNivel(
             $data['nivel'] ?? null,

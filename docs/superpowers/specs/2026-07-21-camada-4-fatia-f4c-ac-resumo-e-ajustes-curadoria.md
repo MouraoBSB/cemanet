@@ -66,6 +66,8 @@ O objetivo declarado, em uma frase por bloco:
 | **D10** | A galeria mantém o **botão de download nos 3 formatos**; só a legenda muda ("Desenho" na pictografia, "Imagem" nos demais). | Dono, §5.2 |
 | **D11** | O **gate de variante** (`$perfil`) do card **permanece**. A lista pública `/mensagens` segue sem miniatura — decisão de design da 2B. Cai **apenas** o gate de formato. | Dono, P1 |
 | **D12** | Esta fatia **revoga o O6 da F4b** (`RegraPublicacao` "vale só no site", §6.6/§13 daquela SPEC) e a frase "no `/admin` nada muda / o admin pode salvar publicado sem nível". Motivo: o Select publicava sem validar e sem gravar autoria. Consequência prevista e aceita: **4 testes** quebram (§8.2). | Dono, F4c |
+| **D13** | `EditMensagem` e `CreateMensagem` ligam `$hasDatabaseTransactions = true`. Sem isso, a reasserção nova recusa o save **depois** de `saveRelationships()` já ter gravado autores e mídia — meio-save silencioso no fluxo mais comum da tela. | Dono, B1 |
+| **D14** | O Select de destinatários do `schemaAdmin` passa a filtrar `ativo` (com `orWhereIn` dos já selecionados), e o caminho do Select passa a **gravar o mesmo conjunto que validou**. Sai de "fora de escopo": é o que torna a validação nova honesta. | Dono, B2 |
 
 ---
 
@@ -101,7 +103,7 @@ FROM wp_posts WHERE post_type='mensagem-mediunicas'
 | `pending` | 47 total · **29 com excerpt** |
 | `auto-draft` | 1 · 0 com excerpt (fora do recorte) |
 | **Total lido pelo comando** | **154** |
-| Comprimento | média **391**, mínimo 1, **máximo 1164** |
+| Comprimento | média **391** (denominador: os **154** preenchidos de `publish`+`pending`), mínimo 1, **máximo 1164** |
 | Contém `<` | **0** |
 | Contém tag HTML real (regex) | **0** |
 | Contém `&` (entidade `&nbsp;`/`&#8217;`/`&amp;`) | **0** |
@@ -219,6 +221,28 @@ de 3 opções com **default `publicado`** e **sem `live()`**
 `schemaAdmin` ([:141](app/Filament/Schemas/MensagemForm.php#L141)) usa `User::orderBy('name')`
 puro — **sem** o filtro/`orWhereIn` que o `blocoDestinatarios` do site ganhou
 ([:180-184](app/Filament/Schemas/MensagemForm.php#L180-L184)).
+
+⚠️ **O docblock de `blocoDestinatarios` mente.** [MensagemForm.php:160-161](app/Filament/Schemas/MensagemForm.php#L160-L161)
+afirma que o `schemaAdmin` "mantém a Section inline (**filtra `ativo`** …)" — e ela **não
+filtra**. É intenção nunca implementada. Corrigir o comentário junto do D14, senão a próxima
+leitura confia nele.
+
+**T15 — o pivô de destinatários tem dois caminhos com conjuntos DIFERENTES.**
+[SincronizadorDestinatarios](app/Support/Mensagens/SincronizadorDestinatarios.php) expõe
+`filtrarPorNivel()` (**cru** — só o guard de nível, não checa existência), `efetivos()`
+(guard + filtro de `ativo`/existência, sem gravar), `sincronizar()` (grava sem filtro) e
+`aplicar()` = `sincronizar(efetivos())`. O trait
+[SincronizaDestinatarios](app/Filament/Resources/Mensagens/Pages/SincronizaDestinatarios.php)
+hoje **captura com `filtrarPorNivel()` e grava com `sincronizar()`** — ou seja, o `/admin`
+persiste o conjunto **cru**. `MensagemDestinatariosGuardTest` consome
+`capturarDestinatarios()` por classe anônima **sem DB**, assertando `[7, 9]` — ids que não
+existem em `users`. Qualquer mudança que leve `efetivos()` para dentro do `capturar`
+**quebra esse teste e o torna dependente de banco**.
+
+**T16 — `ativo` tem default `true`** no schema
+([2026_07_03_000006_add_campos_cema_to_users_table.php:14](database/migrations/2026_07_03_000006_add_campos_cema_to_users_table.php#L14))
+e a `UserFactory` não o sobrescreve ⇒ todo `User::factory()->create()` nasce **ativo**. Por
+isso o D14 não quebra os 6 saves de `MensagemDestinatariosPersistenciaTest`.
 
 **T8 — o front hoje:** só [corpos/pictografia.blade.php](resources/views/mensagens/corpos/pictografia.blade.php)
 renderiza imagens, numa cadeia `@if` (11) … `</div>` (31) … `@elseif blank(corpo)` (32-33) …
@@ -341,6 +365,13 @@ compilada, mas **só no `npm run build`**. `.cema-pictografia-grid` é classe **
 - **I27** — publicar pela Action **persiste as `relacionadas` editadas no formulário**,
   simetricamente nos dois sentidos (paridade com o "Salvar alterações" da mesma tela).
 - **I29** — a entrada de trilha gerada pela Action tem `porta = 'admin'`.
+- **I30** — salvar pelo Select com a regra recusando **não deixa meio-save**: autores e mídia
+  gravados por `saveRelationships()` são revertidos (D13).
+- **I31** — o Select de destinatários do `schemaAdmin` oferece **só usuários ativos**, mais os
+  **já selecionados** (mesmo que tenham sido desativados depois) — senão um destinatário
+  desativado trava até um Salvar de título, sem saída na tela.
+- **I32** — o caminho do Select **grava o mesmo conjunto que validou**: destinatário inativo
+  ou inexistente não entra no pivô.
 
 ---
 
@@ -682,7 +713,9 @@ revisar cimenta essa URL, e a mesma mensagem publicada pelo `/minha-conta` sairi
 
 **Por que `refreshFormData(['status'])` (I21):** a Action grava `publicado` no registro, mas
 `$this->data['status']` continua `pendente`. Sem o refresh, o próximo "Salvar alterações"
-**despublica em silêncio**.
+**despublica em silêncio**. *Nota:* `refreshFormData` passa por `mutateFormDataBeforeFill`,
+que no `EditMensagem` dispara 2 queries de pivô cujo resultado o `fillPartially` descarta —
+inofensivo, mas não confundir com bug ao ler o log de queries.
 
 **Fechando o buraco do Select (D9)** — trait `PublicaMensagem`, molde **exato** dos traits
 `SincronizaDestinatarios`/`SincronizaRelacionadas`: o trait expõe **helpers**, **nunca
@@ -700,10 +733,13 @@ trait PublicaMensagem
 }
 ```
 
-As pages compõem nos hooks que **já têm**:
+As pages compõem nos hooks que **já têm** — e **os nomes diferem entre elas**: compor no hook
+errado é no-op silencioso, exatamente o R11 que esta fatia quer evitar.
 
 ```php
-// EditMensagem
+// EditMensagem — hooks: mutateFormDataBeforeSave + afterSave
+protected ?bool $hasDatabaseTransactions = true;                 // ← D13, ver abaixo
+
 protected function mutateFormDataBeforeSave(array $data): array
 {
     $this->publicandoAgora = $this->record->status !== Mensagem::STATUS_PUBLICADO
@@ -721,6 +757,47 @@ protected function afterSave(): void
 }
 ```
 
+```php
+// CreateMensagem — hooks: mutateFormDataBeforeCREATE + afterCREATE
+protected ?bool $hasDatabaseTransactions = true;
+
+protected function mutateFormDataBeforeCreate(array $data): array
+{
+    $this->publicandoAgora = ($data['status'] ?? null) === Mensagem::STATUS_PUBLICADO;  // sem estado anterior
+
+    $data = $this->reasserirRegraDePublicacao($data);
+    return $this->capturarDestinatarios($this->capturarRelacionadas($data));
+}
+
+protected function afterCreate(): void { /* mesma ordem do afterSave */ }
+```
+
+**D13 — as duas pages ligam `$hasDatabaseTransactions = true`.** Precedente no próprio
+projeto: [CreateUser.php:16](app/Filament/Resources/Users/Pages/CreateUser.php#L16) e
+[EditUser.php:17](app/Filament/Resources/Users/Pages/EditUser.php#L17) (O1 da Fatia 0, mesma
+armadilha). A razão é a ordem de `EditRecord::save()`:
+
+```
+beginDatabaseTransaction()        ← no-op SEM a flag
+getState(afterValidate: …)        ← saveRelationships(): grava autores + mídia
+mutateFormDataBeforeSave($data)   ← a reasserção lança AQUI
+handleRecordUpdate(…)
+catch (Throwable) → rollBackDatabaseTransaction()   ← TAMBÉM no-op sem a flag
+```
+
+Sem a flag, recusar um save de mensagem publicada sem nível deixa autores e mídia **já
+gravados, sem rollback** — meio-save silencioso no fluxo mais comum da tela, não no botão
+novo (I30). O `catch` já existe; a flag é o que o torna um rollback de verdade.
+
+**`CreateMensagem` é diferente, e mesmo assim liga a flag.** Em `CreateRecord::create()` o
+`saveRelationships()` roda na **linha 115**, *depois* de `mutateFormDataBeforeCreate` (109) e
+`handleRecordCreation` (113) — a exceção da reasserção não deixa meio-save de relações. Ligar
+a flag lá é **opcional por esse critério**, e adotado assim mesmo: torna atômico o par
+`create` + pivôs do `afterCreate`, e custa uma linha.
+
+**Ressalva (vale para os dois caminhos e para a Action):** o rollback desfaz a linha em
+`media`, **não** o arquivo já escrito no disco.
+
 | Camada | O quê | Cobre |
 |---|---|---|
 | **Declarativa** (UX) | `Select::make('nivel')->required(fn (Get $get) => $get('status') === Mensagem::STATUS_PUBLICADO)` com `->validationMessages(['required' => 'Selecione o nível de acesso para manter esta mensagem publicada.'])`, **exclusivamente em `MensagemForm::schemaAdmin()` (`:87-91`)**. O `schemaCuradoria` (`:316-320`) e o `schemaMedium` ficam **intactos** — lá não existe campo `status` (`$get('status')` seria sempre `null`, regra morta) e quem arbitra é o botão Publicar da F4b. Exige também `->live()` no `Select::make('status')` (`:93-101`, hoje **sem**), senão o asterisco/mensagem só reage no próximo round-trip. | I22, I23, I25, **C4** |
@@ -730,12 +807,72 @@ protected function afterSave(): void
 `->required()` é **hidratação, não integridade** — protege só o caminho do form. A
 reasserção server-side é a rede que não depende dele.
 
-**Ressalva declarada:** a reasserção usa o conjunto **efetivo** (filtra `ativo`), mas o
-Select de destinatários do `schemaAdmin` (`MensagemForm.php:141`) **não** filtra `ativo` nem
-tem o `orWhereIn` do `blocoDestinatarios` (`:180-184`). Como o carimbo e a regra só valem na
-**transição** para publicado, um save de direcionada **já publicada** não é bloqueado por
-destinatário que ficou inativo. Zero linhas no dev hoje (0 usuários inativos de 148). **Não**
-relaxar a reasserção para o conjunto cru — seria publicar direcionada invisível para todos.
+**D14 — validar com `efetivos()` num form que oferece inativo é incoerente.** Duas metades da
+mesma raiz, ambas obrigatórias:
+
+**(a) O Select do `schemaAdmin` passa a filtrar `ativo`.** Hoje é `User::orderBy('name')`
+puro: lista inativos. Com a reasserção nova, o admin selecionaria só um inativo, veria o nome
+escolhido na tela e receberia *"selecione ao menos um destinatário"* — mensagem que
+**contradiz a tela** — além de contrariar a decisão de produto da F4b (destinatário = usuário
+**ativo**). Adotar o molde já pronto de `blocoDestinatarios` (`:180-184`), preservando o
+`helperText` que só o painel tem:
+
+```php
+->options(fn (Get $get) => User::query()
+    ->where('ativo', true)
+    ->orWhereIn('id', (array) $get('destinatarios'))   // ← OBRIGATÓRIO
+    ->orderBy('name')
+    ->pluck('name', 'id'))
+```
+
+O `orWhereIn` **não é opcional**: é o achado "Important 2a" da própria F4b. Sem ele, o Select
+injeta `Rule::in(options)` sem o id hidratado pelo `fill()`, e um destinatário desativado
+**depois** trava até um simples Salvar de título — a opção nem aparece para ser removida
+(I31).
+
+**(b) O caminho do Select passa a gravar o conjunto que validou.** Hoje a reasserção valida
+`efetivos()` (guard + `ativo` + existência) e a persistência grava `filtrarPorNivel()` **cru**
+(T15). Com `[ativo A, inativo B]` a regra passa por causa de A e o pivô grava **A e B**; com
+um id forjado inexistente, a regra passa e `sincronizar()` estoura `QueryException` de FK — o
+docblock de `aplicar()` alerta exatamente para isso.
+
+A correção **não toca `capturarDestinatarios()`** — mexer nele levaria `efetivos()` para
+dentro do harness sem banco do `MensagemDestinatariosGuardTest`, que assere `[7, 9]` com ids
+inexistentes (T15). Em vez disso, o trait guarda também o nível e troca o método de gravação:
+
+```php
+protected array $idsDestinatarios = [];       // INALTERADO — contrato do GuardTest
+protected ?string $nivelDestinatarios = null; // novo
+
+protected function capturarDestinatarios(array $data): array   // corpo INALTERADO,
+{                                                              // só passa a guardar o nível
+    $this->nivelDestinatarios = $data['nivel'] ?? null;
+    $this->idsDestinatarios = SincronizadorDestinatarios::filtrarPorNivel(…);
+    unset($data['destinatarios']);
+    return $data;
+}
+
+protected function aplicarDestinatarios(Mensagem $mensagem): void
+{
+    // era sincronizar($mensagem, $ids) — cru. Agora filtra integridade, como o site (I7).
+    SincronizadorDestinatarios::aplicar($mensagem, $this->nivelDestinatarios, $this->idsDestinatarios);
+}
+```
+
+Não quebra os 6 saves de `MensagemDestinatariosPersistenciaTest` porque `ativo` nasce `true`
+(T16). Na **Action não havia divergência** — ela já valida e grava o mesmo conjunto efetivo.
+
+**Corrigir junto:** o docblock de `blocoDestinatarios` (`:160-161`), que hoje afirma que o
+`schemaAdmin` filtra `ativo` — com o D14 a frase finalmente passa a ser verdade, mas a
+justificativa de não compartilhar o bloco vira só o `helperText`.
+
+**A mensagem do C4 vale para os dois caminhos (R1).** O `->validationMessages()` só dispara
+quando o Select `status` **já está** em `publicado`; publicar uma pendente pelo **botão** com
+`nivel = null` devolveria o texto de `RegraPublicacao` (*"Selecione um nível de visibilidade
+válido."*), que não ensina o caminho. Para não duplicar literal nem tocar `RegraPublicacao`,
+a frase vive em **uma constante** (`MensagemForm::MSG_NIVEL_OBRIGATORIO`), consumida pelo
+`validationMessages()` **e** pela Action ao montar a `ValidationException` de chave
+`data.nivel`.
 
 **A mensagem do C4 não toca `RegraPublicacao`.** A regra é compartilhada com a curadoria,
 onde o texto atual é adequado, e tem teste unitário próprio
@@ -774,13 +911,16 @@ notificação/e-mail está fora de escopo (§10), como já estava na F4b.
 `app/Filament/Schemas/MensagemForm.php` · `app/Filament/Resources/Mensagens/MensagemResource.php` ·
 `app/Filament/Resources/Mensagens/Pages/EditMensagem.php` ·
 `app/Filament/Resources/Mensagens/Pages/CreateMensagem.php` ·
+`app/Filament/Resources/Mensagens/Pages/SincronizaDestinatarios.php` (D14b — grava `aplicar()`
+em vez de `sincronizar()`; `capturarDestinatarios()` **intocado**) ·
 `resources/views/mensagens/show.blade.php` ·
 `resources/views/mensagens/corpos/pictografia.blade.php` ·
 `resources/views/mensagens/corpos/psicografia.blade.php` ·
 `resources/views/components/mensagem/card.blade.php` · `database/factories/MensagemFactory.php`
 (só se necessário — **não** mudar o default sem contar os saves da §8.2)
 
-**Não tocar:** `RegraPublicacao`, `SincronizadorDestinatarios`, `SlugMensagem`,
+**Não tocar:** `RegraPublicacao`, `SincronizadorDestinatarios` (a mecânica já tem o método
+certo — `aplicar()`; só muda **quem** o chama), `SlugMensagem`,
 `CuradoriaConta`, `MensagensConta`, `LeitorMensagens`/`LeitorMensagensMysql`, o resolvedor de
 visibilidade da 3A, `Lista.php`, o enum `FormatoMensagem`, `ResumoAutor`,
 `resources/css/mensagens.css`.
@@ -885,10 +1025,21 @@ Cada um nasce vermelho.
 30. publicar pelo Select e criar já publicada gravam autoria *(I24)*
 30b. editar o **título** de uma mensagem já publicada (factory default) **não** carimba
     `publicado_em` nem `publicado_por_id` *(I26)*
-31. auditoria da Action tem `porta = 'admin'` *(I29)* — exige
-    `Filament::setCurrentPanel(Filament::getPanel('admin'))` no `setUp`, molde de
-    [AuditoriaUserResourceTest.php:31](tests/Feature/Autorizacao/AuditoriaUserResourceTest.php#L31)
+31. auditoria da Action tem `porta = 'admin'` *(I29)*. **Dois passos no `setUp`, não um:**
+    `Filament::setCurrentPanel(Filament::getPanel('admin'))` (molde de
+    [AuditoriaUserResourceTest.php:31](tests/Feature/Autorizacao/AuditoriaUserResourceTest.php#L31))
+    **e** `AuditoriaAutorizacao::usarPorta(null)` (molde de `AuditoriaAgendaPortaTest:35` e
+    `AuditoriaMensagemPortaTest:38`). `porta()` é `$portaForcada ?? painel ?? 'sistema'`, e
+    `$portaForcada` é **estática**, setada no `boot()` dos 3 componentes do site e nunca
+    resetada: outro teste no mesmo processo pode deixá-la em `'perfil'`, e o override **vence
+    o painel**
 32. **não-regressão**: `schemaCuradoria` continua com `nivel` **não-required** *(I25)*
+33. salvar pelo Select com a regra recusando **não deixa autores/mídia gravados** — prova o
+    rollback real do D13 *(I30)*
+34. o Select de destinatários do `schemaAdmin` **não oferece** usuário inativo, **mas oferece**
+    o inativo que já está selecionado *(I31)*
+35. salvar direcionada com `[ativo, inativo]` grava **só o ativo** no pivô *(I32)*; e id
+    inexistente não estoura `QueryException` de FK
 
 ### 8.1 Armadilhas de teste (falso-verde)
 
@@ -959,7 +1110,11 @@ aplicada ao docblock do `GlossarioCamposMensagem`.
 | R8 | Re-execução de `cema:importar-resumos` sobrescrevendo resumo curado | I1 (`blank()`) + teste 2 |
 | R9 | Esquecer `npm run build` no cutover ⇒ lead sem estilo | §7 passo 4, declarado no PR |
 | R10 | Autoria falsa carimbada nas 133 publicadas por gatilho de estado | Carimbo **só na transição** (§5.3) + I26 + teste 30b |
-| R11 | Trait declarando hook ⇒ camada inteira vira no-op silencioso | Trait expõe **helpers**; pages compõem (§5.3) + os testes 28/29/30 |
+| R11 | Trait declarando hook ⇒ camada inteira vira no-op silencioso; ou compor no hook de nome errado no `CreateMensagem` (`…BeforeCreate`, não `…BeforeSave`) | Trait expõe **helpers**; os dois exemplos de composição estão em §5.3 + os testes 28/29/30 |
+| R12 | Regra recusando o save **depois** de `saveRelationships()` ⇒ meio-save sem rollback | `$hasDatabaseTransactions = true` (D13) + teste 33 |
+| R13 | Validar com `efetivos()` e gravar com o conjunto cru ⇒ inativo no pivô, ou `QueryException` de FK com id forjado | D14b (`aplicar()`) + testes 34/35 |
+| R14 | Levar `efetivos()` para dentro de `capturarDestinatarios()` ⇒ quebra o `MensagemDestinatariosGuardTest`, que roda **sem banco** com ids inexistentes | D14b mexe só em `aplicarDestinatarios()` (T15) |
+| R15 | Teste de porta passando/reprovando por contágio: `$portaForcada` é **estática** e sobrevive entre testes do mesmo processo | `usarPorta(null)` **junto** do `setCurrentPanel` (teste 31) |
 
 **Ciência (não é desta fatia):** o conflito pré-existente entre `cema:importar-mensagens` e a
 curadoria (O5 da F4b) segue como está.
@@ -976,7 +1131,6 @@ curadoria (O5 da F4b) segue como está.
 - `config/navegacao.php` e o rótulo do submenu "Mensagens Públicas" — backlog.
 - **Miniatura na lista pública** — fica para a F6, junto do avatar do autor (D11).
 - Notificação/e-mail ao publicar pelo `/admin`.
-- Filtrar `ativo` no Select de destinatários do `schemaAdmin` (ressalva declarada em §5.3).
 
 ---
 

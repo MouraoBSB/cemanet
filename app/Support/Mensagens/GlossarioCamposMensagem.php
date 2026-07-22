@@ -8,8 +8,9 @@ namespace App\Support\Mensagens;
  * Fonte única do vocabulário de CAMPOS de Mensagem no histórico de auditoria (Fatia F4b, Task 11).
  * Lista branca: só os campos aqui aparecem no histórico — qualquer chave fora dela é IGNORADA
  * (nunca um fallback com o nome cru da coluna). Mesmo molde de
- * App\Support\Autorizacao\GlossarioCapacidades. Mesmos 11 campos de
- * Mensagem::getActivitylogOptions()->logOnly([...]).
+ * App\Support\Autorizacao\GlossarioCapacidades. Mesmos 12 campos de
+ * Mensagem::getActivitylogOptions()->logOnly([...]) — paridade travada por
+ * Tests\Feature\Mensagens\GlossarioCamposParidadeTest.
  */
 class GlossarioCamposMensagem
 {
@@ -18,6 +19,7 @@ class GlossarioCamposMensagem
         'slug' => 'Slug',
         'corpo' => 'Corpo da mensagem',
         'contexto' => 'Contexto',
+        'resumo' => 'Resumo',
         'formato' => 'Formato',
         'data_recebimento' => 'Data de recebimento',
         'casa' => 'Casa',

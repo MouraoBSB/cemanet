@@ -29,7 +29,7 @@ class MensagemTest extends TestCase
 
     public function test_colunas_esperadas_e_podadas(): void
     {
-        foreach (['titulo', 'slug', 'corpo', 'contexto', 'formato', 'data_recebimento', 'casa', 'link_arquivo', 'liberar_download', 'nivel', 'status', 'wp_id'] as $coluna) {
+        foreach (['titulo', 'slug', 'corpo', 'contexto', 'resumo', 'formato', 'data_recebimento', 'casa', 'link_arquivo', 'liberar_download', 'nivel', 'status', 'wp_id'] as $coluna) {
             $this->assertTrue(Schema::hasColumn('mensagens', $coluna), "coluna esperada ausente: {$coluna}");
         }
         foreach (['origem_da_mensagem', 'grupo_mediunico', 'casa_espirita'] as $coluna) {
@@ -40,7 +40,7 @@ class MensagemTest extends TestCase
     public function test_fillable_exato(): void
     {
         $this->assertSame(
-            ['titulo', 'slug', 'corpo', 'contexto', 'formato', 'data_recebimento', 'casa', 'link_arquivo', 'liberar_download', 'nivel', 'status', 'wp_id'],
+            ['titulo', 'slug', 'corpo', 'contexto', 'resumo', 'formato', 'data_recebimento', 'casa', 'link_arquivo', 'liberar_download', 'nivel', 'status', 'wp_id'],
             (new Mensagem)->getFillable(),
         );
     }
@@ -170,5 +170,23 @@ class MensagemTest extends TestCase
 
         $this->assertCount(0, $a->fresh()->relacionadas);
         $this->assertDatabaseMissing('mensagem_relacionada', ['mensagem_id' => $a->id, 'relacionada_id' => $a->id]);
+    }
+
+    public function test_resumo_e_redigido_na_trilha_de_auditoria(): void
+    {
+        $m = Mensagem::factory()->create(['resumo' => 'SENTINELA-RESUMO-ANTIGO']);
+
+        $m->update(['resumo' => 'SENTINELA-RESUMO-NOVO']);
+
+        $props = $m->activities()->latest('id')->first()->properties;
+
+        $this->assertSame('[texto não registrado]', $props['attributes']['resumo']);
+        $this->assertSame('[texto não registrado]', $props['old']['resumo']);
+
+        // Sentinelas em ASCII de propósito: json_encode escapa acento (conteúdo → conteúdo),
+        // e uma busca por texto acentuado passaria SEMPRE, provando nada.
+        $json = $m->activities()->get()->toJson();
+        $this->assertStringNotContainsString('SENTINELA-RESUMO-ANTIGO', $json);
+        $this->assertStringNotContainsString('SENTINELA-RESUMO-NOVO', $json);
     }
 }

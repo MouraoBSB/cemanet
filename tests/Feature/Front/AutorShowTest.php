@@ -106,6 +106,7 @@ class AutorShowTest extends TestCase
 
         $this->get(route('mensagens.index'))
             ->assertOk()
+            ->assertSee(route('mensagens.show', 'na-lista'), false)
             ->assertDontSee($m->fresh()->getFirstMediaUrl(Mensagem::COLECAO_IMAGENS, 'web'), false);
     }
 }

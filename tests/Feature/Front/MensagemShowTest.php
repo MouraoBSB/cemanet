@@ -144,10 +144,10 @@ class MensagemShowTest extends TestCase
     // -----------------------------------------------------------------------
 
     /** @return Mensagem mensagem pública do formato dado, com 1 imagem na coleção */
-    private function mensagemComImagem(string $formato, string $slug): Mensagem
+    private function mensagemComImagem(string $formato, string $slug, ?string $corpo = '<p>Texto.</p>'): Mensagem
     {
         Storage::fake('public');
-        $m = Mensagem::factory()->publica()->create(['slug' => $slug, 'formato' => $formato, 'titulo' => 'Mensagem Ilustrada']);
+        $m = Mensagem::factory()->publica()->create(['slug' => $slug, 'formato' => $formato, 'titulo' => 'Mensagem Ilustrada', 'corpo' => $corpo]);
         $m->addMediaFromString(base64_decode(self::PNG_1X1))->usingFileName('img.png')
             ->toMediaCollection(Mensagem::COLECAO_IMAGENS);
 
@@ -182,7 +182,7 @@ class MensagemShowTest extends TestCase
     /** I28: na pictografia os desenhos SÃO a mensagem — a legenda diz isso. */
     public function test_pictografia_mantem_a_legenda_desenho(): void
     {
-        $this->mensagemComImagem('pictografia', 'pict-legenda');
+        $this->mensagemComImagem('pictografia', 'pict-legenda', null);
 
         $this->get(route('mensagens.show', 'pict-legenda'))
             ->assertOk()

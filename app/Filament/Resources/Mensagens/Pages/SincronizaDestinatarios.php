@@ -24,8 +24,15 @@ trait SincronizaDestinatarios
     /** @var array<int, int|string> */
     protected array $idsDestinatarios = [];
 
+    /** Nível capturado junto dos ids — aplicar() precisa dele para o guard. */
+    protected ?string $nivelDestinatarios = null;
+
     protected function capturarDestinatarios(array $data): array
     {
+        // CORPO INALTERADO: o MensagemDestinatariosGuardTest exercita este método por classe
+        // anônima SEM banco, com ids inexistentes. Trazer efetivos() para cá quebraria o teste
+        // e o tornaria dependente de banco — o filtro de integridade mora em aplicarDestinatarios().
+        $this->nivelDestinatarios = $data['nivel'] ?? null;
         $this->idsDestinatarios = SincronizadorDestinatarios::filtrarPorNivel(
             $data['nivel'] ?? null,
             $data['destinatarios'] ?? []
@@ -37,6 +44,9 @@ trait SincronizaDestinatarios
 
     protected function aplicarDestinatarios(Mensagem $mensagem): void
     {
-        SincronizadorDestinatarios::sincronizar($mensagem, $this->idsDestinatarios);
+        // Era sincronizar() — CRU. Agora filtra integridade (ativo + existência), o mesmo
+        // conjunto que a reasserção da regra valida: senão a regra passa por causa de um ativo
+        // e o pivô grava o inativo junto, ou um id forjado estoura QueryException de FK.
+        SincronizadorDestinatarios::aplicar($mensagem, $this->nivelDestinatarios, $this->idsDestinatarios);
     }
 }

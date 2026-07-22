@@ -46,7 +46,7 @@ Valem para **todas** as tasks. Não repetidas em cada uma.
 
 ## Estrutura de arquivos
 
-**Criados (11):**
+**Criados (12):**
 
 | Arquivo | Responsabilidade |
 |---|---|
@@ -61,6 +61,7 @@ Valem para **todas** as tasks. Não repetidas em cada uma.
 | `tests/Feature/Importacao/LeitorResumosMensagensBindTest.php` | bind do leitor |
 | `tests/Feature/Importacao/ImportarResumosMensagensTest.php` | comando (I1–I5b) |
 | `tests/Feature/Filament/MensagemPublicarActionTest.php` | Action + regra nos 3 caminhos |
+| `tests/Feature/Filament/PublicaMensagemHelperTest.php` | a reasserção server-side isolada do form |
 
 **Modificados (16):** `app/Models/Mensagem.php` ·
 `app/Support/Mensagens/GlossarioCamposMensagem.php` · `app/Providers/AppServiceProvider.php` ·
@@ -1580,7 +1581,7 @@ Esperado: todos verdes.
 
 ```bash
 docker compose exec -T app ./vendor/bin/pint
-git add resources/views/components/mensagem/card.blade.php tests/Feature/Front/AutorShowTest.php tests/Feature/Front/MensagemListaTest.php
+git add resources/views/components/mensagem/card.blade.php tests/Feature/Front/AutorShowTest.php
 git commit -m "feat(f4c-ac): miniatura do card vale para qualquer formato
 
 Cai o gate de formato; o de variante fica. A lista pública segue sem
@@ -1728,6 +1729,10 @@ destinatário desativado depois trava até um Salvar de título."
 
 - [ ] **Passo 1: escrever os testes (vermelho)**
 
+> **Import obrigatório antes de colar**, em `MensagemDestinatariosPersistenciaTest.php` (:7-15):
+> `use App\Support\Mensagens\SincronizadorDestinatarios;` — o arquivo hoje **não** o importa, e
+> sem ele o segundo teste dá erro **fatal**, não falha de asserção.
+
 ```php
     /** I32: valida com efetivos() e gravava o conjunto CRU — o inativo entrava no pivô. */
     public function test_nao_grava_destinatario_inativo_no_pivo(): void
@@ -1760,6 +1765,10 @@ destinatário desativado depois trava até um Salvar de título."
         Livewire::test(EditMensagem::class, ['record' => $m->getRouteKey()])
             ->fillForm(['destinatarios' => [$u->id, 999999]])
             ->call('save')
+            // `.0` e NÃO `.1`, embora o id inválido seja o segundo: quando o estado tem id fora
+            // das options, Select::getInValidationRuleValues() devolve [] e a regra vira `in:`
+            // com lista VAZIA aplicada a `destinatarios.*` ⇒ TODOS os índices reprovam. Não
+            // "corrigir" para .1 — isso quebra o teste.
             ->assertHasErrors(['data.destinatarios.0']);
 
         $this->assertSame([$u->id], $this->pivo($m));
@@ -1991,6 +2000,7 @@ usavam o default da factory, que nasce publicado e sem nível."
 - Modificar: `app/Filament/Resources/Mensagens/Pages/EditMensagem.php`
 - Modificar: `app/Filament/Resources/Mensagens/Pages/CreateMensagem.php`
 - Criar: `tests/Feature/Filament/MensagemPublicarActionTest.php` (parte 1)
+- Criar: `tests/Feature/Filament/PublicaMensagemHelperTest.php` (a rede server-side, ver Passo 1b)
 
 **Interfaces:**
 - Produz: `reasserirRegraDePublicacao(array $data): array` e
@@ -2015,6 +2025,7 @@ namespace Tests\Feature\Filament;
 use App\Enums\VisibilidadeMensagem;
 use App\Filament\Resources\Mensagens\Pages\CreateMensagem;
 use App\Filament\Resources\Mensagens\Pages\EditMensagem;
+use App\Filament\Schemas\MensagemForm;   // MSG_NIVEL_OBRIGATORIO — sem isto, erro FATAL
 use App\Models\Mensagem;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -2156,13 +2167,140 @@ class MensagemPublicarActionTest extends TestCase
 }
 ```
 
+- [ ] **Passo 1b: escrever o teste do HELPER (a rede que não depende do form)**
+
+⚠️ **Sem este passo, dois dos três ramos de `reasserirRegraDePublicacao()` nascem sem prova.**
+Os testes `test_salvar_publicado_sem_nivel_e_recusado` e `test_criar_publicado_sem_nivel_e_recusado`
+**nunca alcançam o helper**: o `required` declarativo da Task 11 barra antes. Apagar o bloco do
+nível dentro do helper deixaria a suíte inteira verde — e era exatamente esse o argumento da
+SPEC §5.3 (*"`->required()` é hidratação, não integridade; a reasserção é a rede que não depende
+dele"*). A rede precisa de prova própria.
+
+Criar `tests/Feature/Filament/PublicaMensagemHelperTest.php` — molde **exato** de
+`MensagemDestinatariosGuardTest`: os helpers são `protected`, então o harness anônimo os expõe.
+É Feature (não Unit puro) porque `efetivos()` consulta `users`.
+
+```php
+<?php
+
+// Thiago Mourão — https://github.com/MouraoBSB — 2026-07-22
+
+namespace Tests\Feature\Filament;
+
+use App\Enums\VisibilidadeMensagem;
+use App\Filament\Resources\Mensagens\Pages\PublicaMensagem;
+use App\Filament\Schemas\MensagemForm;
+use App\Models\Mensagem;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Validation\ValidationException;
+use Tests\TestCase;
+
+/**
+ * Testa a REASSERÇÃO server-side isoladamente. Ela existe porque o `->required()` do form é
+ * hidratação, não integridade — e os testes de UI passam pelo required, nunca por aqui.
+ */
+class PublicaMensagemHelperTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private function harness(): object
+    {
+        return new class
+        {
+            use PublicaMensagem;
+
+            public function exec(array $data): array
+            {
+                return $this->reasserirRegraDePublicacao($data);
+            }
+        };
+    }
+
+    /**
+     * Captura FORA do catch: `$this->fail()` dentro de `catch (RuntimeException)` é engolido,
+     * porque AssertionFailedError estende RuntimeException.
+     *
+     * @return array<string, array<int, string>>
+     */
+    private function errosAoExecutar(array $data): array
+    {
+        $erros = null;
+
+        try {
+            $this->harness()->exec($data);
+        } catch (ValidationException $e) {
+            $erros = $e->errors();
+        }
+
+        $this->assertNotNull($erros, 'esperava ValidationException e não veio nenhuma');
+
+        return $erros;
+    }
+
+    /** Ramo 1: status != publicado ⇒ early-return, sem validar e sem lançar. */
+    public function test_status_nao_publicado_passa_direto(): void
+    {
+        $data = ['status' => Mensagem::STATUS_PENDENTE, 'nivel' => null, 'titulo' => 'Rascunho'];
+
+        $this->assertSame($data, $this->harness()->exec($data));
+    }
+
+    /** Ramo 2: publicado sem nível ⇒ data.nivel, com a frase que ENSINA o caminho (C4). */
+    public function test_publicado_sem_nivel_lanca_na_chave_do_nivel(): void
+    {
+        $erros = $this->errosAoExecutar(['status' => Mensagem::STATUS_PUBLICADO, 'nivel' => null]);
+
+        $this->assertArrayHasKey('data.nivel', $erros);
+        $this->assertSame(MensagemForm::MSG_NIVEL_OBRIGATORIO, $erros['data.nivel'][0]);
+    }
+
+    /** Ramo 2b: nível fora do enum é tão inválido quanto nulo (tryFrom fail-closed). */
+    public function test_publicado_com_nivel_inexistente_lanca_na_chave_do_nivel(): void
+    {
+        $erros = $this->errosAoExecutar(['status' => Mensagem::STATUS_PUBLICADO, 'nivel' => 'lixo-invalido']);
+
+        $this->assertArrayHasKey('data.nivel', $erros);
+    }
+
+    /** Ramo 3: direcionada cujo conjunto EFETIVO é vazio ⇒ data.destinatarios. */
+    public function test_direcionada_so_com_inativo_lanca_na_chave_dos_destinatarios(): void
+    {
+        $inativo = User::factory()->create(['ativo' => false]);
+
+        $erros = $this->errosAoExecutar([
+            'status' => Mensagem::STATUS_PUBLICADO,
+            'nivel' => VisibilidadeMensagem::Direcionada->value,
+            'destinatarios' => [$inativo->id],
+        ]);
+
+        $this->assertArrayHasKey('data.destinatarios', $erros);
+    }
+
+    /** Guarda: direcionada com destinatário ATIVO passa — a regra não é um "não" universal. */
+    public function test_direcionada_com_ativo_passa(): void
+    {
+        $ativo = User::factory()->create();
+
+        $data = [
+            'status' => Mensagem::STATUS_PUBLICADO,
+            'nivel' => VisibilidadeMensagem::Direcionada->value,
+            'destinatarios' => [$ativo->id],
+        ];
+
+        $this->assertSame($data, $this->harness()->exec($data));
+    }
+}
+```
+
 - [ ] **Passo 2: rodar e confirmar que falha**
 
 ```bash
-docker compose exec -T app php artisan test --filter=MensagemPublicarActionTest
+docker compose exec -T app php artisan test --filter="MensagemPublicarActionTest|PublicaMensagemHelperTest"
 ```
 
-Esperado: **4 FALHAS** — `test_publicar_pelo_select_grava_autoria`,
+Esperado: **os 5 do helper falham** (`PublicaMensagem` ainda não existe) e, em
+`MensagemPublicarActionTest`, **4 FALHAS** — `test_publicar_pelo_select_grava_autoria`,
 `test_criar_ja_publicada_grava_autoria`,
 `test_publicar_direcionada_com_destinatario_inativo_e_recusado` e
 `test_save_recusado_nao_deixa_autores_gravados`. Os outros 3 **já passam**: dois pelo
@@ -2619,7 +2757,7 @@ use Illuminate\Validation\ValidationException;
 docker compose exec -T app php artisan test --filter=MensagemPublicarActionTest
 ```
 
-Esperado: **14 passed** (6 da Task 12 + 8 desta).
+Esperado: **15 passed** — 7 da Task 12 (4 que nasceram vermelhos + 3 guardas) + 8 desta.
 
 - [ ] **Passo 5: rodar a suíte completa**
 

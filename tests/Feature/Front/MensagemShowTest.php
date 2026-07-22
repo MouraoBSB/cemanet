@@ -4,6 +4,7 @@
 
 namespace Tests\Feature\Front;
 
+use App\Enums\VisibilidadeMensagem;
 use App\Models\AutorEspiritual;
 use App\Models\Mensagem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -136,5 +137,76 @@ class MensagemShowTest extends TestCase
         $res->assertSee($media->getUrl(), false);
         $res->assertSee('download="desenho-mediunico-1.png"', false);
         $res->assertSee('Baixar', false);
+    }
+
+    // -----------------------------------------------------------------------
+    // F4c-AC Task 4: o resumo no single (meta description e lead)
+    // -----------------------------------------------------------------------
+
+    /**
+     * I9: a asserção é sobre a TAG. O `contexto` também é renderizado no corpo da página
+     * (show.blade.php:85-92) e o resumo vira lead — `assertSee`/`assertDontSee` soltos não
+     * distinguiriam a meta description de nada.
+     */
+    public function test_meta_description_usa_o_resumo_quando_existe(): void
+    {
+        Mensagem::factory()->publica()->create([
+            'slug' => 'com-resumo',
+            'resumo' => 'Radian convida os trabalhadores a refletirem sobre a palavra.',
+            'contexto' => 'Contexto de reserva do single.',
+            'corpo' => '<p>Corpo que nao deve aparecer.</p>',
+        ]);
+
+        $this->get(route('mensagens.show', 'com-resumo'))
+            ->assertOk()
+            ->assertSee('name="description" content="Radian convida os trabalhadores a refletirem sobre a palavra."', false)
+            ->assertDontSee('name="description" content="Contexto de reserva do single."', false);
+    }
+
+    /** GUARDA (não-regressão, já verde): a reserva `contexto` não pode sumir ao entrar o resumo. */
+    public function test_meta_description_cai_no_contexto_sem_resumo(): void
+    {
+        Mensagem::factory()->publica()->create([
+            'slug' => 'sem-resumo', 'resumo' => null,
+            'contexto' => 'Contexto de reserva.', 'corpo' => '<p>Corpo.</p>',
+        ]);
+
+        $this->get(route('mensagens.show', 'sem-resumo'))
+            ->assertOk()
+            ->assertSee('name="description" content="Contexto de reserva."', false);
+    }
+
+    /** D7: o lead é editorial e visualmente distinto da prosa mediúnica. */
+    public function test_lead_do_resumo_aparece_no_single(): void
+    {
+        Mensagem::factory()->publica()->create([
+            'slug' => 'lead-visivel', 'resumo' => "Primeiro parágrafo.\nSegundo parágrafo.",
+        ]);
+
+        $this->get(route('mensagens.show', 'lead-visivel'))
+            ->assertOk()
+            ->assertSee('cema-msg-resumo', false)
+            ->assertSee('Primeiro parágrafo.<br />', false);   // nl2br honra os 12 com parágrafos
+    }
+
+    public function test_lead_nao_aparece_sem_resumo(): void
+    {
+        Mensagem::factory()->publica()->create(['slug' => 'sem-lead', 'resumo' => null]);
+
+        $this->get(route('mensagens.show', 'sem-lead'))->assertOk()->assertDontSee('cema-msg-resumo', false);
+    }
+
+    /** I10 / REGRESSÃO (T10): a barreira intercepta ANTES do render — o resumo restrito não vaza. */
+    public function test_barreira_continua_interceptando_o_restrito_depois_do_resumo(): void
+    {
+        Mensagem::factory()->comNivel(VisibilidadeMensagem::Trabalhadores)->create([
+            'slug' => 'restrita-com-resumo',
+            'status' => Mensagem::STATUS_PUBLICADO,
+            'resumo' => 'Resumo reservado que o anônimo não pode ler.',
+        ]);
+
+        $this->get(route('mensagens.show', 'restrita-com-resumo'))
+            ->assertOk()   // barreira-200 CEGA da 3B — sem o assertOk, um 404 deixaria isto verde
+            ->assertDontSee('Resumo reservado', false);
     }
 }

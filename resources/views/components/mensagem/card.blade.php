@@ -11,7 +11,7 @@
     $miniatura = $perfil
         && $mensagem->formato === \App\Enums\FormatoMensagem::Pictografia
         ? $mensagem->getFirstMediaUrl('pictografia', 'web') : '';
-    $trecho = \Illuminate\Support\Str::limit(strip_tags((string) $mensagem->corpo), 160);
+    $trecho = \Illuminate\Support\Str::limit(strip_tags((string) ($mensagem->resumo ?: $mensagem->corpo)), 160);
 @endphp
 <article {{ $attributes->class(['cema-msg-card group flex flex-col overflow-hidden rounded-2xl border border-border-muted bg-white shadow-card']) }}>
     <a href="{{ route('mensagens.show', $mensagem->slug) }}" class="flex h-full flex-col rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-gold">

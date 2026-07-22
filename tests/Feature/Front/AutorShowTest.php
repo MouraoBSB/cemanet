@@ -54,4 +54,26 @@ class AutorShowTest extends TestCase
         $res->assertDontSee('Curtir');   // F5 fora (tile e botão)
         $res->assertSee(route('login'), false);   // rodapé estático de login
     }
+
+    /** I8: o card prefere o resumo e cai no corpo quando não há. */
+    public function test_card_usa_o_resumo_e_cai_no_corpo_sem_ele(): void
+    {
+        $autor = AutorEspiritual::factory()->create(['slug' => 'radian', 'ativo' => true]);
+
+        $comResumo = Mensagem::factory()->publica()->create([
+            'titulo' => 'Com resumo', 'resumo' => 'Trecho editorial do card.',
+            'corpo' => '<p>Corpo que nao deve aparecer no card.</p>',
+        ]);
+        $semResumo = Mensagem::factory()->publica()->create([
+            'titulo' => 'Sem resumo', 'resumo' => null, 'corpo' => '<p>Corpo de reserva.</p>',
+        ]);
+        $comResumo->autores()->attach($autor);
+        $semResumo->autores()->attach($autor);
+
+        $this->get(route('autores.show', 'radian'))
+            ->assertOk()
+            ->assertSee('Trecho editorial do card.')
+            ->assertDontSee('Corpo que nao deve aparecer no card.')
+            ->assertSee('Corpo de reserva.');
+    }
 }

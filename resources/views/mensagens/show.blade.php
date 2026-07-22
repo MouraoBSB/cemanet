@@ -4,7 +4,7 @@
     $textoCopia = trim($mensagem->titulo."\n\n".strip_tags((string) $mensagem->corpo));
 @endphp
 <x-layout.app :title="$mensagem->titulo"
-              :description="\Illuminate\Support\Str::limit(strip_tags($mensagem->contexto ?: $mensagem->corpo), 155)">
+              :description="\Illuminate\Support\Str::limit(strip_tags($mensagem->resumo ?: $mensagem->contexto ?: $mensagem->corpo), 155)">
     <x-slot:head>
         <link rel="canonical" href="{{ $url }}">
         @if ($mensagem->visibilidade() === \App\Enums\VisibilidadeMensagem::Publico)
@@ -136,6 +136,16 @@
 
                         <div class="px-5 py-9 sm:px-10">
                             <div class="mx-auto max-w-[640px]">
+                                @if (filled($mensagem->resumo))
+                                    {{-- Lead editorial (D7): é texto da CURADORIA, não palavra do
+                                         espírito — por isso a barra dourada e a tipografia menor o
+                                         separam da prosa. e() antes de nl2br: escapa e só então
+                                         converte as quebras dos 12 resumos com parágrafo. --}}
+                                    <div class="cema-msg-resumo mb-8 border-l-[3px] border-gold bg-cream/60 px-5 py-4">
+                                        <p class="font-serif text-[14.5px] font-light leading-[1.75] text-[#5b576b]">{!! nl2br(e($mensagem->resumo)) !!}</p>
+                                    </div>
+                                @endif
+
                                 @switch($mensagem->formato)
                                     @case(\App\Enums\FormatoMensagem::Psicografia) @include('mensagens.corpos.psicografia') @break
                                     @case(\App\Enums\FormatoMensagem::Psicofonia)  @include('mensagens.corpos.psicofonia')  @break

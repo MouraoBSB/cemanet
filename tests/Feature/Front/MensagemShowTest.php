@@ -165,7 +165,8 @@ class MensagemShowTest extends TestCase
             ->assertSee('Imagem 1')
             ->assertSee('Baixar')
             ->assertSee('— imagem 1', false)        // I28: o alt segue a legenda (A11y)
-            ->assertDontSee('— desenho 1', false);  // hoje o alt é hardcoded "desenho"
+            ->assertDontSee('— desenho 1', false)   // hoje o alt é hardcoded "desenho"
+            ->assertSee('class="cema-pictografia-grid mt-8"', false);  // $attributes->class() mescla o mt-8 da psicografia
     }
 
     /** I13: a psicofonia inclui a psicografia — a galeria não pode sair em dobro. */
@@ -187,7 +188,8 @@ class MensagemShowTest extends TestCase
             ->assertOk()
             ->assertSee('Desenho 1')
             ->assertDontSee('Imagem 1')
-            ->assertSee('— desenho 1', false);   // I28: o alt acompanha
+            ->assertSee('— desenho 1', false)   // I28: o alt acompanha
+            ->assertDontSee('ainda não tem desenhos disponíveis');  // não pode vazar com galeria cheia
     }
 
     /** I14: o texto de vazio é da pictografia e não pode vazar. Exige corpo NULL (senão passa por vacuidade). */

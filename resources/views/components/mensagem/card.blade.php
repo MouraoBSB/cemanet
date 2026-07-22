@@ -2,15 +2,15 @@
 
 {{-- Card de mensagem (grade). :variante controla a coerência entre as duas superfícies:
      'lista'  = SEM miniatura, trecho 2 linhas, data simples (SPEC §4.1 / C-A);
-     'perfil' = COM miniatura de pictografia, trecho 3 linhas, data mono dourada (SPEC §4.4).
+     'perfil' = COM miniatura da mensagem (qualquer formato), trecho 3 linhas, data mono dourada (SPEC §4.4).
      Badge/faixa de nível só @auth (I9); null-safe (I14/B1). Sem F5: sem ícone lida/não-lida. --}}
 @php
     $perfil = $variante === 'perfil';
     $autores = $mensagem->autores;
     $data = $mensagem->data_recebimento;
-    $miniatura = $perfil
-        && $mensagem->formato === \App\Enums\FormatoMensagem::Pictografia
-        ? $mensagem->getFirstMediaUrl(\App\Models\Mensagem::COLECAO_IMAGENS, 'web') : '';
+    // Miniatura: vale para QUALQUER formato (I12) — a de variante continua, porque a lista
+    // pública é sem imagem por desenho da 2B (D11) e Lista.php não faz eager-load de mídia.
+    $miniatura = $perfil ? $mensagem->getFirstMediaUrl(\App\Models\Mensagem::COLECAO_IMAGENS, 'web') : '';
     $trecho = \Illuminate\Support\Str::limit(strip_tags((string) ($mensagem->resumo ?: $mensagem->corpo)), 160);
 @endphp
 <article {{ $attributes->class(['cema-msg-card group flex flex-col overflow-hidden rounded-2xl border border-border-muted bg-white shadow-card']) }}>

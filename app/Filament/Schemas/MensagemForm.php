@@ -248,7 +248,7 @@ class MensagemForm
             Section::make('Autoria')
                 ->schema([
                     // ->relationship() é OBRIGATÓRIO aqui (não trocar por ->options()): fica dehydrated(false)
-                    // e só grava em saveRelationships(), o que dá sentido ao G1 (autores + pictografia).
+                    // e só grava em saveRelationships(), o que dá sentido ao G1 (autores + imagens).
                     Select::make('autores')
                         ->label('Autores espirituais')
                         ->relationship('autores', 'nome')
@@ -346,7 +346,7 @@ class MensagemForm
             Section::make('Autoria')
                 ->schema([
                     // ->relationship() é OBRIGATÓRIO aqui (não trocar por ->options()): fica dehydrated(false)
-                    // e só grava em saveRelationships(), o que dá sentido ao G1 (autores + pictografia).
+                    // e só grava em saveRelationships(), o que dá sentido ao G1 (autores + imagens).
                     Select::make('autores')
                         ->label('Autores espirituais')
                         ->relationship('autores', 'nome')

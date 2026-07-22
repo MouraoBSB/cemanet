@@ -140,6 +140,74 @@ class MensagemShowTest extends TestCase
     }
 
     // -----------------------------------------------------------------------
+    // F4c-AC Task 7: galeria de imagens única para os 3 formatos
+    // -----------------------------------------------------------------------
+
+    /** @return Mensagem mensagem pública do formato dado, com 1 imagem na coleção */
+    private function mensagemComImagem(string $formato, string $slug): Mensagem
+    {
+        Storage::fake('public');
+        $m = Mensagem::factory()->publica()->create(['slug' => $slug, 'formato' => $formato, 'titulo' => 'Mensagem Ilustrada']);
+        $m->addMediaFromString(base64_decode(self::PNG_1X1))->usingFileName('img.png')
+            ->toMediaCollection(Mensagem::COLECAO_IMAGENS);
+
+        return $m->fresh();
+    }
+
+    /** I12: hoje a imagem some do site quando o formato não é Pictografia. */
+    public function test_imagem_em_psicografia_aparece_no_corpo(): void
+    {
+        $m = $this->mensagemComImagem('psicografia', 'psico-com-imagem');
+
+        $this->get(route('mensagens.show', 'psico-com-imagem'))
+            ->assertOk()
+            ->assertSee($m->getMedia(Mensagem::COLECAO_IMAGENS)->first()->getUrl('web'), false)
+            ->assertSee('Imagem 1')
+            ->assertSee('Baixar')
+            ->assertSee('— imagem 1', false)        // I28: o alt segue a legenda (A11y)
+            ->assertDontSee('— desenho 1', false);  // hoje o alt é hardcoded "desenho"
+    }
+
+    /** I13: a psicofonia inclui a psicografia — a galeria não pode sair em dobro. */
+    public function test_psicofonia_mostra_a_galeria_uma_unica_vez(): void
+    {
+        $this->mensagemComImagem('psicofonia', 'psicofonia-com-imagem');
+
+        $html = $this->get(route('mensagens.show', 'psicofonia-com-imagem'))->assertOk()->getContent();
+
+        $this->assertSame(1, substr_count($html, 'Imagem 1'), 'a galeria duplicou pelo @include');
+    }
+
+    /** I28: na pictografia os desenhos SÃO a mensagem — a legenda diz isso. */
+    public function test_pictografia_mantem_a_legenda_desenho(): void
+    {
+        $this->mensagemComImagem('pictografia', 'pict-legenda');
+
+        $this->get(route('mensagens.show', 'pict-legenda'))
+            ->assertOk()
+            ->assertSee('Desenho 1')
+            ->assertDontSee('Imagem 1')
+            ->assertSee('— desenho 1', false);   // I28: o alt acompanha
+    }
+
+    /** I14: o texto de vazio é da pictografia e não pode vazar. Exige corpo NULL (senão passa por vacuidade). */
+    public function test_estado_vazio_da_pictografia_nao_vaza_para_psicografia(): void
+    {
+        Mensagem::factory()->publica()->create(['slug' => 'psico-sem-nada', 'formato' => 'psicografia', 'corpo' => null]);
+
+        $this->get(route('mensagens.show', 'psico-sem-nada'))
+            ->assertOk()
+            ->assertDontSee('ainda não tem desenhos disponíveis');
+    }
+
+    public function test_estado_vazio_continua_na_pictografia_sem_corpo_e_sem_imagem(): void
+    {
+        Mensagem::factory()->publica()->create(['slug' => 'pict-vazia', 'formato' => 'pictografia', 'corpo' => null]);
+
+        $this->get(route('mensagens.show', 'pict-vazia'))->assertOk()->assertSee('ainda não tem desenhos disponíveis');
+    }
+
+    // -----------------------------------------------------------------------
     // F4c-AC Task 4: o resumo no single (meta description e lead)
     // -----------------------------------------------------------------------
 

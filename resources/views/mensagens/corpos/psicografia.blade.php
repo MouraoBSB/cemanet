@@ -5,6 +5,10 @@
 
 <div class="cema-msg-prose">{!! $mensagem->corpo !!}</div>
 
+{{-- Ilustrações da mensagem (I12). A psicofonia herda este bloco pelo @include — não
+     acrescentar galeria lá, sob pena de sair em dobro. --}}
+<x-mensagem.imagens :mensagem="$mensagem" legenda="Imagem" class="mt-8" />
+
 <div class="mt-9 flex flex-col items-end gap-1 border-t border-[#F0EEF4] pt-6 text-right">
     <p class="font-serif text-[19px] italic leading-snug text-primary">
         @if ($nomesAutores->isNotEmpty())

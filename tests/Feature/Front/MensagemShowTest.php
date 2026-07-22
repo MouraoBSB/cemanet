@@ -123,9 +123,9 @@ class MensagemShowTest extends TestCase
         ]);
         $m->addMediaFromString(base64_decode(self::PNG_1X1))
             ->usingFileName('desenho.png')
-            ->toMediaCollection(Mensagem::COLECAO_PICTOGRAFIA);
+            ->toMediaCollection(Mensagem::COLECAO_IMAGENS);
 
-        $media = $m->fresh()->getMedia(Mensagem::COLECAO_PICTOGRAFIA)->first();
+        $media = $m->fresh()->getMedia(Mensagem::COLECAO_IMAGENS)->first();
 
         $res = $this->get(route('mensagens.show', 'pict-galeria'));
 

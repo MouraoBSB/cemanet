@@ -260,7 +260,7 @@ class MensagensContaCriarTest extends TestCase
             ->assertFormFieldExists('contexto')
             ->assertFormFieldExists('corpo')
             ->assertFormFieldExists('autores')
-            ->assertFormFieldExists('pictografia')
+            ->assertFormFieldExists('imagens')
             ->assertFormFieldExists('direcionar')
             ->assertFormFieldExists('destinatarios');
     }

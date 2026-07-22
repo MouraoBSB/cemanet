@@ -1,6 +1,6 @@
 @php
     $url = route('mensagens.show', $mensagem->slug);
-    $ogImg = $mensagem->getFirstMediaUrl(\App\Models\Mensagem::COLECAO_PICTOGRAFIA, 'web') ?: null;
+    $ogImg = $mensagem->getFirstMediaUrl(\App\Models\Mensagem::COLECAO_IMAGENS, 'web') ?: null;
     $textoCopia = trim($mensagem->titulo."\n\n".strip_tags((string) $mensagem->corpo));
 @endphp
 <x-layout.app :title="$mensagem->titulo"

@@ -153,7 +153,7 @@ class ImportadorMensagensTest extends TestCase
         ])]);
 
         $m = Mensagem::firstWhere('wp_id', 21694);
-        $this->assertSame(2, $m->getMedia(Mensagem::COLECAO_PICTOGRAFIA)->count());
+        $this->assertSame(2, $m->getMedia(Mensagem::COLECAO_IMAGENS)->count());
     }
 
     public function test_reimport_sem_pictografia_preserva_upload_do_admin(): void
@@ -162,12 +162,12 @@ class ImportadorMensagensTest extends TestCase
         $this->importar([$this->mensagemLegado(['fotos_urls' => []])]);
         $m = Mensagem::firstWhere('wp_id', 21694);
 
-        $m->addMediaFromString(base64_decode(self::PNG_1X1))->usingFileName('manual.png')->toMediaCollection(Mensagem::COLECAO_PICTOGRAFIA);
-        $this->assertTrue($m->fresh()->hasMedia(Mensagem::COLECAO_PICTOGRAFIA));
+        $m->addMediaFromString(base64_decode(self::PNG_1X1))->usingFileName('manual.png')->toMediaCollection(Mensagem::COLECAO_IMAGENS);
+        $this->assertTrue($m->fresh()->hasMedia(Mensagem::COLECAO_IMAGENS));
 
         $this->importar([$this->mensagemLegado(['fotos_urls' => []])]);   // re-import sem fotos
 
-        $this->assertTrue($m->fresh()->hasMedia(Mensagem::COLECAO_PICTOGRAFIA), 'a pictografia do /admin foi apagada (clobber O1)');
+        $this->assertTrue($m->fresh()->hasMedia(Mensagem::COLECAO_IMAGENS), 'a pictografia do /admin foi apagada (clobber O1)');
     }
 
     public function test_download_drive_vira_link_direto(): void
@@ -196,7 +196,7 @@ class ImportadorMensagensTest extends TestCase
         $this->importar([$dados]);
 
         $this->assertSame(1, Mensagem::count());
-        $this->assertSame(1, Mensagem::firstWhere('wp_id', 21694)->getMedia(Mensagem::COLECAO_PICTOGRAFIA)->count());
+        $this->assertSame(1, Mensagem::firstWhere('wp_id', 21694)->getMedia(Mensagem::COLECAO_IMAGENS)->count());
     }
 
     public function test_nao_sincroniza_departamentos(): void

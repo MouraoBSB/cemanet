@@ -97,9 +97,9 @@ class MensagemResource extends Resource
                     ->boolean()
                     ->toggleable(),
 
-                SpatieMediaLibraryImageColumn::make('pictografia')
-                    ->label('Pictografia')
-                    ->collection(Mensagem::COLECAO_PICTOGRAFIA)
+                SpatieMediaLibraryImageColumn::make('imagens')
+                    ->label('Imagens')
+                    ->collection(Mensagem::COLECAO_IMAGENS)
                     ->conversion('thumb')
                     ->toggleable(),
 

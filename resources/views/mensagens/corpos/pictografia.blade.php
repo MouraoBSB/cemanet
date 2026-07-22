@@ -2,7 +2,7 @@
      galeria das imagens LOCAIS da MediaLibrary (coleção pictografia, WebP web). Download por
      imagem (R3): atributo download com nome amigável derivado do título, apontando ao original
      (getUrl() sem conversão). NÃO usa link_arquivo (esse é o anexo Drive da sidebar). --}}
-@php $desenhos = $mensagem->getMedia(\App\Models\Mensagem::COLECAO_PICTOGRAFIA); @endphp
+@php $desenhos = $mensagem->getMedia(\App\Models\Mensagem::COLECAO_IMAGENS); @endphp
 
 @if (filled($mensagem->corpo))
     <div class="cema-msg-prose mb-8">{!! $mensagem->corpo !!}</div>

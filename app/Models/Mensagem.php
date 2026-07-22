@@ -40,7 +40,8 @@ class Mensagem extends Model implements HasMedia, TemDepartamento
     // Slug do termo "Público" da taxonomia nivel-de-acesso (nível BRUTO — a semântica rica é da Fatia 3).
     public const NIVEL_PUBLICO = 'publico';
 
-    public const COLECAO_PICTOGRAFIA = 'pictografia';
+    /** Imagens da mensagem — vale para os 3 formatos (na pictografia os desenhos SÃO a mensagem). */
+    public const COLECAO_IMAGENS = 'imagens';
 
     protected $fillable = [
         'titulo',
@@ -225,8 +226,8 @@ class Mensagem extends Model implements HasMedia, TemDepartamento
 
     public function registerMediaCollections(): void
     {
-        // Pictografia: MÚLTIPLAS imagens (o legado tem mensagem com 2). WebP web + miniatura pelo trait.
-        $this->registrarColecaoImagem(self::COLECAO_PICTOGRAFIA, unica: false);
+        // MÚLTIPLAS imagens (o legado tem mensagem com 2). WebP web + miniatura pelo trait.
+        $this->registrarColecaoImagem(self::COLECAO_IMAGENS, unica: false);
     }
 
     protected function corpo(): Attribute

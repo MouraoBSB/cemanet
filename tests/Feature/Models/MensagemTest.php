@@ -132,11 +132,23 @@ class MensagemTest extends TestCase
         Storage::fake('public');
         $m = Mensagem::factory()->create();
 
-        $m->addMediaFromString(base64_decode(self::PNG_1X1))->usingFileName('a.png')->toMediaCollection(Mensagem::COLECAO_PICTOGRAFIA);
-        $m->addMediaFromString(base64_decode(self::PNG_1X1))->usingFileName('b.png')->toMediaCollection(Mensagem::COLECAO_PICTOGRAFIA);
+        $m->addMediaFromString(base64_decode(self::PNG_1X1))->usingFileName('a.png')->toMediaCollection(Mensagem::COLECAO_IMAGENS);
+        $m->addMediaFromString(base64_decode(self::PNG_1X1))->usingFileName('b.png')->toMediaCollection(Mensagem::COLECAO_IMAGENS);
 
         // multi-arquivo: a coleção guarda as 2 (não é singleFile).
-        $this->assertSame(2, $m->fresh()->getMedia(Mensagem::COLECAO_PICTOGRAFIA)->count());
+        $this->assertSame(2, $m->fresh()->getMedia(Mensagem::COLECAO_IMAGENS)->count());
+    }
+
+    public function test_colecao_de_imagens_se_chama_imagens(): void
+    {
+        Storage::fake('public');
+        $this->assertSame('imagens', Mensagem::COLECAO_IMAGENS);
+
+        $m = Mensagem::factory()->create();
+        $m->addMediaFromString(base64_decode(self::PNG_1X1))->usingFileName('a.png')
+            ->toMediaCollection(Mensagem::COLECAO_IMAGENS);
+
+        $this->assertSame('imagens', $m->fresh()->getMedia(Mensagem::COLECAO_IMAGENS)->first()->collection_name);
     }
 
     public function test_relacionadas_e_simetrica(): void

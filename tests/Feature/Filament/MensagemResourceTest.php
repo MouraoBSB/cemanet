@@ -66,7 +66,7 @@ class MensagemResourceTest extends TestCase
     public function test_form_usa_media_library_para_pictografia(): void
     {
         Livewire::test(CreateMensagem::class)
-            ->assertFormFieldExists('pictografia', fn (SpatieMediaLibraryFileUpload $c): bool => $c->getCollection() === Mensagem::COLECAO_PICTOGRAFIA);
+            ->assertFormFieldExists('imagens', fn (SpatieMediaLibraryFileUpload $c): bool => $c->getCollection() === Mensagem::COLECAO_IMAGENS);
     }
 
     public function test_form_tem_select_nivel_com_publico_e_aceita_null(): void

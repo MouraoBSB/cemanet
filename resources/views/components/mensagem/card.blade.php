@@ -10,7 +10,7 @@
     $data = $mensagem->data_recebimento;
     $miniatura = $perfil
         && $mensagem->formato === \App\Enums\FormatoMensagem::Pictografia
-        ? $mensagem->getFirstMediaUrl('pictografia', 'web') : '';
+        ? $mensagem->getFirstMediaUrl(\App\Models\Mensagem::COLECAO_IMAGENS, 'web') : '';
     $trecho = \Illuminate\Support\Str::limit(strip_tags((string) ($mensagem->resumo ?: $mensagem->corpo)), 160);
 @endphp
 <article {{ $attributes->class(['cema-msg-card group flex flex-col overflow-hidden rounded-2xl border border-border-muted bg-white shadow-card']) }}>

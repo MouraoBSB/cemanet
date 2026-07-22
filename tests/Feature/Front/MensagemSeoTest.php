@@ -53,10 +53,10 @@ class MensagemSeoTest extends TestCase
         $m = Mensagem::factory()->publica()->create(['slug' => 'pict-com-midia', 'formato' => 'pictografia']);
         $m->addMediaFromString(base64_decode(self::PNG_1X1))
             ->usingFileName('desenho.png')
-            ->toMediaCollection(Mensagem::COLECAO_PICTOGRAFIA);
+            ->toMediaCollection(Mensagem::COLECAO_IMAGENS);
 
         $resp = $this->get(route('mensagens.show', 'pict-com-midia'));
-        $urlWeb = $m->fresh()->getFirstMediaUrl(Mensagem::COLECAO_PICTOGRAFIA, 'web');
+        $urlWeb = $m->fresh()->getFirstMediaUrl(Mensagem::COLECAO_IMAGENS, 'web');
 
         $resp->assertOk();
         $resp->assertSee('property="og:image"', false);

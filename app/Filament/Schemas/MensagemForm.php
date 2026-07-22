@@ -153,10 +153,10 @@ class MensagemForm
                         ->columnSpanFull(),
                 ]),
 
-            Section::make('Pictografia')
+            Section::make('Imagens')
                 ->schema([
-                    ComponentesImagem::upload('pictografia', Mensagem::COLECAO_PICTOGRAFIA, multiplas: true)
-                        ->label('Imagens (pictografia)'),
+                    ComponentesImagem::upload('imagens', Mensagem::COLECAO_IMAGENS, multiplas: true)
+                        ->label('Imagens da mensagem'),
                 ]),
         ];
     }
@@ -257,10 +257,10 @@ class MensagemForm
                         ->searchable(),
                 ]),
 
-            Section::make('Pictografia')
+            Section::make('Imagens')
                 ->schema([
-                    ComponentesImagem::upload('pictografia', Mensagem::COLECAO_PICTOGRAFIA, multiplas: true)
-                        ->label('Imagens (pictografia)'),
+                    ComponentesImagem::upload('imagens', Mensagem::COLECAO_IMAGENS, multiplas: true)
+                        ->label('Imagens da mensagem'),
                 ]),
 
             Toggle::make('direcionar')
@@ -359,10 +359,10 @@ class MensagemForm
                 fn (Get $get): bool => $get('nivel') === VisibilidadeMensagem::Direcionada->value
             ),
 
-            Section::make('Pictografia')
+            Section::make('Imagens')
                 ->schema([
-                    ComponentesImagem::upload('pictografia', Mensagem::COLECAO_PICTOGRAFIA, multiplas: true)
-                        ->label('Imagens (pictografia)'),
+                    ComponentesImagem::upload('imagens', Mensagem::COLECAO_IMAGENS, multiplas: true)
+                        ->label('Imagens da mensagem'),
                 ]),
         ];
     }

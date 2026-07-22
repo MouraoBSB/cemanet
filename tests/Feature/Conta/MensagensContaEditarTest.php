@@ -65,7 +65,7 @@ class MensagensContaEditarTest extends TestCase
         $m->autores()->sync([$autor->id]);
         $m->addMediaFromString(base64_decode(self::PNG_1X1))
             ->usingFileName('pict.png')
-            ->toMediaCollection(Mensagem::COLECAO_PICTOGRAFIA);
+            ->toMediaCollection(Mensagem::COLECAO_IMAGENS);
 
         Livewire::actingAs($medium)->test(MensagensConta::class)
             ->call('editar', $m->id)
@@ -80,7 +80,7 @@ class MensagensContaEditarTest extends TestCase
             $m->destinatarios()->pluck('users.id')->sort()->values()->all()
         );
         $this->assertSame(1, DB::table('mensagem_autor_espiritual')->where('mensagem_id', $m->id)->count());
-        $this->assertSame(1, $m->getMedia(Mensagem::COLECAO_PICTOGRAFIA)->count());
+        $this->assertSame(1, $m->getMedia(Mensagem::COLECAO_IMAGENS)->count());
         $this->assertSame(VisibilidadeMensagem::Direcionada->value, $m->nivel);
     }
 

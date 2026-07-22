@@ -11,6 +11,8 @@ use App\Filament\Schemas\MensagemForm;   // MSG_NIVEL_OBRIGATORIO — sem isto, 
 use App\Models\AutorEspiritual;
 use App\Models\Mensagem;
 use App\Models\User;
+use App\Support\Autorizacao\AuditoriaAutorizacao;
+use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -146,5 +148,129 @@ class MensagemPublicarActionTest extends TestCase
             ->fillForm(['status' => Mensagem::STATUS_PUBLICADO, 'destinatarios' => [$inativo->id]])
             ->call('save')
             ->assertHasFormErrors(['destinatarios']);
+    }
+
+    private function pendente(array $attrs = []): Mensagem
+    {
+        return Mensagem::factory()->create([...['status' => Mensagem::STATUS_PENDENTE, 'nivel' => null], ...$attrs]);
+    }
+
+    /** I18: a Action é a primeira escritora de publicado_em no painel. */
+    public function test_action_publica_e_grava_autoria(): void
+    {
+        $m = $this->pendente(['slug' => 'a-publicar']);
+
+        Livewire::test(EditMensagem::class, ['record' => $m->getRouteKey()])
+            ->fillForm(['nivel' => 'publico'])
+            ->callAction('publicar');
+
+        $f = $m->fresh();
+        $this->assertSame(Mensagem::STATUS_PUBLICADO, $f->status);
+        $this->assertNotNull($f->publicado_em);
+        $this->assertSame(auth()->id(), $f->publicado_por_id);
+    }
+
+    /**
+     * I17: contrato INVERSO ao do /minha-conta (CuradoriaConta:169 regenera). Aqui o slug é
+     * campo de tela: regenerar sobrescreveria o que o admin digitou.
+     */
+    public function test_action_nao_altera_o_slug(): void
+    {
+        $m = $this->pendente(['slug' => 'slug-escolhido-a-mao', 'titulo' => 'Título Completamente Outro']);
+
+        Livewire::test(EditMensagem::class, ['record' => $m->getRouteKey()])
+            ->fillForm(['nivel' => 'publico'])
+            ->callAction('publicar');
+
+        $this->assertSame('slug-escolhido-a-mao', $m->fresh()->slug);
+    }
+
+    /** I27: relacionadas não são fillable — fill() as descartaria em silêncio. */
+    public function test_action_persiste_as_relacionadas_nos_dois_sentidos(): void
+    {
+        $b = Mensagem::factory()->create(['titulo' => 'Mensagem B']);
+        $m = $this->pendente(['slug' => 'com-relacionada']);
+
+        Livewire::test(EditMensagem::class, ['record' => $m->getRouteKey()])
+            ->fillForm(['nivel' => 'publico', 'relacionadas' => [$b->id]])
+            ->callAction('publicar');
+
+        $this->assertTrue($m->fresh()->relacionadas->contains('id', $b->id));
+        $this->assertTrue($b->fresh()->relacionadas->contains('id', $m->id), 'a relação não espelhou');
+    }
+
+    /**
+     * I19: nível NULO pela UI. O slug inválido não é injetável por esta porta (o Select aplica
+     * `Rule::in` sobre as 6 opções do enum) e já está coberto em
+     * tests/Unit/Mensagens/RegraPublicacaoTest.php:27.
+     */
+    public function test_action_recusa_nivel_invalido(): void
+    {
+        $m = $this->pendente();
+
+        Livewire::test(EditMensagem::class, ['record' => $m->getRouteKey()])
+            ->fillForm(['nivel' => null])
+            ->callAction('publicar')
+            ->assertHasFormErrors(['nivel'], 'form');
+
+        $this->assertSame(Mensagem::STATUS_PENDENTE, $m->fresh()->status);
+    }
+
+    /** I19: o caminho que a validação NATIVA do Select não cobre. */
+    public function test_action_recusa_direcionada_com_destinatario_inativo(): void
+    {
+        $inativo = User::factory()->create(['ativo' => false]);
+        $m = $this->pendente(['nivel' => VisibilidadeMensagem::Direcionada->value]);
+        $m->destinatarios()->sync([$inativo->id]);
+
+        Livewire::test(EditMensagem::class, ['record' => $m->getRouteKey()])
+            ->callAction('publicar')
+            ->assertHasFormErrors(['destinatarios'], 'form');
+
+        $this->assertSame(Mensagem::STATUS_PENDENTE, $m->fresh()->status);
+    }
+
+    /**
+     * I20. SÓ assertActionHidden: visible(false) já protege no v5.6.7 — hidden ⇒ isDisabled()
+     * ⇒ mountAction() desmonta e retorna null, e callAction() faz assertActionVisible() antes.
+     * "Chamar numa publicada e afirmar que nada mudou" seria falso-verde.
+     */
+    public function test_action_nao_aparece_em_mensagem_ja_publicada(): void
+    {
+        $m = Mensagem::factory()->create(['status' => Mensagem::STATUS_PUBLICADO, 'nivel' => 'publico']);
+
+        Livewire::test(EditMensagem::class, ['record' => $m->getRouteKey()])
+            ->assertActionHidden('publicar');
+    }
+
+    /** I21: sem o refreshFormData, o próximo "Salvar alterações" despublica em silêncio. */
+    public function test_depois_da_action_salvar_nao_despublica(): void
+    {
+        $m = $this->pendente(['slug' => 'nao-despublicar']);
+
+        $tela = Livewire::test(EditMensagem::class, ['record' => $m->getRouteKey()])
+            ->fillForm(['nivel' => 'publico'])
+            ->callAction('publicar');
+
+        $tela->call('save')->assertHasNoFormErrors();
+
+        $this->assertSame(Mensagem::STATUS_PUBLICADO, $m->fresh()->status);
+    }
+
+    /** I29. $portaForcada é ESTÁTICA e sobrevive entre testes do mesmo processo: resetar é obrigatório. */
+    public function test_auditoria_da_action_registra_porta_admin(): void
+    {
+        AuditoriaAutorizacao::usarPorta(null);
+        Filament::setCurrentPanel(Filament::getPanel('admin'));
+
+        $m = $this->pendente(['slug' => 'porta-admin']);
+
+        Livewire::test(EditMensagem::class, ['record' => $m->getRouteKey()])
+            ->fillForm(['nivel' => 'publico'])
+            ->callAction('publicar');
+
+        $atividade = $m->fresh()->activities()->latest('id')->first();
+
+        $this->assertSame('admin', $atividade->properties['porta']);
     }
 }

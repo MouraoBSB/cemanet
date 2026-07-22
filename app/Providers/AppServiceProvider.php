@@ -17,6 +17,8 @@ use App\Importacao\LeitorLegado;
 use App\Importacao\LeitorLegadoMysql;
 use App\Importacao\LeitorMensagens;
 use App\Importacao\LeitorMensagensMysql;
+use App\Importacao\LeitorResumosMensagens;
+use App\Importacao\LeitorResumosMensagensMysql;
 use App\Importacao\LeitorUsuarios;
 use App\Importacao\LeitorUsuariosMysql;
 use App\Listeners\CalcularHashMidia;
@@ -47,6 +49,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(LeitorAutoresEspirituais::class, LeitorAutoresEspirituaisMysql::class);
         $this->app->bind(LeitorMensagens::class, LeitorMensagensMysql::class);
         $this->app->bind(LeitorDirecionadasMensagem::class, LeitorDirecionadasMensagemMysql::class);
+        $this->app->bind(LeitorResumosMensagens::class, LeitorResumosMensagensMysql::class);
         $this->app->bind(FonteReflexao::class, ReflexaoConfig::class);
 
         // SCOPED, nunca singleton: o worker (queue:work) não reconstrói o container entre jobs —

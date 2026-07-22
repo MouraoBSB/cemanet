@@ -189,6 +189,18 @@ class MensagemShowTest extends TestCase
             ->assertSee('Primeiro parágrafo.<br />', false);   // nl2br honra os 12 com parágrafos
     }
 
+    /** O lead é a única linha `{!! !!}` da fatia: e() ANTES de nl2br, senão é injeção. */
+    public function test_resumo_do_lead_e_escapado(): void
+    {
+        Mensagem::factory()->publica()->create(['slug' => 'lead-xss', 'resumo' => "Nota <script>alert(1)</script>\nfim"]);
+
+        $this->get(route('mensagens.show', 'lead-xss'))
+            ->assertOk()
+            ->assertSee('Nota &lt;script&gt;', false)
+            ->assertDontSee('<script>alert(1)</script>', false)
+            ->assertSee('<br />', false);   // nl2br continua depois do e()
+    }
+
     public function test_lead_nao_aparece_sem_resumo(): void
     {
         Mensagem::factory()->publica()->create(['slug' => 'sem-lead', 'resumo' => null]);

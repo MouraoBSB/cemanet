@@ -253,6 +253,7 @@ class MensagensContaCriarTest extends TestCase
             ->assertFormFieldDoesNotExist('link_arquivo')
             ->assertFormFieldDoesNotExist('liberar_download')
             ->assertFormFieldDoesNotExist('relacionadas')
+            ->assertFormFieldDoesNotExist('resumo')   // I11: texto editorial da curadoria; o médium tem o `contexto`
             ->assertFormFieldExists('titulo')
             ->assertFormFieldExists('formato')
             ->assertFormFieldExists('data_recebimento')

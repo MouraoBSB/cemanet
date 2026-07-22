@@ -62,6 +62,13 @@ class MensagemForm
                         ->rows(3)
                         ->columnSpan(2),
 
+                    Textarea::make('resumo')
+                        ->label('Resumo (texto editorial)')
+                        ->helperText('Aparece no card, na busca do Google e como abertura da página. Importado do site antigo quando havia. Opcional.')
+                        ->rows(4)
+                        ->maxLength(1500)
+                        ->columnSpan(2),
+
                     RichEditor::make('corpo')
                         ->label('Corpo da mensagem')
                         ->toolbarButtons([
@@ -289,6 +296,13 @@ class MensagemForm
                         ->label('Contexto (faixa editorial — manual)')
                         ->helperText('Texto curto de contexto exibido acima da mensagem. Opcional.')
                         ->rows(3)
+                        ->columnSpan(2),
+
+                    Textarea::make('resumo')
+                        ->label('Resumo (texto editorial)')
+                        ->helperText('Aparece no card, na busca do Google e como abertura da página. Importado do site antigo quando havia. Opcional.')
+                        ->rows(4)
+                        ->maxLength(1500)
                         ->columnSpan(2),
 
                     RichEditor::make('corpo')

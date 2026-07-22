@@ -212,6 +212,16 @@ class CuradoriaContaTest extends TestCase
             );
     }
 
+    /** I11: o resumo é texto de quem CURA — existe no schemaCuradoria (e não no form do médium). */
+    public function test_i11_form_da_curadoria_tem_o_campo_resumo(): void
+    {
+        $pendente = Mensagem::factory()->pendente()->create();
+
+        Livewire::actingAs($this->diretorDepae())->test(CuradoriaConta::class)
+            ->call('editar', $pendente->id)
+            ->assertFormFieldExists('resumo');
+    }
+
     /**
      * I18 (V1) — sobre o ESTADO, não sobre o HTML: assertDontSee do Livewire apaga o wire:snapshot
      * antes de comparar, então passaria com ou sem o $hidden do model. A prova real é no array `data`.

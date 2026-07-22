@@ -57,6 +57,12 @@ class MensagemResourceTest extends TestCase
             ->assertFormFieldExists('contexto', fn (Textarea $f) => true);
     }
 
+    public function test_form_do_admin_tem_o_campo_resumo(): void
+    {
+        Livewire::test(CreateMensagem::class)
+            ->assertFormFieldExists('resumo', fn (Textarea $f) => true);
+    }
+
     public function test_form_usa_media_library_para_pictografia(): void
     {
         Livewire::test(CreateMensagem::class)

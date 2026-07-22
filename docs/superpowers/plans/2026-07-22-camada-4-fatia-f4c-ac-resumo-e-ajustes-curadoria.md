@@ -471,7 +471,10 @@ contra o banco real **antes do merge** — já houve um `SQL 1064` que a suíte 
 docker compose exec -T app php artisan tinker --execute="\$r = app(App\Importacao\LeitorResumosMensagensMysql::class)->resumos(); echo count(\$r).' resumos; primeiro: '.json_encode(\$r[0] ?? null, JSON_UNESCAPED_UNICODE);"
 ```
 
-Esperado: **154 resumos**, o primeiro com `wp_id` 21724. Se o túnel estiver fechado
+Esperado: **154 resumos**, o primeiro com `wp_id` **21694** (medido 22/07 com o `ORDER BY ID` do
+leitor; a anotação anterior dizia 21724, que é o primeiro `pending` — a medição de 21/07 rodou
+**sem** `ORDER BY` e o MySQL devolveu os pendentes antes). **O gate é a contagem: 154.** Se o
+túnel estiver fechado
 (`Connection refused`), **abrir o túnel e repetir** — não pular este passo.
 
 - [ ] **Passo 8: Pint e commit**
@@ -656,11 +659,13 @@ class ImportarResumosMensagensTest extends TestCase
             ['wp_id' => 4, 'resumo' => '...'],         // curta
         ]);
 
+        // ⚠️ UMA asserção com a linha INTEIRA, não 4 substrings. Cada expectsOutputToContain
+        // vira uma expectativa `doWrite`+`withArgs` (PendingCommand.php:614-621); quando várias
+        // casam com a MESMA chamada — e os 4 contadores saem numa linha só — o Mockery consome
+        // apenas a primeira, e as outras nunca esvaziam `expectedOutputSubstrings`. Com a linha
+        // completa é 1 expectativa para 1 chamada, e ainda prova mais: o formato exato.
         $this->artisan('cema:importar-resumos')
-            ->expectsOutputToContain('Atualizadas: 1')
-            ->expectsOutputToContain('Já tinham resumo: 1')
-            ->expectsOutputToContain('Sem mensagem no banco: 1')
-            ->expectsOutputToContain('Descartadas por serem curtas: 1')
+            ->expectsOutputToContain('Atualizadas: 1 · Já tinham resumo: 1 · Sem mensagem no banco: 1 · Descartadas por serem curtas: 1')
             ->assertSuccessful();
     }
 }

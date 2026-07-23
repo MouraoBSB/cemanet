@@ -7,11 +7,15 @@ namespace Tests\Feature\Front;
 use App\Models\AutorEspiritual;
 use App\Models\Mensagem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class AutorShowTest extends TestCase
 {
     use RefreshDatabase;
+
+    /** PNG 1x1 mínimo (evita GD real sob carga — flaky conhecido do blog). */
+    private const PNG_1X1 = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACXBIWXMAAA7EAAAOxAGVKw4bAAAAC0lEQVQImWNgAAIAAAUAAWJVMogAAAAASUVORK5CYII=';
 
     public function test_inativo_da_404(): void
     {
@@ -53,5 +57,56 @@ class AutorShowTest extends TestCase
         $res = $this->get(route('autores.show', 'x'));
         $res->assertDontSee('Curtir');   // F5 fora (tile e botão)
         $res->assertSee(route('login'), false);   // rodapé estático de login
+    }
+
+    /** I8: o card prefere o resumo e cai no corpo quando não há. */
+    public function test_card_usa_o_resumo_e_cai_no_corpo_sem_ele(): void
+    {
+        $autor = AutorEspiritual::factory()->create(['slug' => 'radian', 'ativo' => true]);
+
+        $comResumo = Mensagem::factory()->publica()->create([
+            'titulo' => 'Com resumo', 'resumo' => 'Trecho editorial do card.',
+            'corpo' => '<p>Corpo que nao deve aparecer no card.</p>',
+        ]);
+        $semResumo = Mensagem::factory()->publica()->create([
+            'titulo' => 'Sem resumo', 'resumo' => null, 'corpo' => '<p>Corpo de reserva.</p>',
+        ]);
+        $comResumo->autores()->attach($autor);
+        $semResumo->autores()->attach($autor);
+
+        $this->get(route('autores.show', 'radian'))
+            ->assertOk()
+            ->assertSee('Trecho editorial do card.')
+            ->assertDontSee('Corpo que nao deve aparecer no card.')
+            ->assertSee('Corpo de reserva.');
+    }
+
+    /** I12: o gate de FORMATO cai; o de VARIANTE fica. */
+    public function test_card_do_perfil_mostra_imagem_de_psicografia(): void
+    {
+        Storage::fake('public');
+        $autor = AutorEspiritual::factory()->create(['slug' => 'radian', 'ativo' => true]);
+        $m = Mensagem::factory()->publica()->create(['formato' => 'psicografia', 'titulo' => 'Ilustrada']);
+        $m->addMediaFromString(base64_decode(self::PNG_1X1))->usingFileName('c.png')
+            ->toMediaCollection(Mensagem::COLECAO_IMAGENS);
+        $m->autores()->attach($autor);
+
+        $this->get(route('autores.show', 'radian'))
+            ->assertOk()
+            ->assertSee($m->fresh()->getFirstMediaUrl(Mensagem::COLECAO_IMAGENS, 'web'), false);
+    }
+
+    /** I15/D11: a lista pública segue sem miniatura — decisão de design da 2B. */
+    public function test_lista_publica_continua_sem_miniatura(): void
+    {
+        Storage::fake('public');
+        $m = Mensagem::factory()->publica()->create(['formato' => 'pictografia', 'slug' => 'na-lista']);
+        $m->addMediaFromString(base64_decode(self::PNG_1X1))->usingFileName('d.png')
+            ->toMediaCollection(Mensagem::COLECAO_IMAGENS);
+
+        $this->get(route('mensagens.index'))
+            ->assertOk()
+            ->assertSee(route('mensagens.show', 'na-lista'), false)
+            ->assertDontSee($m->fresh()->getFirstMediaUrl(Mensagem::COLECAO_IMAGENS, 'web'), false);
     }
 }

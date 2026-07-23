@@ -65,7 +65,7 @@ class MensagensContaEditarTest extends TestCase
         $m->autores()->sync([$autor->id]);
         $m->addMediaFromString(base64_decode(self::PNG_1X1))
             ->usingFileName('pict.png')
-            ->toMediaCollection(Mensagem::COLECAO_PICTOGRAFIA);
+            ->toMediaCollection(Mensagem::COLECAO_IMAGENS);
 
         Livewire::actingAs($medium)->test(MensagensConta::class)
             ->call('editar', $m->id)
@@ -80,7 +80,7 @@ class MensagensContaEditarTest extends TestCase
             $m->destinatarios()->pluck('users.id')->sort()->values()->all()
         );
         $this->assertSame(1, DB::table('mensagem_autor_espiritual')->where('mensagem_id', $m->id)->count());
-        $this->assertSame(1, $m->getMedia(Mensagem::COLECAO_PICTOGRAFIA)->count());
+        $this->assertSame(1, $m->getMedia(Mensagem::COLECAO_IMAGENS)->count());
         $this->assertSame(VisibilidadeMensagem::Direcionada->value, $m->nivel);
     }
 
@@ -204,13 +204,15 @@ class MensagensContaEditarTest extends TestCase
     }
 
     /**
-     * Achado do review final (Important 2a): `schemaAdmin` usa `User::orderBy('name')` (todos),
-     * `blocoDestinatarios` usa `User::where('ativo', true)` — duas listas para o MESMO campo. O
-     * `Select` injeta `Rule::in(options)`: um destinatário DESATIVADO DEPOIS de uma direcionada
-     * existir carrega o id no `fill()` (vindo do pivô) mas ele não está mais nas options ⇒ o
-     * médium fica sem saída para salvar até um simples ajuste de título. O ATIVO continua
-     * preservado; o INATIVO é descartado pelo filtro de integridade de sempre (I7) — o que muda
-     * é que o form deixa de EXPLODIR com "The selected destinatários is invalid.".
+     * Achado do review final da F4b (Important 2a): à época, `schemaAdmin` usava
+     * `User::orderBy('name')` (todos) e `blocoDestinatarios` usava `User::where('ativo', true)`
+     * — duas listas para o MESMO campo. Desde a F4c os dois filtram igual; o que este teste
+     * fixa é o `orWhereIn`. O `Select` injeta `Rule::in(options)`: um destinatário DESATIVADO
+     * DEPOIS de uma direcionada existir carrega o id no `fill()` (vindo do pivô) mas ele não
+     * está mais nas options ⇒ o médium fica sem saída para salvar até um simples ajuste de
+     * título. O ATIVO continua preservado; o INATIVO é descartado pelo filtro de integridade
+     * de sempre (I7) — o que muda é que o form deixa de EXPLODIR com "The selected
+     * destinatários is invalid.".
      */
     public function test_review_editar_com_destinatario_desativado_depois_salva_sem_erro(): void
     {

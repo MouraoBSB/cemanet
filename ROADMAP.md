@@ -155,7 +155,7 @@ Ordem sugerida (cada um como nova fatia vertical):
       privilegiada (`medium_id`/`publicado_por_id`/`publicado_em`, forçados no servidor).
       *(Fatias 0→F4a: PR #35 merge `c988f89`, #36 merge `ef8841b`, #37 merge `161b502`,
       #38 merge `b7f9402`, #39 merge `0fa26c4`, #40 merge `c517b70`, #41 merge `93999e8`,
-      #42 merge `8142883`; F4b nesta branch, PR a abrir.)*
+      #42 merge `8142883`; F4b: PR #43 merge `45a9eb7`.)*
 - [ ] **Blog (Sementeira de Luz)** — módulo **Posts entregue** (admin + front + posts
       importados + editor/mídia abaixo). Pendentes: **Comentários** e **Páginas institucionais**.
   - [x] **Editor + mídia** (RichEditor TipTap): justificado padrão + alinhamento/tamanho de

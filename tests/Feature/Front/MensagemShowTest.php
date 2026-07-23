@@ -4,6 +4,7 @@
 
 namespace Tests\Feature\Front;
 
+use App\Enums\VisibilidadeMensagem;
 use App\Models\AutorEspiritual;
 use App\Models\Mensagem;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -122,9 +123,9 @@ class MensagemShowTest extends TestCase
         ]);
         $m->addMediaFromString(base64_decode(self::PNG_1X1))
             ->usingFileName('desenho.png')
-            ->toMediaCollection(Mensagem::COLECAO_PICTOGRAFIA);
+            ->toMediaCollection(Mensagem::COLECAO_IMAGENS);
 
-        $media = $m->fresh()->getMedia(Mensagem::COLECAO_PICTOGRAFIA)->first();
+        $media = $m->fresh()->getMedia(Mensagem::COLECAO_IMAGENS)->first();
 
         $res = $this->get(route('mensagens.show', 'pict-galeria'));
 
@@ -136,5 +137,158 @@ class MensagemShowTest extends TestCase
         $res->assertSee($media->getUrl(), false);
         $res->assertSee('download="desenho-mediunico-1.png"', false);
         $res->assertSee('Baixar', false);
+    }
+
+    // -----------------------------------------------------------------------
+    // F4c-AC Task 7: galeria de imagens única para os 3 formatos
+    // -----------------------------------------------------------------------
+
+    /** @return Mensagem mensagem pública do formato dado, com 1 imagem na coleção */
+    private function mensagemComImagem(string $formato, string $slug, ?string $corpo = '<p>Texto.</p>'): Mensagem
+    {
+        Storage::fake('public');
+        $m = Mensagem::factory()->publica()->create(['slug' => $slug, 'formato' => $formato, 'titulo' => 'Mensagem Ilustrada', 'corpo' => $corpo]);
+        $m->addMediaFromString(base64_decode(self::PNG_1X1))->usingFileName('img.png')
+            ->toMediaCollection(Mensagem::COLECAO_IMAGENS);
+
+        return $m->fresh();
+    }
+
+    /** I12: hoje a imagem some do site quando o formato não é Pictografia. */
+    public function test_imagem_em_psicografia_aparece_no_corpo(): void
+    {
+        $m = $this->mensagemComImagem('psicografia', 'psico-com-imagem');
+
+        $this->get(route('mensagens.show', 'psico-com-imagem'))
+            ->assertOk()
+            ->assertSee($m->getMedia(Mensagem::COLECAO_IMAGENS)->first()->getUrl('web'), false)
+            ->assertSee('Imagem 1')
+            ->assertSee('Baixar')
+            ->assertSee('— imagem 1', false)        // I28: o alt segue a legenda (A11y)
+            ->assertDontSee('— desenho 1', false)   // hoje o alt é hardcoded "desenho"
+            ->assertSee('class="cema-pictografia-grid mt-8"', false);  // $attributes->class() mescla o mt-8 da psicografia
+    }
+
+    /** I13: a psicofonia inclui a psicografia — a galeria não pode sair em dobro. */
+    public function test_psicofonia_mostra_a_galeria_uma_unica_vez(): void
+    {
+        $this->mensagemComImagem('psicofonia', 'psicofonia-com-imagem');
+
+        $html = $this->get(route('mensagens.show', 'psicofonia-com-imagem'))->assertOk()->getContent();
+
+        $this->assertSame(1, substr_count($html, 'Imagem 1'), 'a galeria duplicou pelo @include');
+    }
+
+    /** I28: na pictografia os desenhos SÃO a mensagem — a legenda diz isso. */
+    public function test_pictografia_mantem_a_legenda_desenho(): void
+    {
+        $this->mensagemComImagem('pictografia', 'pict-legenda', null);
+
+        $this->get(route('mensagens.show', 'pict-legenda'))
+            ->assertOk()
+            ->assertSee('Desenho 1')
+            ->assertDontSee('Imagem 1')
+            ->assertSee('— desenho 1', false)   // I28: o alt acompanha
+            ->assertDontSee('ainda não tem desenhos disponíveis');  // não pode vazar com galeria cheia
+    }
+
+    /** I14: o texto de vazio é da pictografia e não pode vazar. Exige corpo NULL (senão passa por vacuidade). */
+    public function test_estado_vazio_da_pictografia_nao_vaza_para_psicografia(): void
+    {
+        Mensagem::factory()->publica()->create(['slug' => 'psico-sem-nada', 'formato' => 'psicografia', 'corpo' => null]);
+
+        $this->get(route('mensagens.show', 'psico-sem-nada'))
+            ->assertOk()
+            ->assertDontSee('ainda não tem desenhos disponíveis');
+    }
+
+    public function test_estado_vazio_continua_na_pictografia_sem_corpo_e_sem_imagem(): void
+    {
+        Mensagem::factory()->publica()->create(['slug' => 'pict-vazia', 'formato' => 'pictografia', 'corpo' => null]);
+
+        $this->get(route('mensagens.show', 'pict-vazia'))->assertOk()->assertSee('ainda não tem desenhos disponíveis');
+    }
+
+    // -----------------------------------------------------------------------
+    // F4c-AC Task 4: o resumo no single (meta description e lead)
+    // -----------------------------------------------------------------------
+
+    /**
+     * I9: a asserção é sobre a TAG. O `contexto` também é renderizado no corpo da página
+     * (show.blade.php:85-92) e o resumo vira lead — `assertSee`/`assertDontSee` soltos não
+     * distinguiriam a meta description de nada.
+     */
+    public function test_meta_description_usa_o_resumo_quando_existe(): void
+    {
+        Mensagem::factory()->publica()->create([
+            'slug' => 'com-resumo',
+            'resumo' => 'Radian convida os trabalhadores a refletirem sobre a palavra.',
+            'contexto' => 'Contexto de reserva do single.',
+            'corpo' => '<p>Corpo que nao deve aparecer.</p>',
+        ]);
+
+        $this->get(route('mensagens.show', 'com-resumo'))
+            ->assertOk()
+            ->assertSee('name="description" content="Radian convida os trabalhadores a refletirem sobre a palavra."', false)
+            ->assertDontSee('name="description" content="Contexto de reserva do single."', false);
+    }
+
+    /** GUARDA (não-regressão, já verde): a reserva `contexto` não pode sumir ao entrar o resumo. */
+    public function test_meta_description_cai_no_contexto_sem_resumo(): void
+    {
+        Mensagem::factory()->publica()->create([
+            'slug' => 'sem-resumo', 'resumo' => null,
+            'contexto' => 'Contexto de reserva.', 'corpo' => '<p>Corpo.</p>',
+        ]);
+
+        $this->get(route('mensagens.show', 'sem-resumo'))
+            ->assertOk()
+            ->assertSee('name="description" content="Contexto de reserva."', false);
+    }
+
+    /** D7: o lead é editorial e visualmente distinto da prosa mediúnica. */
+    public function test_lead_do_resumo_aparece_no_single(): void
+    {
+        Mensagem::factory()->publica()->create([
+            'slug' => 'lead-visivel', 'resumo' => "Primeiro parágrafo.\nSegundo parágrafo.",
+        ]);
+
+        $this->get(route('mensagens.show', 'lead-visivel'))
+            ->assertOk()
+            ->assertSee('cema-msg-resumo', false)
+            ->assertSee('Primeiro parágrafo.<br />', false);   // nl2br honra os 12 com parágrafos
+    }
+
+    /** O lead é a única linha `{!! !!}` da fatia: e() ANTES de nl2br, senão é injeção. */
+    public function test_resumo_do_lead_e_escapado(): void
+    {
+        Mensagem::factory()->publica()->create(['slug' => 'lead-xss', 'resumo' => "Nota <script>alert(1)</script>\nfim"]);
+
+        $this->get(route('mensagens.show', 'lead-xss'))
+            ->assertOk()
+            ->assertSee('Nota &lt;script&gt;', false)
+            ->assertDontSee('<script>alert(1)</script>', false)
+            ->assertSee('<br />', false);   // nl2br continua depois do e()
+    }
+
+    public function test_lead_nao_aparece_sem_resumo(): void
+    {
+        Mensagem::factory()->publica()->create(['slug' => 'sem-lead', 'resumo' => null]);
+
+        $this->get(route('mensagens.show', 'sem-lead'))->assertOk()->assertDontSee('cema-msg-resumo', false);
+    }
+
+    /** I10 / REGRESSÃO (T10): a barreira intercepta ANTES do render — o resumo restrito não vaza. */
+    public function test_barreira_continua_interceptando_o_restrito_depois_do_resumo(): void
+    {
+        Mensagem::factory()->comNivel(VisibilidadeMensagem::Trabalhadores)->create([
+            'slug' => 'restrita-com-resumo',
+            'status' => Mensagem::STATUS_PUBLICADO,
+            'resumo' => 'Resumo reservado que o anônimo não pode ler.',
+        ]);
+
+        $this->get(route('mensagens.show', 'restrita-com-resumo'))
+            ->assertOk()   // barreira-200 CEGA da 3B — sem o assertOk, um 404 deixaria isto verde
+            ->assertDontSee('Resumo reservado', false);
     }
 }

@@ -61,7 +61,7 @@ class ContaController extends Controller
         $direcionadas = $user->mensagensDirecionadas()
             ->publicado()
             ->where('nivel', VisibilidadeMensagem::Direcionada->value)   // blindagem O5 (I7): só direcionadas
-            ->with('autores', 'media')          // eager-load: autor (card) + media (miniatura pictografia) — sem N+1
+            ->with('autores', 'media')          // eager-load: autor (card) + media (miniatura da mensagem, qualquer formato) — sem N+1
             ->orderByDesc('data_recebimento')
             ->get();
 

@@ -85,12 +85,12 @@ class ImportadorMensagens
                         }
                     }
                     if (! empty($baixadas)) {
-                        $mensagem->clearMediaCollection(Mensagem::COLECAO_PICTOGRAFIA);
+                        $mensagem->clearMediaCollection(Mensagem::COLECAO_IMAGENS);
                         foreach ($baixadas as $img) {
                             $mensagem->addMediaFromString($img['bytes'])
                                 ->usingFileName(basename(parse_url($img['url'], PHP_URL_PATH) ?? 'pictografia.jpg'))
                                 ->withCustomProperties(['url_legado' => $img['url']])
-                                ->toMediaCollection(Mensagem::COLECAO_PICTOGRAFIA);
+                                ->toMediaCollection(Mensagem::COLECAO_IMAGENS);
                         }
                         $this->contadores['com_pictografia']++;
                     }

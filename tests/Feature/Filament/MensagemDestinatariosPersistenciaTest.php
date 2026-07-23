@@ -9,6 +9,7 @@ use App\Filament\Resources\Mensagens\Pages\CreateMensagem;
 use App\Filament\Resources\Mensagens\Pages\EditMensagem;
 use App\Models\Mensagem;
 use App\Models\User;
+use App\Support\Mensagens\SincronizadorDestinatarios;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
@@ -147,6 +148,50 @@ class MensagemDestinatariosPersistenciaTest extends TestCase
         $this->assertTrue(
             $u->mensagensDirecionadas()->publicado()
                 ->where('nivel', VisibilidadeMensagem::Direcionada->value)->exists()
+        );
+    }
+
+    /** I32: valida com efetivos() e gravava o conjunto CRU — o inativo entrava no pivô. */
+    public function test_nao_grava_destinatario_inativo_no_pivo(): void
+    {
+        $ativo = User::factory()->create();
+        $inativo = User::factory()->create(['ativo' => false]);
+        $m = Mensagem::factory()->comNivel(VisibilidadeMensagem::Direcionada)->create();
+        $m->destinatarios()->sync([$ativo->id, $inativo->id]);
+
+        Livewire::test(EditMensagem::class, ['record' => $m->getRouteKey()])
+            ->fillForm(['destinatarios' => [$ativo->id, $inativo->id]])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame([$ativo->id], $this->pivo($m));
+    }
+
+    /**
+     * I32 (a metade que a UI alcança): id forjado é barrado pela `Rule::in` que o Select
+     * multiple injeta em `data.destinatarios.*` (CanBeValidated:912-917 + Select:1741-1766) —
+     * nunca chega a `sincronizar()`, logo NÃO há `QueryException` de FK a provar por esta
+     * porta. O filtro de integridade de `aplicar()` é provado no nível de domínio, abaixo.
+     */
+    public function test_id_inexistente_reprova_na_validacao_e_nao_entra_no_pivo(): void
+    {
+        $u = User::factory()->create();
+        $m = Mensagem::factory()->comNivel(VisibilidadeMensagem::Direcionada)->create();
+        $m->destinatarios()->sync([$u->id]);
+
+        Livewire::test(EditMensagem::class, ['record' => $m->getRouteKey()])
+            ->fillForm(['destinatarios' => [$u->id, 999999]])
+            ->call('save')
+            // `.0` e NÃO `.1`, embora o id inválido seja o segundo: quando o estado tem id fora
+            // das options, Select::getInValidationRuleValues() devolve [] e a regra vira `in:`
+            // com lista VAZIA aplicada a `destinatarios.*` ⇒ TODOS os índices reprovam. Não
+            // "corrigir" para .1 — isso quebra o teste.
+            ->assertHasErrors(['data.destinatarios.0']);
+
+        $this->assertSame([$u->id], $this->pivo($m));
+        $this->assertSame(
+            [$u->id],
+            SincronizadorDestinatarios::efetivos(VisibilidadeMensagem::Direcionada->value, [$u->id, 999999]),
         );
     }
 }

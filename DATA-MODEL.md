@@ -460,7 +460,7 @@ Tabela padrão do pacote (migrations `2026_07_13_191455/56/57`): `log_name`, `de
   (trait no `Mensagem` — lançamento pelo médium e curadoria pelo diretor do DEPAE/presidente,
   Fatia F4b).
 - **`mensagem` redige o conteúdo restrito na escrita**: `tapActivity()` substitui os valores
-  de `corpo` e `contexto` (nos blocos `attributes` e `old` da entrada) pelo literal
+  de `corpo`, `contexto` e `resumo` (nos blocos `attributes` e `old` da entrada) pelo literal
   `'[texto não registrado]'`, preservando a **chave** (`array_key_exists`, nunca `isset` — o
   valor pode ser `null` e é a chave que importa manter). Decisão do dono: a retenção da
   trilha é indefinida, e sem a redação ela acumularia cópia integral de mensagens de níveis
@@ -509,7 +509,7 @@ concentra as regras em métodos próprios (`lancar`/`editarPendente`/`curar`/
   (`editarPendente`: exige `medium_id === auth()->id()` e `status = pendente`). A lista é
   escopada às próprias (`where('medium_id', auth()->id())`).
 - **`conta.curadoria`** (componente `CuradoriaConta`) — o **diretor do DEPAE** (ou o
-  presidente) vê a fila de todas as pendentes, corrige título/corpo/autores/pictografia
+  presidente) vê a fila de todas as pendentes, corrige título/corpo/autores/**imagens**
   (`salvar()` nunca muda o status) e aplica o **martelo** (`publicar()`): arbitra o `nivel`
   (via `App\Support\Mensagens\RegraPublicacao`), grava `status = publicado`,
   `publicado_por_id = auth()->id()` e `publicado_em = now()`. Depois de publicada, a posse
@@ -521,13 +521,24 @@ antes de montar o registro em ambos os componentes):
   `criarRegistro()`, nunca reasserido depois. **`null` significa "importada do legado"**: as
   mensagens vindas do WordPress não têm autoria real (lá foram cadastradas por contas
   técnicas do DECOM) — atribuí-las a um médium seria dado falso.
-- **`publicado_por_id`** (FK→`users`, nullable, `nullOnDelete`) — quem publicou (curador),
-  gravado só em `publicar()`.
-- **`publicado_em`** (timestamp nullable) — quando foi publicada, gravado junto.
+- **`publicado_por_id`** (FK→`users`, nullable, `nullOnDelete`) — quem publicou, gravado
+  **sempre na transição** para `publicado` — pelo `publicar()` do site, mas também pela
+  Action "Publicar" do `/admin` e pelos hooks de `EditMensagem`/`CreateMensagem` (Fatia
+  F4c-AC): os três caminhos gravam, nunca por estado (uma mensagem já publicada não
+  reescreve o campo ao ser apenas salva de novo).
+- **`publicado_em`** (timestamp nullable) — quando foi publicada, gravado junto, na mesma
+  transição.
 
 (migration `2026_07_21_000001_add_autoria_to_mensagens_table.php`.) Os três **não estão em
 `$fillable`** (atribuição é sempre direta, `$model->campo = valor`) e estão em `$hidden` no
 model `Mensagem` — nunca saem em `toArray()`/`wire:snapshot`.
+
+- **`resumo`** (`text` nullable, após `contexto`) — texto editorial **da curadoria**, importado
+  do `post_excerpt` do legado por `cema:importar-resumos` (só preenche o que está vazio). Texto
+  puro, sem HTML; aparece no card, na meta description e como lead do single. Está no
+  `$fillable`, no `logOnly` e no glossário, e é **redigido** no `tapActivity()`.
+- **Mídia** — a coleção de `Mensagem` chama-se **`imagens`** (`Mensagem::COLECAO_IMAGENS`,
+  ex-`pictografia`) e vale para os **3 formatos**; na Pictografia os desenhos SÃO a mensagem.
 
 ## Agenda
 

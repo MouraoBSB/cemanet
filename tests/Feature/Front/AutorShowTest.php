@@ -50,13 +50,11 @@ class AutorShowTest extends TestCase
         $this->get(route('autores.show', 'sem-formato-autor'))->assertOk();
     }
 
-    public function test_sem_curtir_e_com_link_login(): void
+    public function test_sem_curtir(): void
     {
         $a = AutorEspiritual::factory()->create(['ativo' => true, 'slug' => 'x']);
 
-        $res = $this->get(route('autores.show', 'x'));
-        $res->assertDontSee('Curtir');   // F5 fora (tile e botão)
-        $res->assertSee(route('login'), false);   // rodapé estático de login
+        $this->get(route('autores.show', 'x'))->assertDontSee('Curtir');   // F5 fora (tile e botão)
     }
 
     /** I8: o card prefere o resumo e cai no corpo quando não há. */

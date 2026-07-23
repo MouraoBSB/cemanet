@@ -13,8 +13,12 @@
         ->filter(fn (FormatoMensagem $f) => $valoresPresentes->contains($f->value))
         ->values();
 
+    $rotuloContagem = fn (int $n) => $logado
+        ? ($n === 1 ? 'disponível a você' : 'disponíveis a você')
+        : ($n === 1 ? 'pública' : 'públicas');
+
     $tiles = [
-        ['valor' => $resumo->total(), 'rotulo' => 'Mensagens públicas', 'bg' => 'bg-cream'],
+        ['valor' => $resumo->total(), 'rotulo' => $logado ? 'Mensagens disponíveis a você' : 'Mensagens públicas', 'bg' => 'bg-cream'],
         ['valor' => $predominante ? $predominante->rotulo() : '—', 'rotulo' => 'Formato predominante', 'bg' => 'bg-[#EAF0F6]'],
         ['valor' => $ultima ? ucfirst(str_replace('.', '', $ultima->translatedFormat('M/Y'))) : '—', 'rotulo' => 'Última mensagem', 'bg' => 'bg-[#EAF2EC]'],
     ];
@@ -42,7 +46,7 @@
     </x-slot:head>
 
     <div x-data="autorMensagens({ itens: @js($itensFiltro) })">
-        {{-- ===== HERO roxo: partículas + onda + breadcrumb + foto/iniciais + chamada + selos + CTA ===== --}}
+        {{-- ===== HERO roxo: partículas + onda + breadcrumb + foto ou fallback + chamada + selos + CTA ===== --}}
         <section class="relative overflow-hidden text-white"
                  style="background:radial-gradient(circle at 86% 8%, rgba(242,168,30,0.22), transparent 42%), radial-gradient(circle at 20% 90%, rgba(110,159,203,0.28), transparent 55%), linear-gradient(135deg,#0b1030 0%,#1a1f4a 48%,#2c2f64 100%);">
             <x-ui.particulas />
@@ -56,15 +60,14 @@
                 </nav>
 
                 <div class="flex flex-wrap items-end gap-9">
-                    {{-- Foto 3:4 em moldura translúcida; sem foto → iniciais em gradiente. --}}
+                    {{-- Foto 3:4 em moldura translúcida; sem foto → imagem de fallback (autor-fallback.svg). --}}
                     <div class="w-[186px] shrink-0 rounded-[22px] border border-white/16 bg-white/8 p-2 backdrop-blur-sm">
                         @if ($autor->foto_url)
                             <img src="{{ $autor->foto_url }}" alt="{{ $autor->nome }}" width="186" height="248"
                                  class="block aspect-[3/4] w-full rounded-[15px] object-cover">
                         @else
-                            <span class="cema-grad-{{ $autor->id % 8 }} grid aspect-[3/4] w-full place-items-center rounded-[15px]" aria-hidden="true">
-                                <span class="font-display text-5xl font-semibold text-white/90">{{ $autor->iniciais }}</span>
-                            </span>
+                            <img src="{{ asset('images/autor-fallback.svg') }}" alt="{{ $autor->nome }}" width="186" height="248"
+                                 class="block aspect-[3/4] w-full rounded-[15px] object-cover">
                         @endif
                     </div>
 
@@ -115,15 +118,25 @@
                         @endforeach
                     </div>
 
-                    {{-- Grade das mensagens públicas do autor --}}
+                    {{-- Sobre {nome}: bio em prosa. Só renderiza quando há bio (D3). --}}
+                    @if (filled($autor->bio))
+                        <div class="mt-8 rounded-[18px] border border-border-muted bg-white p-7 shadow-card">
+                            <h2 class="font-display text-xl font-semibold text-primary">Sobre {{ $autor->nome }}</h2>
+                            <div class="mb-4 mt-2.5 h-[3.5px] w-[52px] rounded-sm bg-gold"></div>
+                            {{-- bio é HTML saneado por clean('conteudo') no model — {!! !!} é seguro (mesmo caso do corpo da mensagem). --}}
+                            <div class="cema-msg-prose">{!! $autor->bio !!}</div>
+                        </div>
+                    @endif
+
+                    {{-- Grade das mensagens visíveis do autor --}}
                     <div id="mensagens" class="mt-10 scroll-mt-24">
                         <div class="mb-[18px] flex flex-wrap items-baseline justify-between gap-3">
                             <div class="flex items-center gap-2.5">
                                 <span class="h-[3px] w-[22px] rounded-sm bg-gold" aria-hidden="true"></span>
                                 <h2 class="font-display text-[21px] font-semibold text-primary">Mensagens de {{ $autor->nome }}</h2>
                             </div>
-                            {{-- Só o total de PÚBLICAS (nada de "de N" — não vaza a contagem de ocultas, F3). --}}
-                            <p class="font-mono text-[11px] uppercase tracking-[0.12em] text-[#b08a2e]">{{ $resumo->total() }} {{ $resumo->total() === 1 ? 'pública' : 'públicas' }}</p>
+                            {{-- Só o total de VISÍVEIS (nada de "de N" — não vaza a contagem de ocultas). --}}
+                            <p class="font-mono text-[11px] uppercase tracking-[0.12em] text-[#b08a2e]">{{ $resumo->total() }} {{ $rotuloContagem($resumo->total()) }}</p>
                         </div>
 
                         @if ($mensagens->isNotEmpty())
@@ -162,21 +175,27 @@
                             </div>
                         @else
                             <p class="rounded-xl border border-dashed border-border-muted bg-white px-6 py-10 text-center text-text-secondary">
-                                Ainda não há mensagens públicas deste autor.
+                                {{ $logado ? 'Ainda não há mensagens deste autor que você possa ver.' : 'Ainda não há mensagens públicas deste autor.' }}
                             </p>
                         @endif
 
-                        {{-- Rodapé estático de login (F3 fora: sem contagem de ocultas, sem cadeado, sem lógica de nível). --}}
-                        <p class="mt-8 rounded-xl border border-dashed border-border bg-white/60 px-5 py-4 text-center text-[13.5px] leading-relaxed text-text-secondary">
-                            Somente mensagens públicas são exibidas aqui. Há conteúdos restritos a trabalhadores e médiuns —
-                            <a href="{{ route('login') }}" class="font-medium text-primary underline hover:text-secondary">entre</a> para vê-los.
-                        </p>
+                        {{-- Rodapé condicional (O1): só quando há oculta hierárquica para ESTE usuário. Sem número (anti-PII). --}}
+                        @if ($temRestritasOcultas)
+                            <p class="mt-8 rounded-xl border border-dashed border-border bg-white/60 px-5 py-4 text-center text-[13.5px] leading-relaxed text-text-secondary">
+                                @guest
+                                    Há mensagens restritas a trabalhadores e médiuns.
+                                    <a href="{{ route('login') }}" class="font-medium text-primary underline hover:text-secondary">Entre</a> para ver o que é seu.
+                                @else
+                                    Este autor tem mensagens restritas que você ainda não pode ver.
+                                @endguest
+                            </p>
+                        @endif
                     </div>
                 </div>
 
                 {{-- ===== Sidebar: destaque + formatos + compartilhar ===== --}}
                 <aside class="flex w-full shrink-0 flex-col gap-5 desktop-sm:sticky desktop-sm:top-24 desktop-sm:w-[340px]">
-                    {{-- Em destaque: mensagem mais recente pública (some se não houver). --}}
+                    {{-- Em destaque: mensagem mais recente visível (some se não houver). --}}
                     @if ($destaque)
                         <div class="relative overflow-hidden rounded-2xl p-6 text-white shadow-card"
                              style="background:linear-gradient(150deg,#3a3266,#4E4483 65%,#5b4f97);">
@@ -191,7 +210,7 @@
                         </div>
                     @endif
 
-                    {{-- Formatos: distribuição das públicas (groupBy). --}}
+                    {{-- Formatos: distribuição das visíveis (groupBy). --}}
                     @if ($resumo->porFormato()->isNotEmpty())
                         <div class="rounded-2xl border border-border-muted bg-white p-6 shadow-card">
                             <h2 class="mb-3.5 font-display text-base font-semibold text-primary">Formatos</h2>

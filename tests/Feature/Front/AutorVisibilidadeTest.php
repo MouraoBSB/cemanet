@@ -1,0 +1,162 @@
+<?php
+
+// Thiago Mourão — https://github.com/MouraoBSB — 2026-07-23
+
+namespace Tests\Feature\Front;
+
+use App\Models\AutorEspiritual;
+use App\Models\Mensagem;
+use App\Models\User;
+use Database\Seeders\EstruturaCemaSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
+use Tests\TestCase;
+
+class AutorVisibilidadeTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private bool $estruturaSemeada = false;
+
+    /** Semeia a estrutura UMA vez por teste; findOrCreate cobre 'administrador' (fora do EstruturaCemaSeeder). */
+    private function comPapel(string $papel): User
+    {
+        if (! $this->estruturaSemeada) {
+            $this->seed(EstruturaCemaSeeder::class);
+            $this->estruturaSemeada = true;
+        }
+        Role::findOrCreate($papel, 'web');
+        $u = User::factory()->create();
+        $u->assignRole($papel);
+
+        return $u->fresh();
+    }
+
+    /** @return array{pub: AutorEspiritual, restrito: AutorEspiritual} */
+    private function doisAutores(): array
+    {
+        $pub = AutorEspiritual::factory()->create(['nome' => 'Autor Público', 'slug' => 'autor-pub', 'ativo' => true]);
+        $restrito = AutorEspiritual::factory()->create(['nome' => 'Autor Só Trabalhadores', 'slug' => 'autor-trab', 'ativo' => true]);
+        Mensagem::factory()->publica()->create()->autores()->attach($pub->id);
+        Mensagem::factory()->create(['status' => 'publicado', 'nivel' => 'trabalhadores'])->autores()->attach($restrito->id);
+
+        return ['pub' => $pub, 'restrito' => $restrito];
+    }
+
+    /** I1: o anônimo vê exatamente a grade de hoje (só quem tem pública). */
+    public function test_i1_anonimo_ve_so_autor_com_publica(): void
+    {
+        $this->doisAutores();
+
+        $this->get(route('autores.index'))->assertOk()
+            ->assertSee('Autor Público')
+            ->assertDontSee('Autor Só Trabalhadores');   // sem pública, some para o anônimo
+    }
+
+    /** I3: o logado vê na grade o autor que só tem restrita do nível dele. */
+    public function test_i3_logado_ve_autor_so_restrito_na_grade(): void
+    {
+        $this->doisAutores();
+        $trab = $this->comPapel('trabalhador');
+
+        $this->actingAs($trab)->get(route('autores.index'))->assertOk()
+            ->assertSee('Autor Público')
+            ->assertSee('Autor Só Trabalhadores');   // trabalhador enxerga o nível 'trabalhadores'
+    }
+
+    /** I4: a contagem do card varia por usuário — mesmo escopo que a grade. */
+    public function test_i4_contagem_do_card_e_viewer_aware(): void
+    {
+        $autor = AutorEspiritual::factory()->create(['nome' => 'Bezerra', 'slug' => 'bezerra', 'ativo' => true]);
+        Mensagem::factory()->publica()->create()->autores()->attach($autor->id);
+        Mensagem::factory()->create(['status' => 'publicado', 'nivel' => 'trabalhadores'])->autores()->attach($autor->id);
+
+        $this->get(route('autores.index'))->assertOk()->assertSee('1 mensagem');   // anônimo: só a pública
+
+        $trab = $this->comPapel('trabalhador');
+        $this->actingAs($trab)->get(route('autores.index'))->assertOk()->assertSee('2 mensagens'); // logado: pública + trabalhadores
+    }
+
+    /**
+     * I5: a resposta logada não é cacheável por proxy; a anônima é. Na lista e no perfil.
+     * ⚠️ Os GET anônimos vêm ANTES do actingAs — o actingAs PERSISTE pelo resto do teste
+     * (molde de MensagemIndexContadorTest:17-30). Intercalar daria falso-vermelho: a 2ª volta
+     * "anônima" já viria logada e o assertStringNotContainsString falharia com o código certo.
+     */
+    public function test_i5_cache_control_privado_no_logado(): void
+    {
+        $autor = AutorEspiritual::factory()->create(['slug' => 'cache-autor', 'ativo' => true]);
+        Mensagem::factory()->publica()->create()->autores()->attach($autor->id);
+
+        foreach ([route('autores.index'), route('autores.show', 'cache-autor')] as $url) {
+            $anon = $this->get($url)->assertOk();
+            $this->assertStringNotContainsString('no-store', (string) $anon->headers->get('Cache-Control'));
+        }
+
+        $this->actingAs($this->comPapel('trabalhador'));
+
+        foreach ([route('autores.index'), route('autores.show', 'cache-autor')] as $url) {
+            $logado = $this->get($url);
+            $this->assertStringContainsString('no-store', (string) $logado->headers->get('Cache-Control'));
+        }
+    }
+
+    /** A1: o anônimo lê "públicas" na lista e no perfil. */
+    public function test_a1_rotulos_do_anonimo_dizem_publicas(): void
+    {
+        $autor = AutorEspiritual::factory()->create(['slug' => 'rotulo-anon', 'ativo' => true]);
+        Mensagem::factory()->count(2)->publica()->create()->each(fn ($m) => $m->autores()->attach($autor->id));
+
+        $this->get(route('autores.index'))->assertOk()->assertSee('Mensagens públicas');
+        $this->get(route('autores.show', 'rotulo-anon'))->assertOk()
+            ->assertSee('Mensagens públicas')   // tile
+            ->assertSee('2 públicas');          // contagem da grade
+    }
+
+    /** A1: o logado lê "disponíveis a você" (alinhado ao índice de Mensagens). */
+    public function test_a1_rotulos_do_logado_dizem_disponiveis(): void
+    {
+        $autor = AutorEspiritual::factory()->create(['slug' => 'rotulo-log', 'ativo' => true]);
+        Mensagem::factory()->count(2)->publica()->create()->each(fn ($m) => $m->autores()->attach($autor->id));
+        $trab = $this->comPapel('trabalhador');
+
+        $this->actingAs($trab)->get(route('autores.index'))->assertOk()->assertSee('Mensagens disponíveis a você');
+        $this->actingAs($trab)->get(route('autores.show', 'rotulo-log'))->assertOk()
+            ->assertSee('Mensagens disponíveis a você')   // tile
+            ->assertSee('2 disponíveis a você');          // contagem da grade
+    }
+
+    /** A1: o estado vazio da grade é condicional — a superfície mais propensa a regressão (não-vacuoso). */
+    public function test_a1_estado_vazio_e_condicional(): void
+    {
+        AutorEspiritual::factory()->create(['slug' => 'vazio-rotulo', 'ativo' => true]);   // ativo, sem mensagem visível
+
+        $this->get(route('autores.show', 'vazio-rotulo'))->assertOk()
+            ->assertSee('Ainda não há mensagens públicas deste autor.')
+            ->assertDontSee('que você possa ver');
+
+        $trab = $this->comPapel('trabalhador');
+        $this->actingAs($trab)->get(route('autores.show', 'vazio-rotulo'))->assertOk()
+            ->assertSee('Ainda não há mensagens deste autor que você possa ver.')
+            ->assertDontSee('Ainda não há mensagens públicas deste autor.');
+    }
+
+    /** A1: a contagem no singular (1 mensagem) — anônimo "pública", logado "disponível a você". */
+    public function test_a1_contagem_singular(): void
+    {
+        $autor = AutorEspiritual::factory()->create(['slug' => 'singular', 'ativo' => true]);
+        Mensagem::factory()->publica()->create()->autores()->attach($autor->id);
+
+        // "pública" é prefixo de "públicas": o par assertSee/assertDontSee é o que torna o
+        // teste não-vacuoso (pega o bug de sempre pluralizar); verificado que não há outra
+        // ocorrência de "1 públicas" na página para não colidir por substring.
+        $this->get(route('autores.show', 'singular'))->assertOk()
+            ->assertSee('1 pública')
+            ->assertDontSee('1 públicas');
+
+        $trab = $this->comPapel('trabalhador');
+        $this->actingAs($trab)->get(route('autores.show', 'singular'))->assertOk()
+            ->assertSee('1 disponível a você')
+            ->assertDontSee('1 disponíveis a você');
+    }
+}

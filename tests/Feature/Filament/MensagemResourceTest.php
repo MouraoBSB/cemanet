@@ -51,12 +51,6 @@ class MensagemResourceTest extends TestCase
             ->assertFormFieldExists('corpo', fn (RichEditor $f) => true);
     }
 
-    public function test_form_tem_textarea_contexto(): void
-    {
-        Livewire::test(CreateMensagem::class)
-            ->assertFormFieldExists('contexto', fn (Textarea $f) => true);
-    }
-
     public function test_form_do_admin_tem_o_campo_resumo(): void
     {
         Livewire::test(CreateMensagem::class)
@@ -118,7 +112,8 @@ class MensagemResourceTest extends TestCase
         Livewire::test(CreateMensagem::class)
             ->assertFormFieldDoesNotExist('origem_da_mensagem')
             ->assertFormFieldDoesNotExist('grupo_mediunico')
-            ->assertFormFieldDoesNotExist('casa_espirita');
+            ->assertFormFieldDoesNotExist('casa_espirita')
+            ->assertFormFieldDoesNotExist('contexto');   // F4c-D: fundido em `resumo`
     }
 
     public function test_cria_mensagem_com_corpo_sanitizado(): void

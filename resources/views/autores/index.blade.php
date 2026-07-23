@@ -73,7 +73,7 @@
                     </div>
                 </div>
 
-                {{-- Autor em evidência (O3: mais públicas, desempate por nome) --}}
+                {{-- Autor em evidência (O3: mais visíveis, desempate por nome) --}}
                 @if ($destaque)
                     <div class="rounded-2xl p-6 text-white shadow-card" style="background:linear-gradient(150deg,#3a3266,#4E4483 65%,#5b4f97);">
                         <p class="mb-2.5 font-mono text-[10px] uppercase tracking-[0.16em] text-[#F2C55C]">Autor em evidência</p>

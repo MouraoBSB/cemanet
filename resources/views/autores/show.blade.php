@@ -46,7 +46,7 @@
     </x-slot:head>
 
     <div x-data="autorMensagens({ itens: @js($itensFiltro) })">
-        {{-- ===== HERO roxo: partículas + onda + breadcrumb + foto/iniciais + chamada + selos + CTA ===== --}}
+        {{-- ===== HERO roxo: partículas + onda + breadcrumb + foto ou fallback + chamada + selos + CTA ===== --}}
         <section class="relative overflow-hidden text-white"
                  style="background:radial-gradient(circle at 86% 8%, rgba(242,168,30,0.22), transparent 42%), radial-gradient(circle at 20% 90%, rgba(110,159,203,0.28), transparent 55%), linear-gradient(135deg,#0b1030 0%,#1a1f4a 48%,#2c2f64 100%);">
             <x-ui.particulas />
@@ -60,7 +60,7 @@
                 </nav>
 
                 <div class="flex flex-wrap items-end gap-9">
-                    {{-- Foto 3:4 em moldura translúcida; sem foto → iniciais em gradiente. --}}
+                    {{-- Foto 3:4 em moldura translúcida; sem foto → imagem de fallback (autor-fallback.svg). --}}
                     <div class="w-[186px] shrink-0 rounded-[22px] border border-white/16 bg-white/8 p-2 backdrop-blur-sm">
                         @if ($autor->foto_url)
                             <img src="{{ $autor->foto_url }}" alt="{{ $autor->nome }}" width="186" height="248"
@@ -128,14 +128,14 @@
                         </div>
                     @endif
 
-                    {{-- Grade das mensagens públicas do autor --}}
+                    {{-- Grade das mensagens visíveis do autor --}}
                     <div id="mensagens" class="mt-10 scroll-mt-24">
                         <div class="mb-[18px] flex flex-wrap items-baseline justify-between gap-3">
                             <div class="flex items-center gap-2.5">
                                 <span class="h-[3px] w-[22px] rounded-sm bg-gold" aria-hidden="true"></span>
                                 <h2 class="font-display text-[21px] font-semibold text-primary">Mensagens de {{ $autor->nome }}</h2>
                             </div>
-                            {{-- Só o total de PÚBLICAS (nada de "de N" — não vaza a contagem de ocultas, F3). --}}
+                            {{-- Só o total de VISÍVEIS (nada de "de N" — não vaza a contagem de ocultas). --}}
                             <p class="font-mono text-[11px] uppercase tracking-[0.12em] text-[#b08a2e]">{{ $resumo->total() }} {{ $rotuloContagem($resumo->total()) }}</p>
                         </div>
 
@@ -195,7 +195,7 @@
 
                 {{-- ===== Sidebar: destaque + formatos + compartilhar ===== --}}
                 <aside class="flex w-full shrink-0 flex-col gap-5 desktop-sm:sticky desktop-sm:top-24 desktop-sm:w-[340px]">
-                    {{-- Em destaque: mensagem mais recente pública (some se não houver). --}}
+                    {{-- Em destaque: mensagem mais recente visível (some se não houver). --}}
                     @if ($destaque)
                         <div class="relative overflow-hidden rounded-2xl p-6 text-white shadow-card"
                              style="background:linear-gradient(150deg,#3a3266,#4E4483 65%,#5b4f97);">
@@ -210,7 +210,7 @@
                         </div>
                     @endif
 
-                    {{-- Formatos: distribuição das públicas (groupBy). --}}
+                    {{-- Formatos: distribuição das visíveis (groupBy). --}}
                     @if ($resumo->porFormato()->isNotEmpty())
                         <div class="rounded-2xl border border-border-muted bg-white p-6 shadow-card">
                             <h2 class="mb-3.5 font-display text-base font-semibold text-primary">Formatos</h2>

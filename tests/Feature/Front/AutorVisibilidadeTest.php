@@ -89,7 +89,7 @@ class AutorVisibilidadeTest extends TestCase
         Mensagem::factory()->publica()->create()->autores()->attach($autor->id);
 
         foreach ([route('autores.index'), route('autores.show', 'cache-autor')] as $url) {
-            $anon = $this->get($url);
+            $anon = $this->get($url)->assertOk();
             $this->assertStringNotContainsString('no-store', (string) $anon->headers->get('Cache-Control'));
         }
 

@@ -325,13 +325,19 @@ public function index(Request $request): Response
 public function show(Request $request, string $slug): Response
 ```
 
-`$usuario = $request->user()`. Um **escopo único** — recomendo um `Closure` local para os quatro
-usos do `@index`:
+`$usuario = $request->user()`. ⚠️ **NÃO unifique os 4 usos do `@index` num `Closure` tipado
+`Builder`.** O eager-load `with(['mensagens' => ...])` recebe a **Relation** (`BelongsToMany`),
+não um `Builder` (`eagerLoadRelation` chama `$constraints($relation)`) — um `fn (Builder $q)`
+reusado ali estoura **`TypeError`** (type-hint de classe é estrito mesmo sem
+`declare(strict_types)`). **Mantenha a estrutura atual** (o `whereHas`/`withCount` recebem
+`Builder`; só o `with` recebe a Relation) e troque apenas o scope em cada ponto:
 
 ```php
-$visiveis = fn (Builder $q) => $q->publicado()->visiveisPara($usuario);
-// whereHas('mensagens', $visiveis) · withCount([... as mensagens_visiveis_count => $visiveis]) · with(['mensagens' => $visiveis])
-$totalMensagensVisiveis = Mensagem::query()->publicado()->visiveisPara($usuario)->count();
+->whereHas('mensagens', fn (Builder $q) => $q->publicado()->visiveisPara($usuario))
+->withCount(['mensagens as mensagens_visiveis_count' => fn (Builder $q) => $q->publicado()->visiveisPara($usuario)])
+->with(['mensagens' => fn ($q) => $q->publicado()->visiveisPara($usuario)])   // SEM type-hint: recebe a Relation
+// ...
+$totalMensagensVisiveis = Mensagem::publicado()->visiveisPara($usuario)->count();
 ```
 
 No `@show`, a fonte única `$publicas` (renomear opcional; o miolo é trocar a origem):
@@ -376,6 +382,10 @@ $temRestritasOcultas =
 @endguest
 ```
 
+A copy `@guest` cita "trabalhadores e médiuns" como **exemplos**, mas o rodapé também dispara para
+oculta de **diretores/diretor-DEPAE**: a frase é **deliberadamente genérica** — não nomeia o nível
+oculto, para não vazar qual conteúdo específico o usuário não alcança. Aprovado pelo dono no passe.
+
 ### 5.3 Rótulos "públicas" — inventário do A1
 
 **Nome interno (viewer-aware, incondicional):**
@@ -388,7 +398,7 @@ $temRestritasOcultas =
 | [card.blade.php:10](resources/views/components/autor/card.blade.php#L10) | `$autor->mensagens_publicas_count` | `$autor->mensagens_visiveis_count` |
 | [card.blade.php:3-8](resources/views/components/autor/card.blade.php#L3-L8) comentário-contrato | "pré-filtrada por `publica()`", "SÓ das públicas" | descrever `publicado()->visiveisPara($usuario)` |
 | [ResumoAutor.php:12-16,78](app/Support/AutoresEspirituais/ResumoAutor.php#L12-L16) docblock | "mensagens **PÚBLICAS**" | "mensagens **visíveis ao usuário**" |
-| [Controller:17,45-46](app/Http/Controllers/AutorEspiritualController.php#L45-L46) comentários "Só as PÚBLICAS" | | reescrever viewer-aware |
+| [Controller:17-18,45-46](app/Http/Controllers/AutorEspiritualController.php#L17-L18) comentários (a **L18** diz "já filtrado por **`publica()`**"; L45-46 "Só as PÚBLICAS") | | reescrever viewer-aware — a menção a `publica()` na **L18 tem de sair**, senão o grep §9.3 reprova (R2) |
 
 **Rótulo visível (condicional em `$logado`):**
 
@@ -423,9 +433,16 @@ conforme o handoff (`design_handoff_autor_espiritual_perfil`, seção "Sobre {no
    Vite; §3.8).
 2. **Substituir o ramo `@else`** (gradiente+iniciais) por `<img src="{{ asset('images/autor-fallback.svg') }}" ...>`
    em **exatamente duas views**:
-   - hero: [show.blade.php:64-67](resources/views/autores/show.blade.php#L64-L67) — `alt="{{ $autor->nome }}"`;
+   - hero: [show.blade.php:64-67](resources/views/autores/show.blade.php#L64-L67) — `alt="{{ $autor->nome }}"`.
+     Aqui o `cema-grad-{id%8}` vive **dentro** do `@else` ([show:65](resources/views/autores/show.blade.php#L65)) → some com o ramo;
    - card: [card.blade.php:23-26](resources/views/components/autor/card.blade.php#L23-L26) —
      `alt=""` (o nome já está ao lado; imagem decorativa) + `loading="lazy"`.
+   - ⚠️ **card, wrapper `:20`:** o `cema-grad-{{ $autor->id % 8 }}` está no `<span>` **envolvente**
+     ([card.blade.php:20](resources/views/components/autor/card.blade.php#L20)), presente nos
+     **dois** ramos — não só no `@else`. **Remover a classe `cema-grad-*` da `:20`** (o
+     `cema-autor-avatar` fica): no caso COM foto o `<img size-full object-cover>` cobre tudo; no
+     caso SEM foto o SVG traz fundo próprio — o gradiente-placeholder nunca aparece, some **sem
+     efeito visível**. Sem isso, o grep de prova §9.4 reprova.
    Manter as classes da moldura (`aspect-[3/4]`, `object-cover`, cantos) — o SVG traz fundo próprio.
 3. **NUNCA** tocar o trait `TemIniciais` (R7): `Palestrante`/`User` seguem com iniciais. O
    gradiente `cema-grad-{id%8}` some **só** dessas duas telas de autor.
@@ -456,8 +473,11 @@ destinatários (a Direcionada só entra em `$publicas` se for **do próprio** us
   Direcionada). Obrigatório nos **dois** métodos (I5). Hoje ambos retornam `View` cru — é o buraco.
 - **R4 — rodapé "não-vacuoso".** `assertDontSee` do anti-PII (I7) só vale se a string do rodapé
   **puder** aparecer sem o guard. E `assertSee(route('login'))` é **enganoso**: o link de login
-  também vive no **header** do layout para `@guest` — o teste do rodapé deve asserir a **frase**
-  do rodapé, não a rota. É o que quebra o teste atual (§8).
+  também vive no **header** do layout para `@guest`
+  ([header.blade.php:29](resources/views/components/layout/header.blade.php#L29),
+  [:115](resources/views/components/layout/header.blade.php#L115)) — o teste do rodapé deve asserir
+  a **frase** do rodapé, não a rota. É por isso que o teste atual (§8) fica **vacuoso**, não
+  vermelho.
 - **R5 — sitemap NÃO vira `visiveisPara($user)`.** URL de autor só-restrito vazaria ao crawler
   (O2). Mantém `publica()`.
 - **R6 — rótulo hardcoded esquecido.** Se um dos 4 pontos visíveis ficar "públicas" para o logado,
@@ -514,11 +534,11 @@ regra já existente.
 
 Baseline a **reconfirmar** no arranque da execução (main pós-F4c-D ≈ **1286** passed).
 
-**Tocar (quebram ou ficam imprecisos com B1):**
+**Tocar (ficam vacuosos ou imprecisos com B1 — nenhum "quebra"):**
 
 | Arquivo:linha | Método | Ação |
 |---|---|---|
-| [AutorShowTest:53-60](tests/Feature/Front/AutorShowTest.php#L53-L60) | `test_sem_curtir_e_com_link_login` | **REESCREVER**: o autor `'x'` **não tem mensagem** ⇒ com o rodapé condicional **não** haveria rodapé, e o teste quebra. Separar em (a) `test_sem_curtir` (mantém o `assertDontSee('Curtir')`) e (b) o rodapé condicional vira **teste novo não-vacuoso** (asserir a **frase**, não `route('login')` — R4) |
+| [AutorShowTest:53-60](tests/Feature/Front/AutorShowTest.php#L53-L60) | `test_sem_curtir_e_com_link_login` | **REESCREVER** — ⚠️ **NÃO quebra**: `route('login')` também vive no HEADER sob `@guest` ([header.blade.php:29](resources/views/components/layout/header.blade.php#L29) e [:115](resources/views/components/layout/header.blade.php#L115), links "Entrar"), então `assertSee(route('login'))` segue **verde pelo header** mesmo sem rodapé — o teste fica **vacuoso** quanto ao rodapé (é o R4, **não** um "red que guia a mudança"). Separar em (a) `test_sem_curtir` (só `assertDontSee('Curtir')`) e (b) **teste novo** do rodapé asserindo a **frase exata** ("Há mensagens restritas a trabalhadores e médiuns" / "Este autor tem mensagens restritas que você ainda não pode ver"), **nunca** `route('login')` |
 | [AutorShowTest:34-43](tests/Feature/Front/AutorShowTest.php#L34-L43) | `test_grade_e_stats_so_das_publicas` | **MANTER como caso ANÔNIMO** (renomear para deixar claro que é o anônimo); segue válido (anônimo ≡ `publica()`) |
 | [AutoresIndexTest:39-46](tests/Feature/Front/AutoresIndexTest.php#L39-L46) | `test_contagem_so_das_publicas` | **MANTER como caso ANÔNIMO** ("3 mensagens" segue certo para o anônimo); o caso logado é **teste novo** |
 
@@ -556,11 +576,13 @@ acrescenta.
 1. Suíte **completa** verde (feature tests por papel; o comportamento é por-usuário).
 2. `pint --test` limpo **antes** de qualquer push (o CI aborta no Pint, antes dos testes —
    memória `pint-antes-de-push`).
-3. `grep -rn "publica()" app/Http/Controllers/AutorEspiritualController.php` devolve **zero**;
+3. `grep -rn "publica()" app/Http/Controllers/AutorEspiritualController.php` devolve **zero** —
+   **inclui o comentário da L18** ("já filtrado por publica()"), que sai junto (R2);
    `grep -rn "publicas\|públicas" resources/views/autores resources/views/components/autor` só
    devolve os rótulos **condicionais** do anônimo (allowlist fechada) — R1/R6.
-4. `grep -rn "cema-grad\|iniciais" resources/views/autores resources/views/components/autor`
-   devolve **zero** no ramo de fallback (o `@else` virou SVG); o `TemIniciais` intacto (R7/I13).
+4. `grep -rn "cema-grad" resources/views/autores resources/views/components/autor` devolve
+   **zero** (o `@else` do hero virou SVG **e** a classe saiu do wrapper `:20` do card); `grep -rn
+   "iniciais" ...` idem nas views de autor; o trait `TemIniciais` intacto (R7/I13).
 5. CI **verde no último commit** (memória `merge-so-com-ci-verde-no-commit-final`).
 6. Conferência no localhost dos 6 itens da §7.
 
@@ -599,3 +621,21 @@ Levadas ao dono no arranque, com o dado medido, e aprovadas antes de escrever a 
 **Divergência declarada no PR (D2):** o handoff-base resolve "sem foto" com **gradiente +
 iniciais**; a decisão do dono e a entrega `entrega_autor_fallback/` usam **imagem de fallback**.
 A entrega mais nova vence; o pacote é internamente inconsistente e isso vai escrito no corpo do PR.
+
+---
+
+## 12. Correções aplicadas no passe da SPEC (2026-07-23)
+
+Passe do consultor: SPEC sólida, terreno conferido linha a linha contra `8b2c03f`; liberada para o
+plano **após** 2 obrigatórios + 2 refinamentos, todos incorporados acima.
+
+| # | Achado | Correção |
+|---|---|---|
+| **O1** (obrigatório) | §8 dizia que `test_sem_curtir_e_com_link_login` **quebra**. **Falso:** `route('login')` vive no header sob `@guest` ([header:29](resources/views/components/layout/header.blade.php#L29),[:115](resources/views/components/layout/header.blade.php#L115)) ⇒ `assertSee(route('login'))` segue verde pelo header; o teste fica **vacuoso** quanto ao rodapé, não vermelho (é o próprio R4). | §8 reescrito: o teste não guia a mudança; split em `test_sem_curtir` + teste novo do rodapé asserindo a **frase exata**, nunca a rota. R4 alinhado. |
+| **O2** (obrigatório) | §5.1 recomendava um `Closure fn (Builder $q)` **único** para os 4 usos. **Bug:** o `with(['mensagens' => ...])` recebe a **Relation** (`BelongsToMany`), não `Builder` — closure tipado ali estoura `TypeError` (type-hint de classe é estrito mesmo sem `strict_types`). | §5.1 reescrito: manter a estrutura atual (só o `with` sem type-hint), trocando apenas `publica()`→`publicado()->visiveisPara($usuario)` em cada ponto. |
+| **R1** (refinamento) | §5.5 trocava só o `@else` do card, mas `cema-grad-{id%8}` está no **wrapper `:20`** (nos dois ramos) ⇒ o grep de prova §9.4 reprovaria. | §5.5 inclui a `:20` (remover `cema-grad-*` do wrapper; some sem efeito visível). §9.4 alinhado. |
+| **R2** (refinamento) | O grep `publica()`=zero do §9.3 casa o **comentário da L18** ("já filtrado por publica()"); §5.3 listava só "17,45-46". | §5.3 e §9.3 incluem a L18 no par de comentários a reescrever. |
+
+**Não-bloqueante (mantido por decisão):** a copy `@guest` nomeia "trabalhadores e médiuns" como
+exemplos, mas o rodapé dispara para qualquer oculta hierárquica (inclui diretores/DEPAE) — frase
+**genérica de propósito**, não vaza o nível (§5.2).

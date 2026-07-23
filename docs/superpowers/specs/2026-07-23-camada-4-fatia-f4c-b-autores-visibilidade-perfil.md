@@ -412,7 +412,7 @@ Autores não introduzir um 3º vocabulário:
 | [index:72](resources/views/autores/index.blade.php#L72) mini-stat | "Mensagens públicas" | "Mensagens disponíveis a você" |
 | [show:17](resources/views/autores/show.blade.php#L17) tile | "Mensagens públicas" | "Mensagens disponíveis a você" |
 | [show:126](resources/views/autores/show.blade.php#L126) contagem da grade | "N pública/públicas" | "N disponíveis a você" |
-| [show:165](resources/views/autores/show.blade.php#L165) estado vazio | "Ainda não há mensagens públicas deste autor." | "Ainda não há mensagens disponíveis a você deste autor." |
+| [show:165](resources/views/autores/show.blade.php#L165) estado vazio | "Ainda não há mensagens públicas deste autor." | "Ainda não há mensagens deste autor que você possa ver." (frase natural, não a frase-rótulo) |
 
 O card ([:34](resources/views/components/autor/card.blade.php#L34)) já é **neutro** ("N mensagens",
 nos dois casos) — não afirma "públicas", logo **não** muda.

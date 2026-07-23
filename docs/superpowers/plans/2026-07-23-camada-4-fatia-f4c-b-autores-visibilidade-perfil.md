@@ -153,18 +153,26 @@ class AutorVisibilidadeTest extends TestCase
         $this->actingAs($trab)->get(route('autores.index'))->assertOk()->assertSee('2 mensagens'); // logado: pública + trabalhadores
     }
 
-    /** I5: a resposta logada não é cacheável por proxy; a anônima é. Na lista e no perfil. */
+    /**
+     * I5: a resposta logada não é cacheável por proxy; a anônima é. Na lista e no perfil.
+     * ⚠️ Os GET anônimos vêm ANTES do actingAs — o actingAs PERSISTE pelo resto do teste
+     * (molde de MensagemIndexContadorTest:17-30). Intercalar daria falso-vermelho: a 2ª volta
+     * "anônima" já viria logada e o assertStringNotContainsString falharia com o código certo.
+     */
     public function test_i5_cache_control_privado_no_logado(): void
     {
         $autor = AutorEspiritual::factory()->create(['slug' => 'cache-autor', 'ativo' => true]);
         Mensagem::factory()->publica()->create()->autores()->attach($autor->id);
-        $trab = $this->comPapel('trabalhador');
 
-        foreach (['autores.index' => [], 'autores.show' => 'cache-autor'] as $rota => $param) {
-            $anon = $this->get(route($rota, $param));
+        foreach ([route('autores.index'), route('autores.show', 'cache-autor')] as $url) {
+            $anon = $this->get($url);
             $this->assertStringNotContainsString('no-store', (string) $anon->headers->get('Cache-Control'));
+        }
 
-            $logado = $this->actingAs($trab)->get(route($rota, $param));
+        $this->actingAs($this->comPapel('trabalhador'));
+
+        foreach ([route('autores.index'), route('autores.show', 'cache-autor')] as $url) {
+            $logado = $this->get($url);
             $this->assertStringContainsString('no-store', (string) $logado->headers->get('Cache-Control'));
         }
     }
@@ -327,7 +335,7 @@ ainda em publicas (Task 2)."
 
 ## Task 2: Rótulos visíveis condicionais (B1, A1)
 
-As quatro superfícies que **afirmam** "públicas" passam a variar por `$logado`: anônimo lê "públicas"; logado lê **"disponíveis a você"** (alinhado ao índice de Mensagens, SPEC §5.3). O card (`:34`) já é neutro — não muda.
+As quatro superfícies que **afirmam** "públicas" passam a variar por `$logado`: anônimo lê "públicas"; logado lê **"disponíveis a você"** — a **mesma copy da tela de Mensagens** ([mensagens/index.blade.php:38-41](resources/views/mensagens/index.blade.php#L38-L41)). É divergência **ratificada** do A3 (que dizia "Mensagens") — declarar no PR. O card (`:34`) já é neutro — não muda. **Atenção às frases:** tile/mini-stat/contagem usam "disponíveis a você" (frase-rótulo), mas o **estado vazio** logado é a frase natural "Ainda não há mensagens deste autor que você possa ver." (não "…disponíveis a você deste autor.", que sai truncada).
 
 **Files:**
 - Modify: `resources/views/autores/index.blade.php:72` (mini-stat)
@@ -408,7 +416,7 @@ A contagem da grade (`:126`):
 O estado vazio (`:165`):
 
 ```blade
-                                {{ $logado ? 'Ainda não há mensagens disponíveis a você deste autor.' : 'Ainda não há mensagens públicas deste autor.' }}
+                                {{ $logado ? 'Ainda não há mensagens deste autor que você possa ver.' : 'Ainda não há mensagens públicas deste autor.' }}
 ```
 
 - [ ] **Step 4: Rodar e verificar que passa**
@@ -928,7 +936,7 @@ Depois das 5 tasks, **na branch**, antes de abrir o PR:
 docker compose exec -T app php artisan test
 ```
 
-Esperado: **PASS**, `baseline + 14` (5 novos na Task 1, 2 na Task 2, 4 na Task 3, 3 na Task 4, 3 na Task 5, menos 1 renomeado sem novo método na Task 3 = **+14** líquido sobre o baseline). **Reconfirmar o baseline no arranque**; qualquer regressão (não só o número) trava o PR.
+Esperado: **PASS**, `baseline + 16` (**4** na Task 1 · **2** na Task 2 · **4** na Task 3 · **3** na Task 4 · **3** na Task 5 = **+16**; o split da Task 3 **renomeia** `test_sem_curtir_e_com_link_login`, não soma). **Reconfirmar o baseline no arranque**; qualquer regressão (não só o número) trava o PR.
 
 - [ ] **Pint limpo** (o CI aborta no Pint antes dos testes):
 
@@ -954,6 +962,7 @@ grep -rn "iniciais" resources/views/autores resources/views/components/autor    
 
 - [ ] **PR** — no corpo, declarar:
   - a **divergência D2**: o handoff-base resolvia "sem foto" com gradiente+iniciais; esta fatia usa **imagem de fallback** (decisão do dono; a entrega `entrega_autor_fallback/` já a implementa e vence — pacote internamente inconsistente);
+  - a **copy do logado "disponíveis a você"**: reabre o **A3** (que dizia "Mensagens") — divergência **ratificada** pelo dono, alinhada à tela de Mensagens ([mensagens/index.blade.php:38-41](resources/views/mensagens/index.blade.php#L38-L41));
   - o **quirk `nivel=null`**: admin/presidente passam a ver as 2 mensagens `nivel=null` do dev nas contagens (bypass) — dado pré-existente, não regressão;
   - **merge = CI verde no ÚLTIMO commit + go do dono**. Não pré-configurar merge.
 - [ ] **Cutover** (dev; PROD do dono): `optimize:clear` + `restart app worker`. **Sem migration, sem `npm run build`, sem `cema:importar-*`.**

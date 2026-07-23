@@ -170,11 +170,17 @@
                             </p>
                         @endif
 
-                        {{-- Rodapé estático de login (F3 fora: sem contagem de ocultas, sem cadeado, sem lógica de nível). --}}
-                        <p class="mt-8 rounded-xl border border-dashed border-border bg-white/60 px-5 py-4 text-center text-[13.5px] leading-relaxed text-text-secondary">
-                            Somente mensagens públicas são exibidas aqui. Há conteúdos restritos a trabalhadores e médiuns —
-                            <a href="{{ route('login') }}" class="font-medium text-primary underline hover:text-secondary">entre</a> para vê-los.
-                        </p>
+                        {{-- Rodapé condicional (O1): só quando há oculta hierárquica para ESTE usuário. Sem número (anti-PII). --}}
+                        @if ($temRestritasOcultas)
+                            <p class="mt-8 rounded-xl border border-dashed border-border bg-white/60 px-5 py-4 text-center text-[13.5px] leading-relaxed text-text-secondary">
+                                @guest
+                                    Há mensagens restritas a trabalhadores e médiuns.
+                                    <a href="{{ route('login') }}" class="font-medium text-primary underline hover:text-secondary">Entre</a> para ver o que é seu.
+                                @else
+                                    Este autor tem mensagens restritas que você ainda não pode ver.
+                                @endguest
+                            </p>
+                        @endif
                     </div>
                 </div>
 

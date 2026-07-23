@@ -4,6 +4,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\VisibilidadeMensagem;
 use App\Models\AutorEspiritual;
 use App\Models\Mensagem;
 use App\Support\AutoresEspirituais\ResumoAutor;
@@ -72,6 +73,18 @@ class AutorEspiritualController extends Controller
             'formato' => $m->formato?->value,
         ])->values();
 
+        // O1 (rodapé condicional): existe mensagem HIERÁRQUICA (nível definido, não-direcionada) do
+        // autor que ESTE usuário não vê? Direcionadas de terceiros e nivel=null ficam fora (anti-PII).
+        $totalHierarquicas = $autor->mensagens()
+            ->publicado()->whereNotNull('nivel')
+            ->where('nivel', '!=', VisibilidadeMensagem::Direcionada->value)
+            ->count();
+        $visiveisHierarquicas = $autor->mensagens()
+            ->publicado()->visiveisPara($usuario)->whereNotNull('nivel')
+            ->where('nivel', '!=', VisibilidadeMensagem::Direcionada->value)
+            ->count();
+        $temRestritasOcultas = $totalHierarquicas > $visiveisHierarquicas;
+
         $resposta = response()->view('autores.show', [
             'autor' => $autor,
             'mensagens' => $mensagens,
@@ -79,6 +92,7 @@ class AutorEspiritualController extends Controller
             'destaque' => $mensagens->first(),   // mais recente visível (ou null)
             'itensFiltro' => $itensFiltro,
             'logado' => $usuario !== null,
+            'temRestritasOcultas' => $temRestritasOcultas,
         ]);
 
         if ($usuario !== null) {

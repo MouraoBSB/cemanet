@@ -48,7 +48,7 @@ class ImportadorMensagens
 
                 // Curadoria — SÓ no create; preservada no re-import (I13). O admin renomeia slug,
                 // muda status e classifica os sem-nível pela tela; um re-import não desfaz isso.
-                // casa (default 'CEMA') e contexto (manual) NUNCA são setados pelo import.
+                // casa (default 'CEMA') NUNCA é setada pelo import; o resumo vem do cema:importar-resumos.
                 if ($novo) {
                     $mensagem->slug = $this->slugUnico($d);
                     $mensagem->status = $d['status'];

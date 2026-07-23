@@ -47,7 +47,6 @@ class Mensagem extends Model implements HasMedia, TemDepartamento
         'titulo',
         'slug',
         'corpo',   // saneado pelo mutator corpo()
-        'contexto', // texto puro (manual, não-IA); exibido escapado no front
         'resumo',   // texto puro editorial (importado do post_excerpt do legado)
         'formato',
         'data_recebimento',
@@ -264,7 +263,7 @@ class Mensagem extends Model implements HasMedia, TemDepartamento
     {
         return LogOptions::defaults()
             ->useLogName('mensagem')
-            ->logOnly(['titulo', 'slug', 'corpo', 'contexto', 'resumo', 'formato', 'data_recebimento',
+            ->logOnly(['titulo', 'slug', 'corpo', 'resumo', 'formato', 'data_recebimento',
                 'casa', 'link_arquivo', 'liberar_download', 'nivel', 'status'])
             ->useAttributeRawValues(['data_recebimento']) // o accessor devolve Carbon; grava a string Y-m-d
             ->logOnlyDirty()
@@ -296,7 +295,7 @@ class Mensagem extends Model implements HasMedia, TemDepartamento
             }
 
             // resumo chega a 1164 chars e ≥94 dos 154 pertencem a mensagem restrita — não pode ir cru para uma trilha de retenção indefinida.
-            foreach (['corpo', 'contexto', 'resumo'] as $campo) {
+            foreach (['corpo', 'resumo'] as $campo) {
                 // array_key_exists, NUNCA isset: o valor pode ser null e é a CHAVE que se preserva.
                 if (array_key_exists($campo, $dados)) {
                     $dados[$campo] = '[texto não registrado]';

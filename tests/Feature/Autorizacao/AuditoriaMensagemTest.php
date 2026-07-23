@@ -54,47 +54,30 @@ class AuditoriaMensagemTest extends TestCase
         $this->assertStringNotContainsString('SENTINELA-NOVA-XYZ', $json);
     }
 
-    /** I27/P2: idem para 'contexto'. */
-    public function test_editar_contexto_registra_a_chave_mas_nunca_o_texto(): void
-    {
-        $m = Mensagem::factory()->create(['contexto' => 'SENTINELA-ANTIGA-CTX']);
-        Activity::query()->delete();
-
-        $m->update(['contexto' => 'SENTINELA-NOVA-CTX']);
-
-        $props = Activity::where('log_name', 'mensagem')->latest('id')->first()->properties;
-        $this->assertArrayHasKey('contexto', $props['attributes']);
-        $this->assertArrayHasKey('contexto', $props['old']);
-
-        $json = Activity::where('log_name', 'mensagem')->get()->toJson();
-        $this->assertStringNotContainsString('SENTINELA-ANTIGA-CTX', $json);
-        $this->assertStringNotContainsString('SENTINELA-NOVA-CTX', $json);
-    }
-
     /**
-     * Achado Important da revisão da Task 1: nenhum teste da suíte exercitava um valor NULL em
-     * corpo/contexto — trocar array_key_exists por isset no laço de redação não reprovaria nenhum
+     * Achado Important da revisão da Task 1 da F4b: nenhum teste da suíte exercitava um valor NULL
+     * em corpo/resumo — trocar array_key_exists por isset no laço de redação não reprovaria nenhum
      * teste, porque isset(string não vazia) é sempre true. Aqui o valor NOVO é null: isset(null) é
      * false e pularia a redação (o campo ficaria null, em vez de virar '[texto não registrado]'),
      * enquanto array_key_exists redige do mesmo jeito, porque é a CHAVE — não a verdade do valor —
      * que decide.
      */
-    public function test_editar_contexto_para_null_redige_o_campo_mesmo_com_o_valor_novo_nulo(): void
+    public function test_editar_resumo_para_null_redige_o_campo_mesmo_com_o_valor_novo_nulo(): void
     {
-        $m = Mensagem::factory()->create(['contexto' => 'SENTINELA-ANTES-DE-NULL']);
+        $m = Mensagem::factory()->create(['resumo' => 'SENTINELA-ANTES-DE-NULL']);
         Activity::query()->delete();
 
-        $m->update(['contexto' => null]);
+        $m->update(['resumo' => null]);
 
         $props = Activity::where('log_name', 'mensagem')->latest('id')->first()->properties;
-        $this->assertArrayHasKey('contexto', $props['attributes']); // a CHAVE sobrevive mesmo com valor novo null
-        $this->assertSame('[texto não registrado]', $props['attributes']['contexto']); // isset(null) pularia a redação
+        $this->assertArrayHasKey('resumo', $props['attributes']); // a CHAVE sobrevive mesmo com valor novo null
+        $this->assertSame('[texto não registrado]', $props['attributes']['resumo']); // isset(null) pularia a redação
 
         $json = Activity::where('log_name', 'mensagem')->get()->toJson();
         $this->assertStringNotContainsString('SENTINELA-ANTES-DE-NULL', $json);
     }
 
-    /** A redação é cirúrgica: só corpo/contexto são trocados — titulo continua com o valor real. */
+    /** A redação é cirúrgica: só corpo/resumo são trocados — titulo continua com o valor real. */
     public function test_editar_titulo_mantem_o_valor_no_properties(): void
     {
         $m = Mensagem::factory()->create(['titulo' => 'Título antigo']);

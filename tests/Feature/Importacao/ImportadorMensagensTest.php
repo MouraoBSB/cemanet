@@ -91,7 +91,7 @@ class ImportadorMensagensTest extends TestCase
         $this->assertSame('publico', $m->nivel);
         $this->assertSame('publicado', $m->status);
         $this->assertSame('CEMA', $m->casa);       // constante — poda de casa_espirita
-        $this->assertNull($m->contexto);            // manual — não migra
+        $this->assertNull($m->resumo);              // texto editorial da curadoria — o import de mensagens não escreve
     }
 
     public function test_nivel_ausente_vira_null(): void
@@ -225,12 +225,12 @@ class ImportadorMensagensTest extends TestCase
 
     public function test_reimport_preserva_curadoria_do_admin(): void
     {
-        // Curadoria = slug/status/nivel (create-only) + contexto (nunca) + relacionadas (nunca).
+        // Curadoria = slug/status/nivel (create-only) + resumo (nunca) + relacionadas (nunca).
         $this->importar([$this->mensagemLegado(['nivel' => null])]);
         $m = Mensagem::firstWhere('wp_id', 21694);
         $outra = Mensagem::factory()->create();
 
-        $m->update(['nivel' => 'publico', 'status' => 'despublicada', 'contexto' => 'nota do admin']);
+        $m->update(['nivel' => 'publico', 'status' => 'despublicada', 'resumo' => 'nota do admin']);
         $m->sincronizarRelacionadas([$outra->id]);
 
         $this->importar([$this->mensagemLegado(['nivel' => null])]);   // re-import (legado sem termo)
@@ -238,7 +238,7 @@ class ImportadorMensagensTest extends TestCase
         $m->refresh();
         $this->assertSame('publico', $m->nivel, 'nível classificado pelo admin foi zerado');
         $this->assertSame('despublicada', $m->status, 'status do admin foi sobrescrito');
-        $this->assertSame('nota do admin', $m->contexto, 'contexto foi tocado pelo import');
+        $this->assertSame('nota do admin', $m->resumo, 'resumo foi tocado pelo import');
         $this->assertTrue($m->relacionadas->contains('id', $outra->id), 'relacionadas foi tocada pelo import');
     }
 

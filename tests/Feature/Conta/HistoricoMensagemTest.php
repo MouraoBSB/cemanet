@@ -20,7 +20,7 @@ use Tests\TestCase;
 
 /**
  * Primeiro leitor de `activity_log` do projeto (Fatia F4b, Task 11): `HistoricoMensagem` +
- * `x-conta.historico-mensagem`. A redação da Task 1 já limpa corpo/contexto NA ESCRITA — por
+ * `x-conta.historico-mensagem`. A redação da Task 1 já limpa corpo/resumo NA ESCRITA — por
  * isso as asserções negativas do renderizador precisam de uma linha SUJA injetada à mão
  * (`withProperties` direto), senão seriam vacuosas.
  */
@@ -51,7 +51,7 @@ class HistoricoMensagemTest extends TestCase
         Activity::query()->delete(); // ignora o 'created' do factory
 
         // Sentinela em 'titulo' (fora da lista redigida por Mensagem::tapActivity — só
-        // 'corpo'/'contexto' são redigidos): só assim a asserção prova o componente, e não a
+        // 'corpo'/'resumo' são redigidos): só assim a asserção prova o componente, e não a
         // redação da Task 1 chegando ao banco já mascarada. 'corpo' fica com valor inócuo,
         // só para exercitar o rótulo "Corpo da mensagem".
         activity()->useLog('mensagem')->performedOn($m)

@@ -53,9 +53,9 @@ Objetivo declarado, em uma frase por bloco:
 | **D5** | Slug "inteligente" no `/admin` (auto-sufixo até não colidir) — **backlog**, não implementar. A peça já existe: `SlugMensagem::unico()`. | Dono, kickoff + §3.5 |
 | **D6** | Rótulo **"Resumo"** limpo nos **três** schemas (sai o parêntese "(texto editorial)"), com **helper por público**: admin/curadoria mantêm a frase que cita a importação; o médium recebe uma própria. Um nome só para a coluna — o glossário de auditoria diz "Resumo". | Dono, P2 |
 | **D7** | `contexto` sai do glossário de auditoria junto com o `logOnly`. A paridade `≡` do `GlossarioCamposParidadeTest` é **preservada, não afrouxada**. Consequência aceita: 3 entradas antigas de `activity_log` perdem essa linha na tela do DEPAE. | Dono, P3 |
-| **D8** | **DUAS** migrations (funde → dropa), e não uma. **Emenda ao O1 do kickoff**, com o dado que o motiva em §3.3 e §5.1. | Proposta — §11 |
-| **D9** | O bloco 2 cobre **três** arquivos de idioma: `validation.php`, `auth.php` e `passwords.php`. Criar só o primeiro deixa o `/entrar` meio-traduzido. | Proposta — §11 |
-| **D10** | A copy de [autores/index.blade.php:61](resources/views/autores/index.blade.php#L61) é ajustada, e a divergência em relação ao handoff de design é declarada no PR. | Proposta — §11 |
+| **D8** | **DUAS** migrations (funde → dropa), e não uma. **Emenda ao O1 do kickoff**, com o dado que o motiva em §3.3 e §5.1. | Dono, passe da SPEC (§11) |
+| **D9** | O bloco 2 cobre **três** arquivos de idioma: `validation.php`, `auth.php` e `passwords.php`. Criar só o primeiro deixa o `/entrar` meio-traduzido. | Dono, passe da SPEC (§11) |
+| **D10** | A copy de [autores/index.blade.php:61](resources/views/autores/index.blade.php#L61) é ajustada, e a divergência em relação ao handoff de design é declarada no PR. | Dono, passe da SPEC (§11) |
 
 ---
 
@@ -317,9 +317,19 @@ nem chega a ser exercitado). O valor gravado nessas entradas **já é** `[texto 
 ### Bloco 2
 
 - **I12** — a mensagem do `unique` do slug no `/admin` sai em **pt-BR**, com a frase própria.
-- **I13** — `lang/pt_BR/validation.php` tem **todas** as chaves do canônico da v13.17.0. Chave
-  faltando = fallback silencioso para o inglês **na mesma tela** — o Translator faz fallback por
-  **chave**, não por arquivo.
+- **I13** — paridade **recursiva de chaves** entre `lang/pt_BR/validation.php` e o canônico da
+  v13.17.0, **excluindo `custom` e `attributes`**. Chave faltando = fallback silencioso para o
+  inglês **na mesma tela** — o Translator faz fallback por **chave**, não por arquivo.
+
+  ⚠️ **O nível da comparação é parte do invariante, não detalhe de implementação.** As duas
+  leituras ingênuas falham de jeitos opostos, e nenhuma delas avisa que escolheu errado:
+
+  | Leitura | Falha |
+  |---|---|
+  | recursiva **total** | **vermelho falso**: `attributes` é `[]` no `en` e terá 10 chaves no pt-BR; `custom` é placeholder. Pior consequência: alguém "conserta" **esvaziando** a seção `attributes` — justamente o que justifica o arquivo (§3.4) |
+  | só **1º nível** | **inútil**: as 9 regras com sub-array (`between`, `gt`, `gte`, `lt`, `lte`, `max`, `min`, `size` + `password`) escondem ~40 sub-chaves. Faltar `min.string` ou `password.letters` cai no fallback inglês na mesma tela — exatamente o que o I13 existe para impedir |
+
+  Logo: **recursiva, menos as duas seções que divergem por desenho.**
 - **I14** — a seção `attributes` cobre as telas fora do Filament, e **não** contém campo que
   viva só em schema Filament (seria código morto competindo com o `->label()`).
 
@@ -530,7 +540,25 @@ inverso é **benigno**: código novo com banco velho apenas deixa de ler e escre
 1. a página de uma mensagem **não** tem mais a faixa "Contexto —" e o lead dourado segue no lugar;
 2. o médium vê o campo **"Resumo"** em `/minha-conta/mensagens`, digita, salva e **o texto volta** ao reabrir;
 3. no `/admin`, salvar uma mensagem com slug repetido mostra a frase **em português**;
-4. `/entrar` com o formulário vazio responde em português (prova o `validation.php` + `attributes`).
+4. `/entrar` com o formulário vazio responde em português (prova o `validation.php` + `attributes`);
+5. ⭐ **o texto foi mesmo copiado** — depois do `migrate`, a mensagem **id 191** ("Nova Mensagem
+   Teste", `contexto` de 329 chars, `resumo` `NULL` em §3.1) está com `resumo` **preenchido**:
+
+   ```
+   docker compose exec -T app php artisan tinker --execute="
+     echo App\Models\Mensagem::find(191)->resumo;"
+   ```
+
+**Por que o item 5 é obrigatório.** `migrate` com exit 0 **não prova cópia**: um `WHERE` errado
+copia 0 linhas em silêncio, e o I1/I2 provam a semântica só em SQLite. A ordem invertida do
+cutover — correta pelos motivos acima — **agrava** isso: a faixa sai junto com o código, no
+passo 1, então um texto não copiado fica **invisível** (continua no banco, não renderiza em
+lugar nenhum) até alguém reparar. Os itens 1–4 passariam do mesmo jeito.
+
+⚠️ **Estado intermediário, a declarar no PR:** entre o passo 3 e o passo 4 — ou se o `migrate`
+for adiado/falhar — o texto do `contexto` fica invisível no site, porque a faixa já saiu com o
+código. **Não é perda de dado nem regressão: é a ordem.** Quem olhar a tela nesse meio-tempo vai
+achar que perdeu conteúdo.
 
 ---
 
@@ -575,6 +603,10 @@ trouxer regra nova, ele fica **vermelho** e avisa que falta traduzir — que é 
 quer. Consequência a declarar no PR: é o primeiro teste do projeto que depende de um arquivo do
 `vendor/`, e ele exige `composer install` (o CI já faz).
 
+O teste faz `assertFileExists` **antes** do `require`, com mensagem que ensina o que houve —
+quando o caminho mudar numa atualização do Laravel, `require failed` é críptico; a mensagem deve
+dizer que **o canônico mudou de lugar e o I13 precisa ser revisto**, não que falta traduzir.
+
 **Baseline medida em `4e466c9`, nesta branch:** **1278 passed** (3958 asserções), 624s.
 
 ---
@@ -604,13 +636,22 @@ quer. Consequência a declarar no PR: é o primeiro teste do projeto que depende
 
 ---
 
-## 11. Pendências de ratificação
+## 11. Pendências de ratificação — **RATIFICADAS** no passe da SPEC (2026-07-23)
 
-Três pontos que **divergem do kickoff ou ampliam o escopo**. O desenho acima já os adota; se o
-dono recusar qualquer um, a mudança é local e está isolada.
+Três pontos que **divergiam do kickoff ou ampliavam o escopo**. Todos foram levados ao dono com
+o dado que os sustenta, verificados por ele no `vendor/` e no código, e **aprovados**.
 
-| # | Pendência | O que a SPEC adotou | Se recusado |
-|---|---|---|---|
-| **P-A** | **D8 — duas migrations.** O O1 do kickoff diz "numa migration". Dado novo: migration não roda em transação em nenhum dos dois drivers (§3.3), e existe precedente literal do par no projeto. | duas migrations | variante de arquivo único, documentada em §5.1 — `UPDATE` antes do `Schema::table`, fora do closure |
-| **P-B** | **D9 — `auth.php` + `passwords.php`.** O kickoff previa só a frase do slug. Sem estes dois, o `/entrar` fica meio-traduzido (§5.5). | os três arquivos | só `validation.php`; o login continua em inglês e vira dívida declarada |
-| **P-C** | **D10 — a copy e o handoff.** [autores/index.blade.php:61](resources/views/autores/index.blade.php#L61) promete "registramos … o contexto de cada comunicação" — promessa que o site deixa de cumprir. E o handoff de design documenta a faixa como **aprovada**: `design_handoff_mensagem_single/README.md:52-53` ("**Faixa de contexto** (se houver) — fundo `#FAF8F2`, traço dourado 22×3") e o protótipo `Mensagem - Detalhe.dc.html:164`, que ainda expõe o *toggle* `comContexto`. | ajustar a frase (retirando a promessa) e **declarar no PR** a divergência com o handoff | a frase fica como está e a divergência segue sem registro |
+| # | Pendência | Decisão |
+|---|---|---|
+| **P-A** | **D8 — duas migrations.** O O1 do kickoff dizia "numa migration", sem saber que migration não roda em transação nesses drivers (§3.3), e que há precedente literal do par no projeto. | ✅ **Emenda aceita.** Duas migrations. A variante de arquivo único (§5.1) fica documentada, sem uso |
+| **P-B** | **D9 — `auth.php` + `passwords.php`.** O kickoff previa só a frase do slug. Sem estes dois, o `/entrar` fica meio-traduzido (§5.5). | ✅ **Os três arquivos.** "Meio-traduzido é pior que consistentemente em inglês" |
+| **P-C** | **D10 — a copy e o handoff.** [autores/index.blade.php:61](resources/views/autores/index.blade.php#L61) promete "registramos … o contexto de cada comunicação" — promessa que o site deixa de cumprir. E o handoff documenta a faixa como design **aprovado**: `design_handoff_mensagem_single/README.md:52-53` ("**Faixa de contexto** (se houver) — fundo `#FAF8F2`, traço dourado 22×3") e o protótipo `Mensagem - Detalhe.dc.html:164`, que ainda expõe o *toggle* `comContexto`. | ✅ **Ajustar a frase e declarar no PR.** O registro é o que mais importa: divergir de design aprovado sem deixar rastro é como a decisão some |
+
+### Correções aplicadas no passe
+
+| # | Achado | Onde entrou |
+|---|---|---|
+| **Importante 1** | o **I13 nascia ambíguo**: "todas as chaves" não dizia o nível da comparação, e as duas leituras ingênuas falham de jeitos opostos — recursiva total dá **vermelho falso** (e o "conserto" seria esvaziar a seção `attributes`, que é o motivo do arquivo); só 1º nível é **inútil** (perde ~40 sub-chaves das 9 regras com sub-array) | §4, I13 — a comparação é **recursiva, menos `custom` e `attributes`** |
+| **Importante 2** | a conferência do cutover **não provava o bloco 1**: `migrate` com exit 0 não prova cópia, e a ordem invertida deixa um texto não copiado **invisível** | §7, item **5** (a query nominal da msg **191**) + o aviso do estado intermediário |
+| **R1** | `require` do canônico do `vendor/` falha com erro críptico quando o caminho mudar | §8 — `assertFileExists` antes, com mensagem que ensina |
+| **R2** | o estado intermediário do cutover parece perda de dado | §7 — declarado, e vai no PR |

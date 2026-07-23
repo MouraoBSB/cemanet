@@ -60,6 +60,10 @@ class FusaoContextoResumoTest extends TestCase
                 'titulo' => 'Sem contexto', 'slug' => 'sem-contexto',
                 'contexto' => null, 'resumo' => 'Resumo intacto.',
             ]),
+            'sem_contexto_resumo_vazio' => DB::table('mensagens')->insertGetId($base + [
+                'titulo' => 'Sem contexto e resumo vazio', 'slug' => 'sem-contexto-resumo-vazio',
+                'contexto' => null, 'resumo' => '',
+            ]),
         ];
     }
 
@@ -88,6 +92,22 @@ class FusaoContextoResumoTest extends TestCase
 
         $this->assertSame('Texto do resumo.', $this->resumo($ids['os_dois']));
         $this->assertSame('Resumo intacto.', $this->resumo($ids['sem_contexto']));
+    }
+
+    /**
+     * Discrimina o `where(function ...)` agrupado de um `orWhere` solto: sem o agrupamento, o SQL
+     * vira `(contexto IS NOT NULL AND contexto <> '' AND resumo IS NULL) OR (resumo = '')` e esta
+     * linha (contexto NULO, resumo já '') seria pega pelo `resumo = ''` isolado — o UPDATE
+     * sobrescreveria o resumo com o `contexto` nulo. As outras 4 fixtures não distinguem as duas
+     * variantes; só esta prova que a closure é essencial.
+     */
+    public function test_linha_sem_contexto_nao_e_tocada_mesmo_com_resumo_vazio(): void
+    {
+        $ids = $this->cenario();
+
+        $this->migration()->up();
+
+        $this->assertSame('', $this->resumo($ids['sem_contexto_resumo_vazio']));
     }
 
     /** Idempotência: rodar duas vezes não muda nada (é o que torna o par de migrations seguro). */

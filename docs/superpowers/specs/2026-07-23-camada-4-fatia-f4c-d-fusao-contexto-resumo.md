@@ -632,6 +632,11 @@ dizer que **o canônico mudou de lugar e o I13 precisa ser revisto**, não que f
   `<aside aria-label>` no lead; ~6 linhas de `throw` duplicadas entre a Action e o trait.
 - **Traduzir o restante da interface** (mensagens de e-mail, textos do Filament já cobertos pelo
   vendor).
+- **Frase própria para o `unique` do `AgendaDiaForm`** ([:36](app/Filament/Schemas/AgendaDiaForm.php#L36)):
+  com o `validation.php`, ele passa a dizer *"O valor informado em data já está em uso."* — melhor
+  que o inglês de hoje, mas aquele campo merecia uma frase acionável, como o
+  [AgendaMetaMesResource:72-74](app/Filament/Resources/Agenda/AgendaMetaMesResource.php#L72-L74)
+  já tem. Fica para quem tocar a Agenda.
 - Visibilidade, engajamento, curadoria além do que a F4c-AC fechou.
 
 ---

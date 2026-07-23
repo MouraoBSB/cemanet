@@ -453,10 +453,17 @@ docker compose exec -T app php artisan test --filter="MensagemShowTest|MensagemS
 
 Esperado: **PASS**. A barreira continua interceptando antes do render (regressão do I10 da F4c-AC).
 
-- [ ] **Step 5: Commit**
+- [ ] **Step 5: Conferir que a prova temporária não vazou, e commitar**
 
 ```bash
 git add resources/views/mensagens/show.blade.php tests/
+git diff --cached | grep -c "FAIXA AINDA VISIVEL"
+```
+
+Esperado: **0**. Se vier 1 ou mais, as linhas do Step 2 sobreviveram — apagá-las antes de seguir,
+senão a Task 4 quebra com *column not found* depois do `dropColumn`.
+
+```bash
 git commit -m "feat(f4c-d): remove a faixa de contexto; o lead do resumo fica sozinho
 
 A meta description (e o og:description, que sai da mesma variavel) passa de
@@ -504,6 +511,12 @@ use Tests\TestCase;
  * VAZIO: exit 0 não prova cópia alguma — um WHERE errado copia 0 linhas em silêncio. Aqui a
  * coluna `contexto` (já dropada pela migration seguinte) é recriada, o dado é inserido por
  * DB::table (o model não a enxerga mais) e o up() roda de verdade.
+ *
+ * ⚠️ DEPENDE DE DDL TRANSACIONAL — só funciona em SQLite. O `Schema::table` do cenario() roda
+ * dentro da transação do RefreshDatabase; o SQLite reverte o DDL junto, o MySQL NÃO (lá o DDL
+ * causa commit implícito e a coluna recriada vazaria para os testes seguintes). Hoje isso é
+ * seguro porque o phpunit.xml força sqlite/:memory:; se um dia a suíte migrar para MySQL, este
+ * teste precisa de outro desenho.
  */
 class FusaoContextoResumoTest extends TestCase
 {

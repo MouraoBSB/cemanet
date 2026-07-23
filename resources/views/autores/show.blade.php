@@ -13,8 +13,12 @@
         ->filter(fn (FormatoMensagem $f) => $valoresPresentes->contains($f->value))
         ->values();
 
+    $rotuloContagem = fn (int $n) => $logado
+        ? ($n === 1 ? 'disponível a você' : 'disponíveis a você')
+        : ($n === 1 ? 'pública' : 'públicas');
+
     $tiles = [
-        ['valor' => $resumo->total(), 'rotulo' => 'Mensagens públicas', 'bg' => 'bg-cream'],
+        ['valor' => $resumo->total(), 'rotulo' => $logado ? 'Mensagens disponíveis a você' : 'Mensagens públicas', 'bg' => 'bg-cream'],
         ['valor' => $predominante ? $predominante->rotulo() : '—', 'rotulo' => 'Formato predominante', 'bg' => 'bg-[#EAF0F6]'],
         ['valor' => $ultima ? ucfirst(str_replace('.', '', $ultima->translatedFormat('M/Y'))) : '—', 'rotulo' => 'Última mensagem', 'bg' => 'bg-[#EAF2EC]'],
     ];
@@ -123,7 +127,7 @@
                                 <h2 class="font-display text-[21px] font-semibold text-primary">Mensagens de {{ $autor->nome }}</h2>
                             </div>
                             {{-- Só o total de PÚBLICAS (nada de "de N" — não vaza a contagem de ocultas, F3). --}}
-                            <p class="font-mono text-[11px] uppercase tracking-[0.12em] text-[#b08a2e]">{{ $resumo->total() }} {{ $resumo->total() === 1 ? 'pública' : 'públicas' }}</p>
+                            <p class="font-mono text-[11px] uppercase tracking-[0.12em] text-[#b08a2e]">{{ $resumo->total() }} {{ $rotuloContagem($resumo->total()) }}</p>
                         </div>
 
                         @if ($mensagens->isNotEmpty())
@@ -162,7 +166,7 @@
                             </div>
                         @else
                             <p class="rounded-xl border border-dashed border-border-muted bg-white px-6 py-10 text-center text-text-secondary">
-                                Ainda não há mensagens públicas deste autor.
+                                {{ $logado ? 'Ainda não há mensagens deste autor que você possa ver.' : 'Ainda não há mensagens públicas deste autor.' }}
                             </p>
                         @endif
 

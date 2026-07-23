@@ -100,4 +100,29 @@ class AutorVisibilidadeTest extends TestCase
             $this->assertStringContainsString('no-store', (string) $logado->headers->get('Cache-Control'));
         }
     }
+
+    /** A1: o anônimo lê "públicas" na lista e no perfil. */
+    public function test_a1_rotulos_do_anonimo_dizem_publicas(): void
+    {
+        $autor = AutorEspiritual::factory()->create(['slug' => 'rotulo-anon', 'ativo' => true]);
+        Mensagem::factory()->count(2)->publica()->create()->each(fn ($m) => $m->autores()->attach($autor->id));
+
+        $this->get(route('autores.index'))->assertOk()->assertSee('Mensagens públicas');
+        $this->get(route('autores.show', 'rotulo-anon'))->assertOk()
+            ->assertSee('Mensagens públicas')   // tile
+            ->assertSee('2 públicas');          // contagem da grade
+    }
+
+    /** A1: o logado lê "disponíveis a você" (alinhado ao índice de Mensagens). */
+    public function test_a1_rotulos_do_logado_dizem_disponiveis(): void
+    {
+        $autor = AutorEspiritual::factory()->create(['slug' => 'rotulo-log', 'ativo' => true]);
+        Mensagem::factory()->count(2)->publica()->create()->each(fn ($m) => $m->autores()->attach($autor->id));
+        $trab = $this->comPapel('trabalhador');
+
+        $this->actingAs($trab)->get(route('autores.index'))->assertOk()->assertSee('Mensagens disponíveis a você');
+        $this->actingAs($trab)->get(route('autores.show', 'rotulo-log'))->assertOk()
+            ->assertSee('Mensagens disponíveis a você')   // tile
+            ->assertSee('2 disponíveis a você');          // contagem da grade
+    }
 }

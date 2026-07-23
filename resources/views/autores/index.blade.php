@@ -69,7 +69,7 @@
                     </div>
                     <div class="rounded-xl bg-secondary/[0.12] px-4 py-3">
                         <p class="font-display text-2xl font-bold text-secondary">{{ $totalMensagensVisiveis }}</p>
-                        <p class="text-xs text-text-muted">Mensagens públicas</p>
+                        <p class="text-xs text-text-muted">{{ $logado ? 'Mensagens disponíveis a você' : 'Mensagens públicas' }}</p>
                     </div>
                 </div>
 

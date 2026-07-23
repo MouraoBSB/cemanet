@@ -66,9 +66,8 @@
                             <img src="{{ $autor->foto_url }}" alt="{{ $autor->nome }}" width="186" height="248"
                                  class="block aspect-[3/4] w-full rounded-[15px] object-cover">
                         @else
-                            <span class="cema-grad-{{ $autor->id % 8 }} grid aspect-[3/4] w-full place-items-center rounded-[15px]" aria-hidden="true">
-                                <span class="font-display text-5xl font-semibold text-white/90">{{ $autor->iniciais }}</span>
-                            </span>
+                            <img src="{{ asset('images/autor-fallback.svg') }}" alt="{{ $autor->nome }}" width="186" height="248"
+                                 class="block aspect-[3/4] w-full rounded-[15px] object-cover">
                         @endif
                     </div>
 

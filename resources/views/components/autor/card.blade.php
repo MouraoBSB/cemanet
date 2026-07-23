@@ -16,12 +16,11 @@
 @endphp
 <a {{ $attributes->except(['autor']) }} href="{{ route('autores.show', $autor->slug) }}"
    class="cema-msg-card group flex flex-col overflow-hidden rounded-2xl border border-border-muted bg-white shadow-card">
-    <span class="cema-autor-avatar cema-grad-{{ $autor->id % 8 }} relative block aspect-[3/4] w-full overflow-hidden" aria-hidden="true">
+    <span class="cema-autor-avatar relative block aspect-[3/4] w-full overflow-hidden" aria-hidden="true">
         @if ($autor->foto_url)
             <img src="{{ $autor->foto_url }}" alt="" loading="lazy" class="size-full object-cover transition duration-300 group-hover:scale-[1.03]">
         @else
-            <span class="flex size-full items-center justify-center font-display text-[56px] font-bold tracking-wide text-white/92">{{ $autor->iniciais }}</span>
-            <span class="absolute inset-x-0 bottom-0 h-14" style="background:linear-gradient(transparent, rgba(11,16,48,0.45))"></span>
+            <img src="{{ asset('images/autor-fallback.svg') }}" alt="" loading="lazy" class="size-full object-cover">
         @endif
     </span>
     <span class="flex flex-1 flex-col gap-2 px-[18px] pb-[18px] pt-4">

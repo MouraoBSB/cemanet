@@ -410,9 +410,11 @@ Em `tests/Feature/Front/MensagemShowTest.php`:
 
 - [ ] **Step 2: Provar o vermelho — e desfazer a prova**
 
-⚠️ **Este teste passa por vacuidade se rodado como está.** A faixa só renderiza quando `contexto` tem valor, e desde a Task 1 o campo está **fora do `$fillable`** — `factory()->create(['contexto' => …])` descarta a chave em silêncio. Sem a prova do vermelho, não se sabe se o `assertDontSee` procura a string certa.
+⚠️ **Este teste passa por vacuidade se rodado como está:** a fixture não preenche `contexto`, e a faixa só renderiza quando o campo tem valor. Sem a prova do vermelho, não se sabe se o `assertDontSee` procura a string certa.
 
-Acrescentar **temporariamente** a gravação por fora do model, logo depois do `create` (a coluna ainda existe no banco — o drop é a Task 4):
+Acrescentar **temporariamente** a gravação, logo depois do `create` (a coluna ainda existe no banco — o drop é a Task 4). Vai por `DB::table` de propósito: deixa explícito que se está gravando uma coluna que o model **não conhece mais** desde a Task 1.
+
+*(Nota de precisão: `factory()->create(['contexto' => …])` também gravaria — `Factory::make()` roda dentro de `Model::unguarded()`, `Factory.php:399,521`, então a factory ignora o `$fillable`. O `DB::table` é escolhido por ser explícito, não por necessidade.)*
 
 ```php
         // TEMPORÁRIO — só para provar o vermelho. Remover no Step 3.

@@ -125,4 +125,38 @@ class AutorVisibilidadeTest extends TestCase
             ->assertSee('Mensagens disponíveis a você')   // tile
             ->assertSee('2 disponíveis a você');          // contagem da grade
     }
+
+    /** A1: o estado vazio da grade é condicional — a superfície mais propensa a regressão (não-vacuoso). */
+    public function test_a1_estado_vazio_e_condicional(): void
+    {
+        AutorEspiritual::factory()->create(['slug' => 'vazio-rotulo', 'ativo' => true]);   // ativo, sem mensagem visível
+
+        $this->get(route('autores.show', 'vazio-rotulo'))->assertOk()
+            ->assertSee('Ainda não há mensagens públicas deste autor.')
+            ->assertDontSee('que você possa ver');
+
+        $trab = $this->comPapel('trabalhador');
+        $this->actingAs($trab)->get(route('autores.show', 'vazio-rotulo'))->assertOk()
+            ->assertSee('Ainda não há mensagens deste autor que você possa ver.')
+            ->assertDontSee('Ainda não há mensagens públicas deste autor.');
+    }
+
+    /** A1: a contagem no singular (1 mensagem) — anônimo "pública", logado "disponível a você". */
+    public function test_a1_contagem_singular(): void
+    {
+        $autor = AutorEspiritual::factory()->create(['slug' => 'singular', 'ativo' => true]);
+        Mensagem::factory()->publica()->create()->autores()->attach($autor->id);
+
+        // "pública" é prefixo de "públicas": o par assertSee/assertDontSee é o que torna o
+        // teste não-vacuoso (pega o bug de sempre pluralizar); verificado que não há outra
+        // ocorrência de "1 públicas" na página para não colidir por substring.
+        $this->get(route('autores.show', 'singular'))->assertOk()
+            ->assertSee('1 pública')
+            ->assertDontSee('1 públicas');
+
+        $trab = $this->comPapel('trabalhador');
+        $this->actingAs($trab)->get(route('autores.show', 'singular'))->assertOk()
+            ->assertSee('1 disponível a você')
+            ->assertDontSee('1 disponíveis a você');
+    }
 }

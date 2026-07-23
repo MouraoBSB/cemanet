@@ -116,6 +116,22 @@ class MensagemResourceTest extends TestCase
             ->assertFormFieldDoesNotExist('contexto');   // F4c-D: fundido em `resumo`
     }
 
+    /** I12 (F4c-D): slug repetido responde em pt-BR, com frase acionável. */
+    public function test_slug_repetido_reprova_em_portugues(): void
+    {
+        Mensagem::factory()->create(['slug' => 'slug-ja-usado']);
+
+        Livewire::test(CreateMensagem::class)
+            ->fillForm([
+                'titulo' => 'Outra mensagem',
+                'slug' => 'slug-ja-usado',
+                'formato' => 'psicografia',
+                'status' => Mensagem::STATUS_PENDENTE,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['slug' => 'Este slug já está em uso. Ajuste-o antes de salvar.']);
+    }
+
     public function test_cria_mensagem_com_corpo_sanitizado(): void
     {
         Livewire::test(CreateMensagem::class)

@@ -58,7 +58,7 @@
                     <h2 class="font-display text-lg font-semibold text-primary">Os Autores Espirituais</h2>
                     <div class="mb-3.5 mt-2.5 h-[3px] w-11 rounded-full bg-gold"></div>
                     <p class="text-sm leading-relaxed text-text-secondary">Cada mensagem do acervo mediúnico do CEMA é atribuída ao espírito que a assinou — o autor espiritual. São benfeitores que, pela psicografia, pela psicofonia ou pela pictografia, nos alcançam com palavras de consolo, estudo e esperança.</p>
-                    <p class="mt-2.5 text-sm leading-relaxed text-text-secondary">O acervo é mantido pelo DEPAE com respeito e critério: registramos a data de recebimento, o formato e o contexto de cada comunicação, para que sirvam ao estudo sereno da doutrina.</p>
+                    <p class="mt-2.5 text-sm leading-relaxed text-text-secondary">O acervo é mantido pelo DEPAE com respeito e critério: registramos a data de recebimento e o formato de cada comunicação, para que sirvam ao estudo sereno da doutrina.</p>
                 </div>
 
                 {{-- Mini-stats --}}

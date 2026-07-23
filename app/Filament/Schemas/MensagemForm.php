@@ -62,6 +62,9 @@ class MensagemForm
                         ->required()
                         ->maxLength(255)
                         ->unique(ignoreRecord: true)
+                        // Precede a frase genérica do lang/pt_BR/validation.php, de propósito:
+                        // 39 das 47 pendentes têm slug de máquina e precisam de revisão.
+                        ->validationMessages(['unique' => 'Este slug já está em uso. Ajuste-o antes de salvar.'])
                         ->columnSpan(2),
 
                     Textarea::make('resumo')

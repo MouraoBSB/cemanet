@@ -11,8 +11,8 @@ use Illuminate\Support\Collection;
 
 /**
  * Resumo do perfil de um autor espiritual, calculado em PHP (portável SQLite/MySQL)
- * a partir da coleção de mensagens PÚBLICAS atribuídas ao autor: total, última
- * mensagem, distribuição por formato e formato predominante. Sem query interna
+ * a partir da coleção de mensagens visíveis ao usuário atribuídas ao autor: total,
+ * última mensagem, distribuição por formato e formato predominante. Sem query interna
  * (recebe a coleção já materializada pelo controller) — 100% testável.
  */
 class ResumoAutor
@@ -75,7 +75,7 @@ class ResumoAutor
     }
 
     /**
-     * Formatos distintos das públicas, para os selos do hero (já ordenados por
+     * Formatos distintos das visíveis, para os selos do hero (já ordenados por
      * frequência). Reindexado para iteração simples na view.
      *
      * @return Collection<int, array{formato: FormatoMensagem, valor: string, rotulo: string, count: int, cor: string}>

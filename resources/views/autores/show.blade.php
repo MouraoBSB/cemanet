@@ -118,6 +118,16 @@
                         @endforeach
                     </div>
 
+                    {{-- Sobre {nome}: bio em prosa. Só renderiza quando há bio (D3). --}}
+                    @if (filled($autor->bio))
+                        <div class="mt-8 rounded-[18px] border border-border-muted bg-white p-7 shadow-card">
+                            <h2 class="font-display text-xl font-semibold text-primary">Sobre {{ $autor->nome }}</h2>
+                            <div class="mb-4 mt-2.5 h-[3.5px] w-[52px] rounded-sm bg-gold"></div>
+                            {{-- bio é HTML saneado por clean('conteudo') no model — {!! !!} é seguro (mesmo caso do corpo da mensagem). --}}
+                            <div class="cema-msg-prose">{!! $autor->bio !!}</div>
+                        </div>
+                    @endif
+
                     {{-- Grade das mensagens públicas do autor --}}
                     <div id="mensagens" class="mt-10 scroll-mt-24">
                         <div class="mb-[18px] flex flex-wrap items-baseline justify-between gap-3">

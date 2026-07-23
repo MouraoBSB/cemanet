@@ -29,10 +29,10 @@ class MensagemTest extends TestCase
 
     public function test_colunas_esperadas_e_podadas(): void
     {
-        foreach (['titulo', 'slug', 'corpo', 'contexto', 'resumo', 'formato', 'data_recebimento', 'casa', 'link_arquivo', 'liberar_download', 'nivel', 'status', 'wp_id'] as $coluna) {
+        foreach (['titulo', 'slug', 'corpo', 'resumo', 'formato', 'data_recebimento', 'casa', 'link_arquivo', 'liberar_download', 'nivel', 'status', 'wp_id'] as $coluna) {
             $this->assertTrue(Schema::hasColumn('mensagens', $coluna), "coluna esperada ausente: {$coluna}");
         }
-        foreach (['origem_da_mensagem', 'grupo_mediunico', 'casa_espirita'] as $coluna) {
+        foreach (['origem_da_mensagem', 'grupo_mediunico', 'casa_espirita', 'contexto'] as $coluna) {
             $this->assertFalse(Schema::hasColumn('mensagens', $coluna), "coluna podada presente: {$coluna}");
         }
     }
@@ -40,7 +40,7 @@ class MensagemTest extends TestCase
     public function test_fillable_exato(): void
     {
         $this->assertSame(
-            ['titulo', 'slug', 'corpo', 'contexto', 'resumo', 'formato', 'data_recebimento', 'casa', 'link_arquivo', 'liberar_download', 'nivel', 'status', 'wp_id'],
+            ['titulo', 'slug', 'corpo', 'resumo', 'formato', 'data_recebimento', 'casa', 'link_arquivo', 'liberar_download', 'nivel', 'status', 'wp_id'],
             (new Mensagem)->getFillable(),
         );
     }
@@ -66,10 +66,10 @@ class MensagemTest extends TestCase
         $this->assertStringContainsString('Paz', (string) $m->corpo);
     }
 
-    public function test_contexto_e_texto_puro_persistido(): void
+    public function test_resumo_e_texto_puro_persistido(): void
     {
-        $m = Mensagem::factory()->create(['contexto' => 'Recebida na reunião pública de quarta.']);
-        $this->assertSame('Recebida na reunião pública de quarta.', $m->fresh()->contexto);
+        $m = Mensagem::factory()->create(['resumo' => 'Recebida na reunião pública de quarta.']);
+        $this->assertSame('Recebida na reunião pública de quarta.', $m->fresh()->resumo);
     }
 
     public function test_data_recebimento_round_trip_carbon(): void

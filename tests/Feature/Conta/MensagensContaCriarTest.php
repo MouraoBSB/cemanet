@@ -253,15 +253,38 @@ class MensagensContaCriarTest extends TestCase
             ->assertFormFieldDoesNotExist('link_arquivo')
             ->assertFormFieldDoesNotExist('liberar_download')
             ->assertFormFieldDoesNotExist('relacionadas')
-            ->assertFormFieldDoesNotExist('resumo')   // I11: texto editorial da curadoria; o médium tem o `contexto`
+            ->assertFormFieldDoesNotExist('contexto')   // F4c-D: fundido em `resumo`
             ->assertFormFieldExists('titulo')
             ->assertFormFieldExists('formato')
             ->assertFormFieldExists('data_recebimento')
-            ->assertFormFieldExists('contexto')
+            ->assertFormFieldExists('resumo')           // F4c-D (D2): revoga o I11 da F4c-AC
             ->assertFormFieldExists('corpo')
             ->assertFormFieldExists('autores')
             ->assertFormFieldExists('imagens')
             ->assertFormFieldExists('direcionar')
             ->assertFormFieldExists('destinatarios');
+    }
+
+    /** I6 (F4c-D): o resumo digitado pelo médium chega ao banco — o schemaMedium não tem allowlist. */
+    public function test_i6_resumo_do_medium_persiste(): void
+    {
+        $medium = $this->medium();
+
+        Livewire::actingAs($medium)->test(MensagensConta::class)
+            ->call('novo')
+            ->fillForm([
+                'titulo' => 'Mensagem com resumo',
+                'formato' => 'psicografia',
+                'data_recebimento' => '2027-02-10',
+                'corpo' => '<p>Corpo da mensagem.</p>',
+                'resumo' => 'Abertura editorial escrita pelo médium.',
+            ])
+            ->call('salvar')
+            ->assertHasNoFormErrors();
+
+        $this->assertSame(
+            'Abertura editorial escrita pelo médium.',
+            Mensagem::where('titulo', 'Mensagem com resumo')->firstOrFail()->resumo,
+        );
     }
 }

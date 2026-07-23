@@ -62,16 +62,13 @@ class MensagemForm
                         ->required()
                         ->maxLength(255)
                         ->unique(ignoreRecord: true)
-                        ->columnSpan(2),
-
-                    Textarea::make('contexto')
-                        ->label('Contexto (faixa editorial — manual)')
-                        ->helperText('Texto curto de contexto exibido acima da mensagem. Opcional.')
-                        ->rows(3)
+                        // Precede a frase genérica do lang/pt_BR/validation.php, de propósito:
+                        // 39 das 47 pendentes têm slug de máquina e precisam de revisão.
+                        ->validationMessages(['unique' => 'Este slug já está em uso. Ajuste-o antes de salvar.'])
                         ->columnSpan(2),
 
                     Textarea::make('resumo')
-                        ->label('Resumo (texto editorial)')
+                        ->label('Resumo')
                         ->helperText('Aparece no card, na busca do Google e como abertura da página. Importado do site antigo quando havia. Opcional.')
                         ->rows(4)
                         ->maxLength(1500)
@@ -236,10 +233,11 @@ class MensagemForm
                         ->maxLength(255)
                         ->columnSpan(2),
 
-                    Textarea::make('contexto')
-                        ->label('Contexto (faixa editorial — manual)')
-                        ->helperText('Texto curto de contexto exibido acima da mensagem. Opcional.')
-                        ->rows(3)
+                    Textarea::make('resumo')
+                        ->label('Resumo')
+                        ->helperText('Texto curto que abre a página da mensagem e aparece no card. Opcional.')
+                        ->rows(4)
+                        ->maxLength(1500)
                         ->columnSpan(2),
 
                     RichEditor::make('corpo')
@@ -312,14 +310,8 @@ class MensagemForm
                         ->maxLength(255)
                         ->columnSpan(2),
 
-                    Textarea::make('contexto')
-                        ->label('Contexto (faixa editorial — manual)')
-                        ->helperText('Texto curto de contexto exibido acima da mensagem. Opcional.')
-                        ->rows(3)
-                        ->columnSpan(2),
-
                     Textarea::make('resumo')
-                        ->label('Resumo (texto editorial)')
+                        ->label('Resumo')
                         ->helperText('Aparece no card, na busca do Google e como abertura da página. Importado do site antigo quando havia. Opcional.')
                         ->rows(4)
                         ->maxLength(1500)

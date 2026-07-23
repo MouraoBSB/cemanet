@@ -223,14 +223,15 @@ class CuradoriaContaTest extends TestCase
             );
     }
 
-    /** I11: o resumo é texto de quem CURA — existe no schemaCuradoria (e não no form do médium). */
-    public function test_i11_form_da_curadoria_tem_o_campo_resumo(): void
+    /** I11 (F4c-D): a curadoria edita o `resumo`; o `contexto` foi fundido nele e não voltou. */
+    public function test_i11_form_da_curadoria_tem_resumo_e_nao_tem_contexto(): void
     {
         $pendente = Mensagem::factory()->pendente()->create();
 
         Livewire::actingAs($this->diretorDepae())->test(CuradoriaConta::class)
             ->call('editar', $pendente->id)
-            ->assertFormFieldExists('resumo');
+            ->assertFormFieldExists('resumo')
+            ->assertFormFieldDoesNotExist('contexto');
     }
 
     /**

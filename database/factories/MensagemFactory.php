@@ -19,7 +19,6 @@ class MensagemFactory extends Factory
             'titulo' => $titulo,
             'slug' => Str::slug($titulo).'-'.fake()->unique()->numberBetween(1, 99999),
             'corpo' => '<p>'.fake()->paragraph().'</p>',
-            'contexto' => null,
             'formato' => fake()->randomElement(['psicografia', 'psicofonia', 'pictografia']),
             'data_recebimento' => fake()->date('Y-m-d'),
             'casa' => 'CEMA',

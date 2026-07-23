@@ -4,7 +4,7 @@
     $textoCopia = trim($mensagem->titulo."\n\n".strip_tags((string) $mensagem->corpo));
 @endphp
 <x-layout.app :title="$mensagem->titulo"
-              :description="\Illuminate\Support\Str::limit(strip_tags($mensagem->resumo ?: $mensagem->contexto ?: $mensagem->corpo), 155)">
+              :description="\Illuminate\Support\Str::limit(strip_tags($mensagem->resumo ?: $mensagem->corpo), 155)">
     <x-slot:head>
         <link rel="canonical" href="{{ $url }}">
         @if ($mensagem->visibilidade() === \App\Enums\VisibilidadeMensagem::Publico)
@@ -82,16 +82,6 @@
             </div>
         </section>
 
-        {{-- Faixa de contexto (I4: sempre {{ }} — texto puro escapado). --}}
-        @if (filled($mensagem->contexto))
-            <section class="border-b border-border-muted bg-[#FAF8F2]">
-                <div class="mx-auto flex max-w-[1100px] items-start gap-3.5 px-6 py-5">
-                    <span class="mt-2.5 h-[3px] w-[22px] shrink-0 rounded-full bg-gold" aria-hidden="true"></span>
-                    <p class="text-[14.5px] leading-relaxed text-text-secondary"><strong class="font-semibold text-primary">Contexto</strong> — {{ $mensagem->contexto }}</p>
-                </div>
-            </section>
-        @endif
-
         {{-- Nota "Direcionada a você": só ao destinatário (calculado no controller); SEM lista de destinatários (F2). --}}
         @if ($ehDestinatario ?? false)
             <section class="border-b border-[#ECE6D6] bg-[#FAF8F2]">
@@ -137,7 +127,7 @@
                         <div class="px-5 py-9 sm:px-10">
                             <div class="mx-auto max-w-[640px]">
                                 @if (filled($mensagem->resumo))
-                                    {{-- Lead editorial (D7): é texto da CURADORIA, não palavra do
+                                    {{-- Lead editorial (D7): é texto editorial, não palavra do
                                          espírito — por isso a barra dourada e a tipografia menor o
                                          separam da prosa. e() antes de nl2br: escapa e só então
                                          converte as quebras dos 12 resumos com parágrafo. --}}

@@ -51,12 +51,6 @@ class MensagemResourceTest extends TestCase
             ->assertFormFieldExists('corpo', fn (RichEditor $f) => true);
     }
 
-    public function test_form_tem_textarea_contexto(): void
-    {
-        Livewire::test(CreateMensagem::class)
-            ->assertFormFieldExists('contexto', fn (Textarea $f) => true);
-    }
-
     public function test_form_do_admin_tem_o_campo_resumo(): void
     {
         Livewire::test(CreateMensagem::class)
@@ -118,7 +112,24 @@ class MensagemResourceTest extends TestCase
         Livewire::test(CreateMensagem::class)
             ->assertFormFieldDoesNotExist('origem_da_mensagem')
             ->assertFormFieldDoesNotExist('grupo_mediunico')
-            ->assertFormFieldDoesNotExist('casa_espirita');
+            ->assertFormFieldDoesNotExist('casa_espirita')
+            ->assertFormFieldDoesNotExist('contexto');   // F4c-D: fundido em `resumo`
+    }
+
+    /** I12 (F4c-D): slug repetido responde em pt-BR, com frase acionável. */
+    public function test_slug_repetido_reprova_em_portugues(): void
+    {
+        Mensagem::factory()->create(['slug' => 'slug-ja-usado']);
+
+        Livewire::test(CreateMensagem::class)
+            ->fillForm([
+                'titulo' => 'Outra mensagem',
+                'slug' => 'slug-ja-usado',
+                'formato' => 'psicografia',
+                'status' => Mensagem::STATUS_PENDENTE,
+            ])
+            ->call('create')
+            ->assertHasFormErrors(['slug' => 'Este slug já está em uso. Ajuste-o antes de salvar.']);
     }
 
     public function test_cria_mensagem_com_corpo_sanitizado(): void

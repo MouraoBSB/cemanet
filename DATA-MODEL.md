@@ -460,7 +460,7 @@ Tabela padrão do pacote (migrations `2026_07_13_191455/56/57`): `log_name`, `de
   (trait no `Mensagem` — lançamento pelo médium e curadoria pelo diretor do DEPAE/presidente,
   Fatia F4b).
 - **`mensagem` redige o conteúdo restrito na escrita**: `tapActivity()` substitui os valores
-  de `corpo`, `contexto` e `resumo` (nos blocos `attributes` e `old` da entrada) pelo literal
+  de `corpo` e `resumo` (nos blocos `attributes` e `old` da entrada) pelo literal
   `'[texto não registrado]'`, preservando a **chave** (`array_key_exists`, nunca `isset` — o
   valor pode ser `null` e é a chave que importa manter). Decisão do dono: a retenção da
   trilha é indefinida, e sem a redação ela acumularia cópia integral de mensagens de níveis
@@ -533,8 +533,9 @@ antes de montar o registro em ambos os componentes):
 `$fillable`** (atribuição é sempre direta, `$model->campo = valor`) e estão em `$hidden` no
 model `Mensagem` — nunca saem em `toArray()`/`wire:snapshot`.
 
-- **`resumo`** (`text` nullable, após `contexto`) — texto editorial **da curadoria**, importado
-  do `post_excerpt` do legado por `cema:importar-resumos` (só preenche o que está vazio). Texto
+- **`resumo`** (`text` nullable) — texto editorial escrito pelo médium ou pela curadoria (a D2
+  da F4c-D revoga o I11 da F4c-AC), importado do `post_excerpt` do legado por
+  `cema:importar-resumos` (só preenche o que está vazio). Texto
   puro, sem HTML; aparece no card, na meta description e como lead do single. Está no
   `$fillable`, no `logOnly` e no glossário, e é **redigido** no `tapActivity()`.
 - **Mídia** — a coleção de `Mensagem` chama-se **`imagens`** (`Mensagem::COLECAO_IMAGENS`,

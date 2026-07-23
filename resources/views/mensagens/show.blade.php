@@ -127,7 +127,7 @@
                         <div class="px-5 py-9 sm:px-10">
                             <div class="mx-auto max-w-[640px]">
                                 @if (filled($mensagem->resumo))
-                                    {{-- Lead editorial (D7): é texto da CURADORIA, não palavra do
+                                    {{-- Lead editorial (D7): é texto editorial, não palavra do
                                          espírito — por isso a barra dourada e a tipografia menor o
                                          separam da prosa. e() antes de nl2br: escapa e só então
                                          converte as quebras dos 12 resumos com parágrafo. --}}

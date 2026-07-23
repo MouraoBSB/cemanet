@@ -206,7 +206,7 @@ class MensagemShowTest extends TestCase
 
     /**
      * I8: a asserção é sobre a TAG. O resumo também vira lead no corpo da página
-     * (show.blade.php:139-147) — `assertSee`/`assertDontSee` soltos não distinguiriam
+     * (show.blade.php) — `assertSee`/`assertDontSee` soltos não distinguiriam
      * a meta description de nada.
      */
     public function test_meta_description_usa_o_resumo_quando_existe(): void

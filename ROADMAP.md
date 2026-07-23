@@ -151,7 +151,7 @@ Ordem sugerida (cada um como nova fatia vertical):
       `/minha-conta/curadoria` — fila de pendentes, histórico do item e o martelo **Publicar**,
       que arbitra o nível de acesso. Eixo de autoria por **pertencimento a setor/cargo**
       (`MensagemPolicy`), não pela matriz de capacidades (`mensagem.*` inertes); trilha própria
-      em `activity_log` (`log_name='mensagem'`, corpo/contexto redigidos na escrita) e autoria
+      em `activity_log` (`log_name='mensagem'`, corpo/resumo redigidos na escrita) e autoria
       privilegiada (`medium_id`/`publicado_por_id`/`publicado_em`, forçados no servidor).
       *(Fatias 0→F4a: PR #35 merge `c988f89`, #36 merge `ef8841b`, #37 merge `161b502`,
       #38 merge `b7f9402`, #39 merge `0fa26c4`, #40 merge `c517b70`, #41 merge `93999e8`,

@@ -76,4 +76,13 @@ class ValidationPtBrTest extends TestCase
         $this->assertSame('pt_BR', app()->getLocale());
         $this->assertSame('O campo nome é obrigatório.', __('validation.required', ['attribute' => 'nome']));
     }
+
+    /** D9: meio-traduzido é pior que consistentemente em inglês — o /entrar mistura os dois arquivos. */
+    public function test_auth_e_passwords_estao_traduzidos(): void
+    {
+        $this->assertSame('Estas credenciais não conferem com nossos registros.', __('auth.failed'));
+        $this->assertSame('A senha informada está incorreta.', __('auth.password'));
+        $this->assertSame('Enviamos o link de redefinição de senha para o seu e-mail.', __('passwords.sent'));
+        $this->assertSame('Não encontramos nenhum usuário com esse endereço de e-mail.', __('passwords.user'));
+    }
 }

@@ -400,16 +400,22 @@ oculto, para não vazar qual conteúdo específico o usuário não alcança. Apr
 | [ResumoAutor.php:12-16,78](app/Support/AutoresEspirituais/ResumoAutor.php#L12-L16) docblock | "mensagens **PÚBLICAS**" | "mensagens **visíveis ao usuário**" |
 | [Controller:17-18,45-46](app/Http/Controllers/AutorEspiritualController.php#L17-L18) comentários (a **L18** diz "já filtrado por **`publica()`**"; L45-46 "Só as PÚBLICAS") | | reescrever viewer-aware — a menção a `publica()` na **L18 tem de sair**, senão o grep §9.3 reprova (R2) |
 
-**Rótulo visível (condicional em `$logado`):**
+**Rótulo visível (condicional em `$logado`)** — o logado usa **"disponíveis a você"**, alinhado ao
+**precedente do módulo**: o índice de Mensagens já diz "mensagens disponíveis a você" para o logado
+([MensagemController](app/Http/Controllers/MensagemController.php) + `mensagens.index`; travado em
+[MensagemIndexContadorTest:28](tests/Feature/Front/MensagemIndexContadorTest.php#L28)). **Refina o
+A3** (que dizia "Mensagens") — decidido no arranque do plano (2026-07-23) para a superfície de
+Autores não introduzir um 3º vocabulário:
 
 | Superfície | Anônimo | Logado |
 |---|---|---|
-| [index:72](resources/views/autores/index.blade.php#L72) mini-stat | "Mensagens públicas" | "Mensagens" |
-| [show:17](resources/views/autores/show.blade.php#L17) tile | "Mensagens públicas" | "Mensagens" |
-| [show:126](resources/views/autores/show.blade.php#L126) contagem da grade | "N pública/públicas" | "N mensagem/mensagens" |
-| [show:165](resources/views/autores/show.blade.php#L165) estado vazio | "Ainda não há mensagens públicas deste autor." | "Ainda não há mensagens deste autor que você possa ver." |
+| [index:72](resources/views/autores/index.blade.php#L72) mini-stat | "Mensagens públicas" | "Mensagens disponíveis a você" |
+| [show:17](resources/views/autores/show.blade.php#L17) tile | "Mensagens públicas" | "Mensagens disponíveis a você" |
+| [show:126](resources/views/autores/show.blade.php#L126) contagem da grade | "N pública/públicas" | "N disponíveis a você" |
+| [show:165](resources/views/autores/show.blade.php#L165) estado vazio | "Ainda não há mensagens públicas deste autor." | "Ainda não há mensagens disponíveis a você deste autor." |
 
-O card ([:34](resources/views/components/autor/card.blade.php#L34)) já é neutro — **não** muda.
+O card ([:34](resources/views/components/autor/card.blade.php#L34)) já é **neutro** ("N mensagens",
+nos dois casos) — não afirma "públicas", logo **não** muda.
 
 ### 5.4 Bloco "Sobre {nome}" (B2)
 

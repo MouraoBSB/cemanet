@@ -4,7 +4,7 @@
     $textoCopia = trim($mensagem->titulo."\n\n".strip_tags((string) $mensagem->corpo));
 @endphp
 <x-layout.app :title="$mensagem->titulo"
-              :description="\Illuminate\Support\Str::limit(strip_tags($mensagem->resumo ?: $mensagem->contexto ?: $mensagem->corpo), 155)">
+              :description="\Illuminate\Support\Str::limit(strip_tags($mensagem->resumo ?: $mensagem->corpo), 155)">
     <x-slot:head>
         <link rel="canonical" href="{{ $url }}">
         @if ($mensagem->visibilidade() === \App\Enums\VisibilidadeMensagem::Publico)
@@ -81,16 +81,6 @@
                 </div>
             </div>
         </section>
-
-        {{-- Faixa de contexto (I4: sempre {{ }} — texto puro escapado). --}}
-        @if (filled($mensagem->contexto))
-            <section class="border-b border-border-muted bg-[#FAF8F2]">
-                <div class="mx-auto flex max-w-[1100px] items-start gap-3.5 px-6 py-5">
-                    <span class="mt-2.5 h-[3px] w-[22px] shrink-0 rounded-full bg-gold" aria-hidden="true"></span>
-                    <p class="text-[14.5px] leading-relaxed text-text-secondary"><strong class="font-semibold text-primary">Contexto</strong> — {{ $mensagem->contexto }}</p>
-                </div>
-            </section>
-        @endif
 
         {{-- Nota "Direcionada a você": só ao destinatário (calculado no controller); SEM lista de destinatários (F2). --}}
         @if ($ehDestinatario ?? false)

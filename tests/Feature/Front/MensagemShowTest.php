@@ -34,15 +34,6 @@ class MensagemShowTest extends TestCase
         // A mensagem RESTRITA publicada deixou de dar 404: vira barreira-200 cega (ver MensagemBarreiraTest).
     }
 
-    public function test_contexto_e_escapado(): void
-    {
-        $m = Mensagem::factory()->publica()->create(['slug' => 'ctx', 'contexto' => 'Nota <script>alert(1)</script> final']);
-
-        $res = $this->get(route('mensagens.show', 'ctx'));
-        $res->assertSee('Nota &lt;script&gt;', false);   // escapado
-        $res->assertDontSee('<script>alert(1)</script>', false);
-    }
-
     public function test_sem_autor_mostra_sem_assinatura(): void
     {
         $m = Mensagem::factory()->publica()->create(['slug' => 'sa']);
@@ -214,36 +205,47 @@ class MensagemShowTest extends TestCase
     // -----------------------------------------------------------------------
 
     /**
-     * I9: a asserção é sobre a TAG. O `contexto` também é renderizado no corpo da página
-     * (show.blade.php:85-92) e o resumo vira lead — `assertSee`/`assertDontSee` soltos não
-     * distinguiriam a meta description de nada.
+     * I8: a asserção é sobre a TAG. O resumo também vira lead no corpo da página
+     * (show.blade.php:139-147) — `assertSee`/`assertDontSee` soltos não distinguiriam
+     * a meta description de nada.
      */
     public function test_meta_description_usa_o_resumo_quando_existe(): void
     {
         Mensagem::factory()->publica()->create([
             'slug' => 'com-resumo',
             'resumo' => 'Radian convida os trabalhadores a refletirem sobre a palavra.',
-            'contexto' => 'Contexto de reserva do single.',
             'corpo' => '<p>Corpo que nao deve aparecer.</p>',
         ]);
 
         $this->get(route('mensagens.show', 'com-resumo'))
             ->assertOk()
             ->assertSee('name="description" content="Radian convida os trabalhadores a refletirem sobre a palavra."', false)
-            ->assertDontSee('name="description" content="Contexto de reserva do single."', false);
+            ->assertDontSee('name="description" content="Corpo que nao deve aparecer."', false);
     }
 
-    /** GUARDA (não-regressão, já verde): a reserva `contexto` não pode sumir ao entrar o resumo. */
-    public function test_meta_description_cai_no_contexto_sem_resumo(): void
+    /** GUARDA: com a fusão, o corpo é o único fallback — a cadeia não pode ficar sem rede. */
+    public function test_meta_description_cai_no_corpo_sem_resumo(): void
     {
         Mensagem::factory()->publica()->create([
-            'slug' => 'sem-resumo', 'resumo' => null,
-            'contexto' => 'Contexto de reserva.', 'corpo' => '<p>Corpo.</p>',
+            'slug' => 'sem-resumo', 'resumo' => null, 'corpo' => '<p>Corpo.</p>',
         ]);
 
         $this->get(route('mensagens.show', 'sem-resumo'))
             ->assertOk()
-            ->assertSee('name="description" content="Contexto de reserva."', false);
+            ->assertSee('name="description" content="Corpo."', false);
+    }
+
+    /** I7 (F4c-D): a faixa "Contexto —" foi removida; o lead do resumo é o único texto editorial. */
+    public function test_faixa_de_contexto_nao_existe_mais(): void
+    {
+        Mensagem::factory()->publica()->create([
+            'slug' => 'sem-faixa', 'resumo' => 'Abertura editorial.',
+        ]);
+
+        $res = $this->get(route('mensagens.show', 'sem-faixa'));
+        $res->assertOk()
+            ->assertSee('cema-msg-resumo', false)          // o lead continua
+            ->assertDontSee('>Contexto</strong>', false);  // a faixa não
     }
 
     /** D7: o lead é editorial e visualmente distinto da prosa mediúnica. */

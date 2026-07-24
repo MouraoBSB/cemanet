@@ -153,9 +153,29 @@ Ordem sugerida (cada um como nova fatia vertical):
       (`MensagemPolicy`), não pela matriz de capacidades (`mensagem.*` inertes); trilha própria
       em `activity_log` (`log_name='mensagem'`, corpo/resumo redigidos na escrita) e autoria
       privilegiada (`medium_id`/`publicado_por_id`/`publicado_em`, forçados no servidor).
+      Fecharam o ciclo a **Fatia F4c-AC** — o `resumo` do legado (`post_excerpt`, importado por
+      `cema:importar-resumos`), imagens nos 3 formatos (coleção `pictografia` → `imagens`) e a
+      Action **Publicar** no `/admin`, que passou a exigir a mesma regra de negócio do site — e a
+      **Fatia F4c-D**, que **fundiu `contexto` em `resumo`** (as duas colunas eram o mesmo texto
+      editorial, renderizado em dois lugares da mesma página): sobrou o `resumo`, agora também
+      escrito pelo médium, com render único no lead; a coluna `contexto` foi dropada por par de
+      migrations (funde → dropa).
       *(Fatias 0→F4a: PR #35 merge `c988f89`, #36 merge `ef8841b`, #37 merge `161b502`,
       #38 merge `b7f9402`, #39 merge `0fa26c4`, #40 merge `c517b70`, #41 merge `93999e8`,
-      #42 merge `8142883`; F4b: PR #43 merge `45a9eb7`.)*
+      #42 merge `8142883`; F4b: PR #43 merge `45a9eb7`; F4c-AC: PR #44 merge `4c3e5d5`;
+      F4c-D: PR #45 merge `8b2c03f`.)*
+- [x] **Mensagens de validação em pt-BR** — transversal, entregue de carona na Fatia F4c-D.
+      `lang/pt_BR/validation.php` (as 107 regras do canônico da versão instalada, com as
+      sub-chaves de tamanho e de `password`), `auth.php` e `passwords.php`. A causa raiz **não
+      era o `APP_LOCALE`** (já é `pt_BR` no `.env`): faltavam os arquivos, então toda chave caía
+      no `fallback_locale = en`. Vale para o `/admin`, para os formulários do site, para o
+      Fortify e dentro da suíte. A seção `attributes` é **inerte dentro do Filament** (lá o
+      `:attribute` vem do `->label()`) e cobre só o que é validado fora dele — Fortify e o
+      `EditarPerfil` de `/minha-conta/perfil`. Completude travada por
+      `Tests\Feature\Idioma\ValidationPtBrTest`, que compara as chaves com o canônico do
+      `vendor/` de forma recursiva (menos `custom`/`attributes`) e **fica vermelho sozinho**
+      quando um `composer update` trouxer regra nova.
+      *(F4c-D: PR #45 merge `8b2c03f`.)*
 - [ ] **Blog (Sementeira de Luz)** — módulo **Posts entregue** (admin + front + posts
       importados + editor/mídia abaixo). Pendentes: **Comentários** e **Páginas institucionais**.
   - [x] **Editor + mídia** (RichEditor TipTap): justificado padrão + alinhamento/tamanho de

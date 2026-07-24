@@ -11,6 +11,7 @@ use App\Models\Mensagem;
 use App\Models\User;
 use Filament\Forms\Components\Select;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -85,27 +86,31 @@ class MensagemDestinatariosFormTest extends TestCase
         }
     }
 
-    /** I31: o Select não pode oferecer quem a regra vai descartar. */
-    public function test_select_de_destinatarios_nao_oferece_usuario_inativo(): void
+    /** I7: a busca é server-side sobre `name` (não sobre o HTML) e só oferece ATIVOS. */
+    public function test_busca_de_destinatarios_e_por_nome_e_so_ativos(): void
     {
         $ativo = User::factory()->create(['name' => 'Ana Ativa']);
-        $inativo = User::factory()->create(['name' => 'Ivo Inativo', 'ativo' => false]);
+        User::factory()->create(['name' => 'Ivo Inativo', 'ativo' => false]);
 
         Livewire::test(CreateMensagem::class)
             ->fillForm(['nivel' => 'direcionada'])
-            ->assertFormFieldExists('destinatarios', function (Select $f) use ($ativo, $inativo): bool {
-                $opcoes = $f->getOptions();
+            ->assertFormFieldExists('destinatarios', function (Select $f) use ($ativo): bool {
+                $porNome = $f->getSearchResults('Ana');           // acha o ativo
+                $inativo = $f->getSearchResults('Ivo');           // NÃO acha o inativo (where ativo=true)
+                $porHtml = $f->getSearchResults('span');          // termo que só existe no markup do avatar
 
-                return array_key_exists($ativo->id, $opcoes) && ! array_key_exists($inativo->id, $opcoes);
+                return array_key_exists($ativo->id, $porNome)
+                    && $inativo === []
+                    && $porHtml === [];
             });
     }
 
     /**
-     * I31 (a outra metade): quem JÁ está selecionado continua na lista mesmo tendo sido
-     * desativado depois — senão o Select injeta Rule::in(options) sem o id hidratado pelo
-     * fill() e trava até um simples Salvar de título, sem a opção aparecer para ser removida.
+     * I8(a): quem JÁ está selecionado é hidratado mesmo tendo sido desativado depois —
+     * getOptionLabelsUsing (whereKey SEM filtro ativo) faz o papel do antigo orWhereIn; senão
+     * getInValidationRuleValues devolve [] e o Rule::in trava até um simples Salvar de título.
      */
-    public function test_select_mantem_o_destinatario_ja_selecionado_que_ficou_inativo(): void
+    public function test_selecionado_que_ficou_inativo_e_hidratado(): void
     {
         $u = User::factory()->create(['name' => 'Ivo Desativado Depois']);
         $m = Mensagem::factory()->comNivel(VisibilidadeMensagem::Direcionada)->create();
@@ -113,6 +118,44 @@ class MensagemDestinatariosFormTest extends TestCase
         $u->update(['ativo' => false]);
 
         Livewire::test(EditMensagem::class, ['record' => $m->getRouteKey()])
-            ->assertFormFieldExists('destinatarios', fn (Select $f): bool => array_key_exists($u->id, $f->getOptions()));
+            ->assertFormFieldExists('destinatarios', fn (Select $f): bool => array_key_exists($u->id, $f->getOptionLabels()));
+    }
+
+    /**
+     * I9: busca e hidratação eager-loadam perfil.media — a busca dispara EXATAMENTE 1 query na
+     * tabela `media` (o whereIn eager), não 1 por usuário (N+1). R1: conta só o que toca `media`.
+     */
+    public function test_busca_de_destinatarios_carrega_a_midia_em_uma_query(): void
+    {
+        for ($i = 1; $i <= 4; $i++) {
+            User::factory()->create(['name' => "Teste {$i}"])->perfil()->create([]); // perfil sem foto: exercita os 2 hops (perfil + media)
+        }
+
+        $queriesDeMidia = 0;
+        Livewire::test(CreateMensagem::class)
+            ->fillForm(['nivel' => 'direcionada'])
+            ->assertFormFieldExists('destinatarios', function (Select $f) use (&$queriesDeMidia): bool {
+                DB::connection()->flushQueryLog();
+                DB::connection()->enableQueryLog();
+                $f->getSearchResults('Teste');
+                $queriesDeMidia = collect(DB::connection()->getQueryLog())
+                    ->filter(fn (array $q): bool => str_contains($q['query'], '"media"'))
+                    ->count();
+                DB::connection()->disableQueryLog();
+
+                return true;
+            });
+
+        $this->assertSame(1, $queriesDeMidia, 'a busca deve eager-loadar perfil.media numa única query (sem N+1)');
+    }
+
+    /** I10: usuário SEM PerfilMembro passa pelas closures (?->) sem "read property on null". */
+    public function test_usuario_sem_perfil_nao_quebra(): void
+    {
+        $u = User::factory()->create(['name' => 'Sem Perfil']); // sem $u->perfil()->create()
+
+        Livewire::test(CreateMensagem::class)
+            ->fillForm(['nivel' => 'direcionada'])
+            ->assertFormFieldExists('destinatarios', fn (Select $f): bool => array_key_exists($u->id, $f->getSearchResults('Sem Perfil')));
     }
 }

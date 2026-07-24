@@ -147,23 +147,9 @@ class MensagemForm
                 ->description('Usuários a quem esta mensagem direcionada foi endereçada.')
                 ->visible(fn (Get $get): bool => $get('nivel') === VisibilidadeMensagem::Direcionada->value)
                 ->schema([
-                    Select::make('destinatarios')
-                        ->label('Destinatários')
+                    self::selectDestinatarios()
                         ->helperText('Obrigatório para mensagens de nível "Direcionada".')
-                        // As options SEMPRE incluem os já selecionados (orWhereIn), mesmo que
-                        // tenham deixado de estar `ativo` depois — senão o Select injeta
-                        // Rule::in(options) sem o id hidratado pelo fill() e trava até um
-                        // simples Salvar de título, sem a opção aparecer para ser removida.
-                        ->options(fn (Get $get) => User::query()
-                            ->where('ativo', true)
-                            ->orWhereIn('id', (array) $get('destinatarios'))
-                            ->orderBy('name')
-                            ->pluck('name', 'id'))
-                        ->multiple()
-                        ->searchable()
-                        ->required(fn (Get $get): bool => $get('nivel') === VisibilidadeMensagem::Direcionada->value)
-                        ->minItems(1)
-                        ->columnSpanFull(),
+                        ->required(fn (Get $get): bool => $get('nivel') === VisibilidadeMensagem::Direcionada->value),
                 ]),
 
             Section::make('Imagens')
@@ -194,18 +180,53 @@ class MensagemForm
     }
 
     /**
+     * Base do Select `destinatarios` compartilhada pelo inline do schemaAdmin e por blocoDestinatarios().
+     * Motor SERVER-SIDE (D2): a busca casa a coluna `name` (O3, imune ao filtro sobre HTML do allowHtml);
+     * getOptionLabelsUsing hidrata os já-selecionados INCLUSIVE inativos (whereKey SEM filtro `ativo`,
+     * SEM limit — papel do antigo orWhereIn; senão o Rule::in trava até um Salvar de título, A3).
+     * Foto do destinatário via perfil (User não é HasMedia — A1), eager `perfil.media` (O1). Avatar
+     * pelo helper (allowHtml não escapa — O2). Cada call site aplica ->helperText()/->required().
+     */
+    private static function selectDestinatarios(): Select
+    {
+        return Select::make('destinatarios')
+            ->label('Destinatários')
+            ->multiple()
+            ->searchable()
+            ->minItems(1)
+            ->columnSpanFull()
+            ->allowHtml()
+            ->getSearchResultsUsing(fn (string $search): array => User::query()
+                ->where('ativo', true)
+                ->where('name', 'like', "%{$search}%")
+                ->with('perfil.media')
+                ->orderBy('name')
+                ->limit(50)
+                ->get()
+                // LIKE cru: `%`/`_` do termo NÃO escapados; sem generate_search_term_expression (R8, aceito).
+                ->mapWithKeys(fn (User $u) => [$u->id => AvatarOpcao::html($u->perfil?->foto_thumb_url, $u->name, $u->iniciais)])
+                ->all())
+            // As options SEMPRE incluem os já selecionados, mesmo que tenham deixado de estar
+            // `ativo` depois — senão o Select injeta Rule::in(options) sem o id hidratado pelo
+            // fill() e trava até um simples Salvar de título, sem a opção aparecer para ser
+            // removida. Quem garante que um inativo nunca É GRAVADO no pivô é o filtro de
+            // integridade de sempre, em SincronizadorDestinatarios::aplicar() — aqui é só sobre
+            // a OPÇÃO existir na tela.
+            ->getOptionLabelsUsing(fn (array $values): array => User::query()
+                ->whereKey($values)
+                ->with('perfil.media')
+                ->orderBy('name')
+                ->get()
+                ->mapWithKeys(fn (User $u) => [$u->id => AvatarOpcao::html($u->perfil?->foto_thumb_url, $u->name, $u->iniciais)])
+                ->all());
+    }
+
+    /**
      * Bloco de destinatários compartilhado por schemaMedium/schemaCuradoria — PARAMETRIZADO pelo predicado
      * de visibilidade/obrigatoriedade, porque o form do médium não tem o campo `nivel` (quem arbitra o nível
      * é o diretor, na curadoria). NÃO é usado pelo schemaAdmin, que mantém a Section inline por
-     * causa do helperText próprio do painel — o filtro de `ativo` + orWhereIn é o MESMO nos dois
+     * causa do helperText próprio do painel — o motor server-side (selectDestinatarios) é o MESMO nos dois
      * desde a F4c (antes desta fatia o docblock afirmava que o admin filtrava, e ele não filtrava).
-     *
-     * Achado do review final (Important 2a): as options SEMPRE incluem os já selecionados (`orWhereIn`),
-     * mesmo que tenham deixado de estar `ativo` depois — senão o `Select` injeta `Rule::in(options)` sem o
-     * id hidratado pelo `fill()` (vindo do pivô), e um destinatário desativado DEPOIS de uma direcionada
-     * existir trava até um simples Salvar de título, sem saída (a opção nem aparece pra ser removida). Quem
-     * garante que um inativo nunca É GRAVADO no pivô é o filtro de integridade de sempre, em
-     * `SincronizadorDestinatarios::aplicar()` (I7) — aqui é só sobre a OPÇÃO existir na tela.
      *
      * @param  Closure(Get): bool  $ehDirecionada
      */
@@ -215,18 +236,7 @@ class MensagemForm
             ->description('Usuários a quem esta mensagem direcionada foi endereçada.')
             ->visible($ehDirecionada)
             ->schema([
-                Select::make('destinatarios')
-                    ->label('Destinatários')
-                    ->options(fn (Get $get) => User::query()
-                        ->where('ativo', true)
-                        ->orWhereIn('id', (array) $get('destinatarios'))
-                        ->orderBy('name')
-                        ->pluck('name', 'id'))
-                    ->multiple()
-                    ->searchable()
-                    ->required($ehDirecionada)
-                    ->minItems(1)
-                    ->columnSpanFull(),
+                self::selectDestinatarios()->required($ehDirecionada),
             ]);
     }
 

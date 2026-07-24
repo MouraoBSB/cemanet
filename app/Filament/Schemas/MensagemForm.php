@@ -163,7 +163,8 @@ class MensagemForm
     /**
      * Select `autores` compartilhado pelos 3 schemas. `->relationship()` é OBRIGATÓRIO (F2):
      * fica dehydrated(false) e grava só em saveRelationships(). O avatar da opção vem do helper via
-     * getOptionLabelFromRecordUsing (allowHtml não escapa — O2). O eager-load da mídia (3º arg) entra no Step 7.
+     * getOptionLabelFromRecordUsing (allowHtml não escapa — O2). O eager-load da mídia é feito pelo 3º arg de
+     * relationship() (`->with('media')`) — evita N+1 ao ler foto_thumb_url por autor (O1/A2).
      */
     private static function selectAutores(): Select
     {

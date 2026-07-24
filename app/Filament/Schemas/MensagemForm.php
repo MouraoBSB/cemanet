@@ -6,7 +6,9 @@ namespace App\Filament\Schemas;
 
 use App\Enums\FormatoMensagem;
 use App\Enums\VisibilidadeMensagem;
+use App\Filament\Support\AvatarOpcao;
 use App\Filament\Support\ComponentesImagem;
+use App\Models\AutorEspiritual;
 use App\Models\Mensagem;
 use App\Models\User;
 use Closure;
@@ -128,12 +130,7 @@ class MensagemForm
             Section::make('Autoria e relações')
                 ->columns(2)
                 ->schema([
-                    Select::make('autores')
-                        ->label('Autores espirituais')
-                        ->relationship('autores', 'nome')
-                        ->multiple()
-                        ->preload()
-                        ->searchable(),
+                    self::selectAutores(),
 
                     Select::make('relacionadas')
                         ->label('Mensagens relacionadas')
@@ -175,6 +172,25 @@ class MensagemForm
                         ->label('Imagens da mensagem'),
                 ]),
         ];
+    }
+
+    /**
+     * Select `autores` compartilhado pelos 3 schemas. `->relationship()` é OBRIGATÓRIO (F2):
+     * fica dehydrated(false) e grava só em saveRelationships(). O avatar da opção vem do helper via
+     * getOptionLabelFromRecordUsing (allowHtml não escapa — O2). O eager-load da mídia (3º arg) entra no Step 7.
+     */
+    private static function selectAutores(): Select
+    {
+        return Select::make('autores')
+            ->label('Autores espirituais')
+            ->relationship('autores', 'nome', fn ($query) => $query->with('media'))
+            ->multiple()
+            ->preload()
+            ->searchable()
+            ->allowHtml()
+            ->getOptionLabelFromRecordUsing(
+                fn (AutorEspiritual $record): string => AvatarOpcao::html($record->foto_thumb_url, $record->nome, $record->iniciais)
+            );
     }
 
     /**
@@ -265,14 +281,7 @@ class MensagemForm
 
             Section::make('Autoria')
                 ->schema([
-                    // ->relationship() é OBRIGATÓRIO aqui (não trocar por ->options()): fica dehydrated(false)
-                    // e só grava em saveRelationships(), o que dá sentido ao G1 (autores + imagens).
-                    Select::make('autores')
-                        ->label('Autores espirituais')
-                        ->relationship('autores', 'nome')
-                        ->multiple()
-                        ->preload()
-                        ->searchable(),
+                    self::selectAutores(),
                 ]),
 
             Section::make('Imagens')
@@ -357,14 +366,7 @@ class MensagemForm
 
             Section::make('Autoria')
                 ->schema([
-                    // ->relationship() é OBRIGATÓRIO aqui (não trocar por ->options()): fica dehydrated(false)
-                    // e só grava em saveRelationships(), o que dá sentido ao G1 (autores + imagens).
-                    Select::make('autores')
-                        ->label('Autores espirituais')
-                        ->relationship('autores', 'nome')
-                        ->multiple()
-                        ->preload()
-                        ->searchable(),
+                    self::selectAutores(),
                 ]),
 
             self::blocoDestinatarios(
